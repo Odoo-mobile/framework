@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="Dummy" >
+        <EditTextPreference
+            android:key="prefUsername"
+            android:summary="Provide your username"
+            android:title="Username" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

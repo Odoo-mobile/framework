@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_message_compose"
+        android:icon="@drawable/ic_action_mail_add"
+        android:showAsAction="always"
+        android:title="Compose Message">
+    </item>
+    <item
+        android:id="@+id/menu_message_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_action_search"
+        android:showAsAction="always"
+        android:title="Search">
+    </item>
+
+</menu>

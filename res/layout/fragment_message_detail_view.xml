@@ -1,0 +1,70 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:weightSum="5" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/txvMessageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:text="Message Title"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:typeface="sans" />
+
+        <ListView
+            android:id="@+id/lstMessageDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutMessageReply"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:background="#cccccc"
+        android:orientation="horizontal"
+        android:paddingTop="1dp"
+        android:visibility="gone"
+        android:weightSum="3" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:background="#ffffff" >
+
+            <EditText
+                android:id="@+id/edtReplyMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/imgBtnSendMessage"
+                android:paddingRight="5dp"
+                android:hint="Type your message"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/imgBtnSendMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/oe_listview_background_selector"
+                android:clickable="true"
+                android:src="@drawable/ic_action_send_now" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

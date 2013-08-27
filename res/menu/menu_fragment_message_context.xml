@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_message_mark_unread_selected"
+        android:icon="@drawable/ic_action_mark_unread"
+        android:showAsAction="always"
+        android:title="Mark As Unread">
+    </item>
+    <item
+        android:id="@+id/menu_message_mark_read_selected"
+        android:icon="@drawable/ic_action_mark_read"
+        android:showAsAction="always"
+        android:title="Mark As Read">
+    </item>
+    <item
+        android:id="@+id/menu_message_more_move_to_archive_selected"
+        android:title="Archive"/>
+    <item
+        android:id="@+id/menu_message_more_add_star_selected"
+        android:title="Mark as TODO"/>
+    <item
+        android:id="@+id/menu_message_more_remove_star_selected"
+        android:title="Unmark from TODO"/>
+
+</menu>

@@ -1,0 +1,19 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <include
+        android:id="@+id/messageSyncWaiter"
+        layout="@layout/message_listview_header"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:visibility="visible" />
+
+    <ListView
+        android:id="@+id/lstMessages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/messageSyncWaiter" >
+    </ListView>
+
+</RelativeLayout>

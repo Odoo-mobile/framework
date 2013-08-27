@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_account_next"
+        android:icon="@drawable/ic_action_done"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/account_continue_button">
+    </item>
+
+</menu>

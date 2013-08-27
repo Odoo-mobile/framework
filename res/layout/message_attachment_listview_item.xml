@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#f3f3f3"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:weightSum="3" >
+
+    <TextView
+        android:id="@+id/txvFileName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:padding="8dp"
+        android:text="Medium Text" />
+
+    <ImageView
+        android:id="@+id/imgBtnRemoveAttachment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/oe_listview_background_selector"
+        android:clickable="true"
+        android:src="@drawable/ic_action_remove" />
+
+</LinearLayout>

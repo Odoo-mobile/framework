@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">OpenERP</string>
+    <string name="title_activity_main">OpenERP</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <!-- Account Fragment Strings -->
+    <string name="logo_description">OpenERP</string>
+    <string name="account_title">Setup Your OpenERP Server</string>
+    <string name="account_description">Provide your OpenERP 7.0 Server URL and click on Continue button to test Connection and go next step.</string>
+    <string name="account_edit_server_url">Server URL</string>
+    <string name="account_edit_server_port">Port Number (Optional)</string>
+    <string name="account_continue_button">Continue</string>
+    <string name="account_login_button">Login</string>
+
+    <!-- Login Fragment Strings -->
+    <string name="login_title">Config Your OpenERP Login Details</string>
+    <string name="login_description">Select your working database and provide your username and password to access.</string>
+    <string name="login_select_database">Select Database</string>
+    <string name="login_edit_username">Username</string>
+    <string name="login_edit_password">Password</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+
+    
+</resources>
