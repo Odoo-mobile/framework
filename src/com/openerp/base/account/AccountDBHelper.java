@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.openerp.base.account;
 
 import android.content.Context;

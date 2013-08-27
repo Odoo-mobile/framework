@@ -1,3 +1,22 @@
+/*
+ * OpenERP, Open Source Management Solution
+ * Copyright (C) 2012-today OpenERP SA (<http://www.openerp.com>)
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * 
+ */
+
 package com.openerp.providers.message;
 
 import com.openerp.orm.SQLiteDatabaseHelper;
@@ -13,31 +32,63 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MessageProvider.
+ */
 public class MessageProvider extends ContentProvider {
+
+	/** The Constant CONSTANTS. */
 	private static final int CONSTANTS = 1;
+
+	/** The authority. */
 	public static String AUTHORITY = "com.openerp.providers.message";
+
+	/** The Constant CONSTANT_ID. */
 	private static final int CONSTANT_ID = 2;
+
+	/** The Constant MATCHER. */
 	private static final UriMatcher MATCHER;
+
+	/** The Constant TABLE. */
 	private static final String TABLE = "constants";
+
+	/** The db. */
 	SQLiteDatabaseHelper db = null;
 
+	/**
+	 * The Class Constants.
+	 */
 	public static final class Constants implements BaseColumns {
 
+		/** The Constant CONTENT_URI. */
 		public static final Uri CONTENT_URI = Uri
 				.parse("content://com.openerp.providers.message.MessageProvider/constants");
+
+		/** The Constant DEFAULT_SORT_ORDER. */
 		public static final String DEFAULT_SORT_ORDER = "title";
+
+		/** The Constant TITLE. */
 		public static final String TITLE = "title";
+
+		/** The Constant VALUE. */
 		public static final String VALUE = "value";
 	}
 
 	static {
 		MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-		MATCHER.addURI("com.openerp.providers.message.MessageProvider", "constants",
-				CONSTANTS);
-		MATCHER.addURI("com.openerp.providers.message.MessageProvider", "constants/#",
-				CONSTANT_ID);
+		MATCHER.addURI("com.openerp.providers.message.MessageProvider",
+				"constants", CONSTANTS);
+		MATCHER.addURI("com.openerp.providers.message.MessageProvider",
+				"constants/#", CONSTANT_ID);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#delete(android.net.Uri,
+	 * java.lang.String, java.lang.String[])
+	 */
 	@Override
 	public int delete(Uri uri, String where, String[] whereArgs) {
 		// TODO Auto-generated method stub
@@ -48,6 +99,11 @@ public class MessageProvider extends ContentProvider {
 		return (count);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#getType(android.net.Uri)
+	 */
 	@Override
 	public String getType(Uri uri) {
 		// TODO Auto-generated method stub
@@ -59,6 +115,12 @@ public class MessageProvider extends ContentProvider {
 		return ("vnd.commonsware.cursor.item/constant");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#insert(android.net.Uri,
+	 * android.content.ContentValues)
+	 */
 	@Override
 	public Uri insert(Uri uri, ContentValues initialValues) {
 		// TODO Auto-generated method stub
@@ -76,6 +138,11 @@ public class MessageProvider extends ContentProvider {
 		throw new SQLException("Failed to insert row into " + uri);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#onCreate()
+	 */
 	@Override
 	public boolean onCreate() {
 		// TODO Auto-generated method stub
@@ -83,6 +150,13 @@ public class MessageProvider extends ContentProvider {
 		return ((db == null) ? false : true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#query(android.net.Uri,
+	 * java.lang.String[], java.lang.String, java.lang.String[],
+	 * java.lang.String)
+	 */
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sort) {
@@ -107,6 +181,12 @@ public class MessageProvider extends ContentProvider {
 		return (c);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#update(android.net.Uri,
+	 * android.content.ContentValues, java.lang.String, java.lang.String[])
+	 */
 	@Override
 	public int update(Uri uri, ContentValues values, String where,
 			String[] whereArgs) {
@@ -119,6 +199,13 @@ public class MessageProvider extends ContentProvider {
 		return (count);
 	}
 
+	/**
+	 * Checks if is collection uri.
+	 * 
+	 * @param url
+	 *            the url
+	 * @return true, if is collection uri
+	 */
 	private boolean isCollectionUri(Uri url) {
 		return (MATCHER.match(url) == CONSTANTS);
 	}

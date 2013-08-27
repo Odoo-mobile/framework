@@ -35,134 +35,134 @@ import android.util.Log;
  */
 public class OEDate {
 
-    /** The time format. */
-    static SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+	/** The time format. */
+	static SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
 
-    /** The date format. */
-    static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
+	/** The date format. */
+	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
 
-    public static String getDate(String date, String toTimezone) {
-	Calendar cal = Calendar.getInstance();
-	cal.setTimeZone(TimeZone.getTimeZone("GMT-1"));
-	Date originalDate = convertToDate(date);
-	cal.setTime(originalDate);
+	public static String getDate(String date, String toTimezone) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeZone(TimeZone.getTimeZone("GMT-1"));
+		Date originalDate = convertToDate(date);
+		cal.setTime(originalDate);
 
-	Date oDate = removeTime(originalDate);
-	Date today = removeTime(currentDate());
+		Date oDate = removeTime(originalDate);
+		Date today = removeTime(currentDate());
 
-	String finalDateTime = "";
-	if (today.compareTo(oDate) > 0) {
-	    // sending date
-	    finalDateTime = dateFormat.format(oDate);
-	} else {
-	    // sending time because it's today.
-	    finalDateTime = timeFormat
-		    .format(convertToTimezone(cal, toTimezone).getTime());
+		String finalDateTime = "";
+		if (today.compareTo(oDate) > 0) {
+			// sending date
+			finalDateTime = dateFormat.format(oDate);
+		} else {
+			// sending time because it's today.
+			finalDateTime = timeFormat
+					.format(convertToTimezone(cal, toTimezone).getTime());
+		}
+		return finalDateTime;
+
 	}
-	return finalDateTime;
 
-    }
+	/**
+	 * Gets the date.
+	 * 
+	 * @param date
+	 *            the date
+	 * @param timezone
+	 *            the timezone
+	 * @return the date
+	 */
+	public static String getDate(String date, String toTimezone,
+			String fromTimezone) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeZone(TimeZone.getTimeZone(fromTimezone));
+		Date originalDate = convertToDate(date);
+		cal.setTime(originalDate);
 
-    /**
-     * Gets the date.
-     * 
-     * @param date
-     *            the date
-     * @param timezone
-     *            the timezone
-     * @return the date
-     */
-    public static String getDate(String date, String toTimezone,
-	    String fromTimezone) {
-	Calendar cal = Calendar.getInstance();
-	cal.setTimeZone(TimeZone.getTimeZone(fromTimezone));
-	Date originalDate = convertToDate(date);
-	cal.setTime(originalDate);
+		Date oDate = removeTime(originalDate);
+		Date today = removeTime(currentDate());
 
-	Date oDate = removeTime(originalDate);
-	Date today = removeTime(currentDate());
+		String finalDateTime = "";
+		if (today.compareTo(oDate) > 0) {
+			// sending date
+			finalDateTime = dateFormat.format(oDate);
+		} else {
+			// sending time because it's today.
+			finalDateTime = timeFormat
+					.format(convertToTimezone(cal, toTimezone).getTime());
+		}
+		return finalDateTime;
 
-	String finalDateTime = "";
-	if (today.compareTo(oDate) > 0) {
-	    // sending date
-	    finalDateTime = dateFormat.format(oDate);
-	} else {
-	    // sending time because it's today.
-	    finalDateTime = timeFormat
-		    .format(convertToTimezone(cal, toTimezone).getTime());
 	}
-	return finalDateTime;
 
-    }
-
-    private static Date currentDate() {
-	return new Date();
-    }
-
-    /**
-     * Convert to date.
-     * 
-     * @param date
-     *            the date
-     * @return the date
-     */
-    private static Date convertToDate(String date) {
-	Date dt = null;
-	try {
-	    dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
-
-	} catch (Exception e) {
-	    e.printStackTrace();
+	private static Date currentDate() {
+		return new Date();
 	}
-	return dt;
-    }
 
-    /**
-     * Convert to timezone.
-     * 
-     * @param cal
-     *            the cal
-     * @param timezone
-     *            the timezone
-     * @return the calendar
-     */
-    private static Calendar convertToTimezone(Calendar cal, String timezone) {
+	/**
+	 * Convert to date.
+	 * 
+	 * @param date
+	 *            the date
+	 * @return the date
+	 */
+	private static Date convertToDate(String date) {
+		Date dt = null;
+		try {
+			dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
 
-	Calendar localTime = Calendar.getInstance();
-	localTime.set(Calendar.HOUR, cal.get(Calendar.HOUR));
-	localTime.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-	localTime.set(Calendar.SECOND, cal.get(Calendar.SECOND));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return dt;
+	}
 
-	Calendar convertedTime = new GregorianCalendar(
-		TimeZone.getTimeZone(timezone));
-	convertedTime.setTimeInMillis(localTime.getTimeInMillis());
-	return convertedTime;
-    }
+	/**
+	 * Convert to timezone.
+	 * 
+	 * @param cal
+	 *            the cal
+	 * @param timezone
+	 *            the timezone
+	 * @return the calendar
+	 */
+	private static Calendar convertToTimezone(Calendar cal, String timezone) {
 
-    /**
-     * Removes the time.
-     * 
-     * @param date
-     *            the date
-     * @return the date
-     */
-    private static Date removeTime(Date date) {
-	Calendar cal = Calendar.getInstance();
-	cal.setTime(date);
-	cal.set(Calendar.HOUR_OF_DAY, 0);
-	cal.set(Calendar.MINUTE, 0);
-	cal.set(Calendar.SECOND, 0);
-	cal.set(Calendar.MILLISECOND, 0);
-	return cal.getTime();
-    }
+		Calendar localTime = Calendar.getInstance();
+		localTime.set(Calendar.HOUR, cal.get(Calendar.HOUR));
+		localTime.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+		localTime.set(Calendar.SECOND, cal.get(Calendar.SECOND));
 
-    public static String getDate() {
-	SimpleDateFormat gmtFormat = new SimpleDateFormat();
-	gmtFormat.applyPattern("yyyy-MM-dd HH:mm:ss");
-	TimeZone gmtTime = TimeZone.getTimeZone("GMT");
-	gmtFormat.setTimeZone(gmtTime);
-	return gmtFormat.format(new Date());
+		Calendar convertedTime = new GregorianCalendar(
+				TimeZone.getTimeZone(timezone));
+		convertedTime.setTimeInMillis(localTime.getTimeInMillis());
+		return convertedTime;
+	}
 
-    }
+	/**
+	 * Removes the time.
+	 * 
+	 * @param date
+	 *            the date
+	 * @return the date
+	 */
+	private static Date removeTime(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+
+	public static String getDate() {
+		SimpleDateFormat gmtFormat = new SimpleDateFormat();
+		gmtFormat.applyPattern("yyyy-MM-dd HH:mm:ss");
+		TimeZone gmtTime = TimeZone.getTimeZone("GMT");
+		gmtFormat.setTimeZone(gmtTime);
+		return gmtFormat.format(new Date());
+
+	}
 
 }

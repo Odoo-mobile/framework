@@ -18,11 +18,9 @@
  */
 package com.openerp.support;
 
-
 // TODO: Auto-generated Javadoc
 /**
- * The Class Module.
- * Handles Property for module information
+ * The Class Module. Handles Property for module information
  */
 public class Module {
 

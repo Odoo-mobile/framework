@@ -23,17 +23,26 @@ import java.util.ArrayList;
 import com.openerp.addons.messages.Message;
 import com.openerp.support.Module;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ModulesConfig.
+ */
 public class ModulesConfig {
 
-    public ArrayList<Module> applicationModules() {
-	ArrayList<Module> modules = new ArrayList<Module>();
+	/**
+	 * Application modules.
+	 * 
+	 * @return the array list
+	 */
+	public ArrayList<Module> applicationModules() {
+		ArrayList<Module> modules = new ArrayList<Module>();
 
-	/* application modules */
-	// modules.add(new Module("module_idea", "Idea", new Idea(), 0));
-	modules.add(new Module("menu_message", "Message", new Message(), 0,
-		true));
+		/* application modules */
+		// modules.add(new Module("module_idea", "Idea", new Idea(), 0));
+		modules.add(new Module("menu_message", "Message", new Message(), 0,
+				true));
 
-	return modules;
-    }
+		return modules;
+	}
 
 }

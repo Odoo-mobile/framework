@@ -28,15 +28,34 @@ import android.os.Bundle;
  */
 public class UserObject {
 
+	/** The username. */
 	private String username;
+
+	/** The user_id. */
 	private String user_id;
+
+	/** The partner_id. */
 	private String partner_id;
+
+	/** The timezone. */
 	private String timezone;
+
+	/** The isactive. */
 	private boolean isactive;
+
+	/** The avatar. */
 	private String avatar;
+
+	/** The database. */
 	private String database;
+
+	/** The host. */
 	private String host;
+
+	/** The android_name. */
 	private String android_name;
+
+	/** The password. */
 	private String password;
 
 	/**

@@ -51,196 +51,298 @@ import com.openerp.support.OEDialog;
 import com.openerp.support.UserObject;
 import com.openerp.support.menu.OEMenu;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Login.
+ */
 public class Login extends BaseFragment {
-    String[] itemArr = null;
-    Context context = null;
-    ActionMode mActionMode;
-    String openERPServerURL = "";
-    EditText edtServerUrl = null;
-    Bundle arguments = null;
-    Spinner dbListSpinner = null;
-    View rootView = null;
-    LoginUser loginUserASync = null;
-    EditText edtUsername = null;
-    EditText edtPassword = null;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	    Bundle savedInstanceState) {
-	setHasOptionsMenu(true);
-	this.context = getActivity();
-	// Inflate the layout for this fragment
-	rootView = inflater.inflate(R.layout.fragment_login, container, false);
-	dbListSpinner = (Spinner) rootView.findViewById(R.id.lstDatabases);
-	this.handleArguments((Bundle) getArguments());
-	this.loadDatabaseList();
-	getActivity().setTitle("Login");
-	return rootView;
-    }
+	/** The item arr. */
+	String[] itemArr = null;
 
-    public void handleArguments(Bundle bundle) {
-	arguments = bundle;
-	if (arguments != null && arguments.size() > 0) {
-	    if (arguments.containsKey("openERPServerURL")) {
-		openERPServerURL = arguments.getString("openERPServerURL");
-	    }
-	}
-    }
+	/** The context. */
+	Context context = null;
 
-    private void loadDatabaseList() {
-	try {
-	    // MainActivity.openerp = new OEHelper(openERPServerURL);
-	    List<String> dbList = new JSONDataHelper()
-		    .arrayToStringList(MainActivity.openerp.getDatabaseList());
-	    dbList.add(0,
-		    getActivity().getString(R.string.login_select_database));
-	    ArrayAdapter<String> dbAdapter = new ArrayAdapter<String>(
-		    getActivity(), android.R.layout.simple_spinner_item, dbList);
-	    dbAdapter
-		    .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	    dbListSpinner.setAdapter(dbAdapter);
-	} catch (ClientProtocolException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (JSONException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+	/** The m action mode. */
+	ActionMode mActionMode;
 
-    }
+	/** The open erp server url. */
+	String openERPServerURL = "";
 
-    @Override
-    public Object databaseHelper(Context context) {
-	// TODO Auto-generated method stub
-	return new LoginDBHelper(context);
-    }
+	/** The edt server url. */
+	EditText edtServerUrl = null;
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-	// TODO Auto-generated method stub
-	inflater.inflate(R.menu.menu_fragment_login, menu);
-    }
+	/** The arguments. */
+	Bundle arguments = null;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-	// TODO Auto-generated method stub
-	// handle item selection
+	/** The db list spinner. */
+	Spinner dbListSpinner = null;
 
-	switch (item.getItemId()) {
-	case R.id.menu_login_account:
-	    Log.d("LoginFragment()->ActionBarMenuClicked", "menu_login_account");
-	    edtUsername = (EditText) rootView.findViewById(R.id.edtUsername);
-	    edtPassword = (EditText) rootView.findViewById(R.id.edtPassword);
-	    edtUsername.setError(null);
-	    edtPassword.setError(null);
-	    if (TextUtils.isEmpty(edtUsername.getText())) {
-		edtUsername.setError("Provide Username");
-	    } else if (TextUtils.isEmpty(edtPassword.getText())) {
-		edtPassword.setError("Provide Password");
-	    } else if (dbListSpinner.getSelectedItemPosition() == 0) {
-		Toast.makeText(getActivity(), "Please select database",
-			Toast.LENGTH_LONG).show();
-	    } else {
-		loginUserASync = new LoginUser();
-		loginUserASync.execute((Void) null);
-	    }
+	/** The root view. */
+	View rootView = null;
 
-	    return true;
-	default:
-	    return super.onOptionsItemSelected(item);
-	}
-    }
+	/** The login user a sync. */
+	LoginUser loginUserASync = null;
 
-    private class LoginUser extends AsyncTask<Void, Void, Boolean> {
+	/** The edt username. */
+	EditText edtUsername = null;
 
-	OEDialog pdialog;
-	String errorMsg = "";
-	UserObject userData = null;
+	/** The edt password. */
+	EditText edtPassword = null;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
+	 * android.view.ViewGroup, android.os.Bundle)
+	 */
 	@Override
-	protected void onPreExecute() {
-	    pdialog = new OEDialog(getActivity(), false, "Logging in...");
-	    pdialog.show();
-	    edtPassword.setError(null);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		setHasOptionsMenu(true);
+		this.context = getActivity();
+		// Inflate the layout for this fragment
+		rootView = inflater.inflate(R.layout.fragment_login, container, false);
+		dbListSpinner = (Spinner) rootView.findViewById(R.id.lstDatabases);
+		this.handleArguments((Bundle) getArguments());
+		this.loadDatabaseList();
+		getActivity().setTitle("Login");
+		return rootView;
 	}
 
-	@Override
-	protected Boolean doInBackground(Void... params) {
-	    // TODO Auto-generated method stub
-	    try {
-		// Simulate network access.
-		Thread.sleep(2000);
-	    } catch (InterruptedException e) {
-		return false;
-	    }
-	    if (MainActivity.openerp != null) {
-		String userName = edtUsername.getText().toString();
-		String password = edtPassword.getText().toString();
-		String database = dbListSpinner.getSelectedItem().toString();
-
-		userData = MainActivity.openerp.login(userName, password,
-			database, openERPServerURL);
-		if (userData != null) {
-		    MainActivity.userContext = userData;
-		    return true;
-		} else {
-		    errorMsg = "Invalid Username or Password !";
-		    return false;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.openerp.support.FragmentHelper#handleArguments(android.os.Bundle)
+	 */
+	public void handleArguments(Bundle bundle) {
+		arguments = bundle;
+		if (arguments != null && arguments.size() > 0) {
+			if (arguments.containsKey("openERPServerURL")) {
+				openERPServerURL = arguments.getString("openERPServerURL");
+			}
 		}
-	    }
-
-	    return false;
 	}
 
-	@Override
-	protected void onPostExecute(final Boolean success) {
-	    if (success) {
-		Log.d("Creating Account For Username :",
-			MainActivity.userContext.getAndroidName());
-		if (OpenERPAccountManager.fetchAllAccounts(getActivity()) != null) {
-		    if (OpenERPAccountManager.isAnyUser(getActivity())) {
-			OpenERPAccountManager.logoutUser(getActivity(),
-				OpenERPAccountManager
-					.currentUser(getActivity())
-					.getAndroidName());
-		    }
+	/**
+	 * Load database list.
+	 */
+	private void loadDatabaseList() {
+		try {
+			// MainActivity.openerp = new OEHelper(openERPServerURL);
+			List<String> dbList = new JSONDataHelper()
+					.arrayToStringList(MainActivity.openerp.getDatabaseList());
+			dbList.add(0,
+					getActivity().getString(R.string.login_select_database));
+			ArrayAdapter<String> dbAdapter = new ArrayAdapter<String>(
+					getActivity(), android.R.layout.simple_spinner_item, dbList);
+			dbAdapter
+					.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			dbListSpinner.setAdapter(dbAdapter);
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		if (OpenERPAccountManager.createAccount(getActivity(),
-			MainActivity.userContext)) {
-		    loginUserASync.cancel(true);
-		    pdialog.hide();
-		    Intent intent = getActivity().getIntent();
-		    getActivity().finish();
-		    getActivity().startActivity(intent);
 
-		}
-	    } else {
-		edtPassword.setError(errorMsg);
-	    }
-	    loginUserASync.cancel(true);
-	    pdialog.hide();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.openerp.support.FragmentHelper#databaseHelper(android.content.Context
+	 * )
+	 */
 	@Override
-	protected void onCancelled() {
-	    loginUserASync.cancel(true);
-	    pdialog.hide();
+	public Object databaseHelper(Context context) {
+		// TODO Auto-generated method stub
+		return new LoginDBHelper(context);
 	}
 
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
+	 * android.view.MenuInflater)
+	 */
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		// TODO Auto-generated method stub
+		inflater.inflate(R.menu.menu_fragment_login, menu);
+	}
 
-    @Override
-    public void onDestroyView() {
-	super.onDestroyView();
-	rootView = null; // now cleaning up!
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem
+	 * )
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		// handle item selection
 
-    @Override
-    public OEMenu menuHelper(Context context) {
-	// TODO Auto-generated method stub
-	return null;
-    }
+		switch (item.getItemId()) {
+		case R.id.menu_login_account:
+			Log.d("LoginFragment()->ActionBarMenuClicked", "menu_login_account");
+			edtUsername = (EditText) rootView.findViewById(R.id.edtUsername);
+			edtPassword = (EditText) rootView.findViewById(R.id.edtPassword);
+			edtUsername.setError(null);
+			edtPassword.setError(null);
+			if (TextUtils.isEmpty(edtUsername.getText())) {
+				edtUsername.setError("Provide Username");
+			} else if (TextUtils.isEmpty(edtPassword.getText())) {
+				edtPassword.setError("Provide Password");
+			} else if (dbListSpinner.getSelectedItemPosition() == 0) {
+				Toast.makeText(getActivity(), "Please select database",
+						Toast.LENGTH_LONG).show();
+			} else {
+				loginUserASync = new LoginUser();
+				loginUserASync.execute((Void) null);
+			}
+
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
+	 * The Class LoginUser.
+	 */
+	private class LoginUser extends AsyncTask<Void, Void, Boolean> {
+
+		/** The pdialog. */
+		OEDialog pdialog;
+
+		/** The error msg. */
+		String errorMsg = "";
+
+		/** The user data. */
+		UserObject userData = null;
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.os.AsyncTask#onPreExecute()
+		 */
+		@Override
+		protected void onPreExecute() {
+			pdialog = new OEDialog(getActivity(), false, "Logging in...");
+			pdialog.show();
+			edtPassword.setError(null);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.os.AsyncTask#doInBackground(Params[])
+		 */
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			try {
+				// Simulate network access.
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				return false;
+			}
+			if (MainActivity.openerp != null) {
+				String userName = edtUsername.getText().toString();
+				String password = edtPassword.getText().toString();
+				String database = dbListSpinner.getSelectedItem().toString();
+
+				userData = MainActivity.openerp.login(userName, password,
+						database, openERPServerURL);
+				if (userData != null) {
+					MainActivity.userContext = userData;
+					return true;
+				} else {
+					errorMsg = "Invalid Username or Password !";
+					return false;
+				}
+			}
+
+			return false;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+		 */
+		@Override
+		protected void onPostExecute(final Boolean success) {
+			if (success) {
+				Log.d("Creating Account For Username :",
+						MainActivity.userContext.getAndroidName());
+				if (OpenERPAccountManager.fetchAllAccounts(getActivity()) != null) {
+					if (OpenERPAccountManager.isAnyUser(getActivity())) {
+						OpenERPAccountManager.logoutUser(getActivity(),
+								OpenERPAccountManager
+										.currentUser(getActivity())
+										.getAndroidName());
+					}
+				}
+				if (OpenERPAccountManager.createAccount(getActivity(),
+						MainActivity.userContext)) {
+					loginUserASync.cancel(true);
+					pdialog.hide();
+					Intent intent = getActivity().getIntent();
+					getActivity().finish();
+					getActivity().startActivity(intent);
+
+				}
+			} else {
+				edtPassword.setError(errorMsg);
+			}
+			loginUserASync.cancel(true);
+			pdialog.hide();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.os.AsyncTask#onCancelled()
+		 */
+		@Override
+		protected void onCancelled() {
+			loginUserASync.cancel(true);
+			pdialog.hide();
+		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.support.v4.app.Fragment#onDestroyView()
+	 */
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		rootView = null; // now cleaning up!
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.openerp.support.FragmentHelper#menuHelper(android.content.Context)
+	 */
+	@Override
+	public OEMenu menuHelper(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
