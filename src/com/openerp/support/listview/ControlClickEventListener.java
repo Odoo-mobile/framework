@@ -43,6 +43,6 @@ public interface ControlClickEventListener {
 	 *            the view
 	 * @return the oE list view rows
 	 */
-	public OEListViewRows controlClicked(OEListViewRows row, View view);
+	public OEListViewRows controlClicked(int position, OEListViewRows row, View view);
 
 }

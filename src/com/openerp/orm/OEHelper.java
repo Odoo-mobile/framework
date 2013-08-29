@@ -21,6 +21,7 @@ package com.openerp.orm;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import openerp.OpenERP;
@@ -39,6 +40,7 @@ import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.UserObject;
+import com.openerp.support.listview.OEListViewRows;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -351,7 +353,6 @@ public class OEHelper extends OpenERP {
 				}
 				if (!db.hasRecord(db, row_id)) {
 					int newId = db.create(db, values);
-					Log.i("ID Created for  : " + db.getModelName(), newId + "");
 				} else {
 					// Updating data of row
 					db.write(db, values, row_id, true);
@@ -399,7 +400,6 @@ public class OEHelper extends OpenERP {
 									new String[] { String.valueOf(id) });
 							if (db.delete(db, id)) {
 								del_rows.add(del_row);
-								Log.i("Row deleted with ID :", id + "");
 							}
 
 						}
@@ -527,5 +527,83 @@ public class OEHelper extends OpenERP {
 			list.add(id);
 		}
 		return list;
+	}
+
+	/**
+	 * Search_data from server.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param domain
+	 *            the domain
+	 * @param offset
+	 *            the offset
+	 * @param limit
+	 *            the limit
+	 * @return the list
+	 */
+	public List<OEListViewRows> search_data(BaseDBHelper db, JSONObject domain,
+			int offset, int limit) {
+		List<OEListViewRows> record_lists = new ArrayList<OEListViewRows>();
+		try {
+			OEHelper oe = db.getOEInstance();
+			JSONObject fields = fieldsToOEFields(db.getServerColumns());
+			JSONObject result = oe.search_read(db.getModelName(), fields,
+					domain, offset, limit, null, null);
+			if (result.getJSONArray("records").length() > 0) {
+				for (int i = 0; i < result.getJSONArray("records").length(); i++) {
+					JSONObject row = result.getJSONArray("records")
+							.getJSONObject(i);
+					HashMap<String, Object> oe_datarow = jsonDataToMap(row);
+					int row_id = row.getInt("id");
+
+					OEListViewRows oe_row = new OEListViewRows(row_id,
+							oe_datarow);
+					record_lists.add(oe_row);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return record_lists;
+	}
+
+	/**
+	 * Json data to hasmap object.
+	 * 
+	 * @param data
+	 *            the data
+	 * @return the hash map
+	 */
+	public HashMap<String, Object> jsonDataToMap(JSONObject data) {
+		HashMap<String, Object> map_data = new HashMap<String, Object>();
+		Iterator<String> keys = data.keys();
+		try {
+			while (keys.hasNext()) {
+				String key = keys.next();
+				map_data.put(key, data.get(key));
+			}
+		} catch (Exception e) {
+		}
+
+		return map_data;
+	}
+
+	/**
+	 * Fields to JSONObject fields Accumulates fields.
+	 * 
+	 * @param fields
+	 *            the fields
+	 * @return the jSON object
+	 */
+	public JSONObject fieldsToOEFields(List<Fields> fields) {
+		JSONObject oeFields = new JSONObject();
+		try {
+			for (Fields field : fields) {
+				oeFields.accumulate("fields", field.getName());
+			}
+		} catch (Exception e) {
+		}
+		return oeFields;
 	}
 }
