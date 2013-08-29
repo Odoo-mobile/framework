@@ -224,7 +224,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 						public void onClick(View arg0) {
 							// TODO Auto-generated method stub
 							controlClickHandler.get(control_id).controlClicked(
-									rows.get(position), viewRow);
+									position, rows.get(position), viewRow);
 
 						}
 					});

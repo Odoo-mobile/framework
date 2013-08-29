@@ -85,7 +85,6 @@ public class Message extends BaseFragment implements
 		INBOX, TODO, TOME, ARCHIVE
 	}
 
-	private static String current_type = "none";
 	public int selectedCounter = 0;
 
 	@Override

@@ -432,6 +432,7 @@ public class ORM extends SQLiteDatabaseHelper {
 			newId = values.getAsInteger("id");
 		} else {
 			newId = createRecordOnserver(dbHelper, values);
+			values.put("id", newId);
 		}
 
 		values.put("oea_name", MainActivity.userContext.getAndroidName());

@@ -19,11 +19,9 @@
 
 package com.openerp;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -115,8 +113,9 @@ public class MenuDrawerHelper {
 					for (OEMenuItems menuItem : menu.getMenuItems()) {
 						allMenus.add(new OEMenuItems(menuItem.getIcon(),
 								menuItem.getTitle(), menuItem
-										.getFragmentInstance(), menuItem
-										.getNotificationCount()));
+										.getFragmentInstance(), (menuItem
+										.getNotificationCount() < 0) ? 0
+										: menuItem.getNotificationCount()));
 					}
 				}
 

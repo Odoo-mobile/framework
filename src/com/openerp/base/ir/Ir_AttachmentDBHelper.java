@@ -48,7 +48,29 @@ public class Ir_AttachmentDBHelper extends BaseDBHelper {
 		columns.add(new Fields("type", "Type", Types.text()));
 		columns.add(new Fields("file_size", "File Size", Types.integer()));
 		columns.add(new Fields("db_datas", "Base64 Data", Types.blob()));
+		columns.add(new Fields("res_model", "Model", Types.varchar(100)));
+		columns.add(new Fields("company_id", "company id", Types
+				.many2One(new Res_Company(context))));
+		columns.add(new Fields("res_id", "resource id", Types.integer()));
 
 	}
 
+	/**
+	 * The Class Res_Company.
+	 */
+	class Res_Company extends BaseDBHelper {
+
+		/**
+		 * Instantiates a new res_company.
+		 * 
+		 * @param context
+		 *            the context
+		 */
+		public Res_Company(Context context) {
+			super(context);
+			name = "res.company";
+			columns.add(new Fields("name", "Name", Types.varchar(100)));
+		}
+
+	}
 }

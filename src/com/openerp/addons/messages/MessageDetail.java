@@ -272,10 +272,10 @@ public class MessageDetail extends BaseFragment {
 				new ControlClickEventListener() {
 
 					@Override
-					public OEListViewRows controlClicked(OEListViewRows row,
-							View view) {
+					public OEListViewRows controlClicked(int position,
+							OEListViewRows row, View view) {
 						// TODO Auto-generated method stub
-						
+
 						return null;
 					}
 				});
@@ -284,8 +284,8 @@ public class MessageDetail extends BaseFragment {
 				new ControlClickEventListener() {
 
 					@Override
-					public OEListViewRows controlClicked(OEListViewRows row,
-							View view) {
+					public OEListViewRows controlClicked(int position,
+							OEListViewRows row, View view) {
 						// TODO Auto-generated method stub
 						rootView.findViewById(R.id.layoutMessageReply)
 								.setVisibility(View.VISIBLE);

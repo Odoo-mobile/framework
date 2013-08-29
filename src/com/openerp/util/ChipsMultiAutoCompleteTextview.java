@@ -18,7 +18,10 @@
  */
 package com.openerp.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 
@@ -27,7 +30,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -35,12 +37,10 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
@@ -142,7 +142,7 @@ public class ChipsMultiAutoCompleteTextview extends MultiAutoCompleteTextView
 
 		@Override
 		public void afterTextChanged(Editable s) {
-			Log.e(">>> EDITABLE AFTER TEXT Changed", s.toString());
+
 		}
 	};
 
