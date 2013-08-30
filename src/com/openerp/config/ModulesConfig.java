@@ -20,6 +20,7 @@ package com.openerp.config;
 
 import java.util.ArrayList;
 
+import com.openerp.addons.meeting.Meeting;
 import com.openerp.addons.messages.Message;
 import com.openerp.support.Module;
 
@@ -41,8 +42,8 @@ public class ModulesConfig {
 		// modules.add(new Module("module_idea", "Idea", new Idea(), 0));
 		modules.add(new Module("menu_message", "Message", new Message(), 0,
 				true));
+		modules.add(new Module("addons_meeting", "Meeting", new Meeting(), 0));
 
 		return modules;
 	}
-
 }

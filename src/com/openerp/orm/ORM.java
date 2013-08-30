@@ -35,7 +35,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.config.ModulesConfig;
 import com.openerp.support.Module;
@@ -47,6 +46,8 @@ import com.openerp.support.OpenERPServerConnection;
  */
 public class ORM extends SQLiteDatabaseHelper {
 
+	/** The user_name. */
+	String user_name = "";
 	/** The modules. */
 	ArrayList<Module> modules = null;
 
@@ -74,6 +75,7 @@ public class ORM extends SQLiteDatabaseHelper {
 		this.context = context;
 		modules = new ModulesConfig().applicationModules();
 		this.statements = new HashMap<String, String>();
+		user_name = OpenERPAccountManager.currentUser(context).getAndroidName();
 	}
 
 	/**
@@ -370,17 +372,17 @@ public class ORM extends SQLiteDatabaseHelper {
 				}
 
 				ContentValues m2mvals = new ContentValues();
-
+				String android_name = OpenERPAccountManager
+						.currentUser(context).getAndroidName();
 				m2mvals.put(col1, id);
 				m2mvals.put(col2, row_id);
-				m2mvals.put(col3, MainActivity.userContext.getAndroidName());
+				m2mvals.put(col3, android_name);
 				int res = (Integer) this.search(
 						newDb,
 						new String[] { col1 + " = ?", "AND", col2 + "= ?",
 								"AND", col3 + " = ?" },
-						new String[] { id, row_id + "",
-								MainActivity.userContext.getAndroidName() })
-						.get("total");
+						new String[] { id, row_id + "", android_name }).get(
+						"total");
 
 				if (res == 0) {
 					SQLiteDatabase db = getWritableDatabase();
@@ -435,7 +437,8 @@ public class ORM extends SQLiteDatabaseHelper {
 			values.put("id", newId);
 		}
 
-		values.put("oea_name", MainActivity.userContext.getAndroidName());
+		values.put("oea_name", OpenERPAccountManager.currentUser(context)
+				.getAndroidName());
 
 		// Handling Many2Many Records
 		HashMap<String, Object> many2manycols = dbHelper.getMany2ManyColumns();
@@ -719,14 +722,13 @@ public class ORM extends SQLiteDatabaseHelper {
 				ContentValues m2mvals = new ContentValues();
 				m2mvals.put(col1, id);
 				m2mvals.put(col2, row_id);
-				m2mvals.put(col3, MainActivity.userContext.getAndroidName());
+				m2mvals.put(col3, user_name);
 				int res = (Integer) this.search(
 						newDb,
 						new String[] { col1 + " = ?", "AND", col2 + "= ?",
 								"AND", col3 + " = ?" },
-						new String[] { id, row_id + "",
-								MainActivity.userContext.getAndroidName() })
-						.get("total");
+						new String[] { id, row_id + "", user_name }).get(
+						"total");
 				SQLiteDatabase db = getWritableDatabase();
 				if (res == 0) {
 
@@ -740,8 +742,7 @@ public class ORM extends SQLiteDatabaseHelper {
 				} else {
 					db.update(rel_table, m2mvals, col1 + " = " + id + " AND "
 							+ col2 + " = " + row_id + " AND " + col3 + " = '"
-							+ MainActivity.userContext.getAndroidName() + "' ",
-							null);
+							+ user_name + "' ", null);
 				}
 				db.close();
 
@@ -918,7 +919,7 @@ public class ORM extends SQLiteDatabaseHelper {
 				HashMap<String, Object> row = new HashMap<String, Object>();
 				if (cursor.getColumnIndex("oea_name") > 0) {
 					if (!cursor.getString(cursor.getColumnIndex("oea_name"))
-							.equals(MainActivity.userContext.getAndroidName())) {
+							.equals(user_name)) {
 						continue;
 					}
 				} else {
@@ -1128,14 +1129,10 @@ public class ORM extends SQLiteDatabaseHelper {
 						String col1 = newdb.getColumns().get(0).getName();
 						String col2 = newdb.getColumns().get(1).getName();
 						String col3 = newdb.getColumns().get(2).getName();
-						HashMap<String, Object> rel_row = newdb.search(
-								newdb,
+						HashMap<String, Object> rel_row = newdb.search(newdb,
 								new String[] { col1 + " = ?", "AND",
-										col3 + " = ?" },
-								new String[] {
-										id,
-										MainActivity.userContext
-												.getAndroidName() });
+										col3 + " = ?" }, new String[] { id,
+										user_name });
 						int total = Integer.parseInt(rel_row.get("total")
 								.toString());
 						if (total > 0) {
@@ -1267,8 +1264,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	public boolean hasRecord(BaseDBHelper db, int id) {
 		SQLiteDatabase dbHelper = getWritableDatabase();
-		String where = " id = " + id + " AND oea_name = '"
-				+ MainActivity.userContext.getAndroidName() + "'";
+		String where = " id = " + id + " AND oea_name = '" + user_name + "'";
 		Cursor cursor = dbHelper.query(modelToTable(db.getModelName()),
 				new String[] { "*" }, where, null, null, null, null);
 		if (cursor.moveToFirst()) {
@@ -1284,6 +1280,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            : instance of database helper
 	 * @return int[] : list of integer array of local database ids for model
 	 */
+	@SuppressWarnings("unchecked")
 	public int[] localIds(BaseDBHelper db) {
 		HashMap<String, Object> records = search(db);
 		int[] ids = new int[Integer.parseInt(records.get("total").toString())];
@@ -1297,18 +1294,19 @@ public class ORM extends SQLiteDatabaseHelper {
 
 	}
 
-	/**
-	 * Delete.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param id
-	 *            the id
-	 * @return true, if successful
-	 */
-	public boolean delete(BaseDBHelper db, int id) {
+	public boolean delete(BaseDBHelper db, int id, boolean fromLocal) {
 		try {
-			if (getOEInstance().unlink(db.getModelName(), id)) {
+			OEHelper oe = getOEInstance();
+			if (!fromLocal) {
+
+				if (oe.unlink(db.getModelName(), id)) {
+					SQLiteDatabase sdb = getWritableDatabase();
+					String where = "id = " + id;
+					sdb.delete(modelToTable(db.getModelName()), where, null);
+					sdb.close();
+					return true;
+				}
+			} else {
 				SQLiteDatabase sdb = getWritableDatabase();
 				String where = "id = " + id;
 				sdb.delete(modelToTable(db.getModelName()), where, null);
@@ -1316,6 +1314,7 @@ public class ORM extends SQLiteDatabaseHelper {
 				return true;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return false;
 	}
@@ -1333,5 +1332,19 @@ public class ORM extends SQLiteDatabaseHelper {
 			flag = false;
 		}
 		return flag;
+	}
+
+	/**
+	 * Delete.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param id
+	 *            the id
+	 * @return true, if successful
+	 */
+	public boolean delete(BaseDBHelper db, int id) {
+		return delete(db, id, false);
+
 	}
 }

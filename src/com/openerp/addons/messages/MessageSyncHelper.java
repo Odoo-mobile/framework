@@ -81,6 +81,7 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 		HashMap<String, Object> messageSyncOutcome = new HashMap<String, Object>();
 		// Updating old messages (starred and to_read columsn from
 		// mail.notification
+		OEHelper oe = db.getOEInstance();
 		JSONArray updatedIds = new JSONArray();
 		try {
 			JSONArray localIds = JSONDataHelper
@@ -107,10 +108,11 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 			domainRplies.accumulate("domain", new JSONArray(argsObj.getArgs()
 					.toString()));
 
-			JSONObject msgReplies = search_read("mail.notification", fields,
+			JSONObject msgReplies = oe.search_read("mail.notification", fields,
 					domainRplies, 0, 1000, null, null);
-
-			updatedIds = updateMessageStatus(msgReplies, db);
+			if (msgReplies.has("results")) {
+				updatedIds = updateMessageStatus(msgReplies, db);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -119,7 +121,6 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 		// Fetching new message
 		JSONArray newCreated = new JSONArray();
 		try {
-			OEHelper oe = db.getOEInstance();
 			JSONObject serverData = oe.call_kw(db.getModelName(),
 					"message_read", args);
 			if (serverData.has("result")) {

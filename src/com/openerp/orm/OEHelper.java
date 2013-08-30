@@ -390,14 +390,14 @@ public class OEHelper extends OpenERP {
 			List<HashMap<String, Object>> del_rows = new ArrayList<HashMap<String, Object>>();
 			if (total > 1) {
 				for (int id : db.localIds(db)) {
-
 					if (serverIds.size() > 0) {
 						if (!serverIds.contains(String.valueOf(id))) {
 							// Delete record with id.
 							HashMap<String, Object> del_row = db.search(db,
 									new String[] { "id = ?" },
 									new String[] { String.valueOf(id) });
-							if (db.delete(db, id)) {
+
+							if (db.delete(db, id, true)) {
 								del_rows.add(del_row);
 							}
 
@@ -418,6 +418,7 @@ public class OEHelper extends OpenERP {
 	}
 
 	public HashMap<String, List<HashMap<String, Object>>> getDeletedRows() {
+
 		return deleted_rows;
 	}
 
@@ -433,8 +434,9 @@ public class OEHelper extends OpenERP {
 	private JSONObject getDataFromServer(BaseDBHelper db, JSONObject domain) {
 		JSONObject fields = getFieldsFromCols(getSyncCols(db.getServerColumns()));
 		String model = db.getModelName();
+		OEHelper oe = db.getOEInstance();
 		try {
-			return search_read(model, fields, domain, 0, 0, null, null);
+			return oe.search_read(model, fields, domain, 0, 0, null, null);
 		} catch (Exception e) {
 		}
 		return null;

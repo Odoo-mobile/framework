@@ -21,6 +21,8 @@
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
 
     <application
         android:allowBackup="true"
@@ -41,7 +43,7 @@
             </meta-data>
         </service>
 
-        <!-- Sync Providers -->
+        <!-- Msg Sync Providers -->
         <provider
             android:name="com.openerp.providers.message.MessageProvider"
             android:authorities="com.openerp.providers.message"
@@ -50,7 +52,7 @@
             android:label="Messages"
             android:syncable="true" />
 
-        <!-- sync Services -->
+        <!-- Msg sync Services -->
         <service
             android:name="com.openerp.services.MessageSyncService"
             android:exported="true" >
@@ -61,6 +63,19 @@
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_messages" />
+        </service>
+
+        <!-- Meeting sync Services -->
+        <service
+            android:name="com.openerp.services.MeetingSyncService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_meetings" />
         </service>
 
         <activity
