@@ -34,21 +34,17 @@ import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.MailTo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.MultiAutoCompleteTextView.Tokenizer;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
@@ -63,16 +59,16 @@ import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.Base64Helper;
-import com.openerp.util.ChipsMultiAutoCompleteTextview;
 
 public class MessageComposeActivty extends Activity {
 	private static final int PICKFILE_RESULT_CODE = 1;
-	ChipsMultiAutoCompleteTextview multiComplete;
+	private static final int ADD_RECIPIENT = 2;
 	List<Uri> file_uris = new ArrayList<Uri>();
 	ListView lstAttachments = null;
 	List<OEListViewRows> attachments = new ArrayList<OEListViewRows>();
 	OEListViewAdapter lstAttachmentAdapter = null;
 	List<OEListViewRows> partners_list = new ArrayList<OEListViewRows>();
+	HashMap<String, Object> selectedPartners = new HashMap<String, Object>();
 
 	enum ATTACHMENT_TYPE {
 		IMAGE, TEXT_FILE
@@ -108,8 +104,6 @@ public class MessageComposeActivty extends Activity {
 					}
 				});
 
-		multiComplete = (ChipsMultiAutoCompleteTextview) findViewById(R.id.edtMessageTo);
-
 		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(this);
 		HashMap<String, Object> data = partners.search(partners);
 		if ((Integer) data.get("total") > 0) {
@@ -129,73 +123,19 @@ public class MessageComposeActivty extends Activity {
 							.toString() + "]]"));
 		} catch (Exception e) {
 		}
-		partners_list.addAll(oe.search_data(partners, domain, 0, 50));
+		findViewById(R.id.imgBtnAddRecipients).setOnClickListener(
+				new OnClickListener() {
 
-		from = new String[] { "id", "name", "email", "image" };
-		to = new int[] { R.id.txvMultiId, R.id.txvMultiName,
-				R.id.txvMultiEmail, R.id.imgUserPic };
-
-		OEListViewAdapter adapter = new OEListViewAdapter(MainActivity.context,
-				R.layout.multi_select_textview_custom_layout, partners_list,
-				from, to, partners);
-		multiComplete.setAdapter(adapter);
-		adapter.addImageColumn("image");
-		multiComplete.setTokenizer(new Tokenizer() {
-
-			@Override
-			public CharSequence terminateToken(CharSequence text) {
-				// TODO Auto-generated method stub
-				int i = text.length();
-				while (i > 0 && text.charAt(i - 1) == ' ') {
-					i--;
-				}
-
-				if (i > 0 && text.charAt(i - 1) == ' ') {
-					return text;
-				} else {
-					if (text instanceof Spanned) {
-						SpannableString sp = new SpannableString(text + " ");
-						TextUtils.copySpansFrom((Spanned) text, 0,
-								text.length(), Object.class, sp, 0);
-						return sp;
-					} else {
-						return text + " ";
+					@Override
+					public void onClick(View arg0) {
+						// TODO Auto-generated method stub
+						Intent intent = new Intent(MessageComposeActivty.this,
+								MessageRecipientActivity.class);
+						intent.putExtra("selected_ids", selectedPartners);
+						startActivityForResult(intent, ADD_RECIPIENT);
 					}
-				}
-			}
+				});
 
-			@Override
-			public int findTokenStart(CharSequence text, int cursor) {
-				// TODO Auto-generated method stub
-				int i = cursor;
-
-				while (i > 0 && text.charAt(i - 1) != ' ') {
-					i--;
-				}
-				while (i < cursor && text.charAt(i) == ' ') {
-					i++;
-				}
-
-				return i;
-			}
-
-			@Override
-			public int findTokenEnd(CharSequence text, int cursor) {
-				// TODO Auto-generated method stub
-				int i = cursor;
-				int len = text.length();
-
-				while (i < len) {
-					if (text.charAt(i) == ' ') {
-						return i;
-					} else {
-						i++;
-					}
-				}
-
-				return len;
-			}
-		});
 		handleIntentFilter(getIntent());
 	}
 
@@ -225,7 +165,7 @@ public class MessageComposeActivty extends Activity {
 			EditText edtBody = (EditText) findViewById(R.id.edtMessageBody);
 			edtSubject.setError(null);
 			edtBody.setError(null);
-			if (multiComplete.getSelectedIds().length() == 0) {
+			if (selectedPartners.size() == 0) {
 				Toast.makeText(this, "Select atleast one receiptent",
 						Toast.LENGTH_LONG).show();
 			} else if (TextUtils.isEmpty(edtSubject.getText())) {
@@ -262,7 +202,7 @@ public class MessageComposeActivty extends Activity {
 				HashMap<String, Object> values = new HashMap<String, Object>();
 				values.put("subject", subject);
 				values.put("body", body);
-				values.put("partner_ids", multiComplete.getSelectedIds());
+				values.put("partner_ids", getPartnersId());
 				values.put("attachment_ids", newAttachmentIds);
 
 				SendMailMessage sendMessage = new SendMailMessage(values);
@@ -273,6 +213,15 @@ public class MessageComposeActivty extends Activity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private JSONArray getPartnersId() {
+		JSONArray list = new JSONArray();
+		for (String key : selectedPartners.keySet()) {
+			ContentValues val = (ContentValues) selectedPartners.get(key);
+			list.put(val.getAsInteger("id"));
+		}
+		return list;
 	}
 
 	/**
@@ -339,7 +288,19 @@ public class MessageComposeActivty extends Activity {
 				handleReceivedFile();
 			}
 			break;
+		case ADD_RECIPIENT:
+			if (resultCode == RESULT_OK) {
+				selectedPartners = (HashMap<String, Object>) data.getExtras()
+						.get("result");
+				StringBuffer users_list = new StringBuffer();
+				users_list.append(TextUtils.join(", ",
+						selectedPartners.keySet()));
+				EditText edtTo = (EditText) findViewById(R.id.edtMessageTo);
+				edtTo.setText(users_list.toString());
+			}
+			break;
 		}
+
 	}
 
 	/**
@@ -494,6 +455,7 @@ public class MessageComposeActivty extends Activity {
 			if (success) {
 				Toast.makeText(getApplicationContext(),
 						"Message sent succussfull.", Toast.LENGTH_LONG).show();
+				selectedPartners = new HashMap<String, Object>();
 				finish();
 			} else {
 				Toast.makeText(getApplicationContext(),

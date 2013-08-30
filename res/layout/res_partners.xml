@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/oe_listview_background_selector"
+    android:orientation="horizontal"
+    android:padding="5dp" >
+
+    <ImageView
+        android:id="@+id/imgUserPicture"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:contentDescription="res_partner Image will display"
+        android:src="@drawable/ic_action_user" />
+
+    <LinearLayout
+        android:id="@+id/layoutFollowerDetailHeader"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="2dp"
+        android:baselineAligned="false"
+        android:orientation="vertical"
+        android:paddingBottom="8dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:paddingTop="8dp"
+        android:weightSum="5" >
+
+        <TextView
+            android:id="@+id/txvPartner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:singleLine="true"
+            android:text="FirstName LastName"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:typeface="sans" />
+
+        <TextView
+            android:id="@+id/txvPartnerEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:singleLine="true"
+            android:text="email@email.com"
+            android:textSize="11sp"
+            android:typeface="sans" />
+    </LinearLayout>
+
+</LinearLayout>
