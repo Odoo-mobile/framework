@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_add_from_server"
+        android:icon="@drawable/ic_action_sync"
+        android:showAsAction="always"
+        android:title="Get from server">
+    </item>
+    <item
+        android:id="@+id/menu_add_recipients"
+        android:icon="@drawable/ic_action_done"
+        android:showAsAction="always"
+        android:title="Add">
+    </item>
+
+</menu>

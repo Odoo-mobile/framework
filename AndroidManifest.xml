@@ -105,6 +105,10 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.openerp.addons.messages.MessageRecipientActivity"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
 </manifest>

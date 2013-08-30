@@ -9,15 +9,31 @@
         android:orientation="vertical"
         android:padding="10dp" >
 
-        <com.openerp.util.ChipsMultiAutoCompleteTextview
-            android:id="@+id/edtMessageTo"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:hint="To" >
+            android:orientation="horizontal"
+            android:weightSum="3" >
 
-            <requestFocus />
-        </com.openerp.util.ChipsMultiAutoCompleteTextview>
+            <EditText
+                android:id="@+id/edtMessageTo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="3"
+                android:enabled="false"
+                android:hint="To" >
+            </EditText>
+
+            <ImageView
+                android:id="@+id/imgBtnAddRecipients"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/oe_listview_background_selector"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_add_users" />
+        </LinearLayout>
 
         <EditText
             android:id="@+id/edtMessageSubject"
