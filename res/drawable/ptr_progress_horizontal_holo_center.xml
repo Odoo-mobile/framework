@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@android:id/progress">
+        <scale
+            android:scaleWidth="100%"
+            android:scaleGravity="center"
+            android:drawable="@drawable/ptr_progress_primary_holo" />
+    </item>
+
+</layer-list>

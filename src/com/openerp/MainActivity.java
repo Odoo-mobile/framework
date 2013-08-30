@@ -18,14 +18,9 @@
  */
 package com.openerp;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
-
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.AlertDialog;
@@ -44,7 +39,6 @@ import android.view.MenuItem;
 
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.account.AccountFragment;
-import com.openerp.config.ModulesConfig;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.Boot;
 import com.openerp.support.FragmentHandler;

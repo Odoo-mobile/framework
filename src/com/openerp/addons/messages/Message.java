@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -49,6 +48,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
+import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
