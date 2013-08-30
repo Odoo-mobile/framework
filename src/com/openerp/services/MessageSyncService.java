@@ -191,12 +191,16 @@ public class MessageSyncService extends Service {
 						new MessageDBHelper(context), mainArgs.getArgs());
 
 				if (Integer.parseInt(response.get("total").toString()) > 0) {
-					intent.putExtra("data", response.get("new_ids").toString());
+					intent.putExtra("data_new", response.get("new_ids")
+							.toString());
+					intent.putExtra("data_update", response.get("update_ids")
+							.toString());
 					Log.d("MessageSyncService",
 							"sending sync finish broadcast.");
 					context.sendBroadcast(intent);
 				} else {
-					intent.putExtra("data", "false");
+					intent.putExtra("data_new", "false");
+					intent.putExtra("data_update", "false");
 					context.sendBroadcast(intent);
 				}
 
