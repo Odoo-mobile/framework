@@ -36,6 +36,7 @@ import com.openerp.MainActivity;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.DataSetChangeReceiver;
+import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.SyncHelper;
 
@@ -77,12 +78,50 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 	@Override
 	public HashMap<String, Object> syncWithServer(BaseDBHelper db,
 			JSONArray args) {
-		// TODO Auto-generated method stub
 		HashMap<String, Object> messageSyncOutcome = new HashMap<String, Object>();
+		// Updating old messages (starred and to_read columsn from
+		// mail.notification
+		JSONArray updatedIds = new JSONArray();
+		try {
+			JSONArray localIds = JSONDataHelper
+					.intArrayToJSONArray(getAllIds(db));
+
+			JSONObject fields = new JSONObject();
+
+			fields.accumulate("fields", "read");
+			fields.accumulate("fields", "starred");
+			fields.accumulate("fields", "partner_id");
+			fields.accumulate("fields", "message_id");
+
+			OEArgsHelper argsObj1 = new OEArgsHelper();
+			argsObj1.addArgCondition("message_id", "in", localIds);
+			OEArgsHelper argsObj2 = new OEArgsHelper();
+			argsObj2.addArgCondition("partner_id", "=",
+					Integer.parseInt(MainActivity.userContext.getPartner_id()));
+
+			OEArgsHelper argsObj = new OEArgsHelper();
+			argsObj.addArg(argsObj1.getArgs());
+			argsObj.addArg(argsObj2.getArgs());
+
+			JSONObject domainRplies = new JSONObject();
+			domainRplies.accumulate("domain", new JSONArray(argsObj.getArgs()
+					.toString()));
+
+			JSONObject msgReplies = search_read("mail.notification", fields,
+					domainRplies, 0, 1000, null, null);
+
+			updatedIds = updateMessageStatus(msgReplies, db);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// Fetching new message
 		JSONArray newCreated = new JSONArray();
 		try {
-			JSONObject serverData = call_kw(db.getModelName(), "message_read",
-					args);
+			OEHelper oe = db.getOEInstance();
+			JSONObject serverData = oe.call_kw(db.getModelName(),
+					"message_read", args);
 			if (serverData.has("result")) {
 				for (int i = 0; i < serverData.getJSONArray("result").length(); i++) {
 					JSONObject row = serverData.getJSONArray("result")
@@ -104,11 +143,38 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 			e.printStackTrace();
 		}
 
-		messageSyncOutcome.put("total", newCreated.length());
+		int total = newCreated.length() + updatedIds.length();
+		messageSyncOutcome.put("total", total);
 		messageSyncOutcome.put("new_ids", newCreated);
+		messageSyncOutcome.put("update_ids", updatedIds);
 
 		// testing();
 		return messageSyncOutcome;
+	}
+
+	private JSONArray updateMessageStatus(JSONObject msgReplies, BaseDBHelper db) {
+		JSONArray updatedIds = new JSONArray();
+		try {
+			for (int j = 0; j < msgReplies.getJSONArray("records").length(); j++) {
+				JSONObject objRes = msgReplies.getJSONArray("records")
+						.getJSONObject(j);
+				String message_id = objRes.getJSONArray("message_id")
+						.getString(0);
+				String read = (objRes.getString("read").equals("true")) ? "false"
+						: "true";
+				String starred = objRes.getString("starred");
+
+				ContentValues values = new ContentValues();
+				values.put("starred", starred);
+				values.put("to_read", read);
+				if (db.write(db, values, Integer.parseInt(message_id), true)) {
+					updatedIds.put(Integer.parseInt(message_id));
+				}
+
+			}
+		} catch (Exception e) {
+		}
+		return updatedIds;
 	}
 
 	/**
@@ -217,52 +283,4 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 		return newId;
 	}
 
-	/**
-	 * Testing.
-	 */
-	public void testing() {
-		try {
-			JSONObject fields = new JSONObject();
-			fields.accumulate("fields", "notified_partner_ids");
-			fields.accumulate("fields", "author_id");
-			fields.accumulate("fields", "parent_id");
-
-			// filtering notification partner ids
-			OEArgsHelper args1 = new OEArgsHelper();
-			args1.addArgCondition("notification_ids.partner_id.user_ids", "in",
-					new JSONArray("[1]"));
-
-			// Filtering partner_ids to userid
-			OEArgsHelper args2 = new OEArgsHelper();
-			args2.addArgCondition("partner_ids.user_ids", "in", new JSONArray(
-					"[1]"));
-
-			// filtering author
-			OEArgsHelper args3 = new OEArgsHelper();
-			args3.addArgCondition("author_id.user_ids", "in", new JSONArray(
-					"[1]"));
-
-			// // fetching only parents
-			// OEArgsHelper args4 = new OEArgsHelper();
-			// args4.addArgCondition("parent_id", "=", false);
-
-			OEArgsHelper args = new OEArgsHelper();
-
-			args.addArg("|");
-			args.addArg("|");
-			args.addArg(args1.getArgs());
-			args.addArg(args2.getArgs());
-			args.addArg(args3.getArgs());
-			// args.addArg(args4.getArgs());
-
-			JSONObject domain = new JSONObject();
-			domain.accumulate("domain", args.getArgs());
-			JSONObject data = search_read("mail.message", fields, domain, 0, 0,
-					null, null);
-
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-
-	}
 }

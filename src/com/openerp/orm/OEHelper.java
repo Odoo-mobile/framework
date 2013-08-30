@@ -33,7 +33,6 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.openerp.support.JSONDataHelper;

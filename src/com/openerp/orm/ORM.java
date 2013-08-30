@@ -1319,4 +1319,19 @@ public class ORM extends SQLiteDatabaseHelper {
 		}
 		return false;
 	}
+
+	/**
+	 * Checks if is empty table.
+	 * 
+	 * @param db
+	 *            the db
+	 * @return true, if is empty table
+	 */
+	public boolean isEmptyTable(BaseDBHelper db) {
+		boolean flag = true;
+		if (count(db, null, null) > 0) {
+			flag = false;
+		}
+		return flag;
+	}
 }

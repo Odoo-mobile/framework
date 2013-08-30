@@ -198,6 +198,7 @@ public class Message extends BaseFragment implements
 		lstview.setAdapter(listAdapter);
 		// Setting listview choice mode to multiple model
 		lstview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
 		// Seeting item long click listern to activate action mode.
 		lstview.setOnItemLongClickListener(new OnItemLongClickListener() {
 
@@ -435,11 +436,16 @@ public class Message extends BaseFragment implements
 			rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
 					View.GONE);
 		} else {
-			try {
-				Thread.sleep(2000);
-				scope.context().requestSync(MessageProvider.AUTHORITY);
-			} catch (Exception e) {
-				// TODO: handle exception
+			if (db.isEmptyTable(db)) {
+
+				try {
+					Thread.sleep(2000);
+					scope.context().requestSync(MessageProvider.AUTHORITY);
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			} else {
+				Log.e("Display message ", "All messages are read....");
 			}
 
 		}
@@ -529,7 +535,7 @@ public class Message extends BaseFragment implements
 				context)));
 		menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To:Me", this
 				.getObjectOFClass("type", "to-me"),
-				getCount(TYPE.TOME, context) - 1));
+				getCount(TYPE.TOME, context) - 2));
 		menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-Do", this
 				.getObjectOFClass("type", "to-do"),
 				getCount(TYPE.TODO, context)));
@@ -639,7 +645,6 @@ public class Message extends BaseFragment implements
 
 			String id = intent.getExtras().getString("id");
 			String parent_id = intent.getExtras().getString("parent_id");
-
 			if (!parent_id.equals("false")) {
 				id = parent_id;
 			}
@@ -687,32 +692,24 @@ public class Message extends BaseFragment implements
 			// Extract data included in the Intent
 			try {
 				mPullToRefreshAttacher.setRefreshComplete();
-				String data = intent.getExtras().get("data").toString();
-				if (!data.equals("false")) {
+				String data_new = intent.getExtras().get("data_new").toString();
+				String data_update = intent.getExtras()
+						.getString("data_update");
+				if (!data_new.equals("false")) {
+
+				}
+				if (!data_update.equals("false")) {
 
 				}
 				scope.context().refreshMenu(getActivity());
 
-				// int[] ids = intent.getExtras().getIntArray("new_ids");
-				// String total = intent.getExtras().getString("total");
-				// if (Integer.parseInt(total) > 0) {
-				// rootView.findViewById(R.id.messageNewCounter)
-				// .setVisibility(View.VISIBLE);
-				// TextView txvHeaderTitle = (TextView) rootView
-				// .findViewById(R.id.txvMessageHeaderTitle);
-				// TextView txvCounter = (TextView) rootView
-				// .findViewById(R.id.txvMessageHeaderCounter);
-				// rootView.findViewById(R.id.txvMessageHeaderSubtitle)
-				// .setVisibility(View.GONE);
-				// txvHeaderTitle.setText(title);
-				// txvCounter.setText(total + " New");
-				// }
-
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			Log.d("Message::syncFinishReceiver::onReceive()",
 					"Resetting listview messages to INBOX");
+			listAdapter.clear();
+			list.clear();
+			listAdapter.refresh(list);
 			setupListView(TYPE.INBOX);
 
 		}
@@ -834,14 +831,12 @@ public class Message extends BaseFragment implements
 					new String[] { String.valueOf(parent_id),
 							String.valueOf(parent_id) });
 			for (HashMap<String, Object> id : ids) {
-				Log.e(">>>>>>>>>>>>>>>> ", id.get("id").toString());
 				if (parent_id != Integer.parseInt(id.get("id").toString())) {
 
 					args.addArg(Integer.parseInt(id.get("id").toString()));
 				}
 			}
 			args.addArg(key);
-			Log.e(">>>>>>>>>>>>>>>> args.", args.getArgs().toString());
 
 		}
 
