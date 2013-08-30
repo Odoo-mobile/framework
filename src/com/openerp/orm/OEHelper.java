@@ -33,7 +33,6 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.openerp.support.JSONDataHelper;
@@ -391,14 +390,14 @@ public class OEHelper extends OpenERP {
 			List<HashMap<String, Object>> del_rows = new ArrayList<HashMap<String, Object>>();
 			if (total > 1) {
 				for (int id : db.localIds(db)) {
-
 					if (serverIds.size() > 0) {
 						if (!serverIds.contains(String.valueOf(id))) {
 							// Delete record with id.
 							HashMap<String, Object> del_row = db.search(db,
 									new String[] { "id = ?" },
 									new String[] { String.valueOf(id) });
-							if (db.delete(db, id)) {
+
+							if (db.delete(db, id, true)) {
 								del_rows.add(del_row);
 							}
 
@@ -419,6 +418,7 @@ public class OEHelper extends OpenERP {
 	}
 
 	public HashMap<String, List<HashMap<String, Object>>> getDeletedRows() {
+
 		return deleted_rows;
 	}
 

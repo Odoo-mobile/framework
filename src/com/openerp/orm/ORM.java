@@ -1284,6 +1284,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            : instance of database helper
 	 * @return int[] : list of integer array of local database ids for model
 	 */
+	@SuppressWarnings("unchecked")
 	public int[] localIds(BaseDBHelper db) {
 		HashMap<String, Object> records = search(db);
 		int[] ids = new int[Integer.parseInt(records.get("total").toString())];
@@ -1297,18 +1298,19 @@ public class ORM extends SQLiteDatabaseHelper {
 
 	}
 
-	/**
-	 * Delete.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param id
-	 *            the id
-	 * @return true, if successful
-	 */
-	public boolean delete(BaseDBHelper db, int id) {
+	public boolean delete(BaseDBHelper db, int id, boolean fromLocal) {
 		try {
-			if (getOEInstance().unlink(db.getModelName(), id)) {
+			OEHelper oe = getOEInstance();
+			if (!fromLocal) {
+
+				if (oe.unlink(db.getModelName(), id)) {
+					SQLiteDatabase sdb = getWritableDatabase();
+					String where = "id = " + id;
+					sdb.delete(modelToTable(db.getModelName()), where, null);
+					sdb.close();
+					return true;
+				}
+			} else {
 				SQLiteDatabase sdb = getWritableDatabase();
 				String where = "id = " + id;
 				sdb.delete(modelToTable(db.getModelName()), where, null);
@@ -1316,7 +1318,22 @@ public class ORM extends SQLiteDatabaseHelper {
 				return true;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return false;
+	}
+
+	/**
+	 * Delete.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param id
+	 *            the id
+	 * @param fromLocal
+	 * @return true, if successful
+	 */
+	public boolean delete(BaseDBHelper db, int id) {
+		return delete(db, id, false);
 	}
 }
