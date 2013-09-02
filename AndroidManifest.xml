@@ -52,6 +52,15 @@
             android:label="Messages"
             android:syncable="true" />
 
+        <!-- note Sync Providers -->
+        <provider
+            android:name="com.openerp.providers.note.NoteProvider"
+            android:authorities="com.openerp.providers.note"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Notes"
+            android:syncable="true" />
+
         <!-- Msg sync Services -->
         <service
             android:name="com.openerp.services.MessageSyncService"
@@ -76,6 +85,19 @@
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_meetings" />
+        </service>
+
+        <!-- note sync Services -->
+        <service
+            android:name="com.openerp.services.NoteSyncService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_notes" />
         </service>
 
         <activity
