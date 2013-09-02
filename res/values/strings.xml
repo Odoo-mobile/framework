@@ -24,5 +24,12 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
 
-    
+    <!-- Compose Note Fragment Strings -->
+    <string name="compose_note_stages">Stages</string>
+    <string name="compose_note_description">Description</string>
+
+    <!-- Detail Note Fragment Strings -->
+    <string name="detail_note_name">Note Name</string>
+    <string name="detail_note_memo">Note Memo</string>
+
 </resources>

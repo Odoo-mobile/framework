@@ -1,0 +1,41 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_note_edit_save"
+        android:showAsAction="always"
+        android:title="Save">
+    </item>
+    <item
+        android:id="@+id/menu_note_edit_cancel"
+        android:showAsAction="always"
+        android:title="Cancel">
+    </item>
+    <item
+        android:id="@+id/menu_note_operation"
+        android:icon="@drawable/ic_action_overflow"
+        android:showAsAction="always"
+        android:title="More">
+        <menu>
+            <item
+                android:id="@+id/menu_note_invite_people"
+                android:title="Invite People">
+            </item>
+            <item
+                android:id="@+id/menu_note_forward_asmail"
+                android:title="Forward as Email">
+            </item>
+            <item
+                android:id="@+id/menu_note_mark_asdone"
+                android:title="Mark As Done"/>
+            <item
+                android:id="@+id/menu_note_edit"
+                android:title="Edit Note">
+            </item>
+            <item
+                android:id="@+id/menu_note_delete"
+                android:title="Delete Note">
+            </item>
+        </menu>
+    </item>
+
+</menu>

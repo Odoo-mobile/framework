@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_note_compose"
+        android:icon="@drawable/ic_action_new_note"
+        android:showAsAction="always"
+        android:title="Compose Note">
+    </item>
+    <item
+        android:id="@+id/menu_note_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_action_search"
+        android:showAsAction="always"
+        android:title="Search">
+    </item>
+    <item
+        android:id="@+id/menu_note_write"
+        android:showAsAction="always"
+        android:title="Create">
+    </item>
+    <item
+        android:id="@+id/menu_note_cancel"
+        android:showAsAction="always"
+        android:title="Cancel">
+    </item>
+
+</menu>

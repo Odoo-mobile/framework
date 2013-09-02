@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import com.openerp.addons.meeting.Meeting;
 import com.openerp.addons.messages.Message;
+import com.openerp.addons.note.Note;
 import com.openerp.support.Module;
 
 // TODO: Auto-generated Javadoc
@@ -43,6 +44,7 @@ public class ModulesConfig {
 		modules.add(new Module("menu_message", "Message", new Message(), 0,
 				true));
 		modules.add(new Module("addons_meeting", "Meeting", new Meeting(), 0));
+		modules.add(new Module("addons_note", "Notes", new Note(), 0, true));
 
 		return modules;
 	}

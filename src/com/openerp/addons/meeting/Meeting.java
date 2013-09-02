@@ -31,7 +31,7 @@ public class Meeting extends BaseFragment {
 		menu.setId(1);
 		menu.setMenuTitle("Meetings");
 		List<OEMenuItems> items = new ArrayList<OEMenuItems>();
-		items.add(new OEMenuItems("Note", new Meeting(), 0));
+		items.add(new OEMenuItems("Calendar", new Meeting(), 0));
 		menu.setMenuItems(items);
 		return menu;
 	}
