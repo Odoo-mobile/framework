@@ -56,19 +56,7 @@ public class OpenERPServerConnection {
 		try {
 			openerp = new OpenERP(serverURL);
 			openerp.getDatabaseList();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			return false;
-		} catch (RuntimeException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
 			return false;
 		}
 		return true;

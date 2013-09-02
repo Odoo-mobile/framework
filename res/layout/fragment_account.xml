@@ -61,16 +61,25 @@
                 android:id="@+id/edtServerURL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
                 android:hint="@string/account_edit_server_url"
                 android:inputType="textUri"
                 android:singleLine="true" />
+
+            <CheckBox
+                android:id="@+id/chkIsSecureConnection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtServerURL"
+                android:layout_marginBottom="10dp"
+                android:text="Secure Connection"
+                android:textColor="#414141"
+                android:textSize="11sp" />
 
             <EditText
                 android:id="@+id/edtServerPort"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/edtServerURL"
+                android:layout_below="@+id/chkIsSecureConnection"
                 android:layout_marginBottom="20dp"
                 android:hint="@string/account_edit_server_port"
                 android:inputType="number"

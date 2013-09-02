@@ -91,6 +91,7 @@ public class MainActivity extends FragmentActivity {
 				getActionBar().setHomeButtonEnabled(false);
 				// Starting New account setup wizard.
 				Fragment fragment = new AccountFragment();
+				fragmentHandler.setBackStack(true, null);
 				fragmentHandler.startNewFragmnet(fragment);
 				return;
 			} else {

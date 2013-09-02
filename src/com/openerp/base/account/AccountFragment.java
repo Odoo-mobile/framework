@@ -18,23 +18,19 @@
  */
 package com.openerp.base.account;
 
-import java.io.IOException;
-
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -42,6 +38,7 @@ import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.base.login.Login;
 import com.openerp.orm.OEHelper;
+import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OpenERPServerConnection;
@@ -71,6 +68,12 @@ public class AccountFragment extends BaseFragment {
 	/** The server connect a sync. */
 	ConnectToServer serverConnectASync = null;
 
+	/** The root view. */
+	View rootView = null;
+
+	/** The checkbox secure connection. */
+	CheckBox chkSecureConnection = null;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -84,11 +87,32 @@ public class AccountFragment extends BaseFragment {
 		setHasOptionsMenu(true);
 		this.context = getActivity();
 		// Inflate the layout for this fragment
-		View rootView = inflater.inflate(R.layout.fragment_account, container,
-				false);
+		rootView = inflater
+				.inflate(R.layout.fragment_account, container, false);
+
+		scope = new AppScope(MainActivity.userContext,
+				(MainActivity) getActivity());
 
 		rootView.findViewById(R.id.edtServerURL).requestFocus();
-		getActivity().setTitle("Setup New Account");
+		getActivity().setTitle("Setup Account");
+		chkSecureConnection = (CheckBox) rootView
+				.findViewById(R.id.chkIsSecureConnection);
+		final EditText edtUrl = (EditText) rootView
+				.findViewById(R.id.edtServerURL);
+		chkSecureConnection.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				String serverUrl = edtUrl.getText().toString().toLowerCase();
+				if (chkSecureConnection.isChecked()) {
+					serverUrl = serverUrl.replace("http://", "");
+					serverUrl = "https://" + serverUrl;
+				} else {
+					serverUrl = serverUrl.replace("https://", "");
+				}
+				edtUrl.setText(serverUrl);
+				edtUrl.setSelection(edtUrl.length());
+			}
+		});
 		return rootView;
 	}
 
@@ -133,19 +157,24 @@ public class AccountFragment extends BaseFragment {
 		switch (item.getItemId()) {
 		case R.id.menu_account_next:
 			StringBuffer serverURL = new StringBuffer();
-			edtServerUrl = (EditText) getActivity().findViewById(
-					R.id.edtServerURL);
-			EditText edtServerPort = (EditText) getActivity().findViewById(
-					R.id.edtServerPort);
+			edtServerUrl = (EditText) rootView.findViewById(R.id.edtServerURL);
+			EditText edtServerPort = (EditText) rootView
+					.findViewById(R.id.edtServerPort);
 			edtServerUrl.setError(null);
 			if (TextUtils.isEmpty(edtServerUrl.getText())) {
 				edtServerUrl.setError("Provide Server URL");
 			} else {
+
 				if (!edtServerUrl.getText().toString().contains("http://")
 						&& !edtServerUrl.getText().toString()
 								.contains("https://")) {
-					serverURL.append("http://");
+					String http_https = "http://";
+					if (chkSecureConnection.isChecked()) {
+						http_https = "https://";
+					}
+					serverURL.append(http_https);
 				}
+
 				serverURL.append(edtServerUrl.getText());
 				if (!TextUtils.isEmpty(edtServerPort.getText())) {
 					serverURL.append(":");
@@ -180,7 +209,7 @@ public class AccountFragment extends BaseFragment {
 		 */
 		@Override
 		protected void onPreExecute() {
-			pdialog = new OEDialog(getActivity(), false, "Connecting...");
+			pdialog = new OEDialog(scope.context(), false, "Connecting...");
 			pdialog.show();
 		}
 
@@ -204,7 +233,7 @@ public class AccountFragment extends BaseFragment {
 			boolean flag = oeConnect.testConnection(getActivity(),
 					openERPServerURL);
 			if (!flag) {
-				errorMsg = "Unable to connect OpenERP 7.0 Server. Try Again !";
+				errorMsg = "Unable to reach OpenERP 7.0 Server.";
 			}
 			return flag;
 
@@ -226,22 +255,11 @@ public class AccountFragment extends BaseFragment {
 				try {
 					MainActivity.openerp = new OEHelper(context,
 							openERPServerURL);
-				} catch (ClientProtocolException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (Exception e) {
 				}
-				((MainActivity) getActivity()).fragmentHandler
-						.setFragmentArguments(bundle);
-				((MainActivity) getActivity()).fragmentHandler.setBackStack(
-						true, null);
-				((MainActivity) getActivity()).fragmentHandler
-						.replaceFragmnet(loginFragment);
+				scope.context().fragmentHandler.setFragmentArguments(bundle);
+				scope.context().fragmentHandler.setBackStack(true, null);
+				scope.context().fragmentHandler.replaceFragmnet(loginFragment);
 
 				serverConnectASync.cancel(true);
 				serverConnectASync = null;
