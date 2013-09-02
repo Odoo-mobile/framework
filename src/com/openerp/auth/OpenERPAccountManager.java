@@ -93,10 +93,12 @@ public class OpenERPAccountManager {
 
 		List<UserObject> accounts = OpenERPAccountManager
 				.fetchAllAccounts(context);
-		for (UserObject user : accounts) {
-			if (user.isIsactive()) {
-				flag = true;
-				break;
+		if (accounts != null) {
+			for (UserObject user : accounts) {
+				if (user.isIsactive()) {
+					flag = true;
+					break;
+				}
 			}
 		}
 
@@ -111,15 +113,16 @@ public class OpenERPAccountManager {
 	 * @return the user object
 	 */
 	public static UserObject currentUser(Context context) {
-		List<UserObject> accounts = OpenERPAccountManager
-				.fetchAllAccounts(context);
-		for (UserObject user : accounts) {
+		if (OpenERPAccountManager.isAnyUser(context)) {
+			List<UserObject> accounts = OpenERPAccountManager
+					.fetchAllAccounts(context);
+			for (UserObject user : accounts) {
 
-			if (user.isIsactive()) {
-				return user;
+				if (user.isIsactive()) {
+					return user;
+				}
 			}
 		}
-
 		return null;
 	}
 

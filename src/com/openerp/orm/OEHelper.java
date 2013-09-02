@@ -73,7 +73,7 @@ public class OEHelper extends OpenERP {
 			throws ClientProtocolException, JSONException, IOException {
 		super(base_url);
 		this.mContext = context;
-		// TODO Auto-generated constructor stub
+
 	}
 
 	/**
@@ -95,7 +95,6 @@ public class OEHelper extends OpenERP {
 		super(data.getHost(), OpenERPServerConnection
 				.isNetworkAvailable(context));
 		this.mContext = context;
-		// TODO Auto-generated constructor stub
 		this.userContext = this.login(data.getUsername(), data.getPassword(),
 				data.getDatabase(), data.getHost());
 
@@ -138,6 +137,7 @@ public class OEHelper extends OpenERP {
 				fields.accumulate("fields", "partner_id");
 				fields.accumulate("fields", "tz");
 				fields.accumulate("fields", "image");
+				fields.accumulate("fields", "company_id");
 				domain.accumulate("domain", new JSONArray("[[\"id\",\"=\","
 						+ String.valueOf(userId) + "]]"));
 				JSONObject res = this
@@ -158,6 +158,9 @@ public class OEHelper extends OpenERP {
 				userObj.setUser_id(String.valueOf(userId));
 				userObj.setUsername(username);
 				userObj.setPassword(password);
+				String company_id = new JSONArray(res.getString("company_id"))
+						.getString(0);
+				userObj.setCompany_id(company_id);
 
 			}
 		} catch (ClientProtocolException e) {
@@ -169,7 +172,7 @@ public class OEHelper extends OpenERP {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
-			Toast.makeText(mContext, "No Connection to OpenERP Server ! ",
+			Toast.makeText(mContext, "Unable to reach OpenERP 7.0 Server ! ",
 					Toast.LENGTH_LONG).show();
 		}
 		return userObj;
@@ -434,10 +437,10 @@ public class OEHelper extends OpenERP {
 	private JSONObject getDataFromServer(BaseDBHelper db, JSONObject domain) {
 		JSONObject fields = getFieldsFromCols(getSyncCols(db.getServerColumns()));
 		String model = db.getModelName();
-		OEHelper oe = db.getOEInstance();
 		try {
-			return oe.search_read(model, fields, domain, 0, 0, null, null);
+			return search_read(model, fields, domain, 0, 0, null, null);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 
@@ -472,11 +475,8 @@ public class OEHelper extends OpenERP {
 		String[] fields = new String[columns.size()];
 		int i = 0;
 		for (Fields col : columns) {
-
-			// if (!(col.getType() instanceof Many2Many)) {
 			fields[i] = col.getName();
 			i++;
-			// }
 		}
 		return fields;
 	}
@@ -547,10 +547,9 @@ public class OEHelper extends OpenERP {
 			int offset, int limit) {
 		List<OEListViewRows> record_lists = new ArrayList<OEListViewRows>();
 		try {
-			OEHelper oe = db.getOEInstance();
 			JSONObject fields = fieldsToOEFields(db.getServerColumns());
-			JSONObject result = oe.search_read(db.getModelName(), fields,
-					domain, offset, limit, null, null);
+			JSONObject result = search_read(db.getModelName(), fields, domain,
+					offset, limit, null, null);
 			if (result.getJSONArray("records").length() > 0) {
 				for (int i = 0; i < result.getJSONArray("records").length(); i++) {
 					JSONObject row = result.getJSONArray("records")

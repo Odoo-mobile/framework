@@ -58,6 +58,9 @@ public class UserObject {
 	/** The password. */
 	private String password;
 
+	/** The company_id. */
+	private String company_id;
+
 	/**
 	 * Gets the data as bundle.
 	 * 
@@ -75,7 +78,27 @@ public class UserObject {
 		bundle.putString("host", this.getHost());
 		bundle.putString("android_name", this.getAndroidName());
 		bundle.putString("password", this.getPassword());
+		bundle.putString("company_id", this.getCompany_id());
 		return bundle;
+	}
+
+	/**
+	 * Gets the company_id.
+	 * 
+	 * @return the company_id
+	 */
+	public String getCompany_id() {
+		return company_id;
+	}
+
+	/**
+	 * Sets the company_id.
+	 * 
+	 * @param company_id
+	 *            the new company_id
+	 */
+	public void setCompany_id(String company_id) {
+		this.company_id = company_id;
 	}
 
 	/**

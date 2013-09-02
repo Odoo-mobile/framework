@@ -48,6 +48,7 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 
 	/** The m context. */
 	Context mContext = null;
+	private static OEHelper oe = null;
 
 	/**
 	 * Instantiates a new message sync helper.
@@ -81,7 +82,9 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 		HashMap<String, Object> messageSyncOutcome = new HashMap<String, Object>();
 		// Updating old messages (starred and to_read columsn from
 		// mail.notification
-		OEHelper oe = db.getOEInstance();
+		if (oe == null) {
+			oe = db.getOEInstance();
+		}
 		JSONArray updatedIds = new JSONArray();
 		try {
 			JSONArray localIds = JSONDataHelper

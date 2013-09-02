@@ -25,10 +25,8 @@ import java.util.HashMap;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.openerp.config.ModulesConfig;
-import com.openerp.support.Boot;
 import com.openerp.support.Module;
 
 // TODO: Auto-generated Javadoc

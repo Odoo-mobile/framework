@@ -39,6 +39,7 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.config.ModulesConfig;
 import com.openerp.support.Module;
 import com.openerp.support.OpenERPServerConnection;
+import com.openerp.support.UserObject;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -63,6 +64,9 @@ public class ORM extends SQLiteDatabaseHelper {
 	/** The statements. */
 	HashMap<String, String> statements = null;
 
+	/** The oe_obj. */
+	private static OEHelper oe_obj = null;
+
 	/**
 	 * Instantiates a new orm.
 	 * 
@@ -75,7 +79,13 @@ public class ORM extends SQLiteDatabaseHelper {
 		this.context = context;
 		modules = new ModulesConfig().applicationModules();
 		this.statements = new HashMap<String, String>();
-		user_name = OpenERPAccountManager.currentUser(context).getAndroidName();
+		UserObject obj = OpenERPAccountManager.currentUser(context);
+		if (obj != null) {
+			user_name = obj.getAndroidName();
+		}
+		if (oe_obj == null) {
+			oe_obj = getOEInstance();
+		}
 	}
 
 	/**
@@ -84,13 +94,13 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * @return the oE instance
 	 */
 	public OEHelper getOEInstance() {
+
 		OEHelper openerp = null;
 		try {
 			openerp = new OEHelper(context,
 					OpenERPAccountManager.currentUser(context));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
+
 		}
 		return openerp;
 	}
@@ -391,7 +401,7 @@ public class ORM extends SQLiteDatabaseHelper {
 					if (tbl2Obj != null) {
 						List<Integer> list = new ArrayList<Integer>();
 						list.add(row_id);
-						getOEInstance().syncReferenceTables(tbl2Obj, list);
+						oe_obj.syncReferenceTables(tbl2Obj, list);
 					}
 				}
 
@@ -464,7 +474,7 @@ public class ORM extends SQLiteDatabaseHelper {
 					list.add(Integer.parseInt(many2oneRecord(m2oArray)));
 					BaseDBHelper m2oDb = ((Many2One) many2onecols.get(key))
 							.getM2OObject();
-					getOEInstance().syncReferenceTables(m2oDb, list);
+					oe_obj.syncReferenceTables(m2oDb, list);
 				}
 			} catch (Exception e) {
 			}
@@ -494,8 +504,7 @@ public class ORM extends SQLiteDatabaseHelper {
 			for (String key : values.keySet()) {
 				arguments.put(key, values.get(key));
 			}
-			newId = getOEInstance().createNew(model, arguments)
-					.getInt("result");
+			newId = oe_obj.createNew(model, arguments).getInt("result");
 		} catch (Exception e) {
 		}
 		return newId;
@@ -737,7 +746,7 @@ public class ORM extends SQLiteDatabaseHelper {
 					if (tbl2Obj != null) {
 						List<Integer> list = new ArrayList<Integer>();
 						list.add(row_id);
-						getOEInstance().syncReferenceTables(tbl2Obj, list);
+						oe_obj.syncReferenceTables(tbl2Obj, list);
 					}
 				} else {
 					db.update(rel_table, m2mvals, col1 + " = " + id + " AND "
@@ -830,8 +839,9 @@ public class ORM extends SQLiteDatabaseHelper {
 					int res = db.update(table, values, "id = " + id, null);
 					flag = true;
 				} else {
-					OEHelper oe = getOEInstance();
-					if (oe.updateValues(dbHelper.getModelName(), arguments, id)) {
+
+					if (oe_obj.updateValues(dbHelper.getModelName(), arguments,
+							id)) {
 						int res = db.update(table, values, "id = " + id, null);
 						flag = true;
 					}
@@ -1296,10 +1306,9 @@ public class ORM extends SQLiteDatabaseHelper {
 
 	public boolean delete(BaseDBHelper db, int id, boolean fromLocal) {
 		try {
-			OEHelper oe = getOEInstance();
 			if (!fromLocal) {
 
-				if (oe.unlink(db.getModelName(), id)) {
+				if (oe_obj.unlink(db.getModelName(), id)) {
 					SQLiteDatabase sdb = getWritableDatabase();
 					String where = "id = " + id;
 					sdb.delete(modelToTable(db.getModelName()), where, null);
