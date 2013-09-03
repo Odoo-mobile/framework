@@ -25,12 +25,16 @@ import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SyncAdapterType;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -313,9 +317,8 @@ public class MainActivity extends FragmentActivity {
 
 		switch (requestCode) {
 		case RESULT_SETTINGS:
-			Log.e("Compelted", "Settind box finish");
+			handleSyncProvider();
 			break;
-
 		}
 
 	}
@@ -441,5 +444,49 @@ public class MainActivity extends FragmentActivity {
 		ContentResolver.addPeriodicSync(account, authority, extras,
 				sync_interval);
 
+	}
+
+	/**
+	 * Cancel sync.
+	 * 
+	 * @param authority
+	 *            the authority
+	 */
+	public void cancelSync(String authority) {
+		Account account = OpenERPAccountManager.getAccount(this,
+				MainActivity.userContext.getAndroidName());
+
+		getContentResolver().cancelSync(account, authority);
+
+	}
+
+	/**
+	 * Handle sync provider. Depend on user settings
+	 */
+	public void handleSyncProvider() {
+		SharedPreferences sharedPrefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		boolean sync_enable = sharedPrefs.getBoolean("perform_sync", false);
+		String data_limit = sharedPrefs.getString("sync_data_limit", "60");
+		int sync_interval = Integer.parseInt(sharedPrefs.getString(
+				"sync_interval", "1440"));
+
+		List<String> default_authorities = new ArrayList<String>();
+		default_authorities.add("com.android.calendar");
+		default_authorities.add("com.android.contacts");
+		SyncAdapterType[] list = getContentResolver().getSyncAdapterTypes();
+		for (SyncAdapterType lst : list) {
+			if (lst.authority.contains("com.openerp.providers")) {
+				default_authorities.add(lst.authority);
+			}
+		}
+		for (String authority : default_authorities) {
+			if (sync_enable) {
+				setSyncPeriodic(authority, sync_interval, 1, 1);
+			} else {
+				cancelSync(authority);
+				setAutoSync(authority, false);
+			}
+		}
 	}
 }

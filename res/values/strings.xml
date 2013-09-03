@@ -41,4 +41,32 @@ When you process messages in your inbox, you can mark some as todo. From this me
     <string name="detail_note_name">Note Name</string>
     <string name="detail_note_memo">Note Memo</string>
 
+    <!-- Setting pref strings -->
+    <string-array name="syncInterval">
+        <item name="5">Every 5 minutes</item>
+        <item name="10">Every 10 minutes</item>
+        <item name="20">Every 20 minutes</item>
+        <item name="40">Every 40 minutes</item>
+        <item name="60">Every 60 minutes</item>
+        <item name="1440">Once upon a day</item>
+    </string-array>
+    <string-array name="syncIntervalValues">
+        <item name="5">5</item>
+        <item name="10">10</item>
+        <item name="20">20</item>
+        <item name="40">40</item>
+        <item name="60">60</item>
+        <item name="1440">1440</item>
+    </string-array>
+    <string-array name="syncDataLimit">
+        <item name="30">1 month old</item>
+        <item name="60">2 months old</item>
+        <item name="90">3 months old</item>
+    </string-array>
+    <string-array name="syncDataLimitValues">
+        <item name="30">30</item>
+        <item name="60">60</item>
+        <item name="90">90</item>
+    </string-array>
+
 </resources>

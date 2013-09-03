@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceCategory android:title="Dummy" >
-        <EditTextPreference
-            android:key="prefUsername"
-            android:summary="Provide your username"
-            android:title="Username" />
+    <PreferenceCategory
+        android:key="sync_interval_settings"
+        android:title="Sync interval" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="perform_sync"
+            android:summary="Enable or disable data sync"
+            android:title="Enable Sync" />
+
+        <ListPreference
+            android:defaultValue="1440"
+            android:dependency="perform_sync"
+            android:entries="@array/syncInterval"
+            android:entryValues="@array/syncIntervalValues"
+            android:key="sync_interval"
+            android:summary="Define how often sync will be performed"
+            android:title="Sync interval" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="sync_data_limit_settings"
+        android:title="Data Sync Limit" >
+        <ListPreference
+            android:defaultValue="60"
+            android:entries="@array/syncDataLimit"
+            android:entryValues="@array/syncDataLimitValues"
+            android:key="sync_data_limit"
+            android:summary="Define how many old data to be synced"
+            android:title="Sync data limit" />
     </PreferenceCategory>
 
 </PreferenceScreen>

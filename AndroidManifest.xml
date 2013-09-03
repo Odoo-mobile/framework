@@ -43,7 +43,7 @@
             </meta-data>
         </service>
 
-        <!-- Msg Sync Providers -->
+        <!-- Message Sync Providers -->
         <provider
             android:name="com.openerp.providers.message.MessageProvider"
             android:authorities="com.openerp.providers.message"
@@ -52,7 +52,7 @@
             android:label="Messages"
             android:syncable="true" />
 
-        <!-- note Sync Providers -->
+        <!-- Note Sync Providers -->
         <provider
             android:name="com.openerp.providers.note.NoteProvider"
             android:authorities="com.openerp.providers.note"
@@ -61,7 +61,7 @@
             android:label="Notes"
             android:syncable="true" />
 
-        <!-- Msg sync Services -->
+        <!-- Message sync Services -->
         <service
             android:name="com.openerp.services.MessageSyncService"
             android:exported="true" >
