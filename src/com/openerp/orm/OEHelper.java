@@ -300,6 +300,30 @@ public class OEHelper extends OpenERP {
 	}
 
 	/**
+	 * Common method to Sync data with server.
+	 * 
+	 * It will take database helper and fetch data from server as given columns.
+	 * If any column with many2many relation found it will automatic sync
+	 * related table data.
+	 * 
+	 * @param db
+	 * @param domain
+	 * @return
+	 */
+	public boolean syncWithServer(BaseDBHelper db, JSONObject domain) {
+		deleted_rows = new HashMap<String, List<HashMap<String, Object>>>();
+		boolean success = false;
+		try {
+			JSONObject result = getDataFromServer(db, domain);
+			if (result != null) {
+				success = handleServerData(db, result);
+			}
+		} catch (Exception e) {
+		}
+		return success;
+	}
+
+	/**
 	 * Handle server data.
 	 * 
 	 * @param db
