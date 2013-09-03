@@ -9,11 +9,25 @@
         android:paddingTop="5dp"
         android:visibility="visible" />
 
+    <TextView
+        android:id="@+id/txvMessageAllReadMessage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/messageSyncWaiter"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:gravity="top|center_horizontal"
+        android:text="Woohoo! You&apos;ve read all the messages in your inbox."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#77778f"
+        android:visibility="visible" />
+
     <ListView
         android:id="@+id/lstMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/messageSyncWaiter" >
+        android:layout_below="@+id/txvMessageAllReadMessage" >
     </ListView>
 
 </RelativeLayout>
