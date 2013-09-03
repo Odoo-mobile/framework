@@ -24,6 +24,15 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
 
+    <!-- Message Fragment all read messages -->
+    <string name="message_inbox_all_read"><b>Good Job!</b> Your inbox is empty.\n \n
+
+Your inbox contains private messages or emails sent to you as well as information related to documents or people you follow.</string>
+    <string name="message_tome_all_read"><b>No private message.</b>\n\nThis list contains messages sent to you.</string>
+    <string name="message_todo_all_read"><b>No todo.</b>\n\n
+
+When you process messages in your inbox, you can mark some as todo. From this menu, you can process all your todo.</string>
+
     <!-- Compose Note Fragment Strings -->
     <string name="compose_note_stages">Stages</string>
     <string name="compose_note_description">Description</string>

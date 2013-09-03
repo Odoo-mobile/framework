@@ -45,6 +45,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
@@ -141,16 +142,7 @@ public class Message extends BaseFragment implements
 		 */
 		handleArguments((Bundle) getArguments());
 
-		/*
-		 * Your required code below.
-		 */
 
-		// Sync Service with 40 seconds delayed.
-		// scope.context().setSyncPeriodic(MessageProvider.AUTHORITY, 1L, 40L,
-		// 1L);
-		scope.context().setAutoSync(MessageProvider.AUTHORITY, true);
-
-		// setupListView(TYPE.INBOX);
 		return rootView;
 	}
 
@@ -168,6 +160,8 @@ public class Message extends BaseFragment implements
 			list = getMessages(type);
 		} else {
 			rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
+					View.GONE);
+			rootView.findViewById(R.id.txvMessageAllReadMessage).setVisibility(
 					View.GONE);
 		}
 
@@ -371,20 +365,25 @@ public class Message extends BaseFragment implements
 
 		String[] where = null;
 		String[] whereArgs = null;
+		int message_resource = 0;
 		switch (type) {
 		case INBOX:
 			where = new String[] { "to_read = ?", "AND", "starred  = ?" };
 			whereArgs = new String[] { "true", "false" };
+			message_resource = R.string.message_inbox_all_read;
 			break;
 		case TOME:
 			where = new String[] { "res_id = ? ", "AND", "to_read= ?", "AND",
 					"starred=?" };
 			whereArgs = new String[] { "0", "true", "false" };
+			message_resource = R.string.message_tome_all_read;
 			break;
 		case TODO:
-			Log.e("Loading ", "TODO List");
 			where = new String[] { "starred  = ? " };
 			whereArgs = new String[] { "true" };
+			message_resource = R.string.message_todo_all_read;
+			break;
+		default:
 			break;
 		}
 
@@ -394,6 +393,9 @@ public class Message extends BaseFragment implements
 
 		HashMap<String, OEListViewRows> parent_list_details = new HashMap<String, OEListViewRows>();
 		messages_sorted = new ArrayList<OEListViewRows>();
+		rootView.findViewById(R.id.lstMessages).setVisibility(View.VISIBLE);
+		rootView.findViewById(R.id.txvMessageAllReadMessage).setVisibility(
+				View.GONE);	
 		if (Integer.parseInt(result.get("total").toString()) > 0) {
 			int i = 0;
 			for (HashMap<String, Object> row : (List<HashMap<String, Object>>) result
@@ -422,10 +424,6 @@ public class Message extends BaseFragment implements
 								((List<HashMap<String, Object>>) newRow
 										.get("records")).get(0));
 					}
-
-					// OEListViewRows data_row = new OEListViewRows(
-					// Integer.valueOf((String) key),
-					// newRowObj.getRow_data());
 					parent_list_details.put(key, newRowObj);
 					message_row_indexes.put(key, i);
 					i++;
@@ -433,8 +431,7 @@ public class Message extends BaseFragment implements
 
 				}
 			}
-			rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
-					View.GONE);
+
 		} else {
 			if (db.isEmptyTable(db)) {
 
@@ -442,13 +439,18 @@ public class Message extends BaseFragment implements
 					Thread.sleep(2000);
 					scope.context().requestSync(MessageProvider.AUTHORITY);
 				} catch (Exception e) {
-					// TODO: handle exception
 				}
 			} else {
-				Log.e("Display message ", "All messages are read....");
+				rootView.findViewById(R.id.lstMessages)
+						.setVisibility(View.GONE);
+				TextView txvMsg = (TextView) rootView
+						.findViewById(R.id.txvMessageAllReadMessage);
+				txvMsg.setVisibility(View.VISIBLE);
+				txvMsg.setText(message_resource);
 			}
 
 		}
+		rootView.findViewById(R.id.messageSyncWaiter).setVisibility(View.GONE);
 		return messages_sorted;
 
 	}
