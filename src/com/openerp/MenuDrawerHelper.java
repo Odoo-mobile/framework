@@ -80,7 +80,7 @@ public class MenuDrawerHelper {
 	public MenuDrawerHelper(MainActivity object) {
 		super();
 		this.instance = object;
-		modules = new ModulesConfig().applicationModules();
+		modules = new ModulesConfig().modules();
 		this.init();
 
 	}
@@ -192,10 +192,12 @@ public class MenuDrawerHelper {
 			public void onDrawerOpened(View drawerView) {
 				// getActionBar().setTitle(mTitle);
 				instance.invalidateOptionsMenu(); // creates call to
-				Drawable profPic = new BitmapDrawable(
-						Base64Helper.getBitmapImage(instance,
-								instance.userContext.getAvatar()));
-				instance.getActionBar().setIcon(profPic);
+				if (!instance.userContext.getAvatar().equals("false")) {
+					Drawable profPic = new BitmapDrawable(
+							Base64Helper.getBitmapImage(instance,
+									instance.userContext.getAvatar()));
+					instance.getActionBar().setIcon(profPic);
+				}
 				instance.setTitle(instance.userContext.getUsername(),
 						instance.userContext.getHost());
 				// onPrepareOptionsMenu()

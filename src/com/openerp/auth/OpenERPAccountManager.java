@@ -25,7 +25,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.openerp.support.UserObject;
 

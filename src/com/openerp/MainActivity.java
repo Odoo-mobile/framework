@@ -148,8 +148,6 @@ public class MainActivity extends FragmentActivity {
 		try {
 			MainActivity.openerp = new OEHelper(this, MainActivity.userContext);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
 		}
 		// The attacher should always be created in the Activity's
 		// onCreate
@@ -195,15 +193,8 @@ public class MainActivity extends FragmentActivity {
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
-								// User clicked OK, so save the result somewhere
-								// or return them to the component that opened
-								// the dialog
-								// TODO Auto-generated method stub
-
-								startup();
-								// startActivity(new Intent(MainActivity.this,
-								// MainActivity.class));
-								// finish();
+								finish();
+								startActivity(getIntent());
 							}
 						})
 				.setNegativeButton("Cancel",

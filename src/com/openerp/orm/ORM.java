@@ -77,7 +77,7 @@ public class ORM extends SQLiteDatabaseHelper {
 		// TODO Auto-generated constructor stub
 		super(context);
 		this.context = context;
-		modules = new ModulesConfig().applicationModules();
+		modules = new ModulesConfig().modules();
 		this.statements = new HashMap<String, String>();
 		UserObject obj = OpenERPAccountManager.currentUser(context);
 		if (obj != null) {
@@ -1009,9 +1009,9 @@ public class ORM extends SQLiteDatabaseHelper {
 		StringBuffer sql = new StringBuffer();
 		sql.append("SELECT count(*) as total FROM ");
 		sql.append(modelToTable(dbHelper.getModelName()));
-
+		sql.append(" WHERE ");
 		if (where != null && where.length > 0) {
-			sql.append(" WHERE ");
+
 			for (String whr : where) {
 				if (whr.contains(".")) {
 					String[] datas = whr.split("\\.");
@@ -1030,8 +1030,11 @@ public class ORM extends SQLiteDatabaseHelper {
 					sql.append(whr);
 					sql.append(" ");
 				}
-			}
 
+			}
+			sql.append(" and oea_name = '" + user_name + "'");
+		} else {
+			sql.append(" oea_name = '" + user_name + "'");
 		}
 		Cursor cursor = db.rawQuery(sql.toString(), whereArgs);
 		cursor.moveToFirst();
@@ -1354,6 +1357,49 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	public boolean delete(BaseDBHelper db, int id) {
 		return delete(db, id, false);
+
+	}
+
+	/**
+	 * Database tables.
+	 * 
+	 * @return the string[]
+	 */
+	public String[] databaseTables() {
+		String[] tables_list = null;
+		List<String> tables = new ArrayList<String>();
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor cursor = db.rawQuery(
+				"SELECT * FROM sqlite_master WHERE type='table';", null);
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			String tableName = cursor.getString(1);
+			if (!tableName.equals("android_metadata")
+					&& !tableName.equals("sqlite_sequence"))
+				tables.add(tableName);
+			cursor.moveToNext();
+		}
+		cursor.close();
+		tables_list = tables.toArray(new String[tables.size()]);
+		return tables_list;
+	}
+
+	/**
+	 * Clean user records.
+	 * 
+	 * @param user_name
+	 *            the user_name
+	 * @return true, if successful
+	 */
+	public boolean cleanUserRecords(String user_name) {
+		SQLiteDatabase db = getWritableDatabase();
+		for (String table : databaseTables()) {
+			String sql = "DELETE FROM " + table + " where oea_name = '"
+					+ user_name + "'";
+			db.execSQL(sql);
+		}
+		db.close();
+		return true;
 
 	}
 }

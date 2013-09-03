@@ -63,7 +63,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		// TODO Auto-generated constructor stub
 		this.context = context;
-		modules = new ModulesConfig().applicationModules();
+		modules = new ModulesConfig().modules();
 		/*
 		 * this.statements = new ArrayList<SQLStatement>(); Boot boot = new
 		 * Boot(context, modules); this.statements = boot.getAllStatements();

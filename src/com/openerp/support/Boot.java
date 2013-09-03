@@ -62,7 +62,7 @@ public class Boot {
 				.setDisplayShowTitleEnabled(true);
 
 		this.context = context;
-		this.modules = new ModulesConfig().applicationModules();
+		this.modules = new ModulesConfig().modules();
 		this.statements = new ArrayList<SQLStatement>();
 		loadBaseModules();
 		this.initDatabase();

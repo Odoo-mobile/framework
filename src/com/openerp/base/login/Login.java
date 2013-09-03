@@ -299,6 +299,7 @@ public class Login extends BaseFragment {
 					loginUserASync.cancel(true);
 					pdialog.hide();
 					Intent intent = getActivity().getIntent();
+					intent.putExtra("create_new_account", false);
 					getActivity().finish();
 					getActivity().startActivity(intent);
 

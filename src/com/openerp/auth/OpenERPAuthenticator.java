@@ -27,9 +27,9 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.openerp.MainActivity;
+import com.openerp.orm.ORM;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -170,9 +170,12 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 					.getBoolean(AccountManager.KEY_BOOLEAN_RESULT);
 
 			if (removalAllowed) {
-				// TODO: Do removal stuff here
-				Log.e("TODO : Do Database Removal Stuff Here For Account => ",
-						account.name);
+				String account_name = account.name;
+				ORM orm = new ORM(mConetext);
+				if (orm.cleanUserRecords(account_name)) {
+					// TODO: stuff on success of removing user data from
+					// database.
+				}
 			}
 		}
 
