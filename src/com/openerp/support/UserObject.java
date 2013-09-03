@@ -118,6 +118,7 @@ public class UserObject {
 		this.setHost(data.getString("host"));
 		this.setAndroidName(data.getString("android_name"));
 		this.setPassword(data.getString("password"));
+		this.setCompany_id(data.getString("company_id"));
 	}
 
 	/**
@@ -140,6 +141,7 @@ public class UserObject {
 		this.setHost(accMgr.getUserData(account, "host"));
 		this.setAndroidName(accMgr.getUserData(account, "android_name"));
 		this.setPassword(accMgr.getUserData(account, "password"));
+		this.setCompany_id(accMgr.getUserData(account, "company_id"));
 	}
 
 	/**
