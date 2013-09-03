@@ -213,7 +213,9 @@ public class ComposeNoteFragment extends BaseFragment {
 							Toast.LENGTH_SHORT).show();
 				} else {
 					writeNoteStages(stage.getText().toString());
-					adapter.add(stage.getText().toString());
+					stages.add(stages.size() - 1, stage.getText().toString());
+					adapter.notifyDataSetChanged();
+					noteStages.setSelection(stages.size() - 2);
 				}
 			}
 		});
@@ -232,6 +234,7 @@ public class ComposeNoteFragment extends BaseFragment {
 		NoteDBHelper.NoteStages notestageObj = dbhelper.new NoteStages(
 				scope.context());
 		int newId = notestageObj.createRecordOnserver(notestageObj, values);
+		note_Stages.put(stagename, Long.parseLong(String.valueOf(newId)));
 		values.put("id", newId);
 		notestageObj.create(notestageObj, values);
 	}
