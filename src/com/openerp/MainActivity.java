@@ -25,7 +25,6 @@ import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,7 +36,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -455,15 +453,14 @@ public class MainActivity extends FragmentActivity {
 	public void cancelSync(String authority) {
 		Account account = OpenERPAccountManager.getAccount(this,
 				MainActivity.userContext.getAndroidName());
-
-		getContentResolver().cancelSync(account, authority);
-
+		ContentResolver.cancelSync(account, authority);
 	}
 
 	/**
 	 * Handle sync provider. Depend on user settings
 	 */
 	public void handleSyncProvider() {
+
 		SharedPreferences sharedPrefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		boolean sync_enable = sharedPrefs.getBoolean("perform_sync", false);
@@ -474,7 +471,7 @@ public class MainActivity extends FragmentActivity {
 		List<String> default_authorities = new ArrayList<String>();
 		default_authorities.add("com.android.calendar");
 		default_authorities.add("com.android.contacts");
-		SyncAdapterType[] list = getContentResolver().getSyncAdapterTypes();
+		SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
 		for (SyncAdapterType lst : list) {
 			if (lst.authority.contains("com.openerp.providers")) {
 				default_authorities.add(lst.authority);

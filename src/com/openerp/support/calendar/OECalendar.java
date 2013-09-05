@@ -386,12 +386,13 @@ public class OECalendar {
 				new String[] { "_id" }, " _id = ? ",
 				new String[] { cal_meeting_id }, null);
 
+		boolean flag = false;
 		if (cursor.moveToFirst()) {
 			// Event exist
-			cursor.close();
-			return true;
+			flag = true;
 		}
-		return false;
+		cursor.close();
+		return flag;
 	}
 
 	/**
@@ -610,11 +611,8 @@ public class OECalendar {
 			args.put("date_deadline", endDate); // IMP Field REQ
 			args.put("location", location);
 			args.put("description", description);
-			openerp.debugMode(true);
-
 			response = openerp.createNew("crm.meeting", args);
 			new_generated_id = response.getString("result");
-			// openerp.debugMode(false);
 			addMeetings_TOlocaldb(Integer.parseInt(new_generated_id), name,
 					date, endDate, Duration, location, description);
 		} catch (ClientProtocolException e) {

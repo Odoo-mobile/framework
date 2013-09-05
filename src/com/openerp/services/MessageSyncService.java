@@ -38,11 +38,11 @@ import com.openerp.MainActivity;
 import com.openerp.addons.messages.MessageDBHelper;
 import com.openerp.addons.messages.MessageSyncHelper;
 import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
+import com.openerp.util.SyncBroadcastHelper;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -61,6 +61,9 @@ public class MessageSyncService extends Service {
 
 	/** The context. */
 	Context context = null;
+
+	/** The sync broadcast helper. */
+	SyncBroadcastHelper sync_helper = new SyncBroadcastHelper();
 
 	/**
 	 * Instantiates a new message sync service.
@@ -116,18 +119,17 @@ public class MessageSyncService extends Service {
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		// TODO Auto-generated method stub
-		Log.d("performSync for Message", "Started");
 		try {
-
+			MessageDBHelper msgDb = new MessageDBHelper(context);
 			Intent intent = new Intent();
 			HashMap<String, Object> response = null;
 			if (OpenERPServerConnection.isNetworkAvailable(context)) {
-				Log.d(TAG + "::performSync()", "Sync with Server Started");
+				Log.i(TAG + "::performSync()", "Sync with Server Started");
+				sync_helper
+						.sendBrodcast(context, authority, "Message", "start");
 				intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-				MainActivity.openerp = new OEHelper(context,
-						OpenERPAccountManager.currentUser(context));
-				int user_id = Integer.parseInt(MainActivity.userContext
-						.getUser_id());
+				int user_id = Integer.parseInt(OpenERPAccountManager
+						.currentUser(context).getUser_id());
 
 				// Updating User Context for OE-JSON-RPC
 				JSONObject newContext = new JSONObject();
@@ -142,8 +144,7 @@ public class MessageSyncService extends Service {
 				// Argument for Check Ids not in local database
 				OEArgsHelper arg1 = new OEArgsHelper();
 				arg1.addArgCondition("id", "not in", JSONDataHelper
-						.intArrayToJSONArray(MainActivity.openerp
-								.getAllIds(new MessageDBHelper(context))));
+						.intArrayToJSONArray(msgDb.localIds(msgDb)));
 
 				// Argument for check partner_ids.user_id is current user
 				OEArgsHelper arg2 = new OEArgsHelper();
@@ -187,21 +188,26 @@ public class MessageSyncService extends Service {
 				// Param 7 : limit
 				mainArgs.addArg(50);
 
-				response = new MessageSyncHelper(context).syncWithServer(
-						new MessageDBHelper(context), mainArgs.getArgs());
+				response = new MessageSyncHelper(context).syncWithServer(msgDb,
+						mainArgs.getArgs());
+				// Sync status updator
 
 				if (Integer.parseInt(response.get("total").toString()) > 0) {
 					intent.putExtra("data_new", response.get("new_ids")
 							.toString());
 					intent.putExtra("data_update", response.get("update_ids")
 							.toString());
-					Log.d("MessageSyncService",
+					Log.e("MessageSyncService",
 							"sending sync finish broadcast.");
+					sync_helper.sendBrodcast(context, authority, "Message",
+							"finish");
 					context.sendBroadcast(intent);
 				} else {
 					intent.putExtra("data_new", "false");
 					intent.putExtra("data_update", "false");
 					context.sendBroadcast(intent);
+					sync_helper.sendBrodcast(context, authority, "Message",
+							"finish");
 				}
 
 			} else {
@@ -248,14 +254,15 @@ public class MessageSyncService extends Service {
 			// TODO Auto-generated method stub
 			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				account = OpenERPAccountManager.getAccount(mContext,
-						MainActivity.userContext.getAndroidName());
+						OpenERPAccountManager.currentUser(context)
+								.getAndroidName());
 				try {
 					if (account != null) {
 						new MessageSyncService().performSync(mContext, account,
 								bundle, str, providerClient, syncResult);
 					}
 				} catch (Exception e) {
-
+					e.printStackTrace();
 				}
 			} else {
 				return;

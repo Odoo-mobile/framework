@@ -35,10 +35,11 @@ import com.openerp.addons.meeting.MeetingDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.calendar.OECalendar;
+import com.openerp.util.SyncBroadcastHelper;
 
-public class MeetingSyncService extends Service
-{
-
+public class MeetingSyncService extends Service {
+	/** The sync broadcast helper. */
+	SyncBroadcastHelper sync_helper = new SyncBroadcastHelper();
 	private static SyncAdapterImpl sSyncAdapter = null;
 	Context context = null;
 	MeetingDBHelper db = null;
@@ -51,19 +52,16 @@ public class MeetingSyncService extends Service
 	}
 
 	@Override
-	public IBinder onBind(Intent intent)
-	{
+	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		IBinder ret = null;
 		ret = getSyncAdapter().getSyncAdapterBinder();
 		return ret;
 	}
 
-	public SyncAdapterImpl getSyncAdapter()
-	{
+	public SyncAdapterImpl getSyncAdapter() {
 		// TODO Auto-generated method stub
-		if (sSyncAdapter == null)
-		{
+		if (sSyncAdapter == null) {
 			sSyncAdapter = new SyncAdapterImpl(this);
 		}
 		return sSyncAdapter;
@@ -71,12 +69,11 @@ public class MeetingSyncService extends Service
 
 	public void performSync(Context context, Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
-			SyncResult syncResult)
-	{
+			SyncResult syncResult) {
 		// TODO Auto-generated method stub
 
-		try
-		{
+		try {
+			sync_helper.sendBrodcast(context, authority, "Meeting", "start");
 			// creating a object of MeetingDBHelper to handle database
 			db = new MeetingDBHelper(context);
 			// start sync service to fetch new Records from OpenERP Server to
@@ -87,8 +84,7 @@ public class MeetingSyncService extends Service
 			// not in localdb
 			// update localdb with OpenERP Server
 			OEHelper oe = new OEHelper(context, MainActivity.userContext);
-			if (oe.syncWithServer(db))
-			{
+			if (oe.syncWithServer(db)) {
 				// Sync Done, Next stuff....
 				// initilizing com.openerp.support.calendar obejct to delete
 				// event from OpenERP mobile calendar which are no more in
@@ -101,15 +97,13 @@ public class MeetingSyncService extends Service
 						.getDeletedRows();
 
 				// check whether any deleted record foud for crm.meeting
-				if (deleted_ids.containsKey("crm.meeting"))
-				{
+				if (deleted_ids.containsKey("crm.meeting")) {
 					// contains all the deleted records for crm.meeting module
 					List<HashMap<String, Object>> ids = deleted_ids
 							.get("crm.meeting");
 
 					// deleting events from OpenERP mobile calendar by id
-					for (int i = 0; i < ids.size(); i++)
-					{
+					for (int i = 0; i < ids.size(); i++) {
 						// fetching whole row which are deleted
 						@SuppressWarnings("unchecked")
 						HashMap<String, Object> row = ((List<HashMap<String, Object>>) ids
@@ -128,17 +122,17 @@ public class MeetingSyncService extends Service
 				// sync manully created events in OpenERP mobile calendar to
 				// OpenERP Server
 				calendar.sync_Event_TOServer(account, db);
+				sync_helper.sendBrodcast(context, authority, "Meeting",
+						"finish");
 
 			}
 
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public class SyncAdapterImpl extends AbstractThreadedSyncAdapter
-	{
+	public class SyncAdapterImpl extends AbstractThreadedSyncAdapter {
 
 		// declaring conctext CONSTANT
 		private Context mContext;
@@ -152,30 +146,24 @@ public class MeetingSyncService extends Service
 
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
-				ContentProviderClient providerClient, SyncResult syncResult)
-		{
+				ContentProviderClient providerClient, SyncResult syncResult) {
 			// TODO Auto-generated method stub
 
-			if (OpenERPAccountManager.isAnyUser(mContext))
-			{
+			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				// retriving user account name
 				account = OpenERPAccountManager.getAccount(mContext,
 						MainActivity.userContext.getAndroidName());
-				try
-				{
+				try {
 					// checking whether user exist with this account name
-					if (account != null)
-					{
+					if (account != null) {
 						// creating object to call performing sync operation
 						new MeetingSyncService().performSync(mContext, account,
 								bundle, str, providerClient, syncResult);
 					}
-				} catch (Exception e)
-				{
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			} else
-			{
+			} else {
 				return;
 			}
 		}

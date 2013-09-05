@@ -869,7 +869,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the model
 	 * @return the string
 	 */
-	private String modelToTable(String model) {
+	public String modelToTable(String model) {
 		StringBuffer table = new StringBuffer();
 		table.append(model.replaceAll("\\.", "_"));
 		return table.toString();
@@ -1293,13 +1293,15 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            : instance of database helper
 	 * @return int[] : list of integer array of local database ids for model
 	 */
-	@SuppressWarnings("unchecked")
 	public int[] localIds(BaseDBHelper db) {
-		HashMap<String, Object> records = search(db);
-		int[] ids = new int[Integer.parseInt(records.get("total").toString())];
+		String table = modelToTable(db.getModelName());
+		String sql = "SELECT id, oea_name FROM " + table
+				+ " WHERE oea_name = ?";
+		List<HashMap<String, Object>> records = executeSQL(sql,
+				new String[] { user_name });
+		int[] ids = new int[records.size()];
 		int i = 0;
-		for (HashMap<String, Object> row : (List<HashMap<String, Object>>) records
-				.get("records")) {
+		for (HashMap<String, Object> row : records) {
 			ids[i] = Integer.parseInt(row.get("id").toString());
 			i++;
 		}

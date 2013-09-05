@@ -22,16 +22,21 @@ package com.openerp.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.os.Bundle;
+
+import com.openerp.util.SyncBroadcastHelper;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class SyncFinishReceiver.
+ * The Class SyncProgressReceiver.
  */
-public class SyncFinishReceiver extends BroadcastReceiver {
+public class SyncProgressReceiver extends BroadcastReceiver {
+
+	/** The sync_broadcast. */
+	SyncBroadcastHelper sync_broadcast = new SyncBroadcastHelper();
 
 	/** The Constant SYNC_FINISH. */
-	public static final String SYNC_FINISH = "com.openerp.SYNC_FINISH";
+	public static final String SYNC_PROGRESS = "com.openerp.SYNC_PROGRESS";
 
 	/*
 	 * (non-Javadoc)
@@ -41,8 +46,19 @@ public class SyncFinishReceiver extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		// TODO Auto-generated method stub
-		Log.i("SyncFinish", "Sync finished");
+		Bundle serviceInfo = new Bundle();
+		if (intent.hasExtra("sync_service")) {
+			serviceInfo = (Bundle) intent.getExtras().get("sync_service");
+			String name = serviceInfo.getString("name");
+			String authority = serviceInfo.getString("authority");
+			String status = serviceInfo.getString("status");
+			if (status.equals("start")) {
+				sync_broadcast.startSyncNotification(context, name, authority);
+			} else {
+				sync_broadcast.stopSyncNotification(context);
+			}
+		}
 
 	}
+
 }

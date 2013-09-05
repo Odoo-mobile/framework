@@ -204,19 +204,7 @@ public class OEHelper extends OpenERP {
 	 * @return the all ids
 	 */
 	public int[] getAllIds(BaseDBHelper db) {
-		int[] ids = null;
-		HashMap<String, Object> result = db.search(db);
-
-		if (Integer.parseInt(result.get("total").toString()) > 0) {
-			List<HashMap<String, String>> records = (List<HashMap<String, String>>) result
-					.get("records");
-			ids = new int[Integer.parseInt(result.get("total").toString())];
-			int i = 0;
-			for (HashMap<String, String> row : records) {
-				ids[i] = Integer.parseInt(row.get("id").toString());
-				i++;
-			}
-		}
+		int[] ids = db.localIds(db);
 		return ids;
 	}
 
@@ -464,7 +452,6 @@ public class OEHelper extends OpenERP {
 		try {
 			return search_read(model, fields, domain, 0, 0, null, null);
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return null;
 
