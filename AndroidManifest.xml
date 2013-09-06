@@ -101,6 +101,23 @@
                 android:resource="@xml/sync_notes" />
         </service>
 
+        <!-- Contact sync Services -->
+        <service
+            android:name="com.openerp.services.ContactSyncService"
+            android:exported="true"
+            android:process=":contacts" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_contacts" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
+
         <!-- Sync Status Broadcast -->
         <receiver android:name="com.openerp.receivers.SyncProgressReceiver" >
             <intent-filter>

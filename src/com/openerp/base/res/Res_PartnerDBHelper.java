@@ -55,6 +55,8 @@ public class Res_PartnerDBHelper extends BaseDBHelper {
 		columns.add(new Fields("phone", "Phone", Types.text()));
 		columns.add(new Fields("mobile", "Mobile", Types.text()));
 		columns.add(new Fields("email", "email", Types.text()));
+		columns.add(new Fields("company_id", "company", Types
+				.many2One(new Res_Company(context))));
 
 	}
 
