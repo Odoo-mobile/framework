@@ -369,8 +369,13 @@ public class MainActivity extends FragmentActivity {
 			getActionBar()
 					.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 			setTitle(this.systemMenus[position].getTitle());
-			fragment = (Fragment) this.systemMenus[position]
-					.getFragmentInstance();
+			Object instance = this.systemMenus[position].getFragmentInstance();
+			if (instance instanceof Intent) {
+				startActivity((Intent) instance);
+				return;
+			} else {
+				fragment = (Fragment) instance;
+			}
 		}
 		if (fragment != null) {
 			fragmentHandler.replaceFragmnet(fragment);
