@@ -86,6 +86,7 @@ public class Message extends BaseFragment implements
 		INBOX, TODO, TOME, ARCHIVE
 	}
 
+	TYPE current_type = TYPE.INBOX;
 	public int selectedCounter = 0;
 
 	@Override
@@ -141,8 +142,6 @@ public class Message extends BaseFragment implements
 		 * see method for more information about it.
 		 */
 		handleArguments((Bundle) getArguments());
-
-
 		return rootView;
 	}
 
@@ -151,7 +150,7 @@ public class Message extends BaseFragment implements
 	 * 
 	 * Setting up listview for messages to load.
 	 */
-	private void setupListView(TYPE type) {
+	public void setupListView(TYPE type) {
 		// Destroying pre-loaded instance and going to create new one
 		lstview = null;
 
@@ -189,7 +188,15 @@ public class Message extends BaseFragment implements
 		// Creating instance for listview control
 		lstview = (ListView) rootView.findViewById(R.id.lstMessages);
 		// Providing adapter to listview
-		lstview.setAdapter(listAdapter);
+		scope.context().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				lstview.setAdapter(listAdapter);
+
+			}
+		});
+
 		// Setting listview choice mode to multiple model
 		lstview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
@@ -366,6 +373,7 @@ public class Message extends BaseFragment implements
 		String[] where = null;
 		String[] whereArgs = null;
 		int message_resource = 0;
+		current_type = type;
 		switch (type) {
 		case INBOX:
 			where = new String[] { "to_read = ?", "AND", "starred  = ?" };
@@ -390,13 +398,18 @@ public class Message extends BaseFragment implements
 		// Fetching parent ids from Child row with order by date desc
 		HashMap<String, Object> result = db.search(db, where, whereArgs, null,
 				null, "date", "DESC");
-
 		HashMap<String, OEListViewRows> parent_list_details = new HashMap<String, OEListViewRows>();
 		messages_sorted = new ArrayList<OEListViewRows>();
-		rootView.findViewById(R.id.lstMessages).setVisibility(View.VISIBLE);
-		rootView.findViewById(R.id.txvMessageAllReadMessage).setVisibility(
-				View.GONE);	
 		if (Integer.parseInt(result.get("total").toString()) > 0) {
+			scope.context().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					rootView.findViewById(R.id.messageSyncWaiter)
+							.setVisibility(View.GONE);
+				}
+			});
+
 			int i = 0;
 			for (HashMap<String, Object> row : (List<HashMap<String, Object>>) result
 					.get("records")) {
@@ -412,6 +425,7 @@ public class Message extends BaseFragment implements
 					// Fetching row parent message
 					HashMap<String, Object> newRow = null;
 					OEListViewRows newRowObj = null;
+
 					if (isParent) {
 						newRow = row;
 						newRowObj = new OEListViewRows(Integer.parseInt(key),
@@ -434,13 +448,16 @@ public class Message extends BaseFragment implements
 
 		} else {
 			if (db.isEmptyTable(db)) {
-
+				rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
+						View.VISIBLE);
 				try {
 					Thread.sleep(2000);
 					scope.context().requestSync(MessageProvider.AUTHORITY);
 				} catch (Exception e) {
 				}
 			} else {
+				rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
+						View.GONE);
 				rootView.findViewById(R.id.lstMessages)
 						.setVisibility(View.GONE);
 				TextView txvMsg = (TextView) rootView
@@ -450,7 +467,7 @@ public class Message extends BaseFragment implements
 			}
 
 		}
-		rootView.findViewById(R.id.messageSyncWaiter).setVisibility(View.GONE);
+
 		return messages_sorted;
 
 	}
@@ -660,19 +677,42 @@ public class Message extends BaseFragment implements
 								.get(0));
 
 				HashMap<String, Object> row = newRowObj.getRow_data();
-				//
-				if (message_row_indexes.containsKey(id) && list.size() > 0) {
-					list.remove(Integer.parseInt(message_row_indexes.get(id)
-							.toString()));
-					datasetReg.remove(id);
-				}
-				if (!datasetReg.containsKey(String.valueOf(newRowObj
-						.getRow_id()))) {
-					datasetReg.put(String.valueOf(newRowObj.getRow_id()), true);
-					list.add(0, newRowObj);
-					listAdapter.refresh(list);
+
+				boolean condition = false;
+				switch (current_type) {
+				case INBOX:
+					condition = (row.get("to_read").toString().equals("true") && row
+							.get("starred").equals("false"));
+					break;
+				case TOME:
+					condition = (row.get("to_read").toString().equals("true")
+							&& row.get("starred").equals("false") && row.get(
+							"res_id").equals("0"));
+					break;
+				case TODO:
+					condition = (row.get("starred").equals("true"));
+					break;
+				case ARCHIVE:
+					condition = true;
+					break;
+				default:
+					break;
 				}
 
+				if (condition) {
+					if (message_row_indexes.containsKey(id) && list.size() > 0) {
+						list.remove(Integer.parseInt(message_row_indexes
+								.get(id).toString()));
+						datasetReg.remove(id);
+					}
+					if (!datasetReg.containsKey(String.valueOf(newRowObj
+							.getRow_id()))) {
+						datasetReg.put(String.valueOf(newRowObj.getRow_id()),
+								true);
+						list.add(0, newRowObj);
+						listAdapter.refresh(list);
+					}
+				}
 			} catch (Exception e) {
 			}
 
@@ -704,15 +744,23 @@ public class Message extends BaseFragment implements
 
 				}
 				scope.context().refreshMenu(getActivity());
+				listAdapter.clear();
+				list.clear();
+				listAdapter.refresh(list);
+				setupListView(TYPE.INBOX);
 
 			} catch (Exception e) {
 			}
 			Log.d("Message::syncFinishReceiver::onReceive()",
 					"Resetting listview messages to INBOX");
-			listAdapter.clear();
-			list.clear();
-			listAdapter.refresh(list);
-			setupListView(TYPE.INBOX);
+
+			if (mPullToRefreshAttacher == null) {
+				listAdapter.clear();
+				list.clear();
+				listAdapter.refresh(list);
+				setupListView(TYPE.INBOX);
+
+			}
 
 		}
 	};
@@ -858,7 +906,7 @@ public class Message extends BaseFragment implements
 	}
 
 	/* Method for Make Message as TODO */
-	private boolean markAsTodo(OEArgsHelper messageIds, boolean markFlag) {
+	public boolean markAsTodo(OEArgsHelper messageIds, boolean markFlag) {
 		boolean flag = false;
 		OEHelper openerp = getOEInstance();
 

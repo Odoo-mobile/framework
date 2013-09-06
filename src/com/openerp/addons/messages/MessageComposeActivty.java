@@ -38,6 +38,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,6 +60,7 @@ import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.Base64Helper;
+import com.openerp.util.HTMLHelper;
 
 public class MessageComposeActivty extends Activity {
 	private static final int PICKFILE_RESULT_CODE = 1;
@@ -69,6 +71,7 @@ public class MessageComposeActivty extends Activity {
 	OEListViewAdapter lstAttachmentAdapter = null;
 	List<OEListViewRows> partners_list = new ArrayList<OEListViewRows>();
 	HashMap<String, Object> selectedPartners = new HashMap<String, Object>();
+	boolean is_note_body = false;
 
 	enum ATTACHMENT_TYPE {
 		IMAGE, TEXT_FILE
@@ -201,7 +204,11 @@ public class MessageComposeActivty extends Activity {
 				// TASK: sending mail
 				HashMap<String, Object> values = new HashMap<String, Object>();
 				values.put("subject", subject);
-				values.put("body", body);
+				if (is_note_body) {
+					values.put("body", Html.toHtml(edtBody.getText()));
+				} else {
+					values.put("body", body);
+				}
 				values.put("partner_ids", getPartnersId());
 				values.put("attachment_ids", newAttachmentIds);
 
@@ -250,6 +257,14 @@ public class MessageComposeActivty extends Activity {
 			file_uris.addAll(fileUris);
 			handleReceivedFile();
 
+		}
+
+		// note.note send as mail
+		if (intent.hasExtra("note_body")) {
+			EditText edtBody = (EditText) findViewById(R.id.edtMessageBody);
+			String body = intent.getExtras().getString("note_body");
+			edtBody.setText(HTMLHelper.stringToHtml(body));
+			is_note_body = true;
 		}
 
 	}

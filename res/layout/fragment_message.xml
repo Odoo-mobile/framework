@@ -7,7 +7,14 @@
         layout="@layout/message_listview_header"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
-        android:visibility="visible" />
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/loadingHeader"
+        layout="@layout/listview_data_loading_progress"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/txvMessageAllReadMessage"
@@ -21,7 +28,7 @@
         android:text="Woohoo! You&apos;ve read all the messages in your inbox."
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#77778f"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <ListView
         android:id="@+id/lstMessages"

@@ -7,11 +7,19 @@
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical"
     android:paddingBottom="10dp"
-    android:paddingTop="10dp" >
+    android:paddingTop="50dp" >
 
     <ProgressBar
         android:id="@+id/progressBar1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Loading..."
+        android:textColor="#414141" />
 
 </LinearLayout>

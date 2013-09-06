@@ -40,8 +40,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +50,8 @@ import com.openerp.R;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
+import com.openerp.support.JSONDataHelper;
+import com.openerp.support.OEArgsHelper;
 import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
@@ -65,9 +67,6 @@ public class MessageDetail extends BaseFragment {
 
 	/** The root view. */
 	View rootView = null;
-
-	/** The list. */
-	List<OEListViewRows> list = new ArrayList<OEListViewRows>();
 
 	/** The list adapter. */
 	OEListViewAdapter listAdapter = null;
@@ -254,10 +253,11 @@ public class MessageDetail extends BaseFragment {
 	private void setupListView(List<OEListViewRows> list) {
 		// Handling List View controls and keys
 		String[] from = new String[] { "image", "email_from|name",
-				"email_from|email", "parent_id", "body", "date", "partners" };
+				"email_from|email", "parent_id", "body", "date", "partners",
+				"starred" };
 		int[] to = new int[] { R.id.imgUserPicture, R.id.txvMessageAuthor,
 				R.id.txvAuthorEmail, R.id.layoutMessageDetailHeader,
-				R.id.txvBody, R.id.txvTime, R.id.txvTo };
+				R.id.txvBody, R.id.txvTime, R.id.txvTo, R.id.imgBtnStar };
 
 		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
@@ -297,8 +297,8 @@ public class MessageDetail extends BaseFragment {
 				});
 		// Setting callback handler for boolean field value change.
 		listAdapter.setBooleanEventOperation("starred",
-				R.drawable.ic_action_starred, R.drawable.ic_action_unstarred,
-				updateStarred);
+				R.drawable.ic_rating_important,
+				R.drawable.ic_rating_not_important, updateStarred);
 		ListView lstview = (ListView) rootView
 				.findViewById(R.id.lstMessageDetail);
 		// Providing adapter to listview
@@ -446,10 +446,54 @@ public class MessageDetail extends BaseFragment {
 
 		@Override
 		public OEListViewRows updateFlagValues(OEListViewRows row, View view) {
-			// TODO Auto-generated method stub
-			return null;
+			HashMap<String, Object> rowData = (HashMap<String, Object>) row
+					.getRow_data();
+			boolean flag = false;
+			ImageView img = (ImageView) view;
+			if (rowData.get("starred").toString().equals("false")) {
+				flag = true;
+				img.setImageResource(R.drawable.ic_rating_important);
+			} else {
+				img.setImageResource(R.drawable.ic_rating_not_important);
+			}
+			OEArgsHelper messageIds = new OEArgsHelper();
+			messageIds.addArg(row.getRow_id());
+			if (markAsTodo(messageIds, flag)) {
+				rowData.put("starred", flag);
+			} else {
+				Log.e("Unable to mark as todo", "Operation Fail");
+			}
+			return row;
 		}
 	};
+
+	/* Method for Make Message as TODO */
+	public boolean markAsTodo(OEArgsHelper messageIds, boolean markFlag) {
+		boolean flag = false;
+		OEHelper openerp = getOEInstance();
+
+		OEArgsHelper args = new OEArgsHelper();
+
+		// Param 1 : message_ids list
+		args.addArg(messageIds.getArgs());
+
+		// Param 2 : starred - boolean value
+		args.addArg(markFlag);
+
+		// Param 3 : create_missing - If table does not contain any value for
+		// this row than create new one
+		args.addArg(true);
+
+		// Creating Local Database Requirement Values
+		ContentValues values = new ContentValues();
+		String value = (markFlag) ? "true" : "false";
+		values.put("starred", value);
+
+		flag = openerp.callServerMethod(getModel(), "set_message_starred",
+				args.getArgs(), values,
+				JSONDataHelper.jsonArrayTointArray(messageIds.getArgs()));
+		return flag;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -478,15 +522,102 @@ public class MessageDetail extends BaseFragment {
 		// handle item selection
 		switch (item.getItemId()) {
 		case R.id.menu_message_detail_read:
-			Log.i("Menu Clicked", "mark as read");
+			markAsReadUnreadArchive(true);
 			return true;
 		case R.id.menu_message_detail_unread:
-			Log.i("Menu Clicked", "mark as unread");
+			markAsReadUnreadArchive(false);
 			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	/* Method for Make Message as Read,Unread and Archive */
+	private boolean markAsReadUnreadArchive(OEArgsHelper messageIds,
+			String default_model, int res_id, int parent_id, boolean markFlag) {
+		boolean flag = false;
+		OEHelper openerp = getOEInstance();
+		JSONObject newContext = new JSONObject();
+		try {
+			if (default_model.equals("false")) {
+				newContext.put("default_model", false);
+			} else {
+				newContext.put("default_model", default_model);
+			}
+			newContext.put("default_res_id", res_id);
+			newContext.put("default_parent_id", parent_id);
+			OEArgsHelper args = new OEArgsHelper();
+
+			// Param 1 : message_ids list
+			args.addArg(messageIds.getArgs());
+
+			// Param 2 : starred - boolean value
+			args.addArg(markFlag);
+
+			// Param 3 : create_missing - If table does not contain any value
+			// for
+			// this row than create new one
+			args.addArg(true);
+
+			// Param 4 : context
+			args.addArg(newContext);
+
+			// Creating Local Database Requirement Values
+			ContentValues values = new ContentValues();
+			String value = (markFlag) ? "false" : "true";
+			values.put("starred", "false");
+			values.put("to_read", value);
+			flag = openerp.callServerMethod(getModel(), "set_message_read",
+					args.getArgs(), values,
+					JSONDataHelper.jsonArrayTointArray(messageIds.getArgs()));
+			for (int uId : JSONDataHelper.jsonArrayTointArray(messageIds
+					.getArgs())) {
+				db.write(db, values, uId, true);
+			}
+		} catch (Exception e) {
+		}
+		return flag;
+	}
+
+	/* Method for mark multiple message as Read, Unread, Archive */
+	private boolean markAsReadUnreadArchive(final boolean flag) {
+		boolean res = false;
+		OEArgsHelper args = new OEArgsHelper();
+		int parent_id = 0;
+		int res_id = 0;
+		String default_model = "false";
+
+		final int pos = 0;
+		OEListViewRows rowInfo = messages_sorted.get(pos);
+		if (rowInfo.getRow_data().get("parent_id").equals("false")) {
+			parent_id = rowInfo.getRow_id();
+			res_id = Integer.parseInt(rowInfo.getRow_data().get("res_id")
+					.toString());
+			default_model = rowInfo.getRow_data().get("model").toString();
+		} else {
+			parent_id = Integer.parseInt(rowInfo.getRow_data().get("parent_id")
+					.toString());
+		}
+		List<HashMap<String, Object>> ids = db.executeSQL(
+				db.getModelName(),
+				new String[] { "id" },
+				new String[] { "id = ?", "OR", "parent_id = ?" },
+				new String[] { String.valueOf(parent_id),
+						String.valueOf(parent_id) });
+		for (HashMap<String, Object> id : ids) {
+			if (parent_id != Integer.parseInt(id.get("id").toString())) {
+
+				args.addArg(Integer.parseInt(id.get("id").toString()));
+			}
+		}
+		args.addArg(rowInfo.getRow_id());
+
+		if (markAsReadUnreadArchive(args, default_model, res_id, parent_id,
+				flag)) {
+
+		}
+		return res;
 	}
 
 }
