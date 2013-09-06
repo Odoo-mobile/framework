@@ -21,8 +21,10 @@ package com.openerp;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -184,7 +186,6 @@ public class MenuDrawerHelper {
 				instance.invalidateOptionsMenu(); // creates call to
 				Log.d("MenuDrawer", "Closed");
 				instance.getActionBar().setIcon(R.drawable.ic_launcher);
-
 				instance.setTitle(menus[currentMenu].getTitle(), null);
 				// onPrepareOptionsMenu()
 			}
