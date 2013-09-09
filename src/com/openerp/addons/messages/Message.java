@@ -450,8 +450,14 @@ public class Message extends BaseFragment implements
 
 		} else {
 			if (db.isEmptyTable(db)) {
-				rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
-						View.VISIBLE);
+				scope.context().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						rootView.findViewById(R.id.messageSyncWaiter)
+								.setVisibility(View.VISIBLE);
+					}
+				});
+
 				try {
 					Thread.sleep(2000);
 					scope.context().requestSync(MessageProvider.AUTHORITY);
@@ -643,11 +649,6 @@ public class Message extends BaseFragment implements
 		}
 	}
 
-	/*
-	 * Used for Synchronization : Register receiver and unregister receiver
-	 * 
-	 * SyncFinishReceiver
-	 */
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -738,6 +739,11 @@ public class Message extends BaseFragment implements
 		return newRowObj;
 	}
 
+	/*
+	 * Used for Synchronization : Register receiver and unregister receiver
+	 * 
+	 * SyncFinishReceiver
+	 */
 	private SyncFinishReceiver messageSyncFinish = new SyncFinishReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -757,9 +763,7 @@ public class Message extends BaseFragment implements
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
-				// setupListView(TYPE.INBOX);
-				loadMessage = new LoadMessages(TYPE.INBOX);
-				loadMessage.execute((Void) null);
+				setupListView(getMessages(TYPE.INBOX));
 
 			} catch (Exception e) {
 			}
@@ -770,9 +774,7 @@ public class Message extends BaseFragment implements
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
-				// setupListView(TYPE.INBOX);
-				loadMessage = new LoadMessages(TYPE.INBOX);
-				loadMessage.execute((Void) null);
+				setupListView(getMessages(TYPE.INBOX));
 
 			}
 
