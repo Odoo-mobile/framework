@@ -86,8 +86,10 @@ public class Message extends BaseFragment implements
 		INBOX, TODO, TOME, ARCHIVE
 	}
 
+	SearchView searchView = null;
 	TYPE current_type = TYPE.INBOX;
 	public int selectedCounter = 0;
+	LoadMessages loadMessage = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -150,13 +152,13 @@ public class Message extends BaseFragment implements
 	 * 
 	 * Setting up listview for messages to load.
 	 */
-	public void setupListView(TYPE type) {
+	public void setupListView(List<OEListViewRows> message_list) {
 		// Destroying pre-loaded instance and going to create new one
 		lstview = null;
 
 		// Fetching required messages for listview by filtering of requrement
 		if (list != null && list.size() <= 0) {
-			list = getMessages(type);
+			list = message_list;// getMessages(message_list);
 		} else {
 			rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
 					View.GONE);
@@ -483,9 +485,8 @@ public class Message extends BaseFragment implements
 		// TODO Auto-generated method stub
 		inflater.inflate(R.menu.menu_fragment_message, menu);
 		// Associate searchable configuration with the SearchView
-		SearchView searchView = (SearchView) menu.findItem(
-				R.id.menu_message_search).getActionView();
-		searchView.setOnQueryTextListener(getQueryListener(listAdapter));
+		searchView = (SearchView) menu.findItem(R.id.menu_message_search)
+				.getActionView();
 	}
 
 	@Override
@@ -611,23 +612,32 @@ public class Message extends BaseFragment implements
 				String type = bundle.getString("type");
 				String title = "Archive";
 				if (type.equals("inbox")) {
-					setupListView(TYPE.INBOX);
+					// setupListView(TYPE.INBOX);
+					loadMessage = new LoadMessages(TYPE.INBOX);
+					loadMessage.execute((Void) null);
 					title = "Inbox";
 				} else if (type.equals("to-me")) {
 					title = "To-Me";
-					setupListView(TYPE.TOME);
+					// setupListView(TYPE.TOME);
+					loadMessage = new LoadMessages(TYPE.TOME);
+					loadMessage.execute((Void) null);
 				} else if (type.equals("to-do")) {
-					setupListView(TYPE.TODO);
+					// setupListView(TYPE.TODO);
 					title = "To-DO";
-
+					loadMessage = new LoadMessages(TYPE.TODO);
+					loadMessage.execute((Void) null);
 				} else if (type.equals("archive")) {
-					setupListView(TYPE.ARCHIVE);
+					// setupListView(TYPE.ARCHIVE);
+					loadMessage = new LoadMessages(TYPE.ARCHIVE);
+					loadMessage.execute((Void) null);
 
 				}
 				scope.context().setTitle(title);
 			} else {
 				scope.context().setTitle("Inbox");
-				setupListView(TYPE.INBOX);
+				// setupListView(TYPE.INBOX);
+				loadMessage = new LoadMessages(TYPE.INBOX);
+				loadMessage.execute((Void) null);
 
 			}
 		}
@@ -747,7 +757,9 @@ public class Message extends BaseFragment implements
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
-				setupListView(TYPE.INBOX);
+				// setupListView(TYPE.INBOX);
+				loadMessage = new LoadMessages(TYPE.INBOX);
+				loadMessage.execute((Void) null);
 
 			} catch (Exception e) {
 			}
@@ -758,7 +770,9 @@ public class Message extends BaseFragment implements
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
-				setupListView(TYPE.INBOX);
+				// setupListView(TYPE.INBOX);
+				loadMessage = new LoadMessages(TYPE.INBOX);
+				loadMessage.execute((Void) null);
 
 			}
 
@@ -962,6 +976,54 @@ public class Message extends BaseFragment implements
 		}
 
 		return res;
+	}
+
+	public class LoadMessages extends AsyncTask<Void, Void, Boolean> {
+
+		List<OEListViewRows> message_list = null;
+		TYPE message_type = null;
+
+		public LoadMessages(TYPE type) {
+			this.message_type = type;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			scope.context().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					rootView.findViewById(R.id.loadingHeader).setVisibility(
+							View.VISIBLE);
+					rootView.findViewById(R.id.lstMessages).setVisibility(
+							View.GONE);
+				}
+			});
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... arg0) {
+			message_list = getMessages(message_type);
+			return true;
+		}
+
+		@Override
+		protected void onPostExecute(final Boolean success) {
+			scope.context().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					rootView.findViewById(R.id.loadingHeader).setVisibility(
+							View.GONE);
+					rootView.findViewById(R.id.lstMessages).setVisibility(
+							View.VISIBLE);
+				}
+			});
+			setupListView(this.message_list);
+			searchView.setOnQueryTextListener(getQueryListener(listAdapter));
+			loadMessage = null;
+		}
+
 	}
 
 	public class PerformOperation extends AsyncTask<Void, Void, Boolean> {
