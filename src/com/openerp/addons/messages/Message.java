@@ -450,8 +450,14 @@ public class Message extends BaseFragment implements
 
 		} else {
 			if (db.isEmptyTable(db)) {
-				rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
-						View.VISIBLE);
+				scope.context().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						rootView.findViewById(R.id.messageSyncWaiter)
+								.setVisibility(View.VISIBLE);
+					}
+				});
+
 				try {
 					Thread.sleep(2000);
 					scope.context().requestSync(MessageProvider.AUTHORITY);
@@ -635,7 +641,6 @@ public class Message extends BaseFragment implements
 				scope.context().setTitle(title);
 			} else {
 				scope.context().setTitle("Inbox");
-				// setupListView(TYPE.INBOX);
 				loadMessage = new LoadMessages(TYPE.INBOX);
 				loadMessage.execute((Void) null);
 
@@ -643,11 +648,6 @@ public class Message extends BaseFragment implements
 		}
 	}
 
-	/*
-	 * Used for Synchronization : Register receiver and unregister receiver
-	 * 
-	 * SyncFinishReceiver
-	 */
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -738,6 +738,11 @@ public class Message extends BaseFragment implements
 		return newRowObj;
 	}
 
+	/*
+	 * Used for Synchronization : Register receiver and unregister receiver
+	 * 
+	 * SyncFinishReceiver
+	 */
 	private SyncFinishReceiver messageSyncFinish = new SyncFinishReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -757,9 +762,7 @@ public class Message extends BaseFragment implements
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
-				// setupListView(TYPE.INBOX);
-				loadMessage = new LoadMessages(TYPE.INBOX);
-				loadMessage.execute((Void) null);
+				setupListView(getMessages(TYPE.INBOX));
 
 			} catch (Exception e) {
 			}
@@ -770,9 +773,7 @@ public class Message extends BaseFragment implements
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
-				// setupListView(TYPE.INBOX);
-				loadMessage = new LoadMessages(TYPE.INBOX);
-				loadMessage.execute((Void) null);
+				setupListView(getMessages(TYPE.INBOX));
 
 			}
 
@@ -1003,8 +1004,11 @@ public class Message extends BaseFragment implements
 
 		@Override
 		protected Boolean doInBackground(Void... arg0) {
-			message_list = getMessages(message_type);
-			return true;
+			if (list != null && list.size() <= 0) {
+				message_list = getMessages(message_type);
+				return true;
+			}
+			return false;
 		}
 
 		@Override
@@ -1019,8 +1023,11 @@ public class Message extends BaseFragment implements
 							View.VISIBLE);
 				}
 			});
-			setupListView(this.message_list);
-			searchView.setOnQueryTextListener(getQueryListener(listAdapter));
+			if (success) {
+				setupListView(this.message_list);
+				searchView
+						.setOnQueryTextListener(getQueryListener(listAdapter));
+			}
 			loadMessage = null;
 		}
 
