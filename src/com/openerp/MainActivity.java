@@ -406,7 +406,9 @@ public class MainActivity extends FragmentActivity {
 	public void setAutoSync(String authority, boolean isON) {
 		Account account = OpenERPAccountManager.getAccount(this,
 				MainActivity.userContext.getAndroidName());
-		ContentResolver.setSyncAutomatically(account, authority, isON);
+		if (!ContentResolver.isSyncActive(account, authority)) {
+			ContentResolver.setSyncAutomatically(account, authority, isON);
+		}
 	}
 
 	/**

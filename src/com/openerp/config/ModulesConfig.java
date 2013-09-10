@@ -38,7 +38,7 @@ public class ModulesConfig extends ModulesConfigHelper {
 		// add(new Module("module_idea", "Idea", new Idea(), 0));
 		add(new Module("menu_message", "Message", new Message(), 0, true));
 		add(new Module("addons_meeting", "Meeting", new Meeting(), 0));
-		add(new Module("addons_note", "Notes", new Note(), 0, true));
+		add(new Module("addons_note", "Notes", new Note(), 0));
 
 	}
 }
