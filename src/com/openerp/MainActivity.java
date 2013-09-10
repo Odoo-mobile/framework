@@ -378,6 +378,7 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 		if (fragment != null) {
+			fragmentHandler.setBackStack(false, null);
 			fragmentHandler.replaceFragmnet(fragment);
 		}
 		// update selected item and title, then close the drawer
