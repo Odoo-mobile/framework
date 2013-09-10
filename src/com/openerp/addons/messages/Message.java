@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -137,12 +138,12 @@ public class Message extends BaseFragment implements
 
 		rootView = inflater
 				.inflate(R.layout.fragment_message, container, false);
-
 		/*
 		 * handleArguments(Bundle)
 		 * 
 		 * see method for more information about it.
 		 */
+		scope.context().setAutoSync(MessageProvider.AUTHORITY, true);
 		handleArguments((Bundle) getArguments());
 		return rootView;
 	}
@@ -367,11 +368,16 @@ public class Message extends BaseFragment implements
 
 		// Set the Refreshable View to be the ListView and the refresh listener
 		// to be this.
-		mPullToRefreshAttacher.setRefreshableView(lstview, this);
+		if (mPullToRefreshAttacher != null & lstview != null) {
+			mPullToRefreshAttacher.setRefreshableView(lstview, this);
+		}
 	}
 
 	private String updateSubject(String subject, int parent_id) {
 		String newSubject = subject;
+		if (subject.equals("false")) {
+			newSubject = "message";
+		}
 		int total_child = db.count(db, new String[] { "parent_id = ? " },
 				new String[] { String.valueOf(parent_id) });
 		if (total_child > 0) {
@@ -713,42 +719,18 @@ public class Message extends BaseFragment implements
 								.get(0));
 
 				HashMap<String, Object> row = newRowObj.getRow_data();
-
-				boolean condition = false;
-				switch (current_type) {
-				case INBOX:
-					condition = (row.get("to_read").toString().equals("true") && row
-							.get("starred").equals("false"));
-					break;
-				case TOME:
-					condition = (row.get("to_read").toString().equals("true")
-							&& row.get("starred").equals("false") && row.get(
-							"res_id").equals("0"));
-					break;
-				case TODO:
-					condition = (row.get("starred").equals("true"));
-					break;
-				case ARCHIVE:
-					condition = true;
-					break;
-				default:
-					break;
+				if (message_row_indexes.containsKey(id) && list.size() > 0) {
+					list.remove(Integer.parseInt(message_row_indexes.get(id)
+							.toString()));
+					datasetReg.remove(id);
+				}
+				if (!datasetReg.containsKey(String.valueOf(newRowObj
+						.getRow_id()))) {
+					datasetReg.put(String.valueOf(newRowObj.getRow_id()), true);
+					list.add(0, newRowObj);
+					listAdapter.refresh(list);
 				}
 
-				if (condition) {
-					if (message_row_indexes.containsKey(id) && list.size() > 0) {
-						list.remove(Integer.parseInt(message_row_indexes
-								.get(id).toString()));
-						datasetReg.remove(id);
-					}
-					if (!datasetReg.containsKey(String.valueOf(newRowObj
-							.getRow_id()))) {
-						datasetReg.put(String.valueOf(newRowObj.getRow_id()),
-								true);
-						list.add(0, newRowObj);
-						listAdapter.refresh(list);
-					}
-				}
 			} catch (Exception e) {
 			}
 
