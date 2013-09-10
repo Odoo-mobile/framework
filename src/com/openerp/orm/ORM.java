@@ -346,7 +346,6 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	private void createM2MRecords(String id, JSONArray values, String key,
 			BaseDBHelper dbHelper, Many2Many m2m, ContentValues rootRow) {
-
 		String table1 = modelToTable(dbHelper.getModelName());
 		String table2 = "";
 		BaseDBHelper tbl2Obj = null;
@@ -364,7 +363,8 @@ public class ORM extends SQLiteDatabaseHelper {
 		// Temp dummy helper
 		BaseDBHelper newDb = generateM2MHelper(dbHelper, m2m);
 
-		for (int i = 0; i < values.length(); i++) {
+		int loop_val = (values.length() > 10) ? 10 : values.length();
+		for (int i = 0; i < loop_val; i++) {
 			try {
 				int row_id = 0;
 
@@ -519,9 +519,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * @return the hash map
 	 */
 	public HashMap<String, Object> search(BaseDBHelper db) {
-
-		return search(db, null, null, null, null, null, null);
-
+		return search(db, null, null, null, null, null, null, null);
 	}
 
 	/**
@@ -537,11 +535,21 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	public HashMap<String, Object> search(BaseDBHelper db, String[] where,
 			String[] whereArgs) {
+		return search(db, null, where, whereArgs, null, null, null, null);
+	}
 
-		// search (model, columns[], contentvalues, group_by, having, orderby,
-		// DESC|ASC)
-		return search(db, where, whereArgs, null, null, null, null);
-
+	/**
+	 * Search
+	 * 
+	 * @param db
+	 * @param columns
+	 * @param where
+	 * @param whereArgs
+	 * @return
+	 */
+	public HashMap<String, Object> search(BaseDBHelper db, String[] columns,
+			String[] where, String[] whereArgs) {
+		return search(db, columns, where, whereArgs, null, null, null, null);
 	}
 
 	/**
@@ -559,11 +567,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	public HashMap<String, Object> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by) {
-
-		// search (model, columns[], contentvalues, group_by, having, orderby,
-		// DESC|ASC)
-		return search(db, where, whereArgs, group_by, null, null, null);
-
+		return search(db, null, where, whereArgs, group_by, null, null, null);
 	}
 
 	/**
@@ -583,11 +587,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	public HashMap<String, Object> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by, String having) {
-
-		// search (model, columns[], contentvalues, group_by, having, orderby,
-		// DESC|ASC)
-		return search(db, where, whereArgs, group_by, having, null, null);
-
+		return search(db, null, where, whereArgs, group_by, having, null, null);
 	}
 
 	/**
@@ -612,6 +612,32 @@ public class ORM extends SQLiteDatabaseHelper {
 	public HashMap<String, Object> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by, String having, String orderby,
 			String ordertype) {
+		return search(db, null, where, whereArgs, group_by, having, orderby,
+				ordertype);
+	}
+
+	/**
+	 * Search.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param where
+	 *            the where
+	 * @param whereArgs
+	 *            the where args
+	 * @param group_by
+	 *            the group_by
+	 * @param having
+	 *            the having
+	 * @param orderby
+	 *            the orderby
+	 * @param ordertype
+	 *            the ordertype
+	 * @return the hash map
+	 */
+	public HashMap<String, Object> search(BaseDBHelper db, String[] columns,
+			String[] where, String[] whereArgs, String group_by, String having,
+			String orderby, String ordertype) {
 
 		HashMap<String, Object> returnVals = new HashMap<String, Object>();
 
@@ -648,8 +674,8 @@ public class ORM extends SQLiteDatabaseHelper {
 					+ tmpWhereArg.length]);
 		}
 
-		List<HashMap<String, Object>> results = executeQuery(db, finalWhere,
-				finalWhereArgs, group_by, having, order_by);
+		List<HashMap<String, Object>> results = executeQuery(db, columns,
+				finalWhere, finalWhereArgs, group_by, having, order_by);
 		if (results != null) {
 			returnVals.put("total", results.size());
 			returnVals.put("records", results);
@@ -893,8 +919,8 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * @return the list
 	 */
 	private List<HashMap<String, Object>> executeQuery(BaseDBHelper dbHelper,
-			String[] where, String[] whereVals, String group_by, String having,
-			String orderby) {
+			String[] fetch_columns, String[] where, String[] whereVals,
+			String group_by, String having, String orderby) {
 		SQLiteDatabase db = getWritableDatabase();
 
 		List<String> cols = new ArrayList<String>();
@@ -910,7 +936,8 @@ public class ORM extends SQLiteDatabaseHelper {
 				columns, whereStatement(where, dbHelper), whereVals, group_by,
 				having, orderby);
 
-		List<HashMap<String, Object>> data = getResult(dbHelper, cursor);
+		List<HashMap<String, Object>> data = getResult(dbHelper, fetch_columns,
+				cursor);
 		db.close();
 		cursor.close();
 		return data;
@@ -1100,7 +1127,7 @@ public class ORM extends SQLiteDatabaseHelper {
 		SQLiteDatabase db = getWritableDatabase();
 		Cursor cursor = db.query(modelToTable(dbHelper.getModelName()),
 				columns, where, null, null, null, null);
-		List<HashMap<String, Object>> data = getResult(dbHelper, cursor);
+		List<HashMap<String, Object>> data = getResult(dbHelper, null, cursor);
 		db.close();
 		cursor.close();
 		return data;
@@ -1111,12 +1138,14 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * 
 	 * @param dbHelper
 	 *            the db helper
+	 * @param fetch_columns
 	 * @param result
 	 *            the result
 	 * @return the result
 	 */
+	@SuppressWarnings("unchecked")
 	private List<HashMap<String, Object>> getResult(BaseDBHelper dbHelper,
-			Cursor result) {
+			String[] fetch_columns, Cursor result) {
 
 		HashMap<String, Object> m2m = dbHelper.getMany2ManyColumns();
 		HashMap<String, Object> m2o = dbHelper.getMany2OneColumns();
@@ -1131,11 +1160,18 @@ public class ORM extends SQLiteDatabaseHelper {
 					String value = result.getString(result.getColumnIndex(col));
 					row.put(col, value);
 				}
+				List<String> user_columns = null;
+				if (fetch_columns != null) {
+					user_columns = Arrays.asList(fetch_columns);
+				}
 
 				// Getting many2many ids for row
 				if (m2m.size() > 0) {
 					String id = result.getString(result.getColumnIndex("id"));
 					for (String key : m2m.keySet()) {
+						if (user_columns != null && !user_columns.contains(key)) {
+							continue;
+						}
 
 						Many2Many m2mObj = (Many2Many) m2m.get(key);
 						BaseDBHelper newdb = generateM2MHelper(dbHelper, m2mObj);
@@ -1164,7 +1200,6 @@ public class ORM extends SQLiteDatabaseHelper {
 										.toString()));
 								if (Integer.parseInt(rel_data.get("total")
 										.toString()) > 0) {
-
 									ids.put(((List<HashMap<String, Object>>) rel_data
 											.get("records")).get(0).get("name")
 											.toString());
@@ -1179,9 +1214,10 @@ public class ORM extends SQLiteDatabaseHelper {
 
 				// Getting many2one [id, name]
 				if (m2o.size() > 0) {
-					String id = result.getString(result.getColumnIndex("id"));
-
 					for (String key : m2o.keySet()) {
+						if (user_columns != null && !user_columns.contains(key)) {
+							continue;
+						}
 						JSONArray ids_list = new JSONArray();
 						String ref_id = result.getString(result
 								.getColumnIndex(key));
@@ -1191,6 +1227,7 @@ public class ORM extends SQLiteDatabaseHelper {
 							HashMap<String, Object> rel_data = m2oObj
 									.getM2OObject().search(
 											m2oObj.getM2OObject(),
+											new String[] { "id", "name" },
 											new String[] { "id = ? " },
 											new String[] { ref_id });
 							ids.put(ref_id);
