@@ -21,6 +21,9 @@ package com.openerp.services;
 import java.util.HashMap;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
@@ -34,6 +37,7 @@ import com.openerp.MainActivity;
 import com.openerp.addons.meeting.MeetingDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
+import com.openerp.support.JSONDataHelper;
 import com.openerp.support.calendar.OECalendar;
 import com.openerp.util.SyncBroadcastHelper;
 
@@ -76,6 +80,17 @@ public class MeetingSyncService extends Service {
 			sync_helper.sendBrodcast(context, authority, "Meeting", "start");
 			// creating a object of MeetingDBHelper to handle database
 			db = new MeetingDBHelper(context);
+			int user_id = Integer.parseInt(OpenERPAccountManager.currentUser(
+					context).getUser_id());
+			JSONObject domain = new JSONObject();
+			domain.accumulate(
+					"domain",
+					new JSONArray("[[\"user_id\", \"=\", "
+							+ user_id
+							+ "],[\"id\",\"not in\", "
+							+ JSONDataHelper.intArrayToJSONArray(db
+									.localIds(db)) + "]]"));
+
 			// start sync service to fetch new Records from OpenERP Server to
 			// localDB
 			// first delete records from localdb which are no more in OpenERP
@@ -83,8 +98,8 @@ public class MeetingSyncService extends Service {
 			// second add new records from OpenERP Server to localdb which are
 			// not in localdb
 			// update localdb with OpenERP Server
-			OEHelper oe = new OEHelper(context, MainActivity.userContext);
-			if (oe.syncWithServer(db)) {
+			OEHelper oe = db.getOEInstance();
+			if (oe.syncWithServer(db, domain)) {
 				// Sync Done, Next stuff....
 				// initilizing com.openerp.support.calendar obejct to delete
 				// event from OpenERP mobile calendar which are no more in
