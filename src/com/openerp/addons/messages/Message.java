@@ -370,11 +370,22 @@ public class Message extends BaseFragment implements
 		mPullToRefreshAttacher.setRefreshableView(lstview, this);
 	}
 
+	private String updateSubject(String subject, int parent_id) {
+		String newSubject = subject;
+		int total_child = db.count(db, new String[] { "parent_id = ? " },
+				new String[] { String.valueOf(parent_id) });
+		if (total_child > 0) {
+			newSubject += " (" + total_child + ") ";
+		}
+		return newSubject;
+	}
+
+	int message_resource = 0;
+
 	private List<OEListViewRows> getMessages(TYPE type) {
 
 		String[] where = null;
 		String[] whereArgs = null;
-		int message_resource = 0;
 		current_type = type;
 		switch (type) {
 		case INBOX:
@@ -398,8 +409,8 @@ public class Message extends BaseFragment implements
 		}
 
 		// Fetching parent ids from Child row with order by date desc
-		HashMap<String, Object> result = db.search(db, where, whereArgs, null,
-				null, "date", "DESC");
+		HashMap<String, Object> result = db.search(db, from, where, whereArgs,
+				null, null, "date", "DESC");
 		HashMap<String, OEListViewRows> parent_list_details = new HashMap<String, OEListViewRows>();
 		messages_sorted = new ArrayList<OEListViewRows>();
 		if (Integer.parseInt(result.get("total").toString()) > 0) {
@@ -427,18 +438,25 @@ public class Message extends BaseFragment implements
 					// Fetching row parent message
 					HashMap<String, Object> newRow = null;
 					OEListViewRows newRowObj = null;
-
 					if (isParent) {
 						newRow = row;
+						newRow.put(
+								"subject",
+								updateSubject(newRow.get("subject").toString(),
+										Integer.parseInt(key)));
 						newRowObj = new OEListViewRows(Integer.parseInt(key),
 								(HashMap<String, Object>) newRow);
 					} else {
-						newRow = db.search(db, new String[] { "id = ?" },
+						newRow = db.search(db, from, new String[] { "id = ?" },
 								new String[] { key });
-
+						HashMap<String, Object> temp_row = ((List<HashMap<String, Object>>) newRow
+								.get("records")).get(0);
+						temp_row.put(
+								"subject",
+								updateSubject(temp_row.get("subject")
+										.toString(), Integer.parseInt(key)));
 						newRowObj = new OEListViewRows(Integer.parseInt(key),
-								((List<HashMap<String, Object>>) newRow
-										.get("records")).get(0));
+								temp_row);
 					}
 					parent_list_details.put(key, newRowObj);
 					message_row_indexes.put(key, i);
@@ -464,14 +482,21 @@ public class Message extends BaseFragment implements
 				} catch (Exception e) {
 				}
 			} else {
-				rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
-						View.GONE);
-				rootView.findViewById(R.id.lstMessages)
-						.setVisibility(View.GONE);
-				TextView txvMsg = (TextView) rootView
-						.findViewById(R.id.txvMessageAllReadMessage);
-				txvMsg.setVisibility(View.VISIBLE);
-				txvMsg.setText(message_resource);
+				scope.context().runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						rootView.findViewById(R.id.messageSyncWaiter)
+								.setVisibility(View.GONE);
+						rootView.findViewById(R.id.lstMessages).setVisibility(
+								View.GONE);
+						TextView txvMsg = (TextView) rootView
+								.findViewById(R.id.txvMessageAllReadMessage);
+						txvMsg.setVisibility(View.VISIBLE);
+						txvMsg.setText(message_resource);
+					}
+				});
+
 			}
 
 		}
@@ -680,8 +705,9 @@ public class Message extends BaseFragment implements
 			try {
 
 				OEListViewRows newRowObj = null;
-				HashMap<String, Object> newRow = db.search(db,
-						new String[] { "id = ?" }, new String[] { id });
+				HashMap<String, Object> newRow = db.search(db, from,
+						new String[] { "id = ?" }, new String[] { id }, null,
+						null, "date", "DESC");
 				newRowObj = new OEListViewRows(Integer.parseInt(id),
 						((List<HashMap<String, Object>>) newRow.get("records"))
 								.get(0));
@@ -1023,11 +1049,8 @@ public class Message extends BaseFragment implements
 							View.VISIBLE);
 				}
 			});
-			if (success) {
-				setupListView(this.message_list);
-				searchView
-						.setOnQueryTextListener(getQueryListener(listAdapter));
-			}
+			setupListView(this.message_list);
+			searchView.setOnQueryTextListener(getQueryListener(listAdapter));
 			loadMessage = null;
 		}
 
