@@ -398,9 +398,9 @@ public class ORM extends SQLiteDatabaseHelper {
 					SQLiteDatabase db = getWritableDatabase();
 					db.insert(rel_table, null, m2mvals);
 					db.close();
-					if (tbl2Obj != null && !tbl2Obj.hasRecord(tbl2Obj, row_id)) {
-						list.add(row_id);
-					}
+				}
+				if (tbl2Obj != null && !tbl2Obj.hasRecord(tbl2Obj, row_id)) {
+					list.add(row_id);
 				}
 
 			} catch (Exception e) {
