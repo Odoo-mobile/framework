@@ -328,7 +328,7 @@ public class OEHelper extends OpenERP {
 		HashMap<String, List<Integer>> m2mColsIds = new HashMap<String, List<Integer>>();
 		List<String> serverIds = new ArrayList<String>();
 		try {
-			int total = res.getInt("length");
+			int total = res.getJSONArray("records").length();
 			for (int i = 0; i < total; i++) {
 				ContentValues values = new ContentValues();
 				JSONObject row = res.getJSONArray("records").getJSONObject(i);
@@ -379,9 +379,20 @@ public class OEHelper extends OpenERP {
 				if (m2oColsIds.containsKey(key)) {
 					Many2One many2one = (Many2One) m2oCols.get(key);
 					if (many2one.isM2OObject()) {
-						syncReferenceTables(
-								(BaseDBHelper) many2one.getM2OObject(),
-								m2oColsIds.get(key));
+						BaseDBHelper m2oObj = (BaseDBHelper) many2one
+								.getM2OObject();
+						List<Integer> m2oIds = (ArrayList<Integer>) m2oColsIds
+								.get(key);
+						List<Integer> idsToSync = new ArrayList<Integer>();
+						for (int id : m2oIds) {
+							if (!m2oObj.hasRecord(m2oObj, id)) {
+								idsToSync.add(id);
+							}
+						}
+						if (idsToSync.size() > 0) {
+							syncReferenceTables(m2oObj, idsToSync);
+						}
+
 					}
 				}
 			}
@@ -450,7 +461,7 @@ public class OEHelper extends OpenERP {
 		JSONObject fields = getFieldsFromCols(getSyncCols(db.getServerColumns()));
 		String model = db.getModelName();
 		try {
-			return search_read(model, fields, domain, 0, 0, null, null);
+			return search_read(model, fields, domain, 0, 50, null, null);
 		} catch (Exception e) {
 		}
 		return null;

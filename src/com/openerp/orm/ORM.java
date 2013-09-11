@@ -364,6 +364,7 @@ public class ORM extends SQLiteDatabaseHelper {
 		BaseDBHelper newDb = generateM2MHelper(dbHelper, m2m);
 
 		int loop_val = (values.length() > 10) ? 10 : values.length();
+		List<Integer> list = new ArrayList<Integer>();
 		for (int i = 0; i < loop_val; i++) {
 			try {
 				int row_id = 0;
@@ -387,27 +388,27 @@ public class ORM extends SQLiteDatabaseHelper {
 				m2mvals.put(col1, id);
 				m2mvals.put(col2, row_id);
 				m2mvals.put(col3, android_name);
-				int res = (Integer) this.search(
+				int res = Integer.parseInt(search(
 						newDb,
 						new String[] { col1 + " = ?", "AND", col2 + "= ?",
 								"AND", col3 + " = ?" },
 						new String[] { id, row_id + "", android_name }).get(
-						"total");
-
+						"total").toString());
 				if (res == 0) {
 					SQLiteDatabase db = getWritableDatabase();
 					db.insert(rel_table, null, m2mvals);
 					db.close();
-					if (tbl2Obj != null) {
-						List<Integer> list = new ArrayList<Integer>();
+					if (tbl2Obj != null && !tbl2Obj.hasRecord(tbl2Obj, row_id)) {
 						list.add(row_id);
-						oe_obj.syncReferenceTables(tbl2Obj, list);
 					}
 				}
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+		if (list.size() > 0) {
+			oe_obj.syncReferenceTables(tbl2Obj, list);
 		}
 	}
 
@@ -471,10 +472,13 @@ public class ORM extends SQLiteDatabaseHelper {
 					JSONArray m2oArray = new JSONArray(values.getAsString(key));
 					values.put(key, many2oneRecord(m2oArray));
 					List<Integer> list = new ArrayList<Integer>();
-					list.add(Integer.parseInt(many2oneRecord(m2oArray)));
+					int m2o_id = Integer.parseInt(many2oneRecord(m2oArray));
+					list.add(m2o_id);
 					BaseDBHelper m2oDb = ((Many2One) many2onecols.get(key))
 							.getM2OObject();
-					oe_obj.syncReferenceTables(m2oDb, list);
+					if (!m2oDb.hasRecord(m2oDb, m2o_id)) {
+						oe_obj.syncReferenceTables(m2oDb, list);
+					}
 				}
 			} catch (Exception e) {
 			}
@@ -861,7 +865,6 @@ public class ORM extends SQLiteDatabaseHelper {
 
 				}
 				if (fromServer) {
-
 					int res = db.update(table, values, "id = " + id, null);
 					flag = true;
 				} else {
@@ -1317,10 +1320,13 @@ public class ORM extends SQLiteDatabaseHelper {
 		String where = " id = " + id + " AND oea_name = '" + user_name + "'";
 		Cursor cursor = dbHelper.query(modelToTable(db.getModelName()),
 				new String[] { "*" }, where, null, null, null, null);
+		boolean flag = false;
 		if (cursor.moveToFirst()) {
-			return true;
+			flag = true;
 		}
-		return false;
+		cursor.close();
+		dbHelper.close();
+		return flag;
 	}
 
 	/**
