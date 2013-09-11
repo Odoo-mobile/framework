@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -592,7 +591,7 @@ public class Message extends BaseFragment implements
 				context)));
 		menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To:Me", this
 				.getObjectOFClass("type", "to-me"),
-				getCount(TYPE.TOME, context) - 2));
+				getCount(TYPE.TOME, context) - getCount(TYPE.TODO, context)));
 		menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-Do", this
 				.getObjectOFClass("type", "to-do"),
 				getCount(TYPE.TODO, context)));
