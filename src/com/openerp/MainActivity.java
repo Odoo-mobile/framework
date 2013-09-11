@@ -40,6 +40,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.Boot;
@@ -292,6 +293,12 @@ public class MainActivity extends FragmentActivity {
 		case R.id.menu_logout:
 			Dialog logoutConfirm = this.logoutConfirmDialog();
 			logoutConfirm.show();
+			return true;
+		case R.id.menu_about:
+			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
+			Fragment about = new AboutFragment();
+			fragmentHandler.setBackStack(true, null);
+			fragmentHandler.replaceFragmnet(about);
 			return true;
 		case R.id.menu_new_account:
 			getActionBar().setDisplayHomeAsUpEnabled(false);

@@ -69,4 +69,12 @@ When you process messages in your inbox, you can mark some as todo. From this me
         <item name="90">90</item>
     </string-array>
 
+    <!-- Aboout Company Fragment Strings -->
+    <string name="about_Company_line1">Copyright © 2004-TODAY OpenERP SA. All Rights Reserved.</string>
+    <string name="about_Company_line2">OpenERP is a trademark of the <a href="https://www.openerp.com/">OpenERP.com.</a></string>
+    <string name="about_Company_line3">Licenced under the terms of <a href="http://www.gnu.org/licenses/agpl.html/">GNU Affero General Public License</a></string>
+    <string name="about_Company_line4">For more information visit <a href="https://www.openerp.com/">OpenERP.com</a>.</string>
+    <string name="app_version_name">Version</string>
+    <string name="imgcontentDescription">OpenERP LOGO in upper portion of the screen</string>
+
 </resources>
