@@ -312,6 +312,29 @@ public class OEHelper extends OpenERP {
 	}
 
 	/**
+	 * sync with server
+	 * 
+	 * 
+	 * @param db
+	 * @param domain
+	 * @param delete
+	 * @return
+	 */
+	public boolean syncWithServer(BaseDBHelper db, JSONObject domain,
+			boolean delete) {
+		deleted_rows = new HashMap<String, List<HashMap<String, Object>>>();
+		boolean success = false;
+		try {
+			JSONObject result = getDataFromServer(db, domain);
+			if (result != null) {
+				success = handleServerData(db, result, delete);
+			}
+		} catch (Exception e) {
+		}
+		return success;
+	}
+
+	/**
 	 * Handle server data.
 	 * 
 	 * @param db
@@ -321,6 +344,20 @@ public class OEHelper extends OpenERP {
 	 * @return true, if successful
 	 */
 	private boolean handleServerData(BaseDBHelper db, JSONObject res) {
+		return handleServerData(db, res, true);
+	}
+
+	/**
+	 * Handle server data.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param res
+	 *            the res
+	 * @return true, if successful
+	 */
+	private boolean handleServerData(BaseDBHelper db, JSONObject res,
+			boolean delete) {
 		boolean success = false;
 		HashMap<String, Object> m2oCols = db.getMany2OneColumns();
 		HashMap<String, Object> m2mCols = db.getMany2ManyColumns();
@@ -414,22 +451,23 @@ public class OEHelper extends OpenERP {
 			 * server Ids than deleting local record.
 			 */
 			List<HashMap<String, Object>> del_rows = new ArrayList<HashMap<String, Object>>();
-			if (total > 1) {
-				for (int id : db.localIds(db)) {
-					if (serverIds.size() > 0) {
-						if (!serverIds.contains(String.valueOf(id))) {
-							// Delete record with id.
-							HashMap<String, Object> del_row = db.search(db,
-									new String[] { "id = ?" },
-									new String[] { String.valueOf(id) });
+			if (delete) {
+				if (total > 1) {
+					for (int id : db.localIds(db)) {
+						if (serverIds.size() > 0) {
+							if (!serverIds.contains(String.valueOf(id))) {
+								// Delete record with id.
+								HashMap<String, Object> del_row = db.search(db,
+										new String[] { "id = ?" },
+										new String[] { String.valueOf(id) });
 
-							if (db.delete(db, id, true)) {
-								del_rows.add(del_row);
+								if (db.delete(db, id, true)) {
+									del_rows.add(del_row);
+								}
+
 							}
-
 						}
 					}
-
 				}
 			}
 
