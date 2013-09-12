@@ -80,7 +80,6 @@ public class ContactSyncService extends Service {
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		// TODO Auto-generated method stub
-		Log.e("SDSD", "START");
 		try {
 			// sync_helper.sendBrodcast(context, authority, "Contacts",
 			// "start");
@@ -100,7 +99,7 @@ public class ContactSyncService extends Service {
 									.localIds(db)) + "]]"));
 
 			OEHelper oe = db.getOEInstance();
-			if (oe.syncWithServer(db, domain)) {
+			if (oe.syncWithServer(db, domain, false)) {
 				// Sync Done, Next stuff....
 				Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(
 						context);
