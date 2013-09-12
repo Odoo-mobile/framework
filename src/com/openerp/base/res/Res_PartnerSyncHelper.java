@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.json.JSONArray;
+
 import android.accounts.Account;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
@@ -39,6 +41,8 @@ import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
 import com.openerp.R;
+import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.services.ContactSyncService;
 import com.openerp.util.Base64Helper;
 
 public class Res_PartnerSyncHelper {
@@ -58,6 +62,7 @@ public class Res_PartnerSyncHelper {
 			String street2, String city, String zip, String company,
 			String image) {
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
+		int rawContactInsertIndex = operationList.size();
 
 		ContentProviderOperation.Builder builder = ContentProviderOperation
 				.newInsert(RawContacts.CONTENT_URI);
@@ -207,40 +212,25 @@ public class Res_PartnerSyncHelper {
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
-		// ContactImage code
+		// INSERT imAGE
 		if (!image.equals("false")) {
-			ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-					R.drawable.ic_launcher);
-			icon.compress(CompressFormat.PNG, 0, stream);
-			byte[] photo = stream.toByteArray();
-			try {
-				if (photo != null) {
-					builder = ContentProviderOperation
-							.newInsert(ContactsContract.Data.CONTENT_URI);
-					builder.withValue(
-							ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID,
-							0);
-					builder.withValue(
-							ContactsContract.Data.MIMETYPE,
-							ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
-					builder.withValue(
-							ContactsContract.CommonDataKinds.Photo.PHOTO, photo);
-					operationList.add(builder.build());
 
-					builder = ContentProviderOperation
-							.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
-					builder.withSelection(
-							ContactsContract.RawContacts.CONTACT_ID + " = '"
-									+ 0 + "'", null);
-					builder.withValue(PhotoTimestampColumn,
-							String.valueOf(System.currentTimeMillis()));
-					operationList.add(builder.build());
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			Bitmap bitmapOrg = Base64Helper.getBitmapImage(context, image);
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			bitmapOrg.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+			operationList
+					.add(ContentProviderOperation
+							.newInsert(ContactsContract.Data.CONTENT_URI)
+							.withValueBackReference(
+									ContactsContract.Data.RAW_CONTACT_ID,
+									rawContactInsertIndex)
+							.withValue(
+									ContactsContract.Data.MIMETYPE,
+									ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
+							.withValue(
+									ContactsContract.CommonDataKinds.Photo.PHOTO,
+									stream.toByteArray()).build());
 		}
 		if (!company.equals("false")) {
 			operationList
@@ -333,6 +323,8 @@ public class Res_PartnerSyncHelper {
 	public void SyncContect(Context context, Account account) {
 		HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 		mContentResolver = context.getContentResolver();
+		int company_id = Integer.parseInt(OpenERPAccountManager.currentUser(
+				context).getCompany_id());
 
 		RawContacts.CONTENT_URI
 				.buildUpon()
@@ -370,36 +362,49 @@ public class Res_PartnerSyncHelper {
 
 				for (HashMap<String, Object> row_data : rows) {
 					if (localContacts.get(row_data.get("id").toString()) == null) {
-						String partnerID = row_data.get("id").toString();
-						String name = row_data.get("name").toString();
-						String userName = row_data.get("id").toString();
-						String mail = row_data.get("email").toString();
-						String number = row_data.get("phone").toString();
-						String mobile = row_data.get("mobile").toString();
-						String website = row_data.get("website").toString();
-						String street = row_data.get("street").toString();
-						String street2 = row_data.get("street2").toString();
-						String city = row_data.get("city").toString();
-						String zip = row_data.get("zip").toString();
-						String company = "OpenERP";
-						String image = row_data.get("image").toString();
 
-						addContact(context, account, partnerID, name, userName,
-								mail, number, mobile, website, street, street2,
-								city, zip, company, image);
+						if (!(row_data.get("company_id").toString())
+								.equalsIgnoreCase("false")) {
+							JSONArray db_company_id = new JSONArray(row_data
+									.get("company_id").toString());
+							String com_id = db_company_id.getJSONArray(0)
+									.getString(0).toString();
 
-					} else {
-						SyncEntry entry = localContacts.get(row_data.get("id")
-								.toString());
-						updateContactPhoto(operationList, entry.raw_id,
-								row_data.get("image").toString(), context);
+							if (com_id.equalsIgnoreCase(String
+									.valueOf(company_id))) {
+
+								String partnerID = row_data.get("id")
+										.toString();
+								// Remove everything except characters and
+								// digits
+								String name = (row_data.get("name").toString())
+										.replaceAll("[^\\w\\s]", "");
+								String userName = row_data.get("id").toString();
+								String mail = row_data.get("email").toString();
+								String number = row_data.get("phone")
+										.toString();
+								String mobile = row_data.get("mobile")
+										.toString();
+								String website = row_data.get("website")
+										.toString();
+								String street = row_data.get("street")
+										.toString();
+								String street2 = row_data.get("street2")
+										.toString();
+								String city = row_data.get("city").toString();
+								String zip = row_data.get("zip").toString();
+								String company = "OpenERP";
+								String image = row_data.get("image").toString();
+
+								addContact(context, account, partnerID, name,
+										userName, mail, number, mobile,
+										website, street, street2, city, zip,
+										company, image);
+							}
+						}
 					}
 				}
 			}
-			// if (operationList.size() > 0) {
-			// mContentResolver.applyBatch(ContactsContract.AUTHORITY,
-			// operationList);
-			// }
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
