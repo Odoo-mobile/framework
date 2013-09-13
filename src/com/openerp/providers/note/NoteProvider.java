@@ -1,126 +1,52 @@
+/*
+ * OpenERP, Open Source Management Solution
+ * Copyright (C) 2012-today OpenERP SA (<http://www.openerp.com>)
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * 
+ */
+
 package com.openerp.providers.note;
 
-import android.content.ContentProvider;
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.content.UriMatcher;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteQueryBuilder;
-import android.net.Uri;
-import android.provider.BaseColumns;
-import android.text.TextUtils;
+import com.openerp.support.provider.OEContentProvider;
 
-import com.openerp.orm.SQLiteDatabaseHelper;
+// TODO: Auto-generated Javadoc
+/**
+ * The Class NoteProvider.
+ */
+public class NoteProvider extends OEContentProvider {
+	
+	/** The contenturi. */
+	public static String CONTENTURI = "com.openerp.providers.note.NoteProvider";
+	
+	/** The authority. */
+	public static String AUTHORITY = "com.openerp.providers.note";
 
-public class NoteProvider extends ContentProvider {
-    private static final int CONSTANTS = 1;
-    public static String AUTHORITY = "com.openerp.providers.note";
-    private static final int CONSTANT_ID = 2;
-    private static final UriMatcher MATCHER;
-    private static final String TABLE = "constants";
-    SQLiteDatabaseHelper db = null;
-
-    public static final class Constants implements BaseColumns {
-
-	public static final Uri CONTENT_URI = Uri
-		.parse("content://com.openerp.providers.note.NoteProvider/constants");
-	public static final String DEFAULT_SORT_ORDER = "title";
-	public static final String TITLE = "title";
-	public static final String VALUE = "value";
-    }
-
-    static {
-	MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-	MATCHER.addURI("com.openerp.providers.note.NoteProvider", "constants",
-		CONSTANTS);
-	MATCHER.addURI("com.openerp.providers.note.NoteProvider",
-		"constants/#", CONSTANT_ID);
-    }
-
-    @Override
-    public int delete(Uri uri, String where, String[] whereArgs) {
-	// TODO Auto-generated method stub
-	int count = db.getWritableDatabase().delete(TABLE, where, whereArgs);
-
-	getContext().getContentResolver().notifyChange(uri, null);
-
-	return (count);
-    }
-
-    @Override
-    public String getType(Uri uri) {
-	// TODO Auto-generated method stub
-	if (isCollectionUri(uri)) {
-
-	    return ("com.openerp.providers.note.NoteProvider/constant");
+	/* (non-Javadoc)
+	 * @see com.openerp.support.provider.OEContentProviderHelper#authority()
+	 */
+	@Override
+	public String authority() {
+		return AUTHORITY;
 	}
 
-	return ("com.openerp.providers.note.NoteProvider/constant");
-    }
-
-    @Override
-    public Uri insert(Uri uri, ContentValues initialValues) {
-	// TODO Auto-generated method stub
-	long rowID = db.getWritableDatabase().insert(TABLE, Constants.TITLE,
-		initialValues);
-
-	if (rowID > 0) {
-	    Uri uriObj = ContentUris.withAppendedId(
-		    NoteProvider.Constants.CONTENT_URI, rowID);
-	    getContext().getContentResolver().notifyChange(uri, null);
-
-	    return (uriObj);
+	/* (non-Javadoc)
+	 * @see com.openerp.support.provider.OEContentProviderHelper#contentUri()
+	 */
+	@Override
+	public String contentUri() {
+		return CONTENTURI;
 	}
-
-	throw new SQLException("Failed to insert row into " + uri);
-    }
-
-    @Override
-    public boolean onCreate() {
-	// TODO Auto-generated method stub
-	db = new SQLiteDatabaseHelper(getContext());
-	return ((db == null) ? false : true);
-    }
-
-    @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
-	    String[] selectionArgs, String sort) {
-	// TODO Auto-generated method stub
-	SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-
-	qb.setTables(TABLE);
-
-	String orderBy;
-
-	if (TextUtils.isEmpty(sort)) {
-	    orderBy = Constants.DEFAULT_SORT_ORDER;
-	} else {
-	    orderBy = sort;
-	}
-
-	Cursor c = qb.query(db.getReadableDatabase(), projection, selection,
-		selectionArgs, null, null, orderBy);
-
-	c.setNotificationUri(getContext().getContentResolver(), uri);
-
-	return (c);
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String where,
-	    String[] whereArgs) {
-	// TODO Auto-generated method stub
-	int count = db.getWritableDatabase().update(TABLE, values, where,
-		whereArgs);
-
-	getContext().getContentResolver().notifyChange(uri, null);
-
-	return (count);
-    }
-
-    private boolean isCollectionUri(Uri url) {
-	return (MATCHER.match(url) == CONSTANTS);
-    }
 
 }
