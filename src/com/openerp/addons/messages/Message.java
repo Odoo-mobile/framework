@@ -699,16 +699,16 @@ public class Message extends BaseFragment implements
 	private DataSetChangeReceiver datasetChangeReceiver = new DataSetChangeReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
-					View.GONE);
 
-			String id = intent.getExtras().getString("id");
-			String parent_id = intent.getExtras().getString("parent_id");
-			if (!parent_id.equals("false")) {
-				id = parent_id;
-			}
 			try {
+				rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
+						View.GONE);
 
+				String id = intent.getExtras().getString("id");
+				String parent_id = intent.getExtras().getString("parent_id");
+				if (!parent_id.equals("false")) {
+					id = parent_id;
+				}
 				OEListViewRows newRowObj = null;
 				HashMap<String, Object> newRow = db.search(db, from,
 						new String[] { "id = ?" }, new String[] { id }, null,
@@ -776,7 +776,7 @@ public class Message extends BaseFragment implements
 			Log.d("Message::syncFinishReceiver::onReceive()",
 					"Resetting listview messages to INBOX");
 
-			if (mPullToRefreshAttacher == null) {
+			if (mPullToRefreshAttacher == null && listAdapter != null) {
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
