@@ -18,26 +18,21 @@
  */
 package com.openerp.support.calendar;
 
-import java.util.Date;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-
-import com.openerp.addons.meeting.MeetingDBHelper;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.openerp.orm.OEHelper;
 
 import android.accounts.Account;
 import android.content.ContentResolver;
@@ -50,6 +45,11 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
+
+import com.openerp.addons.meeting.MeetingDBHelper;
+import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEHelper;
+import com.openerp.support.UserObject;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -72,6 +72,7 @@ public class OECalendar {
 	 * Calendar
 	 */
 	long created_Calendar_id, creted_Event_id;
+	long cal_id = 0;
 
 	/** uri : To work with android default URI's for [Calendar/Events]. */
 	Uri uri, creationUri;
@@ -170,7 +171,6 @@ public class OECalendar {
 		try {
 			// Fetching all the Meeting which are synced in LOCALDB
 			List<HashMap<String, Object>> local_meetings = getAllMeetings(db);
-			long cal_id = 0;
 
 			for (int i = 0; i < local_meetings.size(); i++) {
 				// Checking calendar is exists or not. If exists than return ID
@@ -251,43 +251,45 @@ public class OECalendar {
 				// checking whether meeting id exist in localdb or not
 				if (!calendar_Eventids.contains(meeting_id)) {
 					// retrieve all the details from Mobile/Device
-					String name = cursor.getString(cursor
-							.getColumnIndex("title"));
+					// checking for only OpenERP calendar's EVENTS
+					if (cal_id == calendar_id) {
+						String name = cursor.getString(cursor
+								.getColumnIndex("title"));
 
-					String date = convertDateTimeZone(cursor.getLong(cursor
-							.getColumnIndex("dtstart")));
+						String date = convertDateTimeZone(cursor.getLong(cursor
+								.getColumnIndex("dtstart")));
 
-					String enddate = convertDateTimeZone(cursor.getLong(cursor
-							.getColumnIndex("dtend")));
+						String enddate = convertDateTimeZone(cursor
+								.getLong(cursor.getColumnIndex("dtend")));
 
-					// System.out.println("date" + date);
-					// System.out.println("endate" + enddate);
+						String duration = getDuration(cursor.getLong(cursor
+								.getColumnIndex("dtstart")),
+								cursor.getLong(cursor.getColumnIndex("dtend")));
 
-					String duration = getDuration(
-							cursor.getLong(cursor.getColumnIndex("dtstart")),
-							cursor.getLong(cursor.getColumnIndex("dtend")));
+						boolean allDay = (cursor.getInt(cursor
+								.getColumnIndex("allDay")) == 1) ? true : false;
 
-					boolean allDay = (cursor.getInt(cursor
-							.getColumnIndex("allDay")) == 1) ? true : false;
+						String categ_id = "[]";
 
-					String categ_id = "[]";
+						String location = cursor.getString(cursor
+								.getColumnIndex("eventLocation"));
 
-					String location = cursor.getString(cursor
-							.getColumnIndex("eventLocation"));
+						String description = cursor.getString(cursor
+								.getColumnIndex("description"));
 
-					String description = cursor.getString(cursor
-							.getColumnIndex("description"));
+						// retrieve the created record id from OpenERP Server
+						// for
+						// new meeting
+						int newId = writeMeeting(name, date, enddate, duration,
+								allDay, categ_id, location, description);
 
-					// retrieve the created record id from OpenERP Server for
-					// new meeting
-					int newId = writeMeeting(name, date, enddate, duration,
-							allDay, categ_id, location, description);
-
-					// updating the values in crm.meeting table in localdb for
-					// synced events.
-					update_SyncedEvent(newId, String.valueOf(calendar_id),
-							meeting_id, "true");
-					flag = true;
+						// updating the values in crm.meeting table in localdb
+						// for
+						// synced events.
+						update_SyncedEvent(newId, String.valueOf(calendar_id),
+								meeting_id, "true");
+						flag = true;
+					}
 				}
 			} while (cursor.moveToNext());
 		}
@@ -334,11 +336,12 @@ public class OECalendar {
 		selectionQuery = "((" + Calendars.ACCOUNT_NAME + " = '" + account.name
 				+ "'))";
 		cursor = cr.query(uri, CALENDAR_PROJECTION, selectionQuery, null, null);
+		int out = 0;
 		while (cursor.moveToNext()) {
-			return cursor.getInt(0);
+			out = cursor.getInt(0);
 		}
 		cursor.close();
-		return 0;
+		return out;
 	}
 
 	/**
@@ -352,8 +355,7 @@ public class OECalendar {
 		cr = context.getContentResolver();
 		values = new ContentValues();
 		values.put(Calendars.ACCOUNT_NAME, account.name);
-		values.put(CalendarContract.Calendars.ACCOUNT_TYPE,
-				CalendarContract.ACCOUNT_TYPE_LOCAL);
+		values.put(CalendarContract.Calendars.ACCOUNT_TYPE, account.type);
 		values.put(Calendars.NAME, account.name);
 		values.put(Calendars.CALENDAR_DISPLAY_NAME, account.name);
 		values.put(Calendars.CALENDAR_COLOR, 0xFFFFFFFF);
@@ -433,7 +435,7 @@ public class OECalendar {
 		Date parsed = null;
 		try {
 			parsed = formatter.parse(formatter.format(date).toString());
-			TimeZone tz = TimeZone.getTimeZone("GMT");
+			TimeZone tz = TimeZone.getTimeZone("UTC");
 			SimpleDateFormat destFormat = new SimpleDateFormat(
 					"yyyy-MM-dd HH:mm:ss");
 			destFormat.setTimeZone(tz);
@@ -462,11 +464,15 @@ public class OECalendar {
 	public void syncEvent(long calendar_id, int meeting_id, String EventName,
 			String Stime, String Etime, String Description) {
 		cal = Calendar.getInstance();
-		cal.setTimeZone(TimeZone.getTimeZone("GMT-1"));
 		try {
 			// parsing localdb time in required format
-			startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(Stime);
-			endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(Etime);
+
+			SimpleDateFormat tempFormat = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm");
+			tempFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+			startDate = tempFormat.parse(Stime);
+			endDate = tempFormat.parse(Etime);
 
 			// creating a calendar instance for the BeginTime
 			eventBeginTime = Calendar.getInstance();
@@ -488,6 +494,7 @@ public class OECalendar {
 					cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY),
 					cal.get(Calendar.MINUTE));
 
+			UserObject user = OpenERPAccountManager.currentUser(context);
 			cr = context.getContentResolver();
 			values = new ContentValues();
 			values.put(Events.DTSTART, eventBeginTime.getTimeInMillis());
@@ -496,7 +503,7 @@ public class OECalendar {
 			values.put(Events.DESCRIPTION, Description);
 			values.put(Events.CALENDAR_ID, calendar_id);
 			// values.put(Events._ID, meeting_id);
-			values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+			values.put(Events.EVENT_TIMEZONE, user.getTimezone());
 
 			// inserting event into OpenERP Mobile calendar
 			uri = cr.insert(Events.CONTENT_URI, values);
