@@ -298,4 +298,13 @@ public class AccountFragment extends BaseFragment {
 
 	}
 
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		scope.context().getActionBar().setDisplayHomeAsUpEnabled(true);
+		scope.context().getActionBar().setHomeButtonEnabled(true);
+
+	}
+
 }

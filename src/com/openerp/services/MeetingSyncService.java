@@ -33,17 +33,16 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
+
 import com.openerp.MainActivity;
 import com.openerp.addons.meeting.MeetingDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.calendar.OECalendar;
-import com.openerp.util.SyncBroadcastHelper;
 
 public class MeetingSyncService extends Service {
 	/** The sync broadcast helper. */
-	SyncBroadcastHelper sync_helper = new SyncBroadcastHelper();
 	private static SyncAdapterImpl sSyncAdapter = null;
 	Context context = null;
 	MeetingDBHelper db = null;
@@ -77,7 +76,6 @@ public class MeetingSyncService extends Service {
 		// TODO Auto-generated method stub
 
 		try {
-			sync_helper.sendBrodcast(context, authority, "Meeting", "start");
 			// creating a object of MeetingDBHelper to handle database
 			db = new MeetingDBHelper(context);
 			int user_id = Integer.parseInt(OpenERPAccountManager.currentUser(
@@ -137,8 +135,6 @@ public class MeetingSyncService extends Service {
 				// sync manully created events in OpenERP mobile calendar to
 				// OpenERP Server
 				calendar.sync_Event_TOServer(account, db);
-				sync_helper.sendBrodcast(context, authority, "Meeting",
-						"finish");
 
 			}
 

@@ -31,16 +31,13 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.base.res.Res_PartnerSyncHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.JSONDataHelper;
-import com.openerp.util.SyncBroadcastHelper;
 
 public class ContactSyncService extends Service {
 	private final static String TAG1 = "In this method: ";

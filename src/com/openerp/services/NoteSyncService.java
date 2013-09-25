@@ -34,11 +34,9 @@ import com.openerp.addons.note.NoteDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
-import com.openerp.util.SyncBroadcastHelper;
 
 public class NoteSyncService extends Service {
 	/** The sync broadcast helper. */
-	SyncBroadcastHelper sync_helper = new SyncBroadcastHelper();
 	public static final String TAG = "NoteSyncService";
 	private static SyncAdapterImpl sSyncAdapter = null;
 	static int i = 0;
@@ -70,7 +68,6 @@ public class NoteSyncService extends Service {
 			SyncResult syncResult) {
 		// TODO Auto-generated method stub
 		try {
-			sync_helper.sendBrodcast(context, authority, "Note", "start");
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
 
@@ -80,7 +77,6 @@ public class NoteSyncService extends Service {
 			if (oe.syncWithServer(db)) {
 				// Sync Done, Next stuff....
 				context.sendBroadcast(intent);
-				sync_helper.sendBrodcast(context, authority, "Note", "finish");
 			}
 
 		} catch (Exception e) {

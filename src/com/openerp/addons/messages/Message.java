@@ -65,6 +65,7 @@ import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.OEDate;
 
 public class Message extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
@@ -423,8 +424,11 @@ public class Message extends BaseFragment implements
 
 				@Override
 				public void run() {
-					rootView.findViewById(R.id.messageSyncWaiter)
-							.setVisibility(View.GONE);
+					try {
+						rootView.findViewById(R.id.messageSyncWaiter)
+								.setVisibility(View.GONE);
+					} catch (Exception e) {
+					}
 				}
 			});
 
@@ -443,7 +447,9 @@ public class Message extends BaseFragment implements
 					// Fetching row parent message
 					HashMap<String, Object> newRow = null;
 					OEListViewRows newRowObj = null;
+
 					if (isParent) {
+
 						newRow = row;
 						newRow.put(
 								"subject",
@@ -451,6 +457,7 @@ public class Message extends BaseFragment implements
 										Integer.parseInt(key)));
 						newRowObj = new OEListViewRows(Integer.parseInt(key),
 								(HashMap<String, Object>) newRow);
+
 					} else {
 						newRow = db.search(db, from, new String[] { "id = ?" },
 								new String[] { key });
@@ -463,6 +470,7 @@ public class Message extends BaseFragment implements
 						newRowObj = new OEListViewRows(Integer.parseInt(key),
 								temp_row);
 					}
+
 					parent_list_details.put(key, newRowObj);
 					message_row_indexes.put(key, i);
 					i++;
@@ -690,8 +698,20 @@ public class Message extends BaseFragment implements
 	@Override
 	public void onPause() {
 		super.onPause();
+		if (loadMessage != null) {
+			loadMessage.cancel(true);
+		}
 		scope.context().unregisterReceiver(messageSyncFinish);
 		scope.context().unregisterReceiver(datasetChangeReceiver);
+	}
+
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		if (loadMessage != null) {
+			loadMessage.cancel(true);
+		}
 	}
 
 	private HashMap<String, Boolean> datasetReg = new HashMap<String, Boolean>();
@@ -1024,10 +1044,13 @@ public class Message extends BaseFragment implements
 
 				@Override
 				public void run() {
-					rootView.findViewById(R.id.loadingHeader).setVisibility(
-							View.GONE);
-					rootView.findViewById(R.id.lstMessages).setVisibility(
-							View.VISIBLE);
+					try {
+						rootView.findViewById(R.id.loadingHeader)
+								.setVisibility(View.GONE);
+						rootView.findViewById(R.id.lstMessages).setVisibility(
+								View.VISIBLE);
+					} catch (Exception e) {
+					}
 				}
 			});
 			setupListView(this.message_list);

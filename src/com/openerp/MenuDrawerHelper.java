@@ -184,23 +184,14 @@ public class MenuDrawerHelper {
 			public void onDrawerClosed(View view) {
 				// getActionBar().setTitle(mTitle);
 				instance.invalidateOptionsMenu(); // creates call to
-				Log.d("MenuDrawer", "Closed");
-				instance.getActionBar().setIcon(R.drawable.ic_launcher);
-				instance.setTitle(menus[currentMenu].getTitle(), null);
+				instance.drawerCloseListener(menus[currentMenu].getTitle());
 				// onPrepareOptionsMenu()
 			}
 
 			public void onDrawerOpened(View drawerView) {
 				// getActionBar().setTitle(mTitle);
 				instance.invalidateOptionsMenu(); // creates call to
-				if (!instance.userContext.getAvatar().equals("false")) {
-					Drawable profPic = new BitmapDrawable(
-							Base64Helper.getBitmapImage(instance,
-									instance.userContext.getAvatar()));
-					instance.getActionBar().setIcon(profPic);
-				}
-				instance.setTitle(instance.userContext.getUsername(),
-						instance.userContext.getHost());
+				instance.drawerOpenListener();
 				// onPrepareOptionsMenu()
 			}
 		};

@@ -21,6 +21,7 @@ package com.openerp.support.listview;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.json.JSONArray;
 
@@ -270,7 +271,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 				}
 
 				if (datecols.contains(key_col)) {
-					data = OEDate.getDate(data, timezone);
+					data = OEDate.getDate(data, TimeZone.getDefault().getID());
 				}
 
 				if (!data.equals("false")) {

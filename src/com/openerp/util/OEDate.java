@@ -43,17 +43,19 @@ public class OEDate {
 
 	public static String getDate(String date, String toTimezone) {
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeZone(TimeZone.getTimeZone("GMT-1"));
+		// cal.setTimeZone(TimeZone.getTimeZone("GMT-1"));
 		Date originalDate = convertToDate(date);
 		cal.setTime(originalDate);
 
 		Date oDate = removeTime(originalDate);
 		Date today = removeTime(currentDate());
-
+		dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
+		timeFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
 		String finalDateTime = "";
 		if (today.compareTo(oDate) > 0) {
 			// sending date
 			finalDateTime = dateFormat.format(oDate);
+
 		} else {
 			// sending time because it's today.
 			finalDateTime = timeFormat
@@ -75,13 +77,14 @@ public class OEDate {
 	public static String getDate(String date, String toTimezone,
 			String fromTimezone) {
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeZone(TimeZone.getTimeZone(fromTimezone));
+		// cal.setTimeZone(TimeZone.getTimeZone(fromTimezone));
 		Date originalDate = convertToDate(date);
 		cal.setTime(originalDate);
 
 		Date oDate = removeTime(originalDate);
 		Date today = removeTime(currentDate());
-
+		dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
+		timeFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
 		String finalDateTime = "";
 		if (today.compareTo(oDate) > 0) {
 			// sending date
@@ -109,7 +112,9 @@ public class OEDate {
 	private static Date convertToDate(String date) {
 		Date dt = null;
 		try {
-			dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+			SimpleDateFormat temp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			temp.setTimeZone(TimeZone.getTimeZone("GMT"));
+			dt = temp.parse(date);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -162,7 +167,5 @@ public class OEDate {
 		TimeZone gmtTime = TimeZone.getTimeZone("GMT");
 		gmtFormat.setTimeZone(gmtTime);
 		return gmtFormat.format(new Date());
-
 	}
-
 }

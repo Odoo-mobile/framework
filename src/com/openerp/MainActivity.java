@@ -32,6 +32,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncAdapterType;
 import android.content.res.Configuration;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -39,6 +41,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.openerp.R.id;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
@@ -48,6 +51,7 @@ import com.openerp.support.FragmentHandler;
 import com.openerp.support.Module;
 import com.openerp.support.UserObject;
 import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.Base64Helper;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -77,13 +81,15 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_main);
 		context = this;
 		if (findViewById(R.id.fragment_container) != null) {
-			if (savedInstanceState != null) {
-				return;
-			}
 			fragmentHandler = new FragmentHandler(MainActivity.this);
 			Boot boot = new Boot(this);
 			moduleLists = boot.getModules();
 			refreshMenu(this);
+			if (savedInstanceState != null) {
+				mPullToRefreshAttacher = new PullToRefreshAttacher(this);
+				return;
+			}
+
 			/**
 			 * Getting Application users list. If it's null that means
 			 * application does not contain any account and it will request user
@@ -295,6 +301,8 @@ public class MainActivity extends FragmentActivity {
 			logoutConfirm.show();
 			return true;
 		case R.id.menu_about:
+			getActionBar().setDisplayHomeAsUpEnabled(false);
+			getActionBar().setHomeButtonEnabled(false);
 			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 			Fragment about = new AboutFragment();
 			fragmentHandler.setBackStack(true, null);
@@ -305,7 +313,12 @@ public class MainActivity extends FragmentActivity {
 			getActionBar().setHomeButtonEnabled(false);
 			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 			Fragment fragment = new AccountFragment();
+			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(fragment);
+			return true;
+		case R.id.menu_accounts:
+			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
+			Log.e("Loading Accounts", "Accounts");
 			return true;
 		default:
 			if (drawer.mDrawerToggle.onOptionsItemSelected(item)) {
@@ -358,7 +371,9 @@ public class MainActivity extends FragmentActivity {
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
-		drawer.mDrawerToggle.syncState();
+		if (drawer != null) {
+			drawer.mDrawerToggle.syncState();
+		}
 	}
 
 	@Override
@@ -500,5 +515,20 @@ public class MainActivity extends FragmentActivity {
 				setAutoSync(authority, false);
 			}
 		}
+	}
+
+	public void drawerCloseListener(String title) {
+		Log.d("MenuDrawer", "Closed");
+		getActionBar().setIcon(R.drawable.ic_launcher);
+		setTitle(title, null);
+	}
+
+	public void drawerOpenListener() {
+		if (!userContext.getAvatar().equals("false")) {
+			Drawable profPic = new BitmapDrawable(Base64Helper.getBitmapImage(
+					this, userContext.getAvatar()));
+			getActionBar().setIcon(profPic);
+		}
+		setTitle(userContext.getUsername(), userContext.getHost());
 	}
 }

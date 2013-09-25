@@ -34,7 +34,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.openerp.MainActivity;
 import com.openerp.addons.messages.MessageDBHelper;
 import com.openerp.addons.messages.MessageSyncHelper;
 import com.openerp.auth.OpenERPAccountManager;
@@ -42,7 +41,6 @@ import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
-import com.openerp.util.SyncBroadcastHelper;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -61,9 +59,6 @@ public class MessageSyncService extends Service {
 
 	/** The context. */
 	Context context = null;
-
-	/** The sync broadcast helper. */
-	SyncBroadcastHelper sync_helper = new SyncBroadcastHelper();
 
 	/**
 	 * Instantiates a new message sync service.
@@ -125,8 +120,6 @@ public class MessageSyncService extends Service {
 			HashMap<String, Object> response = null;
 			if (OpenERPServerConnection.isNetworkAvailable(context)) {
 				Log.i(TAG + "::performSync()", "Sync with Server Started");
-				sync_helper
-						.sendBrodcast(context, authority, "Message", "start");
 				intent.setAction(SyncFinishReceiver.SYNC_FINISH);
 				int user_id = Integer.parseInt(OpenERPAccountManager
 						.currentUser(context).getUser_id());
@@ -137,8 +130,8 @@ public class MessageSyncService extends Service {
 				newContext.put("default_res_id", user_id);
 				newContext.put("search_default_message_unread", true);
 				newContext.put("search_disable_custom_filters", true);
-				JSONObject dataContext = MainActivity.openerp
-						.updateContext(newContext);
+				JSONObject dataContext = msgDb.getOEInstance().updateContext(
+						newContext);
 
 				// Providing arguments to filter messages from server.
 				// Argument for Check Ids not in local database
@@ -199,15 +192,11 @@ public class MessageSyncService extends Service {
 							.toString());
 					Log.e("MessageSyncService",
 							"sending sync finish broadcast.");
-					sync_helper.sendBrodcast(context, authority, "Message",
-							"finish");
 					context.sendBroadcast(intent);
 				} else {
 					intent.putExtra("data_new", "false");
 					intent.putExtra("data_update", "false");
 					context.sendBroadcast(intent);
-					sync_helper.sendBrodcast(context, authority, "Message",
-							"finish");
 				}
 
 			} else {
