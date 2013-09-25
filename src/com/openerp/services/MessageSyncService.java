@@ -34,6 +34,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.openerp.MainActivity;
+import com.openerp.R;
 import com.openerp.addons.messages.MessageDBHelper;
 import com.openerp.addons.messages.MessageSyncHelper;
 import com.openerp.auth.OpenERPAccountManager;
@@ -41,6 +43,7 @@ import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
+import com.openerp.util.OENotificationHelper;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -188,6 +191,17 @@ public class MessageSyncService extends Service {
 				if (Integer.parseInt(response.get("total").toString()) > 0) {
 					intent.putExtra("data_new", response.get("new_ids")
 							.toString());
+					int totalNewMessage = ((JSONArray) response.get("new_ids"))
+							.length();
+					OENotificationHelper notification = new OENotificationHelper();
+					Intent mainActiivty = new Intent(context,
+							MainActivity.class);
+					notification.setResultIntent(mainActiivty, context);
+
+					notification.showNotification(context, totalNewMessage
+							+ " new messages", totalNewMessage
+							+ " new message received (OpneERP)", authority,
+							R.drawable.ic_stat_oe_logo);
 					intent.putExtra("data_update", response.get("update_ids")
 							.toString());
 					Log.e("MessageSyncService",

@@ -60,6 +60,7 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OEDialog;
+import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
@@ -810,9 +811,14 @@ public class Message extends BaseFragment implements
 	@Override
 	public void onRefreshStarted(View view) {
 		// TODO Auto-generated method stub
-		Log.d("MessageFragment", "requesting for sync");
-		scope.context().requestSync(MessageProvider.AUTHORITY);
-
+		if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
+			Log.d("MessageFragment", "requesting for sync");
+			scope.context().requestSync(MessageProvider.AUTHORITY);
+		} else {
+			Toast.makeText(getActivity(), "Unable to connect server !",
+					Toast.LENGTH_LONG).show();
+			mPullToRefreshAttacher.setRefreshComplete();
+		}
 	}
 
 	// PullToRefresh
