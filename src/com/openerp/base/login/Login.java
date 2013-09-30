@@ -25,7 +25,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -45,6 +44,7 @@ import android.widget.Toast;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
@@ -102,12 +102,16 @@ public class Login extends BaseFragment {
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		this.context = getActivity();
+		scope = new AppScope(MainActivity.userContext,
+				(MainActivity) getActivity());
 		// Inflate the layout for this fragment
 		rootView = inflater.inflate(R.layout.fragment_login, container, false);
 		dbListSpinner = (Spinner) rootView.findViewById(R.id.lstDatabases);
 		this.handleArguments((Bundle) getArguments());
 		this.loadDatabaseList();
 		getActivity().setTitle("Login");
+		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+		getActivity().getActionBar().setHomeButtonEnabled(false);
 		return rootView;
 	}
 
@@ -298,10 +302,8 @@ public class Login extends BaseFragment {
 						MainActivity.userContext)) {
 					loginUserASync.cancel(true);
 					pdialog.hide();
-					Intent intent = getActivity().getIntent();
-					intent.putExtra("create_new_account", false);
-					getActivity().finish();
-					getActivity().startActivity(intent);
+					SyncWizard syncWizard = new SyncWizard();
+					scope.context().fragmentHandler.replaceFragmnet(syncWizard);
 
 				}
 			} else {

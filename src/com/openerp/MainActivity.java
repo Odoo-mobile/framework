@@ -45,6 +45,7 @@ import android.view.MenuItem;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
+import com.openerp.base.account.AccountsDetail;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.Boot;
 import com.openerp.support.FragmentHandler;
@@ -101,6 +102,7 @@ public class MainActivity extends FragmentActivity {
 			if (OpenERPAccountManager.fetchAllAccounts(this) == null) {
 				getActionBar().setDisplayHomeAsUpEnabled(false);
 				getActionBar().setHomeButtonEnabled(false);
+				drawer.lockDrawer(true);
 				// Starting New account setup wizard.
 				Fragment fragment = new AccountFragment();
 				fragmentHandler.setBackStack(true, null);
@@ -111,6 +113,7 @@ public class MainActivity extends FragmentActivity {
 				// Application contain user account, so going for next stuff.
 				// Checking that rather user have requested to create new
 				// account from application account setting.
+				drawer.lockDrawer(false);
 				Intent intent = getIntent();
 				boolean reqForNewAccount = intent.getBooleanExtra(
 						"create_new_account", false);
@@ -325,6 +328,9 @@ public class MainActivity extends FragmentActivity {
 		case R.id.menu_accounts:
 			set_setting_menu = true;
 			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
+			Fragment acFragment = new AccountsDetail();
+			fragmentHandler.setBackStack(true, null);
+			fragmentHandler.replaceFragmnet(acFragment);
 			return true;
 		default:
 			if (drawer.mDrawerToggle.onOptionsItemSelected(item)) {
