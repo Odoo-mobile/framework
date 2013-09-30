@@ -193,15 +193,22 @@ public class MessageSyncService extends Service {
 							.toString());
 					int totalNewMessage = ((JSONArray) response.get("new_ids"))
 							.length();
-					OENotificationHelper notification = new OENotificationHelper();
-					Intent mainActiivty = new Intent(context,
-							MainActivity.class);
-					notification.setResultIntent(mainActiivty, context);
+					boolean showNotification = true;
 
-					notification.showNotification(context, totalNewMessage
-							+ " new messages", totalNewMessage
-							+ " new message received (OpneERP)", authority,
-							R.drawable.ic_stat_oe_logo);
+					if (MainActivity.APP_STATE == 1) {
+						showNotification = false;
+					}
+					if (showNotification) {
+						OENotificationHelper notification = new OENotificationHelper();
+						Intent mainActiivty = new Intent(context,
+								MainActivity.class);
+						notification.setResultIntent(mainActiivty, context);
+
+						notification.showNotification(context, totalNewMessage
+								+ " new messages", totalNewMessage
+								+ " new message received (OpneERP)", authority,
+								R.drawable.ic_stat_oe_logo);
+					}
 					intent.putExtra("data_update", response.get("update_ids")
 							.toString());
 					Log.e("MessageSyncService",
