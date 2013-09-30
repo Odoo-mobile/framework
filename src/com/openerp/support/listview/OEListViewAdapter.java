@@ -57,6 +57,8 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	/** The resource_id. */
 	int resource_id;
 
+	OEListViewOnCreateListener viewListener = null;
+
 	/** The rows. */
 	public List<OEListViewRows> rows = null;
 
@@ -321,6 +323,10 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 			}
 		}
 
+		if (viewListener != null) {
+			viewRow = viewListener.listViewOnCreateListener(position, viewRow,
+					row);
+		}
 		return viewRow;
 	}
 
@@ -579,4 +585,9 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	public void toHTML(String column) {
 		toHtml.add(column);
 	}
+
+	public void addViewListener(OEListViewOnCreateListener viewListener) {
+		this.viewListener = viewListener;
+	}
+
 }

@@ -234,4 +234,13 @@ public class MenuDrawerHelper {
 		}
 	}
 
+	public void lockDrawer(boolean bool) {
+		if (!bool) {
+			mDrawerLayout.setDrawerLockMode(DrawerLayout.STATE_IDLE);
+		} else {
+			mDrawerLayout
+					.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+		}
+	}
+
 }
