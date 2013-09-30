@@ -42,7 +42,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.openerp.R.id;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
@@ -70,6 +69,8 @@ public class MainActivity extends FragmentActivity {
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 	public static Context context = null;
 	private OEMenuItems[] systemMenus = null;
+	public static int APP_STATE = 0;
+	public static boolean set_setting_menu = false;
 
 	/*
 	 * (non-Javadoc)
@@ -81,6 +82,7 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		context = this;
+		APP_STATE = 1;
 		if (findViewById(R.id.fragment_container) != null) {
 			fragmentHandler = new FragmentHandler(MainActivity.this);
 			Boot boot = new Boot(this);
@@ -103,6 +105,7 @@ public class MainActivity extends FragmentActivity {
 				Fragment fragment = new AccountFragment();
 				fragmentHandler.setBackStack(true, null);
 				fragmentHandler.startNewFragmnet(fragment);
+
 				return;
 			} else {
 				// Application contain user account, so going for next stuff.
@@ -290,10 +293,10 @@ public class MainActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// The action bar home/up action should open or close the drawer.
 		// ActionBarDrawerToggle will take care of this.
-
 		// Handle action buttons
 		switch (item.getItemId()) {
 		case R.id.menu_global_settings:
+			set_setting_menu = false;
 			Intent i = new Intent(this, AppSettingsActivity.class);
 			startActivityForResult(i, RESULT_SETTINGS);
 			return true;
@@ -302,6 +305,7 @@ public class MainActivity extends FragmentActivity {
 			logoutConfirm.show();
 			return true;
 		case R.id.menu_about:
+			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
 			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
@@ -310,6 +314,7 @@ public class MainActivity extends FragmentActivity {
 			fragmentHandler.replaceFragmnet(about);
 			return true;
 		case R.id.menu_new_account:
+			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
 			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
@@ -318,8 +323,8 @@ public class MainActivity extends FragmentActivity {
 			fragmentHandler.replaceFragmnet(fragment);
 			return true;
 		case R.id.menu_accounts:
+			set_setting_menu = true;
 			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
-			Log.e("Loading Accounts", "Accounts");
 			return true;
 		default:
 			if (drawer.mDrawerToggle.onOptionsItemSelected(item)) {
@@ -385,7 +390,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public void selectItem(int position) {
-
+		set_setting_menu = false;
 		Fragment fragment = null;
 		if (this.systemMenus != null) {
 			getActionBar().setDisplayShowTitleEnabled(true);
@@ -401,6 +406,7 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 		if (fragment != null) {
+
 			fragmentHandler.setBackStack(false, null);
 			fragmentHandler.replaceFragmnet(fragment);
 		}
@@ -521,7 +527,11 @@ public class MainActivity extends FragmentActivity {
 	public void drawerCloseListener(String title) {
 		Log.d("MenuDrawer", "Closed");
 		getActionBar().setIcon(R.drawable.ic_launcher);
-		setTitle(title, null);
+		if (!set_setting_menu) {
+			setTitle(title, null);
+		} else {
+			getActionBar().setSubtitle(null);
+		}
 	}
 
 	public void drawerOpenListener() {
@@ -532,4 +542,12 @@ public class MainActivity extends FragmentActivity {
 		}
 		setTitle(userContext.getUsername(), userContext.getHost());
 	}
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		APP_STATE = 0;
+	}
+
 }

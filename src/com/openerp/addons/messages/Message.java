@@ -66,7 +66,6 @@ import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuItems;
-import com.openerp.util.OEDate;
 
 public class Message extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
@@ -401,9 +400,8 @@ public class Message extends BaseFragment implements
 			message_resource = R.string.message_inbox_all_read;
 			break;
 		case TOME:
-			where = new String[] { "res_id = ? ", "AND", "to_read= ?", "AND",
-					"starred=?" };
-			whereArgs = new String[] { "0", "true", "false" };
+			where = new String[] { "res_id = ? ", "AND", "to_read= ?", };
+			whereArgs = new String[] { "0", "true" };
 			message_resource = R.string.message_tome_all_read;
 			break;
 		case TODO:
@@ -600,7 +598,7 @@ public class Message extends BaseFragment implements
 				context)));
 		menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To:Me", this
 				.getObjectOFClass("type", "to-me"),
-				getCount(TYPE.TOME, context) - getCount(TYPE.TODO, context)));
+				getCount(TYPE.TOME, context) - 1));
 		menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-Do", this
 				.getObjectOFClass("type", "to-do"),
 				getCount(TYPE.TODO, context)));
@@ -622,9 +620,8 @@ public class Message extends BaseFragment implements
 			whereArgs = new String[] { "true", "false" };
 			break;
 		case TOME:
-			where = new String[] { "to_read = ?", "AND", "res_id = ?", "AND",
-					"starred= ?" };
-			whereArgs = new String[] { "true", "0", "false" };
+			where = new String[] { "to_read = ?", "AND", "res_id = ?" };
+			whereArgs = new String[] { "true", "0" };
 			break;
 		case TODO:
 			where = new String[] { "to_read = ?", "AND", "starred = ?" };

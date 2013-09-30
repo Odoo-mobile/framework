@@ -30,7 +30,6 @@ import org.json.JSONObject;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.openerp.MainActivity;
 import com.openerp.orm.BaseDBHelper;
@@ -89,7 +88,6 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 		try {
 			JSONArray localIds = JSONDataHelper
 					.intArrayToJSONArray(getAllIds(db));
-
 			JSONObject fields = new JSONObject();
 
 			fields.accumulate("fields", "read");
@@ -113,7 +111,7 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 
 			JSONObject msgReplies = oe.search_read("mail.notification", fields,
 					domainRplies, 0, 1000, null, null);
-			if (msgReplies.has("results")) {
+			if (msgReplies.has("records")) {
 				updatedIds = updateMessageStatus(msgReplies, db);
 			}
 
@@ -167,7 +165,6 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 				String read = (objRes.getString("read").equals("true")) ? "false"
 						: "true";
 				String starred = objRes.getString("starred");
-
 				ContentValues values = new ContentValues();
 				values.put("starred", starred);
 				values.put("to_read", read);
