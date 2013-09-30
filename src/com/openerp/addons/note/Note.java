@@ -29,10 +29,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,10 +39,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
@@ -74,9 +71,6 @@ public class Note extends BaseFragment implements
 	public FragmentHandler fragmentHandler;
 	NoteDBHelper db;
 
-	// SwipeDetector swipeDetector;
-	// Button deleteRow;
-
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
@@ -86,18 +80,8 @@ public class Note extends BaseFragment implements
 		db = (NoteDBHelper) getModel();
 		rootView = inflater.inflate(R.layout.fragment_note, container, false);
 		lstNotes = (ListView) rootView.findViewById(R.id.lstNotes);
-		// deleteRow = (Button)
-		// rootView.findViewById(R.id.btnNoteListItemDelete);
 		handleArguments((Bundle) getArguments());
-
-		// swipeDetector = new SwipeDetector();
-		// lstNotes.setOnTouchListener(swipeDetector);
-		/*
-		 * if (swipeDetector.getAction() == Action.RL) { // Do some action
-		 * System.out.println("="); }
-		 */
 		return rootView;
-
 	}
 
 	@Override
@@ -145,13 +129,10 @@ public class Note extends BaseFragment implements
 			setNoteStages(scope.context());
 			stage_id = bundle.getString("stage");
 			setupListView(stage_id);
-			// Log.e("Loading stage notes : ", stage_id);
 		} else {
 			setNoteStages(scope.context());
-			// Log.e("Loading all stages..", "all stages");
 			setupListView("-1");
 		}
-
 	}
 
 	@Override
@@ -212,11 +193,11 @@ public class Note extends BaseFragment implements
 	public void onRefreshStarted(View view) {
 		// TODO Auto-generated method stub
 		scope.context().requestSync(NoteProvider.AUTHORITY);
-
 	}
 
 	void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
 		mPullAttacher = attacher;
+
 	}
 
 	@Override
@@ -236,7 +217,6 @@ public class Note extends BaseFragment implements
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			mPullAttacher.setRefreshComplete();
-			Log.e("Sycn Status", "Sync Finish");
 			// refreshing list view after synchronisation
 			scope.context().refreshMenu(context);
 			setupListView(stage_id);
@@ -271,7 +251,6 @@ public class Note extends BaseFragment implements
 				String stageIds = listRows.get(position).getRow_data()
 						.get("stage_id").toString();
 
-				// Log.e("SINGLE PRESSED ::", rowId + "");
 				// Create an instance of DetailNoteFragment
 				DetailNoteFragment fragment = new DetailNoteFragment();
 				Bundle selectedNoteID = new Bundle();
@@ -284,38 +263,42 @@ public class Note extends BaseFragment implements
 			}
 		});
 
-		lstNotes.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View view,
-					int position, long arg3) {
-				// TODO Auto-generated method stub
-				int rowId = listRows.get(position).getRow_id();
-				String raw_status = listRows.get(position).getRow_data()
-						.get("open").toString();
-				// Log.e("LONG PRESSED ON:: ", rowId + "::" + raw_status);
-				// identifying the textview container for NoteName
-				final TextView txvNote = (TextView) view
-						.findViewById(R.id.txvNoteListItem);
-				if (!rawStrikeStatus) {
-					// for STRIKING selected raw
-					txvNote.setPaintFlags(txvNote.getPaintFlags()
-							| Paint.STRIKE_THRU_TEXT_FLAG);
-					strikeNote(rowId, raw_status, scope.context());
-					rawStrikeStatus = true;
-
-				} else {
-					// for UNSTRIKING selected raw
-					txvNote.setPaintFlags(txvNote.getPaintFlags()
-							& (~Paint.STRIKE_THRU_TEXT_FLAG));
-					strikeNote(rowId, raw_status, scope.context());
-					rawStrikeStatus = false;
-				}
-				return true;
-			}
-		});
-
 		mPullAttacher = scope.context().getPullToRefreshAttacher();
 		mPullAttacher.setRefreshableView(lstNotes, this);
+
+		SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(
+				lstNotes,
+				new SwipeDismissListViewTouchListener.DismissCallbacks() {
+					@Override
+					public boolean canDismiss(int position) {
+						return true;
+					}
+
+					@Override
+					public void onDismiss(ListView listView,
+							int[] reverseSortedPositions) {
+						for (int position : reverseSortedPositions) {
+							int rowId = listRows.get(position).getRow_id();
+							String raw_status = listRows.get(position)
+									.getRow_data().get("open").toString();
+							if (!rawStrikeStatus) {
+								strikeNote(rowId, raw_status, scope.context());
+								rawStrikeStatus = true;
+							} else {
+								strikeNote(rowId, raw_status, scope.context());
+								rawStrikeStatus = false;
+							}
+							listRows.remove(position);
+							listAdapter.refresh(listRows);
+						}
+					}
+				});
+
+		lstNotes.setOnTouchListener(touchListener);
+		// Setting this scroll listener is required to ensure that during
+		// ListView scrolling,
+		// we don't look for swipes.
+		lstNotes.setOnScrollListener(touchListener.makeScrollListener());
 
 	}
 
@@ -333,23 +316,23 @@ public class Note extends BaseFragment implements
 
 			// Update--> Open[true]-->To-->Close[false]
 			if (open.equalsIgnoreCase("true")) {
-
+				Toast.makeText(getActivity(), "Move to Archive",
+						Toast.LENGTH_SHORT).show();
 				JSONObject res = oe.call_kw("note.note",
 						"onclick_note_is_done", args);
-				// System.out.println("Update--> Open[true]-->To-->Close[false]");
 				values.put("open", "false");
 				db = new NoteDBHelper(context);
 				db.write(db, values, note_id);
 			}
 			// Update--> Close[false]-->To-->Open[true]
 			else {
+				Toast.makeText(getActivity(), "Move to All", Toast.LENGTH_SHORT)
+						.show();
 				JSONObject res = oe.call_kw("note.note",
 						"onclick_note_not_done", args);
-				// System.out.println(" Update--> Close[false]-->To-->Open[true]");
 				values.put("open", "true");
 				db.write(db, values, note_id);
 			}
-
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -396,7 +379,6 @@ public class Note extends BaseFragment implements
 
 	public void setNoteStages(Context context) {
 		stages = new HashMap<String, String>();
-		// NoteDBHelper dbhelper = new NoteDBHelper(context);
 		db = new NoteDBHelper(context);
 		NoteDBHelper.NoteStages stagesobj = db.new NoteStages(context);
 		HashMap<String, Object> data = stagesobj.search(stagesobj);
@@ -412,7 +394,5 @@ public class Note extends BaseFragment implements
 				stages.put(row_id, name);
 			}
 		}
-
 	}
-
 }
