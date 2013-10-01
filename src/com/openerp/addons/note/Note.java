@@ -316,22 +316,22 @@ public class Note extends BaseFragment implements
 
 			// Update--> Open[true]-->To-->Close[false]
 			if (open.equalsIgnoreCase("true")) {
-				Toast.makeText(getActivity(), "Move to Archive",
-						Toast.LENGTH_SHORT).show();
 				JSONObject res = oe.call_kw("note.note",
 						"onclick_note_is_done", args);
 				values.put("open", "false");
 				db = new NoteDBHelper(context);
 				db.write(db, values, note_id);
+				Toast.makeText(context, "Move to Archive", Toast.LENGTH_SHORT)
+						.show();
 			}
 			// Update--> Close[false]-->To-->Open[true]
 			else {
-				Toast.makeText(getActivity(), "Move to All", Toast.LENGTH_SHORT)
-						.show();
 				JSONObject res = oe.call_kw("note.note",
 						"onclick_note_not_done", args);
 				values.put("open", "true");
 				db.write(db, values, note_id);
+				Toast.makeText(context, "Move to All", Toast.LENGTH_SHORT)
+						.show();
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -371,8 +371,10 @@ public class Note extends BaseFragment implements
 				lists.add(row);
 			}
 		} else {
-			// request to sync..
-			scope.context().requestSync(NoteProvider.AUTHORITY);
+			if (db.isEmptyTable(db)) {
+				// request to sync..
+				scope.context().requestSync(NoteProvider.AUTHORITY);
+			}
 		}
 		return lists;
 	}

@@ -29,6 +29,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -79,6 +80,22 @@ public class DetailNoteFragment extends BaseFragment {
 		MenuItem item_cancel = menu.findItem(R.id.menu_note_edit_cancel);
 		item_save.setVisible(false);
 		item_cancel.setVisible(false);
+
+		// handling Menubutton[Marks As Done or Open] depending upon note status
+		if (getArguments() != null) {
+			Bundle bundle = this.getArguments();
+			row_status = getArguments().getString("row_status");
+
+			if (row_status.equalsIgnoreCase("true")) {
+				MenuItem mark_asopen = menu
+						.findItem(R.id.menu_note_mark_asopen);
+				mark_asopen.setVisible(false);
+			} else {
+				MenuItem mark_asdone = menu
+						.findItem(R.id.menu_note_mark_asdone);
+				mark_asdone.setVisible(false);
+			}
+		}
 	}
 
 	@Override
@@ -107,6 +124,12 @@ public class DetailNoteFragment extends BaseFragment {
 			return true;
 
 		case R.id.menu_note_mark_asdone:
+
+			note.strikeNote(row_id, row_status, scope.context());
+			getActivity().getSupportFragmentManager().popBackStack();
+			return true;
+
+		case R.id.menu_note_mark_asopen:
 
 			note.strikeNote(row_id, row_status, scope.context());
 			getActivity().getSupportFragmentManager().popBackStack();
@@ -145,7 +168,6 @@ public class DetailNoteFragment extends BaseFragment {
 		// TODO Auto-generated method stub
 
 		if (bundle.containsKey("row_id")) {
-			//System.out.println("DETAIL VIEW OPEN::" + bundle.getInt("row_id"));
 			row_id = bundle.getInt("row_id");
 			row_status = bundle.getString("row_status");
 			stageid = bundle.getString("stage_id");
