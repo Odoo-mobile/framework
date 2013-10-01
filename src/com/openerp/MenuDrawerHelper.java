@@ -21,16 +21,12 @@ package com.openerp;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -41,7 +37,6 @@ import com.openerp.support.Module;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuAdapter;
 import com.openerp.support.menu.OEMenuItems;
-import com.openerp.util.Base64Helper;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -113,11 +108,7 @@ public class MenuDrawerHelper {
 					allMenus.add(new OEMenuItems(menu.getMenuTitle()
 							.toUpperCase(), null, 0, true));
 					for (OEMenuItems menuItem : menu.getMenuItems()) {
-						allMenus.add(new OEMenuItems(menuItem.getIcon(),
-								menuItem.getTitle(), menuItem
-										.getFragmentInstance(), (menuItem
-										.getNotificationCount() < 0) ? 0
-										: menuItem.getNotificationCount()));
+						allMenus.add(menuItem);
 					}
 				}
 

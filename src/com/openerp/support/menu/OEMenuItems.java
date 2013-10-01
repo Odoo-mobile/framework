@@ -18,6 +18,8 @@
  */
 package com.openerp.support.menu;
 
+import android.graphics.Color;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class OEMenuItems.
@@ -38,6 +40,11 @@ public class OEMenuItems {
 
 	/** The is group. */
 	private boolean isGroup;
+
+	/** The Menu Tag color */
+	private boolean set_menu_tag_color = false;
+
+	private int menu_color = 0;
 
 	/**
 	 * Instantiates a new oE menu items.
@@ -227,4 +234,19 @@ public class OEMenuItems {
 		this.notificationCount = notificationCount;
 	}
 
+	public void setAutoMenuTagColor(boolean set_tag_color) {
+		this.set_menu_tag_color = set_tag_color;
+	}
+
+	public boolean hasMenuTagColor() {
+		return this.set_menu_tag_color;
+	}
+
+	public void setMenuTagColor(int color_code) {
+		this.menu_color = color_code;
+	}
+
+	public int getMenuTagColor() {
+		return this.menu_color;
+	}
 }

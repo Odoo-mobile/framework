@@ -417,6 +417,13 @@ public class MainActivity extends FragmentActivity {
 				return;
 			} else {
 				fragment = (Fragment) instance;
+				if (this.systemMenus[position].hasMenuTagColor()
+						&& !fragment.getArguments().containsKey("tag_color")) {
+					Bundle tagcolor = fragment.getArguments();
+					tagcolor.putInt("tag_color",
+							this.systemMenus[position].getMenuTagColor());
+					fragment.setArguments(tagcolor);
+				}
 			}
 		}
 		if (fragment != null) {
