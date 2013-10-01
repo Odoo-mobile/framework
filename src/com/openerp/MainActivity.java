@@ -46,6 +46,7 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
 import com.openerp.base.account.AccountsDetail;
+import com.openerp.base.account.UserProfile;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.Boot;
 import com.openerp.support.FragmentHandler;
@@ -331,6 +332,13 @@ public class MainActivity extends FragmentActivity {
 			Fragment acFragment = new AccountsDetail();
 			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(acFragment);
+			return true;
+		case R.id.menu_user_profile:
+			set_setting_menu = true;
+			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
+			Fragment profileFragment = new UserProfile();
+			fragmentHandler.setBackStack(true, null);
+			fragmentHandler.replaceFragmnet(profileFragment);
 			return true;
 		default:
 			if (drawer.mDrawerToggle.onOptionsItemSelected(item)) {
