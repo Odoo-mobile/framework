@@ -28,6 +28,9 @@
                 android:id="@+id/menu_note_mark_asdone"
                 android:title="Mark As Done"/>
             <item
+                android:id="@+id/menu_note_mark_asopen"
+                android:title="Mark As Open"/>
+            <item
                 android:id="@+id/menu_note_edit"
                 android:title="Edit Note">
             </item>
