@@ -25,6 +25,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.openerp.support.UserObject;
 
@@ -243,5 +244,26 @@ public class OpenERPAccountManager {
 		accMgr.removeAccount(
 				OpenERPAccountManager.getAccount(context, username), null, null);
 
+	}
+
+	public static boolean updateAccountDetails(Context context,
+			UserObject userObject) {
+
+		boolean flag = false;
+		UserObject user = OpenERPAccountManager.getAccountDetail(context,
+				userObject.getAndroidName());
+		Bundle userBundle = userObject.getAsBundle();
+		if (user != null) {
+			AccountManager accMgr = AccountManager.get(context);
+			for (String key : userBundle.keySet()) {
+				accMgr.setUserData(
+						OpenERPAccountManager.getAccount(context,
+								user.getAndroidName()), key,
+						userBundle.getString(key));
+			}
+
+			flag = true;
+		}
+		return flag;
 	}
 }
