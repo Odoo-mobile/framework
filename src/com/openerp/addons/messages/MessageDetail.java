@@ -26,8 +26,10 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -57,7 +59,6 @@ import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
-import com.openerp.util.OEDate;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -67,6 +68,7 @@ public class MessageDetail extends BaseFragment {
 
 	/** The root view. */
 	View rootView = null;
+	private static final int MESSAGE_REPLY = 3;
 
 	/** The list adapter. */
 	OEListViewAdapter listAdapter = null;
@@ -119,129 +121,12 @@ public class MessageDetail extends BaseFragment {
 							Toast.makeText(scope.context(),
 									"Sending message...", Toast.LENGTH_LONG)
 									.show();
-							if (sendMessageReply(edtReply.getText().toString())) {
-								Toast.makeText(scope.context(),
-										"Message Sent successfully.",
-										Toast.LENGTH_LONG).show();
-								edtReply.setText("");
-								rootView.findViewById(R.id.layoutMessageReply)
-										.setVisibility(View.GONE);
-
-							} else {
-								Toast.makeText(scope.context(),
-										"Message Sending fail !",
-										Toast.LENGTH_LONG).show();
-							}
 						}
 					}
 
 				});
 
 		return rootView;
-	}
-
-	/**
-	 * Send message reply.
-	 * 
-	 * @param body
-	 *            the body
-	 * @return true, if successful
-	 */
-	private boolean sendMessageReply(String body) {
-		boolean flag = false;
-		try {
-			OEHelper oe = db.getOEInstance();
-			ContentValues values = new ContentValues();
-
-			JSONArray arguments = new JSONArray("[false]");
-			String crate_date = OEDate.getDate();
-			JSONObject kwargs = new JSONObject();
-			kwargs.put("body", body);
-			values.put("body", body);
-
-			kwargs.put("subject", false);
-			values.put("subject", "false");
-			kwargs.put("date", crate_date);
-			kwargs.put("parent_id", message_id);
-			values.put("parent_id", message_id);
-
-			kwargs.put("attachment_ids", new JSONArray());
-			kwargs.put("partner_ids", new JSONArray());
-
-			JSONObject oecontext = new JSONObject();
-			String model = parent_row.get("model").toString();
-
-			oecontext
-					.put("default_model",
-							(!model.equals("mail.thread") ? (model
-									.equals("false") ? false : model) : false));
-			oecontext
-					.put("default_res_id", (parent_row.get("res_id").toString()
-							.equals("0") ? false : parent_row.get("res_id")));
-			oecontext.put("default_parent_id", message_id);
-			oecontext.put("mail_post_autofollow", true);
-			oecontext.put("mail_post_autofollow_partner_ids", new JSONArray());
-
-			kwargs.put("context", oecontext);
-
-			kwargs.put("type", "comment");
-			values.put("type", "comment");
-
-			kwargs.put("content_subtype", "plaintext");
-			kwargs.put("subtype", "mail.mt_comment");
-
-			values.put("email_from", "false");
-			values.put("record_name", "false");
-			values.put("to_read", "false");
-			values.put("author_id", scope.User().getPartner_id());
-			values.put("model", oecontext.getString("default_model"));
-			values.put("res_id", oecontext.getString("default_res_id"));
-			values.put("date", crate_date);
-			values.put("starred", "false");
-			values.put("partner_ids", parent_row.get("partners").toString());
-			oe.updateKWargs(kwargs);
-			JSONObject result = oe.call_kw("mail.thread", "message_post",
-					arguments);
-			values.put("id", result.getString("result"));
-			int newid = db.create(db, values);
-
-			String query = "select t1.id as message_id , t1.*, t2.name, t2.image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.id desc";
-			List<HashMap<String, Object>> records = db
-					.executeSQL(query, new String[] { String.valueOf(newid),
-							String.valueOf(newid) });
-
-			HashMap<String, Object> row = new HashMap<String, Object>();
-			row.put("total", records.size());
-			row.put("records", records);
-			if ((Integer) row.get("total") > 0) {
-
-				List<HashMap<String, Object>> rows_detail = (List<HashMap<String, Object>>) row
-						.get("records");
-				for (HashMap<String, Object> row_detail : rows_detail) {
-
-					int msg_id = Integer.parseInt(row_detail.get("message_id")
-							.toString());
-					String key = row_detail.get("parent_id").toString();
-					OEListViewRows rowObj = null;
-					String[] ids = getPartnersOfMessage(row_detail.get(
-							"message_id").toString());
-					String partners = "nobody";
-					if (ids != null) {
-						partners = TextUtils.join(", ", ids);
-					}
-					row_detail.put("partners", partners);
-
-					rowObj = new OEListViewRows(msg_id, row_detail);
-					messages_sorted.add(1, rowObj);
-
-				}
-			}
-			listAdapter.refresh(messages_sorted);
-			flag = true;
-		} catch (Exception e) {
-			flag = false;
-		}
-		return flag;
 	}
 
 	/**
@@ -268,18 +153,6 @@ public class MessageDetail extends BaseFragment {
 				Color.parseColor("#aaaaaa"), Color.parseColor("#0099cc"));
 		listAdapter.cleanDate("date", scope.User().getTimezone());
 
-		listAdapter.setItemClickListener(R.id.layoutMessageDetailHeader,
-				new ControlClickEventListener() {
-
-					@Override
-					public OEListViewRows controlClicked(int position,
-							OEListViewRows row, View view) {
-						// TODO Auto-generated method stub
-
-						return null;
-					}
-				});
-
 		listAdapter.setItemClickListener(R.id.imgBtnReply,
 				new ControlClickEventListener() {
 
@@ -287,10 +160,11 @@ public class MessageDetail extends BaseFragment {
 					public OEListViewRows controlClicked(int position,
 							OEListViewRows row, View view) {
 						// TODO Auto-generated method stub
-						rootView.findViewById(R.id.layoutMessageReply)
-								.setVisibility(View.VISIBLE);
-						rootView.findViewById(R.id.edtReplyMessage)
-								.requestFocus();
+						Intent composeIntent = new Intent(scope.context(),
+								MessageComposeActivty.class);
+						composeIntent.putExtra("message_id", message_id);
+						composeIntent.putExtra("send_reply", true);
+						startActivityForResult(composeIntent, MESSAGE_REPLY);
 
 						return null;
 					}
@@ -398,9 +272,9 @@ public class MessageDetail extends BaseFragment {
 	 *            the message_id
 	 * @return the partners of message
 	 */
-	private String[] getPartnersOfMessage(String message_id) {
+	public String[] getPartnersOfMessage(String message_id) {
 		String[] str = null;
-
+		db = new MessageDBHelper(MainActivity.context);
 		HashMap<String, Object> data = db.search(db, new String[] { "id = ?" },
 				new String[] { message_id });
 		if (Integer.parseInt(data.get("total").toString()) > 0) {
@@ -615,9 +489,21 @@ public class MessageDetail extends BaseFragment {
 
 		if (markAsReadUnreadArchive(args, default_model, res_id, parent_id,
 				flag)) {
-
 		}
 		return res;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case MESSAGE_REPLY:
+			if (resultCode == Activity.RESULT_OK) {
+				Bundle bundle = new Bundle();
+				bundle.putInt("message_id", message_id);
+				handleArguments(bundle);
+			}
+			break;
+		}
 	}
 
 }

@@ -40,6 +40,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,12 +56,14 @@ import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
+import com.openerp.support.AppScope;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.HTMLHelper;
+import com.openerp.util.OEDate;
 
 public class MessageComposeActivty extends Activity {
 	private static final int PICKFILE_RESULT_CODE = 1;
@@ -72,6 +75,11 @@ public class MessageComposeActivty extends Activity {
 	List<OEListViewRows> partners_list = new ArrayList<OEListViewRows>();
 	HashMap<String, Object> selectedPartners = new HashMap<String, Object>();
 	boolean is_note_body = false;
+	boolean is_reply = false;
+	int message_id = 0;
+	AppScope scope = null;
+	/** The parent_row. */
+	HashMap<String, Object> parent_row = null;
 
 	enum ATTACHMENT_TYPE {
 		IMAGE, TEXT_FILE
@@ -84,9 +92,57 @@ public class MessageComposeActivty extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_message_compose);
+		scope = new AppScope(MainActivity.userContext,
+				(MainActivity) MainActivity.context);
 		getActionBar().setHomeButtonEnabled(true);
-		getActionBar().setTitle("Compose");
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+
+		Intent replyIntent = getIntent();
+		if (replyIntent.hasExtra("send_reply")) {
+			is_reply = true;
+			message_id = replyIntent.getExtras().getInt("message_id");
+			MessageDBHelper msgDb = new MessageDBHelper(this);
+			parent_row = ((List<HashMap<String, Object>>) msgDb
+					.search(msgDb, new String[] { "id = ?" },
+							new String[] { message_id + "" }).get("records"))
+					.get(0);
+			getActionBar().setTitle("Reply");
+			EditText edtSubject = (EditText) findViewById(R.id.edtMessageSubject);
+			edtSubject.setText("Re: " + parent_row.get("subject").toString());
+			JSONArray partner_ids = new JSONArray();
+			try {
+				JSONArray partners = new JSONArray(parent_row
+						.get("partner_ids").toString());
+				for (int i = 0; i < partners.length(); i++) {
+					JSONArray partner = partners.getJSONArray(i);
+					partner_ids.put(partner.get(0));
+
+					String display_name = partner.getString(1);
+
+					ContentValues value = new ContentValues();
+					value.put("pos", -1);
+					value.put("id", partner.getInt(0));
+					value.put("email", "");
+
+					selectedPartners.put(display_name, value);
+
+					StringBuffer users_list = new StringBuffer();
+
+					users_list.append(TextUtils.join(", ",
+							selectedPartners.keySet()));
+
+					EditText edtTo = (EditText) findViewById(R.id.edtMessageTo);
+					edtTo.setText(users_list.toString());
+
+					findViewById(R.id.edtMessageBody).requestFocus();
+				}
+				parent_row.put("partners", partner_ids);
+			} catch (Exception e) {
+			}
+
+		} else {
+			getActionBar().setTitle("Compose");
+		}
 
 		lstAttachments = (ListView) findViewById(R.id.lstAttachments);
 		String[] from = new String[] { "name" };
@@ -101,6 +157,7 @@ public class MessageComposeActivty extends Activity {
 					@Override
 					public OEListViewRows controlClicked(int position,
 							OEListViewRows row, View view) {
+						file_uris.remove(position);
 						attachments.remove(position);
 						lstAttachmentAdapter.refresh(attachments);
 						return null;
@@ -212,8 +269,14 @@ public class MessageComposeActivty extends Activity {
 				values.put("partner_ids", getPartnersId());
 				values.put("attachment_ids", newAttachmentIds);
 
-				SendMailMessage sendMessage = new SendMailMessage(values);
-				sendMessage.execute((Void) null);
+				if (is_reply) {
+					SendMailMessageReply sendMessageRply = new SendMailMessageReply(
+							values);
+					sendMessageRply.execute((Void) null);
+				} else {
+					SendMailMessage sendMessage = new SendMailMessage(values);
+					sendMessage.execute((Void) null);
+				}
 
 			}
 			return true;
@@ -471,6 +534,138 @@ public class MessageComposeActivty extends Activity {
 				Toast.makeText(getApplicationContext(),
 						"Message sent succussfull.", Toast.LENGTH_LONG).show();
 				selectedPartners = new HashMap<String, Object>();
+				finish();
+			} else {
+				Toast.makeText(getApplicationContext(),
+						"Unable to send message.", Toast.LENGTH_LONG).show();
+			}
+		}
+
+	}
+
+	class SendMailMessageReply extends AsyncTask<Void, Void, Boolean> {
+		HashMap<String, Object> values = new HashMap<String, Object>();
+
+		public SendMailMessageReply(HashMap<String, Object> values) {
+			this.values = values;
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+
+			// Message Details
+			String subject = values.get("subject").toString();
+			String body = values.get("body").toString();
+			JSONArray partner_ids = (JSONArray) values.get("partner_ids");
+			JSONArray attachment_ids = (JSONArray) values.get("attachment_ids");
+
+			try {
+				MessageDBHelper message = new MessageDBHelper(
+						MainActivity.context);
+				OEHelper oe = message.getOEInstance();
+				ContentValues values = new ContentValues();
+
+				JSONArray arguments = new JSONArray("[false]");
+				String crate_date = OEDate.getDate();
+				JSONObject kwargs = new JSONObject();
+				kwargs.put("body", body);
+				values.put("body", body);
+
+				kwargs.put("subject", subject);
+				kwargs.put("date", crate_date);
+				kwargs.put("parent_id", message_id);
+				values.put("parent_id", message_id);
+
+				kwargs.put("attachment_ids", attachment_ids);
+				kwargs.put("partner_ids", partner_ids);
+
+				JSONObject oecontext = new JSONObject();
+				String model = parent_row.get("model").toString();
+
+				oecontext
+						.put("default_model",
+								(!model.equals("mail.thread") ? (model
+										.equals("false") ? false : model)
+										: false));
+				oecontext
+						.put("default_res_id",
+								(parent_row.get("res_id").toString()
+										.equals("0") ? false : parent_row
+										.get("res_id")));
+				oecontext.put("default_parent_id", message_id);
+				oecontext.put("mail_post_autofollow", true);
+				oecontext.put("mail_post_autofollow_partner_ids",
+						new JSONArray());
+
+				kwargs.put("context", oecontext);
+
+				kwargs.put("type", "comment");
+				values.put("type", "comment");
+
+				kwargs.put("content_subtype", "plaintext");
+				kwargs.put("subtype", "mail.mt_comment");
+
+				values.put("email_from", "false");
+				values.put("record_name", "false");
+				values.put("to_read", "false");
+				values.put("author_id", scope.User().getPartner_id());
+				values.put("model", oecontext.getString("default_model"));
+				values.put("res_id", oecontext.getString("default_res_id"));
+				values.put("date", crate_date);
+				values.put("starred", "false");
+				values.put("partner_ids", parent_row.get("partners").toString());
+				oe.updateKWargs(kwargs);
+				JSONObject result = oe.call_kw("mail.thread", "message_post",
+						arguments);
+				values.put("id", result.getString("result"));
+				int newid = message.create(message, values);
+
+				String query = "select t1.id as message_id , t1.*, t2.name, t2.image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.id desc";
+				List<HashMap<String, Object>> records = message.executeSQL(
+						query,
+						new String[] { String.valueOf(newid),
+								String.valueOf(newid) });
+
+				HashMap<String, Object> row = new HashMap<String, Object>();
+				row.put("total", records.size());
+				row.put("records", records);
+				if ((Integer) row.get("total") > 0) {
+
+					List<HashMap<String, Object>> rows_detail = (List<HashMap<String, Object>>) row
+							.get("records");
+					for (HashMap<String, Object> row_detail : rows_detail) {
+
+						int msg_id = Integer.parseInt(row_detail.get(
+								"message_id").toString());
+						String key = row_detail.get("parent_id").toString();
+						OEListViewRows rowObj = null;
+						String[] ids = new MessageDetail()
+								.getPartnersOfMessage(row_detail.get(
+										"message_id").toString());
+						String partners = "nobody";
+						if (ids != null) {
+							partners = TextUtils.join(", ", ids);
+						}
+						row_detail.put("partners", partners);
+
+						rowObj = new OEListViewRows(msg_id, row_detail);
+
+					}
+				}
+				return true;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(final Boolean success) {
+			if (success) {
+				Toast.makeText(getApplicationContext(),
+						"Message sent succussfull.", Toast.LENGTH_LONG).show();
+				selectedPartners = new HashMap<String, Object>();
+				setResult(RESULT_OK);
 				finish();
 			} else {
 				Toast.makeText(getApplicationContext(),

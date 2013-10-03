@@ -19,13 +19,16 @@
 package com.openerp.services;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.accounts.Account;
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
+import android.content.ComponentName;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
@@ -195,10 +198,20 @@ public class MessageSyncService extends Service {
 							.length();
 					boolean showNotification = true;
 
-					if (MainActivity.APP_STATE == 1) {
+					ActivityManager am = (ActivityManager) context
+							.getSystemService(ACTIVITY_SERVICE);
+					// get the info from the currently running task
+					List<ActivityManager.RunningTaskInfo> taskInfo = am
+							.getRunningTasks(1);
+
+					ComponentName componentInfo = taskInfo.get(0).topActivity;
+					// if app is running
+					if (componentInfo.getPackageName().equalsIgnoreCase(
+							"com.openerp")) {
 						showNotification = false;
 					}
-					if (showNotification) {
+
+					if (showNotification && totalNewMessage > 0) {
 						OENotificationHelper notification = new OENotificationHelper();
 						Intent mainActiivty = new Intent(context,
 								MainActivity.class);
@@ -211,8 +224,6 @@ public class MessageSyncService extends Service {
 					}
 					intent.putExtra("data_update", response.get("update_ids")
 							.toString());
-					Log.e("MessageSyncService",
-							"sending sync finish broadcast.");
 					context.sendBroadcast(intent);
 				} else {
 					intent.putExtra("data_new", "false");
