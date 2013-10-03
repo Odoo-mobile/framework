@@ -71,7 +71,6 @@ public class MainActivity extends FragmentActivity {
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 	public static Context context = null;
 	private OEMenuItems[] systemMenus = null;
-	public static int APP_STATE = 0;
 	public static boolean set_setting_menu = false;
 
 	/*
@@ -84,7 +83,6 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		context = this;
-		APP_STATE = 1;
 		if (findViewById(R.id.fragment_container) != null) {
 			fragmentHandler = new FragmentHandler(MainActivity.this);
 			Boot boot = new Boot(this);
@@ -563,12 +561,4 @@ public class MainActivity extends FragmentActivity {
 		}
 		setTitle(userContext.getUsername(), userContext.getHost());
 	}
-
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-		APP_STATE = 0;
-	}
-
 }
