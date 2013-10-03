@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <View
+        android:id="@+id/viewNoteStageColor"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="#ffffff" />
+
     <TextView
         android:id="@+id/txv_detailNote_Tags"
         android:layout_width="fill_parent"

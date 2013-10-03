@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     android:background="#aaaaaa"
     android:clickable="false"
-    android:paddingBottom="2dp" >
+    android:paddingBottom="1dp" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,9 +24,8 @@
             android:paddingLeft="0dp"
             android:paddingRight="16dp"
             android:text="Messages"
-            android:textColor="#000000"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
     </LinearLayout>
 
 </RelativeLayout>

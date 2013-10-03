@@ -3,7 +3,7 @@
     <item
         android:id="@+id/menu_message_compose_add_attachment"
         android:icon="@drawable/ic_action_attachment"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom|withText"
         android:title="Add Attachment">
         <menu>
             <item
@@ -21,8 +21,8 @@
     <item
         android:id="@+id/menu_message_compose_send"
         android:icon="@drawable/ic_action_send_now"
-        android:showAsAction="always"
-        android:title="Send Message">
+        android:showAsAction="ifRoom|withText"
+        android:title="Send">
     </item>
 
 </menu>

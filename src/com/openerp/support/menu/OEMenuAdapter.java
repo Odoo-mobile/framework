@@ -90,8 +90,15 @@ public class OEMenuAdapter extends ArrayAdapter<OEMenuItems> {
 					.inflate(R.layout.drawer_menu_item, parent, false);
 			// menuItemHolder.txvMenuTitle.setText(menu.getTitle());
 			ImageView imgIcon = (ImageView) viewRow.findViewById(R.id.imgIcon);
-			if (menu.getIcon() != 0) {
+
+			if (menu.getIcon() != 0 && !menu.hasMenuTagColor()) {
 				imgIcon.setImageResource(menu.getIcon());
+			}
+			if (menu.hasMenuTagColor()) {
+				imgIcon.setVisibility(View.GONE);
+				View tagView = (View) viewRow.findViewById(R.id.viewTagColor);
+				tagView.setVisibility(View.VISIBLE);
+				tagView.setBackgroundColor(menu.getMenuTagColor());
 			}
 			TextView txvTitle = (TextView) viewRow
 					.findViewById(R.id.txvMenuTitle);

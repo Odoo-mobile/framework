@@ -29,8 +29,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +43,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
@@ -53,13 +56,17 @@ import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.FragmentHandler;
 import com.openerp.support.listview.OEListViewAdapter;
+import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuItems;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
-
+	String tag_colors[] = new String[] { "#9933CC", "#669900", "#FF8800",
+			"#CC0000", "#59A2BE", "#808080", "#192823", "#0099CC", "#218559",
+			"#EBB035" };
+	static HashMap<String, Integer> stage_colors = new HashMap<String, Integer>();
 	OEListViewAdapter listAdapter = null;
 	ListView lstNotes = null;
 	View rootView = null;
@@ -128,6 +135,12 @@ public class Note extends BaseFragment implements
 		if (bundle != null) {
 			setNoteStages(scope.context());
 			stage_id = bundle.getString("stage");
+			if (bundle.containsKey("tag_color")) {
+				// current_stage_color = bundle.getInt("tag_color");
+				stage_colors.put("stage_" + stage_id,
+						bundle.getInt("tag_color"));
+			}
+
 			setupListView(stage_id);
 		} else {
 			setNoteStages(scope.context());
@@ -147,11 +160,20 @@ public class Note extends BaseFragment implements
 		items.add(new OEMenuItems("All", getFragBundle("stage", "-1"),
 				getCount("-1", context)));
 		items.add(new OEMenuItems("Archive", getFragBundle("stage", "-2"), 0));
-
 		if (stages != null) {
+			int i = 0;
 			for (String key : stages.keySet()) {
-				items.add(new OEMenuItems(stages.get(key).toString(),
-						getFragBundle("stage", key), getCount(key, context)));
+				if (i > tag_colors.length - 1) {
+					i = 0;
+				}
+				OEMenuItems stageMenu = new OEMenuItems(stages.get(key)
+						.toString(), getFragBundle("stage", key), getCount(key,
+						context));
+				stageMenu.setAutoMenuTagColor(true);
+				stageMenu.setMenuTagColor(Color.parseColor(tag_colors[i]));
+				stage_colors.put("stage_" + key, stageMenu.getMenuTagColor());
+				items.add(stageMenu);
+				i++;
 			}
 		}
 		menu.setMenuItems(items);
@@ -239,7 +261,36 @@ public class Note extends BaseFragment implements
 				db);
 		listAdapter.cleanHtmlToTextOn("memo");
 		lstNotes.setAdapter(listAdapter);
+		listAdapter.addViewListener(new OEListViewOnCreateListener() {
 
+			@Override
+			public View listViewOnCreateListener(int position, View row_view,
+					OEListViewRows row_data) {
+				View newView = row_view;
+				TextView txvTag = (TextView) newView
+						.findViewById(R.id.txvNoteListTags);
+				try {
+					String stageInfo = row_data.getRow_data().get("stage_id")
+							.toString();
+					if (!stageInfo.equals("false")) {
+						JSONArray stage_id = new JSONArray(stageInfo);
+						String stageid = stage_id.getJSONArray(0).getString(0);
+						if (stage_colors.containsKey("stage_" + stageid)) {
+							txvTag.setBackgroundColor(Integer
+									.parseInt(stage_colors.get(
+											"stage_" + stageid).toString()));
+						}
+					} else {
+						txvTag.setBackgroundColor(Color.parseColor("#ffffff"));
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				return newView;
+			}
+		});
 		lstNotes.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
@@ -257,6 +308,18 @@ public class Note extends BaseFragment implements
 				selectedNoteID.putInt("row_id", rowId);
 				selectedNoteID.putString("row_status", rowStatus);
 				selectedNoteID.putString("stage_id", stageIds);
+				if (!stageIds.equals("false")) {
+					try {
+						JSONArray stage_id = new JSONArray(stageIds);
+						String stageid = stage_id.getJSONArray(0).getString(0);
+						if (stage_colors.containsKey("stage_" + stageid)) {
+							selectedNoteID.putInt("stage_color",
+									stage_colors.get("stage_" + stageid));
+						}
+					} catch (Exception e) {
+					}
+				}
+
 				fragment.setArguments(selectedNoteID);
 				scope.context().fragmentHandler.setBackStack(true, null);
 				scope.context().fragmentHandler.replaceFragmnet(fragment);

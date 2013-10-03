@@ -48,9 +48,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.25"
-            android:background="#C7C7BE"
+            android:background="#ffffff"
             android:gravity="center"
-            android:text="Tomorrow"
+            android:text="New"
+            android:padding="3dp"
+            android:textColor="#ffffff"
             android:textSize="12sp" />
     </LinearLayout>
 

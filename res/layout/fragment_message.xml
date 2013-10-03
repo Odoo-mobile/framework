@@ -34,7 +34,8 @@
         android:id="@+id/lstMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txvMessageAllReadMessage" >
+        android:layout_below="@+id/txvMessageAllReadMessage"
+        android:animateLayoutChanges="true" >
     </ListView>
 
 </RelativeLayout>

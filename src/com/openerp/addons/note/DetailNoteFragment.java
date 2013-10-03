@@ -171,6 +171,11 @@ public class DetailNoteFragment extends BaseFragment {
 			row_id = bundle.getInt("row_id");
 			row_status = bundle.getString("row_status");
 			stageid = bundle.getString("stage_id");
+			if (bundle.containsKey("stage_color")) {
+				View vStageColor = (View) rootview
+						.findViewById(R.id.viewNoteStageColor);
+				vStageColor.setBackgroundColor(bundle.getInt("stage_color"));
+			}
 			showNoteDetails(bundle.getInt("row_id"));
 		}
 	}

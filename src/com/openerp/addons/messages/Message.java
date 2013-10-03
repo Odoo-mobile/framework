@@ -593,17 +593,20 @@ public class Message extends BaseFragment implements
 		menu.setId(1);
 		menu.setMenuTitle("Message");
 
-		menuitems.add(new OEMenuItems(R.drawable.ic_action_inbox, "Inbox", this
-				.getObjectOFClass("type", "inbox"), getCount(TYPE.INBOX,
-				context)));
+		menuitems.add(new OEMenuItems(R.drawable.ic_menu_inbox_main_holo_light,
+				"Inbox", this.getObjectOFClass("type", "inbox"), getCount(
+						TYPE.INBOX, context)));
+		int tomeTotal = getCount(TYPE.TOME, context);
+		if (tomeTotal > 0) {
+			tomeTotal = tomeTotal - 1;
+		}
 		menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To:Me", this
-				.getObjectOFClass("type", "to-me"),
-				getCount(TYPE.TOME, context) - 1));
+				.getObjectOFClass("type", "to-me"), tomeTotal));
 		menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-Do", this
 				.getObjectOFClass("type", "to-do"),
 				getCount(TYPE.TODO, context)));
-		menuitems.add(new OEMenuItems(R.drawable.ic_action_archive, "Archive",
-				this.getObjectOFClass("type", "archive"), 0));
+		menuitems.add(new OEMenuItems(R.drawable.ic_menu_archive_holo_light,
+				"Archive", this.getObjectOFClass("type", "archive"), 0));
 
 		menu.setMenuItems(menuitems);
 		return menu;
