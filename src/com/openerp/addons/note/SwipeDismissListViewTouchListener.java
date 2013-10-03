@@ -26,6 +26,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -217,6 +218,9 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 				return false;
 			}
 
+			// setting background color[gray] while swapping the rows.
+			view.setBackgroundColor(Color.parseColor("#aaaaaa"));
+
 			// TODO: ensure this is a finger, and set a flag
 			// Find the child view that was touched (perform a hit test)
 			Rect rect = new Rect();
@@ -254,6 +258,10 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 			if (mVelocityTracker == null) {
 				break;
 			}
+
+			// setting original background color[white] while swapping the rows
+			// COMPLETE.
+			view.setBackgroundColor(Color.WHITE);
 
 			float deltaX = motionEvent.getRawX() - mDownX;
 			mVelocityTracker.addMovement(motionEvent);

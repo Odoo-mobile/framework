@@ -9,7 +9,7 @@
         android:id="@+id/lstNotes"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#aaaaaa"
+        android:animateLayoutChanges="true"
         android:divider="#f3f3f3"
         android:dividerHeight="1dp"
         android:fadingEdge="none" >
