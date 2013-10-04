@@ -63,20 +63,23 @@ import com.openerp.support.menu.OEMenuItems;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
+
+	public FragmentHandler fragmentHandler;
+	private PullToRefreshAttacher mPullAttacher;
+	NoteDBHelper db;
+	View rootView = null;
+	TextView noteSyncProcessText, emptyNotesText;
+	ListView lstNotes = null;
+	List<OEListViewRows> listRows = null;
+	OEListViewAdapter listAdapter = null;
 	String tag_colors[] = new String[] { "#9933CC", "#669900", "#FF8800",
 			"#CC0000", "#59A2BE", "#808080", "#192823", "#0099CC", "#218559",
 			"#EBB035" };
+	String[] from = new String[] { "name", "memo", "stage_id" };
 	static HashMap<String, Integer> stage_colors = new HashMap<String, Integer>();
-	OEListViewAdapter listAdapter = null;
-	ListView lstNotes = null;
-	View rootView = null;
 	HashMap<String, String> stages = null;
-	private PullToRefreshAttacher mPullAttacher;
-	List<OEListViewRows> listRows = null;
 	static boolean rawStrikeStatus = false;
 	String stage_id = "-1";
-	public FragmentHandler fragmentHandler;
-	NoteDBHelper db;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -87,6 +90,8 @@ public class Note extends BaseFragment implements
 		db = (NoteDBHelper) getModel();
 		rootView = inflater.inflate(R.layout.fragment_note, container, false);
 		lstNotes = (ListView) rootView.findViewById(R.id.lstNotes);
+		emptyNotesText = (TextView) rootView
+				.findViewById(R.id.txvNoteAllArchive);
 		handleArguments((Bundle) getArguments());
 		return rootView;
 	}
@@ -94,12 +99,14 @@ public class Note extends BaseFragment implements
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// TODO Auto-generated method stub
+
+		// Setting required menu for the action bar
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 		SearchView searchView = (SearchView) menu.findItem(
 				R.id.menu_note_search).getActionView();
 		searchView.setOnQueryTextListener(getQueryListener(listAdapter));
 
-		// disabling the menu
+		// Hiding unnecesary Menu from action bar
 		MenuItem item_write = menu.findItem(R.id.menu_note_write);
 		item_write.setVisible(false);
 		MenuItem item_cancel = menu.findItem(R.id.menu_note_cancel);
@@ -108,11 +115,10 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
+		// Handling menu item selection
 		switch (item.getItemId()) {
 		case R.id.menu_note_compose:
-
-			// Create an instance of ComposeNoteFragment
+			// Creating an instance for composing Note
 			Fragment fragment = new ComposeNoteFragment();
 			scope.context().fragmentHandler.setBackStack(true, null);
 			scope.context().fragmentHandler.replaceFragmnet(fragment);
@@ -140,7 +146,6 @@ public class Note extends BaseFragment implements
 				stage_colors.put("stage_" + stage_id,
 						bundle.getInt("tag_color"));
 			}
-
 			setupListView(stage_id);
 		} else {
 			setNoteStages(scope.context());
@@ -156,10 +161,13 @@ public class Note extends BaseFragment implements
 		menu.setId(1);
 		menu.setMenuTitle("Notes");
 		setNoteStages(context);
+
+		// Setting list of stages under Note in Drawable menu
 		List<OEMenuItems> items = new ArrayList<OEMenuItems>();
 		items.add(new OEMenuItems("All", getFragBundle("stage", "-1"),
 				getCount("-1", context)));
 		items.add(new OEMenuItems("Archive", getFragBundle("stage", "-2"), 0));
+
 		if (stages != null) {
 			int i = 0;
 			for (String key : stages.keySet()) {
@@ -189,11 +197,14 @@ public class Note extends BaseFragment implements
 		return note;
 	}
 
+	/* Method for counting Notes according stages */
 	private int getCount(String stage_id, Context context) {
+
 		int count = 0;
 		db = new NoteDBHelper(context);
 		String[] where = null;
 		String[] whereArgs = null;
+
 		if (stage_id.equals("-1")) {
 			where = new String[] { "open = ?" };
 			whereArgs = new String[] { "true" };
@@ -217,6 +228,8 @@ public class Note extends BaseFragment implements
 		scope.context().requestSync(NoteProvider.AUTHORITY);
 	}
 
+	// PullToRefresh
+	// Allow Activity to pass us it's PullToRefreshAttacher
 	void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
 		mPullAttacher = attacher;
 
@@ -235,19 +248,28 @@ public class Note extends BaseFragment implements
 		scope.context().unregisterReceiver(syncFinishReceiver);
 	}
 
+	/*
+	 * Used for Synchronization : Register receiver and unregister receiver
+	 * 
+	 * SyncFinishReceiver
+	 */
 	private SyncFinishReceiver syncFinishReceiver = new SyncFinishReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+
+			// Hiding the NoteSyncWaiter view
+			rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
 			mPullAttacher.setRefreshComplete();
-			// refreshing list view after synchronisation
+
+			// Refreshing Menulist [counter] after synchronisation complete
 			scope.context().refreshMenu(context);
 			setupListView(stage_id);
 		}
 	};
 
-	private void setupListView(String stage_id) {
+	/* Method for setting list view for Notes according stages */
+	private void setupListView(final String stage_id) {
 
-		String[] from = new String[] { "name", "memo", "stage_id" };
 		int[] to = new int[] { R.id.txvNoteListItem, R.id.txvNoteListDetail,
 				R.id.txvNoteListTags };
 		listRows = new ArrayList<OEListViewRows>();
@@ -256,20 +278,27 @@ public class Note extends BaseFragment implements
 			listRows = getListRows(stage_id);
 		}
 
+		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
 				R.layout.listview_fragment_note_listitem, listRows, from, to,
 				db);
+
+		// Telling adapter to clean HTML text for key value
 		listAdapter.cleanHtmlToTextOn("memo");
 		lstNotes.setAdapter(listAdapter);
+
 		listAdapter.addViewListener(new OEListViewOnCreateListener() {
 
 			@Override
 			public View listViewOnCreateListener(int position, View row_view,
 					OEListViewRows row_data) {
+
 				View newView = row_view;
 				TextView txvTag = (TextView) newView
 						.findViewById(R.id.txvNoteListTags);
+
 				try {
+					// Fetching Note Stage and Setting Background color for that
 					String stageInfo = row_data.getRow_data().get("stage_id")
 							.toString();
 					if (!stageInfo.equals("false")) {
@@ -283,31 +312,33 @@ public class Note extends BaseFragment implements
 					} else {
 						txvTag.setBackgroundColor(Color.parseColor("#ffffff"));
 					}
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
 				return newView;
 			}
 		});
+
+		// Setting item click listner for Detail view of selected Note.
 		lstNotes.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
 				// TODO Auto-generated method stub
+
 				int rowId = listRows.get(position).getRow_id();
 				String rowStatus = listRows.get(position).getRow_data()
 						.get("open").toString();
 				String stageIds = listRows.get(position).getRow_data()
 						.get("stage_id").toString();
 
-				// Create an instance of DetailNoteFragment
+				// Creating an instance of DetailNoteFragment
 				DetailNoteFragment fragment = new DetailNoteFragment();
 				Bundle selectedNoteID = new Bundle();
 				selectedNoteID.putInt("row_id", rowId);
 				selectedNoteID.putString("row_status", rowStatus);
 				selectedNoteID.putString("stage_id", stageIds);
+
 				if (!stageIds.equals("false")) {
 					try {
 						JSONArray stage_id = new JSONArray(stageIds);
@@ -317,6 +348,7 @@ public class Note extends BaseFragment implements
 									stage_colors.get("stage_" + stageid));
 						}
 					} catch (Exception e) {
+						e.printStackTrace();
 					}
 				}
 
@@ -326,9 +358,11 @@ public class Note extends BaseFragment implements
 			}
 		});
 
+		// important to write
 		mPullAttacher = scope.context().getPullToRefreshAttacher();
 		mPullAttacher.setRefreshableView(lstNotes, this);
 
+		// Setting touch listner for swapping the list rows.
 		SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(
 				lstNotes,
 				new SwipeDismissListViewTouchListener.DismissCallbacks() {
@@ -341,9 +375,12 @@ public class Note extends BaseFragment implements
 					public void onDismiss(ListView listView,
 							int[] reverseSortedPositions) {
 						for (int position : reverseSortedPositions) {
+
 							int rowId = listRows.get(position).getRow_id();
 							String raw_status = listRows.get(position)
 									.getRow_data().get("open").toString();
+							// Handling functionality to change note status
+							// open --> close OR close --> open
 							if (!rawStrikeStatus) {
 								strikeNote(rowId, raw_status, scope.context());
 								rawStrikeStatus = true;
@@ -351,8 +388,24 @@ public class Note extends BaseFragment implements
 								strikeNote(rowId, raw_status, scope.context());
 								rawStrikeStatus = false;
 							}
+
 							listRows.remove(position);
 							listAdapter.refresh(listRows);
+
+							// Checking whether list view is empty !
+							if (listAdapter.isEmpty()) {
+
+								// Setting text for empty archive list view
+								if (stage_id.equalsIgnoreCase("-2")) {
+									emptyNotesText
+											.setText("Sorry! You don't have any archive notes right now.");
+								}
+								// Displaying text message of empty list view
+								emptyNotesText.setVisibility(View.VISIBLE);
+							} else {
+								// Hiding text message of empty list view
+								emptyNotesText.setVisibility(View.GONE);
+							}
 						}
 					}
 				});
@@ -365,7 +418,7 @@ public class Note extends BaseFragment implements
 
 	}
 
-	// will used to do STRIKE/UNSTRIKE the note
+	/* Method for handling STRIKE/UNSTRIKE functionality of notes */
 	public void strikeNote(int note_id, String open, Context context) {
 		try {
 
@@ -396,24 +449,28 @@ public class Note extends BaseFragment implements
 				Toast.makeText(context, "Move to All", Toast.LENGTH_SHORT)
 						.show();
 			}
+			// Refreshing list view after synchronisation
+			// complete
+			scope.context().refreshMenu(context);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	/* Method for fetching rows of notes by stage_id */
 	private List<OEListViewRows> getListRows(String stage_id) {
-		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
 
+		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
 		String[] where = null;
 		String[] whereArgs = null;
+
 		if (!stage_id.equals("-1") && !stage_id.equals("-2")) {
 			where = new String[] { "open = ? ", "AND ", "stage_id = ?" };
 			whereArgs = new String[] { "true", stage_id };
 		} else if (stage_id.equals("-2")) {
 			where = new String[] { "open = ? " };
 			whereArgs = new String[] { "false" };
-
 		} else {
 			where = new String[] { "open = ? " };
 			whereArgs = new String[] { "true" };
@@ -422,11 +479,25 @@ public class Note extends BaseFragment implements
 		HashMap<String, Object> results = getModel().search(db, where,
 				whereArgs);
 		int total = Integer.parseInt(results.get("total").toString());
+
+		// Handling text message of empty list view
+		// exa. "Sorry ! you don't have open any notes right now"
+		if (total == 0) {
+
+			// Setting text for empty archive list view
+			if (stage_id.equalsIgnoreCase("-2")) {
+				emptyNotesText
+						.setText("Sorry! You don't have any archive notes right now.");
+			}
+			emptyNotesText.setVisibility(View.VISIBLE);
+		} else {
+			emptyNotesText.setVisibility(View.GONE);
+		}
+
 		if (total > 0) {
 			@SuppressWarnings("unchecked")
 			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) results
 					.get("records");
-
 			for (HashMap<String, Object> row_data : rows) {
 				OEListViewRows row = new OEListViewRows(
 						Integer.parseInt(row_data.get("id").toString()),
@@ -435,14 +506,28 @@ public class Note extends BaseFragment implements
 			}
 		} else {
 			if (db.isEmptyTable(db)) {
-				// request to sync..
+
+				// Hiding text message of empty list view
+				// due to visibility of sync process message
+				emptyNotesText.setVisibility(View.GONE);
+
+				// Handling text message for sync process on startup
+				noteSyncProcessText = (TextView) rootView
+						.findViewById(R.id.txvMessageHeaderSubtitle);
+				noteSyncProcessText.setText("Your notes will appear shortly");
+				rootView.findViewById(R.id.noteSyncWaiter).setVisibility(
+						View.VISIBLE);
+
+				// requesting to sync..
 				scope.context().requestSync(NoteProvider.AUTHORITY);
 			}
 		}
 		return lists;
 	}
 
+	/* Method for fetching stages of notes */
 	public void setNoteStages(Context context) {
+
 		stages = new HashMap<String, String>();
 		db = new NoteDBHelper(context);
 		NoteDBHelper.NoteStages stagesobj = db.new NoteStages(context);

@@ -5,6 +5,26 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
+    <include
+        android:id="@+id/noteSyncWaiter"
+        layout="@layout/message_listview_header"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/txvNoteAllArchive"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:gravity="top|center_horizontal"
+        android:text="Sorry! You don&apos;t have any open notes right now."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#77778f"
+        android:visibility="gone" />
+
     <ListView
         android:id="@+id/lstNotes"
         android:layout_width="fill_parent"
