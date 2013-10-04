@@ -22,6 +22,7 @@
         android:id="@+id/txv_detailNote_Memo"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:autoLink="web"
         android:background="@android:color/transparent"
         android:padding="10dp"
         android:scrollbars="vertical"
