@@ -381,7 +381,6 @@ public class ORM extends SQLiteDatabaseHelper {
 				if (values.get(i) instanceof Integer) {
 					row_id = values.getInt(i);
 				}
-
 				ContentValues m2mvals = new ContentValues();
 				String android_name = OpenERPAccountManager
 						.currentUser(context).getAndroidName();
@@ -408,7 +407,7 @@ public class ORM extends SQLiteDatabaseHelper {
 			}
 		}
 		if (list.size() > 0) {
-			oe_obj.syncReferenceTables(tbl2Obj, list);
+			oe_obj.syncReferenceTables(tbl2Obj, list, false);
 		}
 	}
 
@@ -439,13 +438,19 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the values
 	 * @return the int
 	 */
-	public int create(BaseDBHelper dbHelper, ContentValues values) {
+	public int create(BaseDBHelper dbHelper, ContentValues data_values) {
 		int newId = 0;
-		if (values.containsKey("id")) {
-			newId = values.getAsInteger("id");
+		ContentValues values = new ContentValues();
+		if (data_values.containsKey("id")) {
+			newId = data_values.getAsInteger("id");
 		} else {
-			newId = createRecordOnserver(dbHelper, values);
-			values.put("id", newId);
+			newId = createRecordOnserver(dbHelper, data_values);
+			data_values.put("id", newId);
+		}
+
+		for (Fields field : dbHelper.getColumns()) {
+			values.put(field.getName(),
+					data_values.getAsString(field.getName()));
 		}
 
 		values.put("oea_name", OpenERPAccountManager.currentUser(context)
@@ -477,7 +482,7 @@ public class ORM extends SQLiteDatabaseHelper {
 					BaseDBHelper m2oDb = ((Many2One) many2onecols.get(key))
 							.getM2OObject();
 					if (!m2oDb.hasRecord(m2oDb, m2o_id)) {
-						oe_obj.syncReferenceTables(m2oDb, list);
+						oe_obj.syncReferenceTables(m2oDb, list, false);
 					}
 				}
 			} catch (Exception e) {
@@ -776,7 +781,7 @@ public class ORM extends SQLiteDatabaseHelper {
 					if (tbl2Obj != null) {
 						List<Integer> list = new ArrayList<Integer>();
 						list.add(row_id);
-						oe_obj.syncReferenceTables(tbl2Obj, list);
+						oe_obj.syncReferenceTables(tbl2Obj, list, false);
 					}
 				} else {
 					db.update(rel_table, m2mvals, col1 + " = " + id + " AND "

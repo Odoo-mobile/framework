@@ -85,9 +85,33 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 			oe = db.getOEInstance();
 		}
 		JSONArray updatedIds = new JSONArray();
+		JSONArray localIds = JSONDataHelper.intArrayToJSONArray(getAllIds(db));
+		// Fetching new message
+		JSONArray newCreated = new JSONArray();
 		try {
-			JSONArray localIds = JSONDataHelper
-					.intArrayToJSONArray(getAllIds(db));
+			JSONObject serverData = oe.call_kw(db.getModelName(),
+					"message_read", args);
+			if (serverData.has("result")) {
+				for (int i = 0; i < serverData.getJSONArray("result").length(); i++) {
+					JSONObject row = serverData.getJSONArray("result")
+							.getJSONObject(i);
+
+					// If row is expandable
+					if (row.getString("type").equals("expandable")) {
+						this.handleMessageExpandable(db, row);
+					} else {
+						int newId = this.handleMessageResponse(db, row);
+						newCreated.put(newId);
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// Updating old messages
+		try {
 			JSONObject fields = new JSONObject();
 
 			fields.accumulate("fields", "read");
@@ -119,38 +143,11 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 			e.printStackTrace();
 		}
 
-		// Fetching new message
-		JSONArray newCreated = new JSONArray();
-		try {
-			JSONObject serverData = oe.call_kw(db.getModelName(),
-					"message_read", args);
-			if (serverData.has("result")) {
-				for (int i = 0; i < serverData.getJSONArray("result").length(); i++) {
-					JSONObject row = serverData.getJSONArray("result")
-							.getJSONObject(i);
-
-					// If row is expandable
-					if (row.getString("type").equals("expandable")) {
-						this.handleMessageExpandable(db, row);
-					} else {
-						int newId = this.handleMessageResponse(db, row);
-						newCreated.put(newId);
-					}
-				}
-			}
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 		int total = newCreated.length() + updatedIds.length();
 		messageSyncOutcome.put("total", total);
 		messageSyncOutcome.put("new_ids", newCreated);
 		messageSyncOutcome.put("update_ids", updatedIds);
 
-		// testing();
 		return messageSyncOutcome;
 	}
 
@@ -266,7 +263,6 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 				}
 			}
 			values.put("starred", starred);
-
 			if (!db.hasRecord(db, response.getInt("id"))) {
 				// Sending Broadcast message for data set change.
 				Intent intent = new Intent();

@@ -1,157 +1,189 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#ffffff"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="5dp" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <ImageView
-            android:id="@+id/imgUserPicture"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_action_user" />
-
-        <LinearLayout
-            android:id="@+id/layoutMessageDetailHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:background="#0099cc"
-            android:orientation="horizontal"
-            android:paddingBottom="8dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="5dp"
-            android:paddingTop="8dp"
-            android:weightSum="5" >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:gravity="left|top"
-                android:orientation="vertical" >
-
-                <TextView
-                    android:id="@+id/txvMessageAuthor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:singleLine="true"
-                    android:text="FirstName LastName"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="#ffffff"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txvAuthorEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:singleLine="true"
-                    android:text="email@email.com"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#ffffff" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:gravity="right|center_horizontal"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/imgBtnStar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_action_star_dark" />
-
-                <ImageView
-                    android:id="@+id/imgBtnReply"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_action_reply" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#aaaaaa"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#ffffff"
-            android:orientation="horizontal"
-            android:padding="6dp"
-            android:weightSum="4" >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:background="#ffffff"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:text="To: "
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textStyle="bold"
-                    android:typeface="sans" />
-
-                <TextView
-                    android:id="@+id/txvTo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:text=""
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:typeface="sans" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/txvTime"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right|center_horizontal"
-                android:singleLine="true"
-                android:text="3:45 PM"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:typeface="sans" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/container_drop_shadow"
         android:orientation="vertical"
         android:padding="8dp" >
 
-        <TextView
-            android:id="@+id/txvBody"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left|top"
-            android:linksClickable="true"
-            android:autoLink="web"
-            android:text="Body Text"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:typeface="sans" />
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/imgUserPicture"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="#f3f3f3"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_action_user" />
+
+            <LinearLayout
+                android:id="@+id/layoutMessageDetailHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="5dp"
+                android:paddingTop="8dp"
+                android:weightSum="5" >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:gravity="left|top"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/txvMessageAuthor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:singleLine="true"
+                        android:text="FirstName LastName"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="#414141"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txvAuthorEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:singleLine="true"
+                        android:text="email@email.com"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#414141" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:gravity="right|center_horizontal"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/imgBtnStar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_action_rating_not_important" />
+
+                    <ImageView
+                        android:id="@+id/imgBtnReply"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_action_social_reply" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#eeeeee"
+            android:orientation="horizontal"
+            android:paddingBottom="1dp" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:orientation="horizontal"
+                android:padding="6dp"
+                android:weightSum="4" >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:background="#ffffff"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:text="To: "
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#414141" />
+
+                    <TextView
+                        android:id="@+id/txvTo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:text=""
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#414141" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txvTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right|center_horizontal"
+                    android:singleLine="true"
+                    android:text="3:45 PM"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#414141"
+                    android:typeface="sans" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutMessageBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp" >
+
+            <TextView
+                android:id="@+id/txvBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:gravity="left|top"
+                android:text="Body Text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutMessageAttachments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            android:padding="8dp" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:text="ATTACHMENTS"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/gridAttachments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

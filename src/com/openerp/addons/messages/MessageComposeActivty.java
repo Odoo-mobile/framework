@@ -247,7 +247,7 @@ public class MessageComposeActivty extends Activity {
 					ContentValues values = new ContentValues();
 					values.put("datas_fname", fileData.getName());
 					values.put("res_model", "mail.compose.message");
-					values.put("company_id", 1);
+					values.put("company_id", scope.User().getCompany_id());
 					values.put("type", "binary");
 					values.put("res_id", 0);
 					values.put("file_size", fileData.length());
@@ -575,7 +575,7 @@ public class MessageComposeActivty extends Activity {
 				kwargs.put("date", crate_date);
 				kwargs.put("parent_id", message_id);
 				values.put("parent_id", message_id);
-
+				values.put("attachment_ids", attachment_ids.toString());
 				kwargs.put("attachment_ids", attachment_ids);
 				kwargs.put("partner_ids", partner_ids);
 
