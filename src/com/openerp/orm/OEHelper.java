@@ -33,6 +33,7 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.openerp.support.JSONDataHelper;
@@ -551,6 +552,22 @@ public class OEHelper extends OpenERP {
 	 * @return true, if successful
 	 */
 	public boolean syncReferenceTables(BaseDBHelper db, List<Integer> list) {
+		return syncReferenceTables(db, list, true);
+	}
+
+	/**
+	 * Sync reference tables.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param list
+	 *            the list
+	 * @param can_delete
+	 *            can delete
+	 * @return true, if successful
+	 */
+	public boolean syncReferenceTables(BaseDBHelper db, List<Integer> list,
+			boolean can_delete) {
 		boolean success = false;
 		try {
 			OEArgsHelper ids = new OEArgsHelper();
@@ -566,7 +583,7 @@ public class OEHelper extends OpenERP {
 
 			JSONObject result = getDataFromServer(db, domain);
 			if (result != null) {
-				success = handleServerData(db, result);
+				success = handleServerData(db, result, can_delete);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

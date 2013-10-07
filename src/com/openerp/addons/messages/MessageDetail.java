@@ -30,9 +30,9 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,14 +41,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
@@ -57,8 +56,12 @@ import com.openerp.support.OEArgsHelper;
 import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
+import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
+import com.openerp.util.HTMLHelper;
+import com.openerp.util.OEBinaryDownloadHelper;
+import com.openerp.util.OEFileSizeHelper;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -105,27 +108,6 @@ public class MessageDetail extends BaseFragment {
 
 		handleArguments((Bundle) getArguments());
 
-		rootView.findViewById(R.id.imgBtnSendMessage).setOnClickListener(
-				new OnClickListener() {
-
-					@Override
-					public void onClick(View arg0) {
-						// TODO Auto-generated method stub
-						EditText edtReply = (EditText) rootView
-								.findViewById(R.id.edtReplyMessage);
-						edtReply.setError(null);
-
-						if (TextUtils.isEmpty(edtReply.getText())) {
-							edtReply.setError("Provide message reply !");
-						} else {
-							Toast.makeText(scope.context(),
-									"Sending message...", Toast.LENGTH_LONG)
-									.show();
-						}
-					}
-
-				});
-
 		return rootView;
 	}
 
@@ -138,21 +120,93 @@ public class MessageDetail extends BaseFragment {
 	private void setupListView(List<OEListViewRows> list) {
 		// Handling List View controls and keys
 		String[] from = new String[] { "image", "email_from|name",
-				"email_from|email", "parent_id", "body", "date", "partners",
-				"starred" };
+				"email_from|email", "body", "date", "partners", "starred" };
 		int[] to = new int[] { R.id.imgUserPicture, R.id.txvMessageAuthor,
-				R.id.txvAuthorEmail, R.id.layoutMessageDetailHeader,
-				R.id.txvBody, R.id.txvTime, R.id.txvTo, R.id.imgBtnStar };
+				R.id.txvAuthorEmail, R.id.txvBody, R.id.txvTime, R.id.txvTo,
+				R.id.imgBtnStar };
 
 		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
 				R.layout.message_detail_listview_items, list, from, to, db);
-		listAdapter.toHTML("body");
+		// listAdapter.toHTML("body");
 		listAdapter.addImageColumn("image");
-		listAdapter.layoutBackgroundColor("parent_id",
-				Color.parseColor("#aaaaaa"), Color.parseColor("#0099cc"));
+		// listAdapter.layoutBackgroundColor("parent_id",
+		// Color.parseColor("#aaaaaa"), Color.parseColor("#0099cc"));
 		listAdapter.cleanDate("date", scope.User().getTimezone());
+		listAdapter.addViewListener(new OEListViewOnCreateListener() {
 
+			@Override
+			public View listViewOnCreateListener(int position, View row_view,
+					OEListViewRows row_data) {
+				TextView txvBody = (TextView) row_view
+						.findViewById(R.id.txvBody);
+				txvBody.setMovementMethod(LinkMovementMethod.getInstance());
+
+				txvBody.setText(HTMLHelper.stringToHtml(row_data.getRow_data()
+						.get("body").toString()));
+
+				/* handling attachments */
+				List<OEListViewRows> attachments = getAttachmentsOfMessage(row_data
+						.getRow_id() + "");
+				int index = 0;
+				if (attachments.size() > 0) {
+					LayoutInflater vi = (LayoutInflater) scope.context()
+							.getApplicationContext()
+							.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+					View v = vi
+							.inflate(
+									R.layout.fragment_message_detail_attachment_grid_item,
+									null, false);
+					View insertPoint = row_view
+							.findViewById(R.id.gridAttachments);
+					((ViewGroup) insertPoint).removeAllViews();
+					for (OEListViewRows row : attachments) {
+
+						TextView txvAttachmentName = (TextView) v
+								.findViewById(R.id.txvFileName);
+
+						txvAttachmentName.setText(row.getRow_data().get("name")
+								.toString());
+						TextView txvAttachmentSize = (TextView) v
+								.findViewById(R.id.txvFileSize);
+						long fileSize = Long.parseLong(row.getRow_data()
+								.get("file_size").toString());
+						String file_size = OEFileSizeHelper
+								.readableFileSize(fileSize);
+						txvAttachmentSize.setText((file_size.equals("0")) ? " "
+								: file_size);
+
+						TextView txvAttachmentId = (TextView) v
+								.findViewById(R.id.txvAttachmentId);
+						txvAttachmentId.setText(String.valueOf(row.getRow_id()));
+
+						((ViewGroup) insertPoint).addView(v, index,
+								new ViewGroup.LayoutParams(
+										ViewGroup.LayoutParams.FILL_PARENT,
+										ViewGroup.LayoutParams.FILL_PARENT));
+						v.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								int attachment_id = Integer.parseInt(((TextView) v
+										.findViewById(R.id.txvAttachmentId))
+										.getText().toString());
+								OEBinaryDownloadHelper binaryDownload = new OEBinaryDownloadHelper();
+								binaryDownload
+										.downloadBinary(attachment_id, db);
+							}
+						});
+						index++;
+
+					}
+
+				} else {
+					row_view.findViewById(R.id.layoutMessageAttachments)
+							.setVisibility(View.GONE);
+				}
+				return row_view;
+			}
+		});
 		listAdapter.setItemClickListener(R.id.imgBtnReply,
 				new ControlClickEventListener() {
 
@@ -171,9 +225,9 @@ public class MessageDetail extends BaseFragment {
 				});
 		// Setting callback handler for boolean field value change.
 		listAdapter.setBooleanEventOperation("starred",
-				R.drawable.ic_rating_important,
-				R.drawable.ic_rating_not_important, updateStarred);
-		ListView lstview = (ListView) rootView
+				R.drawable.ic_action_rating_important,
+				R.drawable.ic_action_rating_not_important, updateStarred);
+		GridView lstview = (GridView) rootView
 				.findViewById(R.id.lstMessageDetail);
 		// Providing adapter to listview
 		lstview.setAdapter(listAdapter);
@@ -201,7 +255,6 @@ public class MessageDetail extends BaseFragment {
 	@Override
 	public void handleArguments(Bundle bundle) {
 		// TODO Auto-generated method stub
-
 		if (bundle != null) {
 			if (bundle.containsKey("message_id")) {
 				messages_sorted = new ArrayList<OEListViewRows>();
@@ -297,10 +350,52 @@ public class MessageDetail extends BaseFragment {
 						}
 					}
 				} catch (Exception e) {
+
 				}
 			}
 		}
 		return str;
+	}
+
+	/**
+	 * Gets the attachments of message.
+	 * 
+	 * @param message_id
+	 *            the message_id
+	 * @return the partners of message
+	 */
+	public List<OEListViewRows> getAttachmentsOfMessage(String message_id) {
+		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
+		db = new MessageDBHelper(MainActivity.context);
+		HashMap<String, Object> data = db.search(db, new String[] { "id = ?" },
+				new String[] { message_id });
+		if (Integer.parseInt(data.get("total").toString()) > 0) {
+			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
+					.get("records");
+			Ir_AttachmentDBHelper attachments = new Ir_AttachmentDBHelper(
+					MainActivity.context);
+
+			for (HashMap<String, Object> row : rows) {
+				try {
+					JSONArray arr = new JSONArray(row.get("attachment_ids")
+							.toString());
+					for (int i = 0; i < arr.length(); i++) {
+						int attachment_id = arr.getJSONArray(i).getInt(0);
+						HashMap<String, Object> rowData = attachments.search(
+								attachments, new String[] { "id = ? " },
+								new String[] { attachment_id + "" });
+						List<HashMap<String, Object>> lists_data = (List<HashMap<String, Object>>) rowData
+								.get("records");
+						OEListViewRows list_row = new OEListViewRows(
+								attachment_id, lists_data.get(0));
+						lists.add(list_row);
+					}
+				} catch (Exception e) {
+				}
+			}
+
+		}
+		return lists;
 	}
 
 	/*
@@ -326,9 +421,9 @@ public class MessageDetail extends BaseFragment {
 			ImageView img = (ImageView) view;
 			if (rowData.get("starred").toString().equals("false")) {
 				flag = true;
-				img.setImageResource(R.drawable.ic_rating_important);
+				img.setImageResource(R.drawable.ic_action_rating_important);
 			} else {
-				img.setImageResource(R.drawable.ic_rating_not_important);
+				img.setImageResource(R.drawable.ic_action_rating_not_important);
 			}
 			OEArgsHelper messageIds = new OEArgsHelper();
 			messageIds.addArg(row.getRow_id());

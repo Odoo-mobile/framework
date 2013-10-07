@@ -216,7 +216,6 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 		if (viewRow == null) {
 			viewRow = inflater.inflate(this.resource_id, parent, false);
 		}
-
 		row = this.rows.get(position);
 		rowdata = row.getRow_data();
 		for (final Integer control_id : controlClickHandler.keySet()) {
@@ -225,10 +224,8 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 
 						@Override
 						public void onClick(View arg0) {
-							// TODO Auto-generated method stub
 							controlClickHandler.get(control_id).controlClicked(
 									position, rows.get(position), viewRow);
-
 						}
 					});
 		}
@@ -314,7 +311,6 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 		if (this.canChangeBackground && !viewRow.isSelected()) {
 			boolean flag = Boolean.parseBoolean(rowdata.get(conditionKey)
 					.toString());
-
 			if (flag) {
 				viewRow.setBackgroundResource(colors[1]);
 
@@ -322,11 +318,11 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 				viewRow.setBackgroundResource(colors[0]);
 			}
 		}
-
 		if (viewListener != null) {
 			viewRow = viewListener.listViewOnCreateListener(position, viewRow,
 					row);
 		}
+
 		return viewRow;
 	}
 
