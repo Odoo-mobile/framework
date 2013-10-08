@@ -34,7 +34,6 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
 
-import com.openerp.MainActivity;
 import com.openerp.addons.meeting.MeetingDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
@@ -163,7 +162,8 @@ public class MeetingSyncService extends Service {
 			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				// retriving user account name
 				account = OpenERPAccountManager.getAccount(mContext,
-						MainActivity.userContext.getAndroidName());
+						OpenERPAccountManager.currentUser(mContext)
+								.getAndroidName());
 				try {
 					// checking whether user exist with this account name
 					if (account != null) {

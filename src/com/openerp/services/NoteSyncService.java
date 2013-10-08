@@ -72,7 +72,8 @@ public class NoteSyncService extends Service {
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
 
 			NoteDBHelper db = new NoteDBHelper(context);
-			OEHelper oe = new OEHelper(context, MainActivity.userContext);
+			OEHelper oe = new OEHelper(context,
+					OpenERPAccountManager.currentUser(context));
 
 			if (oe.syncWithServer(db)) {
 				// Sync Done, Next stuff....
@@ -99,7 +100,8 @@ public class NoteSyncService extends Service {
 
 			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				account = OpenERPAccountManager.getAccount(mContext,
-						MainActivity.userContext.getAndroidName());
+						OpenERPAccountManager.currentUser(mContext)
+								.getAndroidName());
 
 				Log.i("Sync Service Start", "Syncing Notes");
 
