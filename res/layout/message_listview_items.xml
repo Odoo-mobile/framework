@@ -3,7 +3,10 @@
     android:layout_height="fill_parent"
     android:background="@drawable/oe_listview_background_selector"
     android:orientation="horizontal"
-    android:padding="5dp"
+    android:paddingBottom="0dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="5dp"
     android:weightSum="4" >
 
     <ImageView
@@ -27,6 +30,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="5dp"
+        android:paddingRight="5dp"
         android:paddingTop="5dp" >
 
         <LinearLayout
@@ -86,18 +90,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left|top"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:weightSum="2" >
 
             <TextView
                 android:id="@+id/txvMessageFrom"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="2"
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="Administrator"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#414141"
                 android:textStyle="italic|bold" />
+
+            <TextView
+                android:id="@+id/txvMessageTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:background="#414141"
+                android:lines="1"
+                android:paddingBottom="3dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="3dp"
+                android:text="message"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
 
