@@ -41,6 +41,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
@@ -541,6 +542,7 @@ public class MainActivity extends FragmentActivity {
 				setAutoSync(authority, false);
 			}
 		}
+		Toast.makeText(this, "Setting saved.", Toast.LENGTH_LONG).show();
 	}
 
 	public void drawerCloseListener(String title) {

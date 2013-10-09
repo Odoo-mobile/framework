@@ -19,7 +19,9 @@
 package com.openerp.addons.messages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -28,8 +30,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -63,6 +67,7 @@ import com.openerp.support.OEDialog;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.OEListViewAdapter;
+import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuItems;
@@ -82,6 +87,12 @@ public class Message extends BaseFragment implements
 	View rootView = null;
 	String[] from = new String[] { "id", "subject", "body", "record_name",
 			"type", "to_read", "starred", "author_id" };
+
+	String tag_colors[] = new String[] { "#9933CC", "#669900", "#FF8800",
+			"#CC0000", "#59A2BE", "#808080", "#192823", "#0099CC", "#218559",
+			"#EBB035" };
+	HashMap<String, String> message_model_colors = new HashMap<String, String>();
+	int tag_color_count = 0;
 
 	private enum TYPE {
 		INBOX, TODO, TOME, ARCHIVE
@@ -169,10 +180,10 @@ public class Message extends BaseFragment implements
 
 		// Handling List View controls and keys
 		String[] from = new String[] { "subject|type", "body", "starred",
-				"author_id|email_from", "date" };
+				"author_id|email_from", "date", "model|type" };
 		int[] to = new int[] { R.id.txvMessageSubject, R.id.txvMessageBody,
 				R.id.imgMessageStarred, R.id.txvMessageFrom,
-				R.id.txvMessageDate };
+				R.id.txvMessageDate, R.id.txvMessageTag };
 
 		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
@@ -188,6 +199,42 @@ public class Message extends BaseFragment implements
 		listAdapter.setBooleanEventOperation("starred",
 				R.drawable.ic_action_starred, R.drawable.ic_action_unstarred,
 				updateStarred);
+		listAdapter.addViewListener(new OEListViewOnCreateListener() {
+
+			@Override
+			public View listViewOnCreateListener(int position, View row_view,
+					OEListViewRows row_data) {
+				String model_name = row_data.getRow_data().get("model")
+						.toString();
+				if (model_name.equals("false")) {
+					model_name = row_data.getRow_data().get("type").toString();
+				} else {
+					String[] model_parts = TextUtils.split(model_name, "\\.");
+					HashSet unique_parts = new HashSet(Arrays
+							.asList(model_parts));
+					model_name = capitalizeString(TextUtils.join(" ",
+							unique_parts.toArray()));
+
+				}
+				TextView msgTag = (TextView) row_view
+						.findViewById(R.id.txvMessageTag);
+				String tag_color = "";
+				if (message_model_colors.containsKey(model_name)) {
+					tag_color = message_model_colors.get(model_name);
+				} else {
+					tag_color = tag_colors[tag_color_count];
+					message_model_colors.put(model_name, tag_color);
+					tag_color_count++;
+					if (tag_color_count > tag_colors.length) {
+						tag_color_count = 0;
+					}
+				}
+				msgTag.setBackgroundColor(Color.parseColor(tag_color));
+				msgTag.setText(model_name);
+				return row_view;
+			}
+		});
+
 		// Creating instance for listview control
 		lstview = (ListView) rootView.findViewById(R.id.lstMessages);
 		// Providing adapter to listview
@@ -371,6 +418,21 @@ public class Message extends BaseFragment implements
 		if (mPullToRefreshAttacher != null & lstview != null) {
 			mPullToRefreshAttacher.setRefreshableView(lstview, this);
 		}
+	}
+
+	public static String capitalizeString(String string) {
+		char[] chars = string.toLowerCase().toCharArray();
+		boolean found = false;
+		for (int i = 0; i < chars.length; i++) {
+			if (!found && Character.isLetter(chars[i])) {
+				chars[i] = Character.toUpperCase(chars[i]);
+				found = true;
+			} else if (Character.isWhitespace(chars[i]) || chars[i] == '.'
+					|| chars[i] == '\'') { // You can add other chars here
+				found = false;
+			}
+		}
+		return String.valueOf(chars);
 	}
 
 	private String updateSubject(String subject, int parent_id) {
