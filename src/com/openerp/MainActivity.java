@@ -465,14 +465,29 @@ public class MainActivity extends FragmentActivity {
 	 * 
 	 * @param authority
 	 *            the authority
+	 * @param bundle
+	 *            the extra data
 	 */
-	public void requestSync(String authority) {
+	public void requestSync(String authority, Bundle bundle) {
 		Account account = OpenERPAccountManager.getAccount(this,
 				MainActivity.userContext.getAndroidName());
 		Bundle settingsBundle = new Bundle();
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+		if (bundle != null) {
+			settingsBundle.putAll(bundle);
+		}
 		ContentResolver.requestSync(account, authority, settingsBundle);
+	}
+
+	/**
+	 * Request sync.
+	 * 
+	 * @param authority
+	 *            the authority
+	 */
+	public void requestSync(String authority) {
+		requestSync(authority, null);
 	}
 
 	/**

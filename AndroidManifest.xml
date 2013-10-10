@@ -24,7 +24,7 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
-    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:allowBackup="true"
@@ -53,7 +53,14 @@
             android:exported="true"
             android:label="Messages"
             android:syncable="true" />
-
+        <!-- User Group Sync Providers -->
+        <provider
+            android:name="com.openerp.providers.groups.UserGroupsProvider"
+            android:authorities="com.openerp.providers.groups"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Groups"
+            android:syncable="true" />
         <!-- Note Sync Providers -->
         <provider
             android:name="com.openerp.providers.note.NoteProvider"
@@ -74,6 +81,19 @@
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_messages" />
+        </service>
+
+        <!-- User Group sync Services -->
+        <service
+            android:name="com.openerp.services.UserGroupsSyncService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_groups" />
         </service>
 
         <!-- Meeting sync Services -->
