@@ -26,7 +26,7 @@
     <!-- SyncWizard fragment strings -->
     <string name="syncwizard_title">Enable/Disable your Sync Settings</string>
     <string name="syncwizard_description">Select your auto sync option so application will get upto-date automatically.</string>
-	<string name="account_sync_wizard_button">Continue</string>
+    <string name="account_sync_wizard_button">Continue</string>
     <!-- Message Fragment all read messages -->
     <string name="message_inbox_all_read"><b>Good Job!</b> Your inbox is empty.\n \n
 
@@ -35,7 +35,7 @@ Your inbox contains private messages or emails sent to you as well as informatio
     <string name="message_todo_all_read"><b>No todo.</b>\n\n
 
 When you process messages in your inbox, you can mark some as todo. From this menu, you can process all your todo.</string>
-
+    <string name="message_no_group_message">No message in this group.</string>
     <!-- Compose Note Fragment Strings -->
     <string name="compose_note_stages">Stages</string>
     <string name="compose_note_description">Description</string>

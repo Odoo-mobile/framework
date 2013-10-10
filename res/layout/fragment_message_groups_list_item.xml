@@ -1,0 +1,75 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/container_drop_shadow"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:weightSum="2" >
+
+        <ImageView
+            android:id="@+id/imgGroupPic"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#f3f3f3"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="5dp" >
+
+            <TextView
+                android:id="@+id/txvGroupName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:text="Group Name"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#414141" />
+
+            <TextView
+                android:id="@+id/txvGroupDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:ellipsize="end"
+                android:gravity="center_horizontal"
+                android:lines="2"
+                android:text="Group Name"
+                android:textColor="#414141"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnJoinGroup"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:background="@drawable/button_bg_user_group_join"
+            android:text="Join"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnUnJoinGroup"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:background="@drawable/button_bg_user_group_unjoin"
+            android:text="Unfollow"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

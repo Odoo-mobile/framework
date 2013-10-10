@@ -119,7 +119,6 @@ public class MessageSyncService extends Service {
 	public void performSync(Context context, Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
-		// TODO Auto-generated method stub
 		try {
 			MessageDBHelper msgDb = new MessageDBHelper(context);
 			Intent intent = new Intent();
@@ -145,30 +144,50 @@ public class MessageSyncService extends Service {
 				arg1.addArgCondition("id", "not in", JSONDataHelper
 						.intArrayToJSONArray(msgDb.localIds(msgDb)));
 
-				// Argument for check partner_ids.user_id is current user
-				OEArgsHelper arg2 = new OEArgsHelper();
-				arg2.addArgCondition("partner_ids.user_ids", "in",
-						new JSONArray().put(user_id));
-
-				// Argument for check notification_ids.partner_ids.user_id is
-				// current user
-				OEArgsHelper arg3 = new OEArgsHelper();
-				arg3.addArgCondition("notification_ids.partner_id.user_ids",
-						"in", new JSONArray().put(user_id));
-
-				// Argument for check author id is current user
-				OEArgsHelper arg4 = new OEArgsHelper();
-				arg4.addArgCondition("author_id.user_ids", "in",
-						new JSONArray().put(user_id));
-
-				// Combination of arg1, arg2, arg3, arg4 with operators
 				OEArgsHelper mainArg_2 = new OEArgsHelper();
 				mainArg_2.addArg(arg1.getArgs());
-				mainArg_2.addArg("|");
-				mainArg_2.addArg(arg2.getArgs());
-				mainArg_2.addArg("|");
-				mainArg_2.addArg(arg3.getArgs());
-				mainArg_2.addArg(arg4.getArgs());
+				if (!extras.containsKey("group_ids")) {
+
+					// Argument for check partner_ids.user_id is current user
+					OEArgsHelper arg2 = new OEArgsHelper();
+					arg2.addArgCondition("partner_ids.user_ids", "in",
+							new JSONArray().put(user_id));
+
+					// Argument for check notification_ids.partner_ids.user_id
+					// is
+					// current user
+					OEArgsHelper arg3 = new OEArgsHelper();
+					arg3.addArgCondition(
+							"notification_ids.partner_id.user_ids", "in",
+							new JSONArray().put(user_id));
+
+					// Argument for check author id is current user
+					OEArgsHelper arg4 = new OEArgsHelper();
+					arg4.addArgCondition("author_id.user_ids", "in",
+							new JSONArray().put(user_id));
+
+					// Combination of arg2, arg3, arg4 with operators
+					mainArg_2.addArg("|");
+					mainArg_2.addArg(arg2.getArgs());
+					mainArg_2.addArg("|");
+					mainArg_2.addArg(arg3.getArgs());
+					mainArg_2.addArg(arg4.getArgs());
+				} else {
+					JSONArray group_ids = new JSONArray(
+							extras.getString("group_ids"));
+
+					// Argument for group model check
+					OEArgsHelper arg2 = new OEArgsHelper();
+					arg2.addArgCondition("model", "=", "mail.group");
+
+					// Argument for group model res id
+					OEArgsHelper arg3 = new OEArgsHelper();
+					arg3.addArgCondition("res_id", "in", group_ids);
+
+					// Combination of arg2, arg3 with main argument
+					mainArg_2.addArg(arg2.getArgs());
+					mainArg_2.addArg(arg3.getArgs());
+				}
 
 				// Generating Full Argument using above arguments
 				OEArgsHelper mainArgs = new OEArgsHelper();

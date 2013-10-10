@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.content.ContentValues;
@@ -95,9 +96,10 @@ public class Message extends BaseFragment implements
 	int tag_color_count = 0;
 
 	private enum TYPE {
-		INBOX, TODO, TOME, ARCHIVE
+		INBOX, TODO, TOME, ARCHIVE, GROUP
 	}
 
+	private String group_id = null;
 	SearchView searchView = null;
 	TYPE current_type = TYPE.INBOX;
 	public int selectedCounter = 0;
@@ -471,6 +473,11 @@ public class Message extends BaseFragment implements
 			whereArgs = new String[] { "true" };
 			message_resource = R.string.message_todo_all_read;
 			break;
+		case GROUP:
+			where = new String[] { "res_id  = ? ", "AND", "model = ?" };
+			whereArgs = new String[] { group_id, "mail.group" };
+			message_resource = R.string.message_no_group_message;
+			break;
 		default:
 			break;
 		}
@@ -552,7 +559,16 @@ public class Message extends BaseFragment implements
 
 				try {
 					Thread.sleep(2000);
-					scope.context().requestSync(MessageProvider.AUTHORITY);
+					if (group_id != null) {
+						Bundle group_bundle = new Bundle();
+						JSONArray ids = new JSONArray();
+						ids.put(group_id);
+						group_bundle.putString("group_ids", ids.toString());
+						scope.context().requestSync(MessageProvider.AUTHORITY,
+								group_bundle);
+					} else {
+						scope.context().requestSync(MessageProvider.AUTHORITY);
+					}
 				} catch (Exception e) {
 				}
 			} else {
@@ -592,6 +608,11 @@ public class Message extends BaseFragment implements
 		// Associate searchable configuration with the SearchView
 		searchView = (SearchView) menu.findItem(R.id.menu_message_search)
 				.getActionView();
+		Bundle bundle = getArguments();
+		if (bundle != null && bundle.containsKey("group_id")) {
+			MenuItem compose = menu.findItem(R.id.menu_message_compose);
+			compose.setVisible(false);
+		}
 	}
 
 	@Override
@@ -741,9 +762,15 @@ public class Message extends BaseFragment implements
 				}
 				scope.context().setTitle(title);
 			} else {
-				scope.context().setTitle("Inbox");
-				loadMessage = new LoadMessages(TYPE.INBOX);
-				loadMessage.execute((Void) null);
+				if (bundle.containsKey("group_id")) {
+					group_id = bundle.getString("group_id");
+					loadMessage = new LoadMessages(TYPE.GROUP);
+					loadMessage.execute((Void) null);
+				} else {
+					scope.context().setTitle("Inbox");
+					loadMessage = new LoadMessages(TYPE.INBOX);
+					loadMessage.execute((Void) null);
+				}
 
 			}
 		}
@@ -852,7 +879,11 @@ public class Message extends BaseFragment implements
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
-				setupListView(getMessages(TYPE.INBOX));
+				if (group_id != null) {
+					setupListView(getMessages(TYPE.GROUP));
+				} else {
+					setupListView(getMessages(TYPE.INBOX));
+				}
 
 			} catch (Exception e) {
 			}
@@ -863,7 +894,11 @@ public class Message extends BaseFragment implements
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
-				setupListView(getMessages(TYPE.INBOX));
+				if (group_id != null) {
+					setupListView(getMessages(TYPE.GROUP));
+				} else {
+					setupListView(getMessages(TYPE.INBOX));
+				}
 
 			}
 
@@ -872,10 +907,18 @@ public class Message extends BaseFragment implements
 
 	@Override
 	public void onRefreshStarted(View view) {
-		// TODO Auto-generated method stub
 		if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
 			Log.d("MessageFragment", "requesting for sync");
-			scope.context().requestSync(MessageProvider.AUTHORITY);
+			if (group_id != null) {
+				Bundle group_bundle = new Bundle();
+				JSONArray ids = new JSONArray();
+				ids.put(group_id);
+				group_bundle.putString("group_ids", ids.toString());
+				scope.context().requestSync(MessageProvider.AUTHORITY,
+						group_bundle);
+			} else {
+				scope.context().requestSync(MessageProvider.AUTHORITY);
+			}
 		} else {
 			Toast.makeText(getActivity(), "Unable to connect server !",
 					Toast.LENGTH_LONG).show();
