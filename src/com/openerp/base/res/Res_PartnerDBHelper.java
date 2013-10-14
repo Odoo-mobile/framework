@@ -46,7 +46,7 @@ public class Res_PartnerDBHelper extends BaseDBHelper {
 		/* providing model columns */
 		columns.add(new Fields("is_company", "Is Company", Types.text()));
 		columns.add(new Fields("name", "Name", Types.text()));
-		columns.add(new Fields("image", "Image", Types.blob()));
+		columns.add(new Fields("image_small", "Image", Types.blob()));
 		columns.add(new Fields("street", "Street", Types.text()));
 		columns.add(new Fields("street2", "Street 2", Types.text()));
 		columns.add(new Fields("city", "City", Types.text()));

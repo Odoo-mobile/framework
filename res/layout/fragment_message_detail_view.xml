@@ -3,19 +3,36 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
+    <include
+        android:id="@+id/loadingHeader"
+        layout="@layout/listview_data_loading_progress"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:visibility="gone" />
+
     <LinearLayout
+        android:id="@+id/messageDetailView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="5"
         android:background="#eeeeee"
         android:orientation="vertical" >
 
+        <View
+            android:id="@+id/groupColorLine"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="#ffffff" />
+
         <TextView
             android:id="@+id/txvMessageTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#ffffff"
-            android:padding="15dp"
+            android:paddingBottom="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="10dp"
             android:singleLine="true"
             android:text="Message Title"
             android:textAppearance="?android:attr/textAppearanceMedium"

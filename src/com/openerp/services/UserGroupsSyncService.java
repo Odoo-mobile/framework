@@ -127,7 +127,6 @@ public class UserGroupsSyncService extends Service {
 				Log.i(TAG + "::performSync()", "Sync with Server Started");
 				OEHelper oe = usergroups.getOEInstance();
 				if (oe.syncWithServer(usergroups)) {
-					context.sendBroadcast(intent);
 					MailFollowerDb group_follower = new MailFollowerDb(context);
 					OEHelper oe_1 = group_follower.getOEInstance();
 					JSONObject domain = new JSONObject();
@@ -155,6 +154,7 @@ public class UserGroupsSyncService extends Service {
 										.get("res_id").toString()));
 							}
 						}
+						context.sendBroadcast(intent);
 						Bundle bundle = new Bundle();
 						bundle.putString("group_ids", group_ids.toString());
 						bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL,

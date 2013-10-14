@@ -87,12 +87,13 @@ public class Message extends BaseFragment implements
 	HashMap<String, Integer> message_row_indexes = new HashMap<String, Integer>();
 	View rootView = null;
 	String[] from = new String[] { "id", "subject", "body", "record_name",
-			"type", "to_read", "starred", "author_id" };
+			"type", "to_read", "starred", "author_id", "res_id", "email_from",
+			"parent_id", "model", "date" };
 
-	String tag_colors[] = new String[] { "#9933CC", "#669900", "#FF8800",
-			"#CC0000", "#59A2BE", "#808080", "#192823", "#0099CC", "#218559",
+	String tag_colors[] = new String[] { "#A4C400", "#00ABA9", "#1BA1E2",
+			"#AA00FF", "#D80073", "#A20025", "#FA6800", "#6D8764", "#76608A",
 			"#EBB035" };
-	HashMap<String, String> message_model_colors = new HashMap<String, String>();
+	HashMap<String, Integer> message_model_colors = new HashMap<String, Integer>();
 	int tag_color_count = 0;
 
 	private enum TYPE {
@@ -208,6 +209,8 @@ public class Message extends BaseFragment implements
 					OEListViewRows row_data) {
 				String model_name = row_data.getRow_data().get("model")
 						.toString();
+				String model = model_name;
+				String res_id = row_data.getRow_data().get("res_id").toString();
 				if (model_name.equals("false")) {
 					model_name = row_data.getRow_data().get("type").toString();
 				} else {
@@ -220,18 +223,26 @@ public class Message extends BaseFragment implements
 				}
 				TextView msgTag = (TextView) row_view
 						.findViewById(R.id.txvMessageTag);
-				String tag_color = "";
+				int tag_color = 0;
 				if (message_model_colors.containsKey(model_name)) {
 					tag_color = message_model_colors.get(model_name);
 				} else {
-					tag_color = tag_colors[tag_color_count];
+					tag_color = Color.parseColor(tag_colors[tag_color_count]);
 					message_model_colors.put(model_name, tag_color);
 					tag_color_count++;
 					if (tag_color_count > tag_colors.length) {
 						tag_color_count = 0;
 					}
 				}
-				msgTag.setBackgroundColor(Color.parseColor(tag_color));
+				if (model.equals("mail.group")) {
+					if (UserGroups.group_names.containsKey("group_" + res_id)) {
+						model_name = UserGroups.group_names.get("group_"
+								+ res_id);
+						tag_color = UserGroups.menu_color
+								.get("group_" + res_id);
+					}
+				}
+				msgTag.setBackgroundColor(tag_color);
 				msgTag.setText(model_name);
 				return row_view;
 			}
@@ -453,7 +464,6 @@ public class Message extends BaseFragment implements
 	int message_resource = 0;
 
 	private List<OEListViewRows> getMessages(TYPE type) {
-
 		String[] where = null;
 		String[] whereArgs = null;
 		current_type = type;
@@ -590,20 +600,16 @@ public class Message extends BaseFragment implements
 			}
 
 		}
-
 		return messages_sorted;
-
 	}
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new MessageDBHelper(context);
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 		inflater.inflate(R.menu.menu_fragment_message, menu);
 		// Associate searchable configuration with the SearchView
 		searchView = (SearchView) menu.findItem(R.id.menu_message_search)
@@ -617,7 +623,6 @@ public class Message extends BaseFragment implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		// handle item selection
 		switch (item.getItemId()) {
 		case R.id.menu_message_compose:
@@ -733,8 +738,6 @@ public class Message extends BaseFragment implements
 
 	@Override
 	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
 		if (bundle != null) {
 			if (bundle.containsKey("type")) {
 				String type = bundle.getString("type");
@@ -796,8 +799,15 @@ public class Message extends BaseFragment implements
 	}
 
 	@Override
+	public void onStop() {
+		super.onStop();
+		if (loadMessage != null) {
+			loadMessage.cancel(true);
+		}
+	}
+
+	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
 		super.onDestroy();
 		if (loadMessage != null) {
 			loadMessage.cancel(true);
@@ -847,7 +857,7 @@ public class Message extends BaseFragment implements
 	};
 
 	private OEListViewRows getRowForMessage(int id) {
-		HashMap<String, Object> newRow = db.search(db,
+		HashMap<String, Object> newRow = db.search(db, from,
 				new String[] { "id = ?" }, new String[] { String.valueOf(id) });
 		OEListViewRows newRowObj = new OEListViewRows(id,
 				((List<HashMap<String, Object>>) newRow.get("records")).get(0));

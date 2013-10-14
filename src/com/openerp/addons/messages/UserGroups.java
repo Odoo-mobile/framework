@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
+import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.BaseDBHelper;
@@ -32,20 +34,27 @@ import com.openerp.providers.groups.UserGroupsProvider;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
+import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuItems;
 
-public class UserGroups extends BaseFragment {
+public class UserGroups extends BaseFragment implements
+		PullToRefreshAttacher.OnRefreshListener {
 	public static final String TAG = "UserGroups";
+	private PullToRefreshAttacher mPullToRefreshAttacher;
 	View rootView = null;
 	GridView lstGroups = null;
 	String tag_colors[] = new String[] { "#218559", "#192823", "#FF8800",
 			"#CC0000", "#59A2BE", "#808080", "#9933CC", "#0099CC", "#669900",
 			"#EBB035" };
-	HashMap<String, Integer> menu_color = new HashMap<String, Integer>();
+	public static HashMap<String, Integer> menu_color = new HashMap<String, Integer>();
+	public static HashMap<String, String> group_names = new HashMap<String, String>();
+	LoadGroups groups_loader = null;
+	JoinUnfollowGroup joinUnfollow = null;
+	MailFollowerDb follower = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,20 +78,21 @@ public class UserGroups extends BaseFragment {
 
 	@Override
 	public void handleArguments(Bundle bundle) {
+		follower = new MailFollowerDb(scope.context());
 		scope.context().setTitle("Join a Group");
 		lstGroups = (GridView) rootView.findViewById(R.id.listGroups);
-		setupView();
+		groups_loader = new LoadGroups();
+		groups_loader.execute((Void) null);
 	}
 
-	private void setupView() {
+	private Boolean setupView() {
 		List<OEListViewRows> groups = getGroups();
 		String[] from = new String[] { "name", "image_medium", "description" };
 		int[] to = new int[] { R.id.txvGroupName, R.id.imgGroupPic,
 				R.id.txvGroupDescription };
-		OEListViewAdapter adapter = new OEListViewAdapter(scope.context(),
-				R.layout.fragment_message_groups_list_item, groups, from, to,
-				db);
-		final MailFollowerDb follower = new MailFollowerDb(scope.context());
+		final OEListViewAdapter adapter = new OEListViewAdapter(
+				scope.context(), R.layout.fragment_message_groups_list_item,
+				groups, from, to, db);
 		adapter.addViewListener(new OEListViewOnCreateListener() {
 
 			@Override
@@ -97,67 +107,25 @@ public class UserGroups extends BaseFragment {
 						"res_model = ?", "AND", "res_id = ?", "AND",
 						"partner_id = ?" }, new String[] { "mail.group",
 						group_id + "", scope.User().getPartner_id() });
-				final OEHelper oe = db.getOEInstance();
-				final JSONArray args = new JSONArray();
 
-				final List<HashMap<String, Object>> mail_follower_ids = follower
-						.executeSQL(follower.getModelName(),
-								new String[] { "id" }, new String[] {
-										"res_model = ?", "AND", "res_id = ?",
-										"AND", "partner_id = ?" },
-								new String[] { "mail.group", group_id + "",
-										scope.User().getPartner_id() });
-				try {
-					args.put(new JSONArray("[" + group_id + "]"));
-					args.put(oe.updateContext(new JSONObject()));
-				} catch (Exception e) {
-				}
 				btnUnJoin.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View arg0) {
-						try {
-							JSONObject result = oe.call_kw("mail.group",
-									"action_unfollow", args);
-							if (result.getBoolean("result")) {
-								if (mail_follower_ids.size() > 0) {
-									follower.delete(
-											follower,
-											Integer.parseInt(mail_follower_ids
-													.get(0).get("id")
-													.toString()));
-									Toast.makeText(scope.context(),
-											"Unfollowed from group",
-											Toast.LENGTH_LONG).show();
-									btnJoin.setVisibility(View.VISIBLE);
-									btnUnJoin.setVisibility(View.GONE);
-									scope.context().refreshMenu(scope.context());
-								}
-
-							}
-
-						} catch (Exception e) {
-						}
+						joinUnfollow = new JoinUnfollowGroup(group_id, false);
+						joinUnfollow.execute((Void) null);
+						btnJoin.setVisibility(View.VISIBLE);
+						btnUnJoin.setVisibility(View.GONE);
 					}
 				});
 				btnJoin.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
-						try {
-							ContentValues data_vals = new ContentValues();
-							data_vals.put("res_model", "mail.group");
-							data_vals.put("res_id", group_id);
-							data_vals.put("partner_id", Integer.parseInt(scope
-									.User().getPartner_id()));
-							follower.create(follower, data_vals);
-							Toast.makeText(scope.context(), "Group joined",
-									Toast.LENGTH_LONG).show();
-							btnJoin.setVisibility(View.GONE);
-							btnUnJoin.setVisibility(View.VISIBLE);
-							scope.context().refreshMenu(scope.context());
-						} catch (Exception e) {
-						}
+						joinUnfollow = new JoinUnfollowGroup(group_id, true);
+						joinUnfollow.execute((Void) null);
+						btnJoin.setVisibility(View.GONE);
+						btnUnJoin.setVisibility(View.VISIBLE);
 					}
 				});
 				if (total > 0) {
@@ -172,7 +140,23 @@ public class UserGroups extends BaseFragment {
 			}
 		});
 		adapter.addImageColumn("image_medium");
-		lstGroups.setAdapter(adapter);
+		scope.context().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				lstGroups.setAdapter(adapter);
+			}
+		});
+
+		// Getting Pull To Refresh Attacher from Main Activity
+		mPullToRefreshAttacher = scope.context().getPullToRefreshAttacher();
+
+		// Set the Refreshable View to be the ListView and the refresh listener
+		// to be this.
+		if (mPullToRefreshAttacher != null & lstGroups != null) {
+			mPullToRefreshAttacher.setRefreshableView(lstGroups, this);
+		}
+		return true;
 
 	}
 
@@ -180,9 +164,16 @@ public class UserGroups extends BaseFragment {
 		List<OEListViewRows> groups = new ArrayList<OEListViewRows>();
 
 		if (!db.isEmptyTable(db)) {
-			rootView.findViewById(R.id.groupSyncWaiter)
-					.setVisibility(View.GONE);
-			rootView.findViewById(R.id.listGroups).setVisibility(View.VISIBLE);
+			scope.context().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					rootView.findViewById(R.id.groupSyncWaiter).setVisibility(
+							View.GONE);
+					rootView.findViewById(R.id.listGroups).setVisibility(
+							View.VISIBLE);
+				}
+			});
 
 			HashMap<String, Object> group_data = db.search(db);
 			if (Integer.parseInt(group_data.get("total").toString()) > 0) {
@@ -196,16 +187,21 @@ public class UserGroups extends BaseFragment {
 			}
 
 		} else {
-			rootView.findViewById(R.id.groupSyncWaiter).setVisibility(
-					View.VISIBLE);
-			TextView txvSyncDetail = (TextView) rootView
-					.findViewById(R.id.txvMessageHeaderSubtitle);
-			txvSyncDetail.setText("Your groups will appear shortly");
-			rootView.findViewById(R.id.listGroups).setVisibility(View.GONE);
-			Log.d(TAG, "Requesting for sync groups");
-			scope.context().requestSync(UserGroupsProvider.AUTHORITY);
+			scope.context().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					rootView.findViewById(R.id.groupSyncWaiter).setVisibility(
+							View.VISIBLE);
+					TextView txvSyncDetail = (TextView) rootView
+							.findViewById(R.id.txvMessageHeaderSubtitle);
+					txvSyncDetail.setText("Your groups will appear shortly");
+					rootView.findViewById(R.id.listGroups).setVisibility(
+							View.GONE);
+					Log.d(TAG, "Requesting for sync groups");
+					scope.context().requestSync(UserGroupsProvider.AUTHORITY);
+				}
+			});
 		}
-
 		return groups;
 	}
 
@@ -253,6 +249,7 @@ public class UserGroups extends BaseFragment {
 						.setMenuTagColor(Color.parseColor(tag_colors[i]));
 				menu_color.put("group_" + key,
 						group_menu_item.getMenuTagColor());
+				group_names.put("group_" + key, group_menu_item.getTitle());
 				group_menu_items.add(group_menu_item);
 				i++;
 			}
@@ -289,13 +286,156 @@ public class UserGroups extends BaseFragment {
 				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
 	}
 
+	// PullToRefresh
+	// Allow Activity to pass us it's PullToRefreshAttacher
+	void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
+		mPullToRefreshAttacher = attacher;
+	}
+
 	private SyncFinishReceiver syncFinishReceiver = new SyncFinishReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			mPullToRefreshAttacher.setRefreshComplete();
 			setupView();
+			scope.context().refreshMenu(context);
 		}
 
 	};
+
+	@Override
+	public void onRefreshStarted(View arg0) {
+		if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
+			Log.i("UserGroupsFragment", "requesting for sync");
+			scope.context().requestSync(UserGroupsProvider.AUTHORITY);
+		} else {
+			Toast.makeText(getActivity(), "Unable to connect server !",
+					Toast.LENGTH_LONG).show();
+			mPullToRefreshAttacher.setRefreshComplete();
+		}
+	}
+
+	public class JoinUnfollowGroup extends AsyncTask<Void, Void, Boolean> {
+		int group_id = 0;
+		boolean join = false;
+		String toast_message = "";
+		JSONObject result = new JSONObject();
+
+		public JoinUnfollowGroup(int group_id, boolean join) {
+			this.group_id = group_id;
+			this.join = join;
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			try {
+				follower = new MailFollowerDb(scope.context());
+				int partner_id = Integer.parseInt(scope.User().getPartner_id());
+				OEHelper oe = db.getOEInstance();
+				JSONArray args = new JSONArray();
+				args.put(new JSONArray("[" + this.group_id + "]"));
+				args.put(oe.updateContext(new JSONObject()));
+				if (this.join) {
+					result = oe.call_kw("mail.group", "action_follow", args);
+					JSONObject fields = new JSONObject();
+					fields.accumulate("fields", "res_model");
+					fields.accumulate("fields", "res_id");
+					fields.accumulate("fields", "partner_id");
+					JSONObject domain = new JSONObject();
+					domain.accumulate("domain", new JSONArray(
+							"[[\"res_model\", \"=\", \"mail.group\"], [\"res_id\",\"=\","
+									+ this.group_id
+									+ "] ,[\"partner_id\",\"=\", " + partner_id
+									+ "]]"));
+					JSONObject result_data = oe.search_read("mail.followers",
+							null, domain, 0, 0, null, null);
+					ContentValues data_vals = new ContentValues();
+					data_vals.put("id", result_data.getJSONArray("records")
+							.getJSONObject(0).getString("id"));
+					data_vals.put("res_model", "mail.group");
+					data_vals.put("res_id", this.group_id);
+					data_vals.put("partner_id",
+							Integer.parseInt(scope.User().getPartner_id()));
+					int newId = follower.create(follower, data_vals);
+					toast_message = "Group joined";
+				} else {
+					result = oe.call_kw("mail.group", "action_unfollow", args);
+
+					List<HashMap<String, Object>> mail_follower_ids = follower
+							.executeSQL(follower.getModelName(),
+									new String[] { "id" }, new String[] {
+											"res_model = ?", "AND",
+											"res_id = ?", "AND",
+											"partner_id = ?" }, new String[] {
+											"mail.group", group_id + "",
+											scope.User().getPartner_id() });
+					if (mail_follower_ids.size() > 0) {
+						int id = Integer.parseInt(mail_follower_ids.get(0)
+								.get("id").toString());
+						follower.delete(follower, id, true);
+					}
+					toast_message = "Unfollowed from group";
+				}
+				scope.context().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							if (result.getBoolean("result")) {
+								Toast.makeText(scope.context(), toast_message,
+										Toast.LENGTH_LONG).show();
+							}
+						} catch (Exception e) {
+						}
+						scope.context().refreshMenu(scope.context());
+					}
+				});
+				return true;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+	}
+
+	public class LoadGroups extends AsyncTask<Void, Void, Boolean> {
+
+		@Override
+		protected void onPreExecute() {
+			scope.context().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					rootView.findViewById(R.id.loadingHeader).setVisibility(
+							View.VISIBLE);
+					rootView.findViewById(R.id.listGroups).setVisibility(
+							View.GONE);
+				}
+			});
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... arg0) {
+			return setupView();
+		}
+
+		@Override
+		protected void onPostExecute(final Boolean success) {
+			scope.context().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						rootView.findViewById(R.id.loadingHeader)
+								.setVisibility(View.GONE);
+						rootView.findViewById(R.id.listGroups).setVisibility(
+								View.VISIBLE);
+						groups_loader = null;
+					} catch (Exception e) {
+					}
+				}
+			});
+		}
+
+	}
 
 }
