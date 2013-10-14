@@ -20,6 +20,7 @@
 package com.openerp.addons.messages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,8 +31,10 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.format.Time;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,7 +50,9 @@ import android.widget.TextView;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
+import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
@@ -84,6 +89,7 @@ public class MessageDetail extends BaseFragment {
 
 	/** The parent_row. */
 	HashMap<String, Object> parent_row = null;
+	public static String oea_name = null;
 
 	/*
 	 * (non-Javadoc)
@@ -105,7 +111,8 @@ public class MessageDetail extends BaseFragment {
 
 		rootView = inflater.inflate(R.layout.fragment_message_detail_view,
 				container, false);
-
+		oea_name = OpenERPAccountManager.currentUser(MainActivity.context)
+				.getAndroidName();
 		handleArguments((Bundle) getArguments());
 
 		return rootView;
@@ -117,7 +124,7 @@ public class MessageDetail extends BaseFragment {
 	 * @param list
 	 *            the new up list view
 	 */
-	private void setupListView(List<OEListViewRows> list) {
+	private boolean setupListView(List<OEListViewRows> list) {
 		// Handling List View controls and keys
 		String[] from = new String[] { "image", "email_from|name",
 				"email_from|email", "body", "date", "partners", "starred" };
@@ -231,6 +238,7 @@ public class MessageDetail extends BaseFragment {
 				.findViewById(R.id.lstMessageDetail);
 		// Providing adapter to listview
 		lstview.setAdapter(listAdapter);
+		return true;
 	}
 
 	/*
@@ -254,68 +262,78 @@ public class MessageDetail extends BaseFragment {
 	 */
 	@Override
 	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
 		if (bundle != null) {
 			if (bundle.containsKey("message_id")) {
-				messages_sorted = new ArrayList<OEListViewRows>();
-				message_id = bundle.getInt("message_id");
-
-				String query = "select t1.id as message_id , t1.*, t2.name, t2.image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.id desc";
-				List<HashMap<String, Object>> records = db.executeSQL(
-						query,
-						new String[] { String.valueOf(message_id),
-								String.valueOf(message_id) });
-
-				HashMap<String, Object> row = new HashMap<String, Object>();
-				row.put("total", records.size());
-				row.put("records", records);
-				if ((Integer) row.get("total") > 0) {
-
-					List<HashMap<String, Object>> rows_detail = (List<HashMap<String, Object>>) row
-							.get("records");
-					for (HashMap<String, Object> row_detail : rows_detail) {
-
-						int msg_id = Integer.parseInt(row_detail.get(
-								"message_id").toString());
-						String key = row_detail.get("parent_id").toString();
-						OEListViewRows rowObj = null;
-						String[] ids = getPartnersOfMessage(row_detail.get(
-								"message_id").toString());
-						String partners = "nobody";
-						if (ids != null) {
-							partners = TextUtils.join(", ", ids);
-						}
-						row_detail.put("partners", partners);
-						if (key.equals("false")) {
-
-							// Parent Message
-							if (row_detail.get("author_id").toString()
-									.equals("false")) {
-								row_detail.put("image", "false");
-							}
-							rowObj = new OEListViewRows(msg_id, row_detail);
-							parent_row = row_detail;
-							messages_sorted.add(0, rowObj);
-							String sub = rowObj.getRow_data().get("subject")
-									.toString();
-							if (sub.equals("false")) {
-								sub = rowObj.getRow_data().get("type")
-										.toString();
-							}
-							TextView txvTitle = (TextView) rootView
-									.findViewById(R.id.txvMessageTitle);
-							txvTitle.setText(sub);
-						} else {
-							rowObj = new OEListViewRows(msg_id, row_detail);
-							messages_sorted.add(rowObj);
-						}
-
-					}
-				}
-				setupListView(messages_sorted);
+				int message_id = bundle.getInt("message_id");
+				LoadMessageDetails messageDetails = new LoadMessageDetails(
+						message_id);
+				messageDetails.execute((Void) null);
 			}
 		}
 
+	}
+
+	private boolean setupMessageDetail(int message_id) {
+		messages_sorted = new ArrayList<OEListViewRows>();
+
+		String query = "select t1.id as message_id , t1.*, t2.name, t2.image_small as image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.date desc";
+		List<HashMap<String, Object>> records = db.executeSQL(
+				query,
+				new String[] { String.valueOf(message_id),
+						String.valueOf(message_id) });
+		Log.e("Start to execute", "query : got records = > " + records.size());
+		HashMap<String, Object> row = new HashMap<String, Object>();
+		row.put("total", records.size());
+		row.put("records", records);
+		if ((Integer) row.get("total") > 0) {
+			List<HashMap<String, Object>> rows_detail = (List<HashMap<String, Object>>) row
+					.get("records");
+			for (HashMap<String, Object> row_detail : rows_detail) {
+				int msg_id = Integer.parseInt(row_detail.get("message_id")
+						.toString());
+				String key = row_detail.get("parent_id").toString();
+				OEListViewRows rowObj = null;
+				String[] ids = getPartnersOfMessage(row_detail
+						.get("message_id").toString());
+				String partners = "nobody";
+				if (ids != null) {
+					partners = TextUtils.join(", ", ids);
+				}
+				row_detail.put("partners", partners);
+				if (key.equals("false")) {
+					// Parent Message
+					if (row_detail.get("author_id").toString().equals("false")) {
+						row_detail.put("image", "false");
+					}
+					rowObj = new OEListViewRows(msg_id, row_detail);
+					parent_row = row_detail;
+					messages_sorted.add(0, rowObj);
+					String sub = rowObj.getRow_data().get("subject").toString();
+					if (sub.equals("false")) {
+						sub = rowObj.getRow_data().get("type").toString();
+					}
+					TextView txvTitle = (TextView) rootView
+							.findViewById(R.id.txvMessageTitle);
+					txvTitle.setText(sub);
+					if (row_detail.get("model").toString().equals("mail.group")) {
+						if (UserGroups.menu_color.containsKey("group_"
+								+ row_detail.get("res_id").toString())) {
+							View tagColor = rootView
+									.findViewById(R.id.groupColorLine);
+							tagColor.setBackgroundColor(UserGroups.menu_color
+									.get("group_"
+											+ row_detail.get("res_id")
+													.toString()));
+						}
+					}
+				} else {
+					rowObj = new OEListViewRows(msg_id, row_detail);
+					messages_sorted.add(rowObj);
+				}
+
+			}
+		}
+		return setupListView(messages_sorted);
 	}
 
 	/**
@@ -326,35 +344,28 @@ public class MessageDetail extends BaseFragment {
 	 * @return the partners of message
 	 */
 	public String[] getPartnersOfMessage(String message_id) {
-		String[] str = null;
-		db = new MessageDBHelper(MainActivity.context);
-		HashMap<String, Object> data = db.search(db, new String[] { "id = ?" },
-				new String[] { message_id });
-		if (Integer.parseInt(data.get("total").toString()) > 0) {
-			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
-					.get("records");
-			for (HashMap<String, Object> row : rows) {
-				try {
-					JSONArray arr = new JSONArray(row.get("partner_ids")
-							.toString());
-					str = new String[arr.length()];
-					for (int i = 0; i < arr.length(); i++) {
-						if (arr.getJSONArray(i).length() == 2) {
-
-							if (arr.getJSONArray(i).getString(0)
-									.equals(scope.User().getPartner_id())) {
-								str[i] = "me";
-							} else {
-								str[i] = arr.getJSONArray(i).getString(1);
-							}
-						}
-					}
-				} catch (Exception e) {
-
+		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(
+				MainActivity.context);
+		oea_name = OpenERPAccountManager.currentUser(MainActivity.context)
+				.getAndroidName();
+		List<HashMap<String, Object>> records = partners
+				.executeSQL(
+						"SELECT id,name,oea_name FROM res_partner where id in (select res_partner_id from mail_message_res_partner_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
+						new String[] { message_id, oea_name, oea_name });
+		List<String> names = new ArrayList<String>();
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				if (row.get("name").toString()
+						.equals(scope.User().getPartner_id())) {
+					names.add("me");
+				} else {
+					names.add(row.get("name").toString());
 				}
 			}
+		} else {
+			names.add("nobody");
 		}
-		return str;
+		return names.toArray(new String[names.size()]);
 	}
 
 	/**
@@ -366,34 +377,20 @@ public class MessageDetail extends BaseFragment {
 	 */
 	public List<OEListViewRows> getAttachmentsOfMessage(String message_id) {
 		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
-		db = new MessageDBHelper(MainActivity.context);
-		HashMap<String, Object> data = db.search(db, new String[] { "id = ?" },
-				new String[] { message_id });
-		if (Integer.parseInt(data.get("total").toString()) > 0) {
-			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
-					.get("records");
-			Ir_AttachmentDBHelper attachments = new Ir_AttachmentDBHelper(
-					MainActivity.context);
-
-			for (HashMap<String, Object> row : rows) {
-				try {
-					JSONArray arr = new JSONArray(row.get("attachment_ids")
-							.toString());
-					for (int i = 0; i < arr.length(); i++) {
-						int attachment_id = arr.getJSONArray(i).getInt(0);
-						HashMap<String, Object> rowData = attachments.search(
-								attachments, new String[] { "id = ? " },
-								new String[] { attachment_id + "" });
-						List<HashMap<String, Object>> lists_data = (List<HashMap<String, Object>>) rowData
-								.get("records");
-						OEListViewRows list_row = new OEListViewRows(
-								attachment_id, lists_data.get(0));
-						lists.add(list_row);
-					}
-				} catch (Exception e) {
-				}
+		Ir_AttachmentDBHelper attachments = new Ir_AttachmentDBHelper(
+				MainActivity.context);
+		oea_name = OpenERPAccountManager.currentUser(MainActivity.context)
+				.getAndroidName();
+		List<HashMap<String, Object>> records = attachments
+				.executeSQL(
+						"SELECT * FROM ir_attachment where id in (select ir_attachment_id from mail_message_ir_attachment_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
+						new String[] { message_id, oea_name, oea_name });
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				int attachment_id = Integer.parseInt(row.get("id").toString());
+				OEListViewRows list_row = new OEListViewRows(attachment_id, row);
+				lists.add(list_row);
 			}
-
 		}
 		return lists;
 	}
@@ -601,4 +598,48 @@ public class MessageDetail extends BaseFragment {
 		}
 	}
 
+	public class LoadMessageDetails extends AsyncTask<Void, Void, Boolean> {
+		int message_id = 0;
+
+		public LoadMessageDetails(int message_id) {
+			this.message_id = message_id;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			scope.context().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					rootView.findViewById(R.id.loadingHeader).setVisibility(
+							View.VISIBLE);
+					rootView.findViewById(R.id.messageDetailView)
+							.setVisibility(View.GONE);
+				}
+			});
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... arg0) {
+			return setupMessageDetail(this.message_id);
+		}
+
+		@Override
+		protected void onPostExecute(final Boolean success) {
+			scope.context().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						rootView.findViewById(R.id.loadingHeader)
+								.setVisibility(View.GONE);
+						rootView.findViewById(R.id.messageDetailView)
+								.setVisibility(View.VISIBLE);
+					} catch (Exception e) {
+					}
+				}
+			});
+		}
+
+	}
 }

@@ -930,21 +930,24 @@ public class ORM extends SQLiteDatabaseHelper {
 			String[] fetch_columns, String[] where, String[] whereVals,
 			String group_by, String having, String orderby) {
 		SQLiteDatabase db = getWritableDatabase();
-
 		List<String> cols = new ArrayList<String>();
-		for (Fields col : dbHelper.getColumns()) {
-			if (!(col.getType() instanceof Many2Many)) {
-				cols.add(col.getName());
+
+		String columns[] = null;
+		if (fetch_columns != null) {
+			cols = new ArrayList<String>();
+			cols = Arrays.asList(fetch_columns);
+		} else {
+			for (Fields col : dbHelper.getColumns()) {
+				if (!(col.getType() instanceof Many2Many)) {
+					cols.add(col.getName());
+				}
 			}
 		}
-
-		String columns[] = cols.toArray(new String[cols.size()]);
-
+		columns = cols.toArray(new String[cols.size()]);
 		Cursor cursor = db.query(modelToTable(dbHelper.getModelName()),
 				columns, whereStatement(where, dbHelper), whereVals, group_by,
 				having, orderby);
-
-		List<HashMap<String, Object>> data = getResult(dbHelper, fetch_columns,
+		List<HashMap<String, Object>> data = getResult(dbHelper, columns,
 				cursor);
 		db.close();
 		cursor.close();
@@ -1177,35 +1180,65 @@ public class ORM extends SQLiteDatabaseHelper {
 				if (m2m.size() > 0) {
 					String id = result.getString(result.getColumnIndex("id"));
 					for (String key : m2m.keySet()) {
-						if (user_columns != null && !user_columns.contains(key)) {
-							continue;
+						if (user_columns != null && user_columns.contains(key)) {
+							Many2Many m2mObj = (Many2Many) m2m.get(key);
+							BaseDBHelper newdb = generateM2MHelper(dbHelper,
+									m2mObj);
+							String col1 = newdb.getColumns().get(0).getName();
+							String col2 = newdb.getColumns().get(1).getName();
+							String col3 = newdb.getColumns().get(2).getName();
+							HashMap<String, Object> rel_row = newdb.search(
+									newdb, new String[] { col1 + " = ?", "AND",
+											col3 + " = ?" }, new String[] { id,
+											user_name });
+							int total = Integer.parseInt(rel_row.get("total")
+									.toString());
+							if (total > 0) {
+								JSONArray ids_list = new JSONArray();
+								for (int i = 0; i < total; i++) {
+									JSONArray ids = new JSONArray();
+									HashMap<String, Object> rowdata = ((List<HashMap<String, Object>>) rel_row
+											.get("records")).get(i);
+									BaseDBHelper rel_obj = m2mObj
+											.getM2mObject();
+									HashMap<String, Object> rel_data = rel_obj
+											.search(rel_obj,
+													new String[] { "id = ? " },
+													new String[] { rowdata.get(
+															col2).toString() });
+									ids.put(Integer.parseInt(rowdata.get(col2)
+											.toString()));
+									if (Integer.parseInt(rel_data.get("total")
+											.toString()) > 0) {
+										ids.put(((List<HashMap<String, Object>>) rel_data
+												.get("records")).get(0)
+												.get("name").toString());
+									}
+									ids_list.put(ids);
+								}
+								row.put(key, ids_list);
+							}
 						}
+					}
+				}
 
-						Many2Many m2mObj = (Many2Many) m2m.get(key);
-						BaseDBHelper newdb = generateM2MHelper(dbHelper, m2mObj);
-						String col1 = newdb.getColumns().get(0).getName();
-						String col2 = newdb.getColumns().get(1).getName();
-						String col3 = newdb.getColumns().get(2).getName();
-						HashMap<String, Object> rel_row = newdb.search(newdb,
-								new String[] { col1 + " = ?", "AND",
-										col3 + " = ?" }, new String[] { id,
-										user_name });
-						int total = Integer.parseInt(rel_row.get("total")
-								.toString());
-						if (total > 0) {
+				// Getting many2one [id, name]
+				if (m2o.size() > 0) {
+					for (String key : m2o.keySet()) {
+						if (user_columns != null && user_columns.contains(key)) {
 							JSONArray ids_list = new JSONArray();
-							for (int i = 0; i < total; i++) {
+							String ref_id = result.getString(result
+									.getColumnIndex(key));
+							if (!ref_id.equals("false")) {
+								Many2One m2oObj = (Many2One) m2o.get(key);
 								JSONArray ids = new JSONArray();
-								HashMap<String, Object> rowdata = ((List<HashMap<String, Object>>) rel_row
-										.get("records")).get(i);
-								BaseDBHelper rel_obj = m2mObj.getM2mObject();
-								HashMap<String, Object> rel_data = rel_obj
-										.search(rel_obj,
+								HashMap<String, Object> rel_data = m2oObj
+										.getM2OObject().search(
+												m2oObj.getM2OObject(),
+												new String[] { "id", "name" },
 												new String[] { "id = ? " },
-												new String[] { rowdata
-														.get(col2).toString() });
-								ids.put(Integer.parseInt(rowdata.get(col2)
-										.toString()));
+												new String[] { ref_id });
+								ids.put(ref_id);
 								if (Integer.parseInt(rel_data.get("total")
 										.toString()) > 0) {
 									ids.put(((List<HashMap<String, Object>>) rel_data
@@ -1214,44 +1247,11 @@ public class ORM extends SQLiteDatabaseHelper {
 								}
 								ids_list.put(ids);
 							}
-							row.put(key, ids_list);
-						}
-
-					}
-				}
-
-				// Getting many2one [id, name]
-				if (m2o.size() > 0) {
-					for (String key : m2o.keySet()) {
-						if (user_columns != null && !user_columns.contains(key)) {
-							continue;
-						}
-						JSONArray ids_list = new JSONArray();
-						String ref_id = result.getString(result
-								.getColumnIndex(key));
-						if (!ref_id.equals("false")) {
-							Many2One m2oObj = (Many2One) m2o.get(key);
-							JSONArray ids = new JSONArray();
-							HashMap<String, Object> rel_data = m2oObj
-									.getM2OObject().search(
-											m2oObj.getM2OObject(),
-											new String[] { "id", "name" },
-											new String[] { "id = ? " },
-											new String[] { ref_id });
-							ids.put(ref_id);
-							if (Integer.parseInt(rel_data.get("total")
-									.toString()) > 0) {
-
-								ids.put(((List<HashMap<String, Object>>) rel_data
-										.get("records")).get(0).get("name")
-										.toString());
+							if (ids_list.length() != 0) {
+								row.put(key, ids_list);
+							} else {
+								row.put(key, false);
 							}
-							ids_list.put(ids);
-						}
-						if (ids_list.length() != 0) {
-							row.put(key, ids_list);
-						} else {
-							row.put(key, false);
 						}
 					}
 				}
