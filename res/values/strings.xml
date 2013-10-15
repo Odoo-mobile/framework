@@ -25,7 +25,7 @@
 
     <!-- SyncWizard fragment strings -->
     <string name="syncwizard_title">Enable/Disable your Sync Settings</string>
-    <string name="syncwizard_description">Select your auto sync option so application will get upto-date automatically.</string>
+    <string name="syncwizard_description">Select your auto sync option so application will get up to-date automatically.</string>
     <string name="account_sync_wizard_button">Continue</string>
     <!-- Message Fragment all read messages -->
     <string name="message_inbox_all_read"><b>Good Job!</b> Your inbox is empty.\n \n
@@ -79,5 +79,11 @@ When you process messages in your inbox, you can mark some as todo. From this me
     <string name="about_Company_line4">For more information visit <a href="https://www.openerp.com/">OpenERP.com</a>.</string>
     <string name="app_version_name">Version</string>
     <string name="imgcontentDescription">OpenERP LOGO in upper portion of the screen</string>
+
+    <!-- OpenERP Widget Strings -->
+    <string name="widget_notes_label">notes</string>
+    <string name="widget_notes_notification">00</string>
+    <string name="widget_messages_label">messages</string>
+    <string name="widget_messages_notification">00</string>
 
 </resources>

@@ -47,6 +47,7 @@ import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.util.OENotificationHelper;
+import com.openerp.widget.Mobile_Widget;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -122,10 +123,12 @@ public class MessageSyncService extends Service {
 		try {
 			MessageDBHelper msgDb = new MessageDBHelper(context);
 			Intent intent = new Intent();
+			Intent update_widget = new Intent();
 			HashMap<String, Object> response = null;
 			if (OpenERPServerConnection.isNetworkAvailable(context)) {
 				Log.i(TAG + "::performSync()", "Sync with Server Started");
 				intent.setAction(SyncFinishReceiver.SYNC_FINISH);
+				update_widget.setAction(Mobile_Widget.TAG);
 				int user_id = Integer.parseInt(OpenERPAccountManager
 						.currentUser(context).getUser_id());
 
@@ -244,10 +247,12 @@ public class MessageSyncService extends Service {
 					intent.putExtra("data_update", response.get("update_ids")
 							.toString());
 					context.sendBroadcast(intent);
+					context.sendBroadcast(update_widget);
 				} else {
 					intent.putExtra("data_new", "false");
 					intent.putExtra("data_update", "false");
 					context.sendBroadcast(intent);
+					context.sendBroadcast(update_widget);
 				}
 
 			} else {

@@ -41,6 +41,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.openerp.auth.OpenERPAccountManager;
@@ -73,6 +74,7 @@ public class MainActivity extends FragmentActivity {
 	public static Context context = null;
 	private OEMenuItems[] systemMenus = null;
 	public static boolean set_setting_menu = false;
+	ListView drawablelist = null;
 
 	/*
 	 * (non-Javadoc)
@@ -84,6 +86,7 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		context = this;
+		drawablelist = (ListView) findViewById(R.id.left_drawer);
 		if (findViewById(R.id.fragment_container) != null) {
 			fragmentHandler = new FragmentHandler(MainActivity.this);
 			Boot boot = new Boot(this);
@@ -264,20 +267,39 @@ public class MainActivity extends FragmentActivity {
 		return MainActivity.userContext;
 	}
 
+	/* Find menu's position in left drawable listview */
+	public int findPosition(String moduleName) {
+		for (int i = 0; i < drawablelist.getCount(); i++) {
+			OEMenuItems menu = (OEMenuItems) drawablelist.getItemAtPosition(i);
+			if ((menu.getTitle()).equalsIgnoreCase(moduleName)) {
+				return i + 1;
+			}
+		}
+		return 0;
+	}
+
 	private void loadDefaultModule() {
 		for (Module module : drawer.modules) {
 			if (module.isLoadDefault()) {
-				fragmentHandler.startNewFragmnet((Fragment) module
-						.getModuleInstance());
-				drawer.mDrawerList.setItemChecked(1, true);
-				selectItem(1);
-				// TextView menuTitle = (TextView) drawer.mDrawerList
-				// .getChildAt(1).findViewById(R.id.txvMenuTitle);
-				// setTitle(menuTitle.getText());
-				break;
+				// application open by App WIDGET
+				if (getIntent().getAction() != null
+						&& !getIntent().getAction().toString()
+								.equalsIgnoreCase("android.intent.action.MAIN")) {
+					selectItem(findPosition(getIntent().getAction().toString()));
+					break;
+				} else {
+					// application open by App ICON
+					fragmentHandler.startNewFragmnet((Fragment) module
+							.getModuleInstance());
+					drawer.mDrawerList.setItemChecked(1, true);
+					selectItem(1);
+					// TextView menuTitle = (TextView) drawer.mDrawerList
+					// .getChildAt(1).findViewById(R.id.txvMenuTitle);
+					// setTitle(menuTitle.getText());
+					break;
+				}
 			}
 		}
-
 	}
 
 	@Override

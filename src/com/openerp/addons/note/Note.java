@@ -198,7 +198,7 @@ public class Note extends BaseFragment implements
 	}
 
 	/* Method for counting Notes according stages */
-	private int getCount(String stage_id, Context context) {
+	public int getCount(String stage_id, Context context) {
 
 		int count = 0;
 		db = new NoteDBHelper(context);

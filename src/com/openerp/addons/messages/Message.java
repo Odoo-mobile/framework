@@ -96,7 +96,7 @@ public class Message extends BaseFragment implements
 	HashMap<String, Integer> message_model_colors = new HashMap<String, Integer>();
 	int tag_color_count = 0;
 
-	private enum TYPE {
+	public enum TYPE {
 		INBOX, TODO, TOME, ARCHIVE, GROUP
 	}
 
@@ -700,7 +700,7 @@ public class Message extends BaseFragment implements
 		return menu;
 	}
 
-	private int getCount(TYPE type, Context context) {
+	public int getCount(TYPE type, Context context) {
 		db = new MessageDBHelper(context);
 		int count = 0;
 		String[] where = null;

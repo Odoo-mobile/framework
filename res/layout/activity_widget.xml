@@ -1,0 +1,79 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:background="@drawable/widget_bg"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:id="@+id/notes_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp" >
+
+            <TextView
+                android:id="@+id/widget_notes_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:paddingTop="8dp"
+                android:text="@string/widget_notes_label"
+                android:textColor="#f3f3f3"
+                android:textSize="15sp"
+                android:typeface="serif" />
+
+            <TextView
+                android:id="@+id/widget_notes_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="-10dp"
+                android:text="@string/widget_notes_notification"
+                android:textColor="#f3f3f3"
+                android:textSize="40sp"
+                android:typeface="sans" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/update1"
+            android:layout_width="2dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:background="#f3f3f3" />
+
+        <LinearLayout
+            android:id="@+id/messages_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp" >
+
+            <TextView
+                android:id="@+id/widget_messages_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:paddingTop="8dp"
+                android:text="@string/widget_messages_label"
+                android:textColor="#f3f3f3"
+                android:textSize="15sp"
+                android:typeface="serif" />
+
+            <TextView
+                android:id="@+id/widget_messages_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="-10dp"
+                android:text="@string/widget_messages_notification"
+                android:textColor="#f3f3f3"
+                android:textSize="40sp"
+                android:typeface="sans" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
