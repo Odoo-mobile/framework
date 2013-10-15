@@ -192,6 +192,17 @@
             android:name="com.openerp.addons.messages.MessageRecipientActivity"
             android:label="@string/app_name" >
         </activity>
+
+        <!-- Widget Broad Cast Reciever -->
+        <receiver android:name="com.openerp.widget.Mobile_Widget" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_provider" />
+        </receiver>
     </application>
 
 </manifest>
