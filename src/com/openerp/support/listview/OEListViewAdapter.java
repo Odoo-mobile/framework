@@ -320,7 +320,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 		}
 		if (viewListener != null) {
 			viewRow = viewListener.listViewOnCreateListener(position, viewRow,
-					row);
+					this.rows.get(position));
 		}
 
 		return viewRow;
@@ -569,6 +569,14 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	public void refresh(List<OEListViewRows> items) {
 		this.rows = items;
 		this.unfiltered_rows = items;
+		notifyDataSetChanged();
+	}
+
+	public void updateRow(int position, OEListViewRows row) {
+		rows.remove(position);
+		rows.add(position, row);
+		unfiltered_rows.remove(position);
+		unfiltered_rows.add(position, row);
 		notifyDataSetChanged();
 	}
 
