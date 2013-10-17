@@ -76,6 +76,7 @@
                         android:id="@+id/imgBtnStar"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:background="@drawable/oe_background_selector"
                         android:padding="5dp"
                         android:src="@drawable/ic_action_rating_not_important" />
 
@@ -83,6 +84,7 @@
                         android:id="@+id/imgBtnReply"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:background="@drawable/oe_background_selector"
                         android:padding="5dp"
                         android:src="@drawable/ic_action_social_reply" />
                 </LinearLayout>
@@ -92,21 +94,22 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#eeeeee"
             android:orientation="horizontal"
-            android:paddingBottom="1dp" >
+            android:weightSum="2" >
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="2"
                 android:background="#ffffff"
-                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:orientation="vertical"
                 android:padding="6dp"
                 android:weightSum="4" >
 
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_weight="3"
                     android:background="#ffffff"
                     android:orientation="horizontal" >
@@ -124,15 +127,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:singleLine="true"
-                        android:text=""
+                        android:text="Admin"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="#414141" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/txvTime"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="right|center_horizontal"
                     android:singleLine="true"
@@ -141,7 +144,39 @@
                     android:textColor="#414141"
                     android:typeface="sans" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutMessageVote"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:paddingRight="5dp" >
+
+                <TextView
+                    android:id="@+id/txvmessageVotenb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/oe_vote_button"
+                    android:clickable="true"
+                    android:drawableLeft="@drawable/ic_action_rating_filled_small"
+                    android:gravity="center"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp"
+                    android:text="5"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#414141"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#eeeeee" />
 
         <LinearLayout
             android:id="@+id/layoutMessageBody"

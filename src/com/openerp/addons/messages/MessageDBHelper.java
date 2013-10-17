@@ -33,7 +33,8 @@ public class MessageDBHelper extends BaseDBHelper {
 		columns.add(new Fields("model", "Model", Types.varchar(50)));
 		columns.add(new Fields("res_id", "Resouce Reference", Types.text()));
 		columns.add(new Fields("date", "Date", Types.varchar(20)));
-
+		columns.add(new Fields("has_voted", "Has Voted", Types.varchar(5)));
+		columns.add(new Fields("vote_nb", "vote numbers", Types.integer()));
 		columns.add(new Fields("starred", "Starred", Types.varchar(5)));
 		columns.add(new Fields("attachment_ids", "Attachments", Types
 				.many2Many(new Ir_AttachmentDBHelper(context))));

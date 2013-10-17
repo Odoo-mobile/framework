@@ -92,7 +92,7 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 			JSONObject serverData = oe.call_kw(db.getModelName(),
 					"message_read", args);
 			if (serverData.has("result")) {
-				for (int i = 0; i < serverData.getJSONArray("result").length(); i++) {
+				for (int i = serverData.getJSONArray("result").length() - 1; i >= 0; i--) {
 					JSONObject row = serverData.getJSONArray("result")
 							.getJSONObject(i);
 

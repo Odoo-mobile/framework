@@ -20,7 +20,6 @@
 package com.openerp.addons.messages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +33,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.format.Time;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -124,13 +122,14 @@ public class MessageDetail extends BaseFragment {
 	 * @param list
 	 *            the new up list view
 	 */
-	private boolean setupListView(List<OEListViewRows> list) {
+	private boolean setupListView(final List<OEListViewRows> list) {
 		// Handling List View controls and keys
 		String[] from = new String[] { "image", "email_from|name",
-				"email_from|email", "body", "date", "partners", "starred" };
+				"email_from|email", "body", "date", "partners", "starred",
+				"vote_nb" };
 		int[] to = new int[] { R.id.imgUserPicture, R.id.txvMessageAuthor,
 				R.id.txvAuthorEmail, R.id.txvBody, R.id.txvTime, R.id.txvTo,
-				R.id.imgBtnStar };
+				R.id.imgBtnStar, R.id.txvmessageVotenb };
 
 		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
@@ -143,8 +142,42 @@ public class MessageDetail extends BaseFragment {
 		listAdapter.addViewListener(new OEListViewOnCreateListener() {
 
 			@Override
-			public View listViewOnCreateListener(int position, View row_view,
-					OEListViewRows row_data) {
+			public View listViewOnCreateListener(final int position,
+					View row_view, OEListViewRows row_data) {
+				final int message_id = row_data.getRow_id();
+				final HashMap<String, Object> row_values = row_data
+						.getRow_data();
+				/* handling vote control */
+				final TextView txvVote = (TextView) row_view
+						.findViewById(R.id.txvmessageVotenb);
+				final int vote_nb = Integer.parseInt(row_data.getRow_data()
+						.get("vote_nb").toString());
+				if (vote_nb == 0) {
+					txvVote.setText("");
+				}
+				final boolean hasVoted = Boolean.parseBoolean(row_data
+						.getRow_data().get("has_voted").toString());
+				txvVote.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View arg0) {
+						MessageVoteToggle voteToggle = new MessageVoteToggle(
+								message_id, vote_nb, hasVoted);
+						String newVote = "";
+						if (hasVoted) {
+							newVote = (vote_nb - 1) + "";
+							row_values.put("has_voted", false);
+						} else {
+							newVote = (vote_nb + 1) + "";
+							row_values.put("has_voted", true);
+						}
+						row_values.put("vote_nb", newVote);
+						listAdapter.updateRow(position, new OEListViewRows(
+								message_id, row_values));
+						voteToggle.execute((Void) null);
+						txvVote.setText(newVote);
+					}
+				});
+
 				TextView txvBody = (TextView) row_view
 						.findViewById(R.id.txvBody);
 				txvBody.setMovementMethod(LinkMovementMethod.getInstance());
@@ -638,6 +671,51 @@ public class MessageDetail extends BaseFragment {
 					}
 				}
 			});
+		}
+
+	}
+
+	private class MessageVoteToggle extends AsyncTask<Void, Void, Boolean> {
+		int message_id = 0;
+		int vote_nb = 0;
+		boolean has_voted = false;
+
+		public MessageVoteToggle(int message_id, int current_vote_nb,
+				boolean has_voted) {
+			this.message_id = message_id;
+			this.vote_nb = current_vote_nb;
+			this.has_voted = has_voted;
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			db = new MessageDBHelper(scope.context());
+			OEHelper oe = db.getOEInstance();
+			try {
+				JSONArray args = new JSONArray();
+				args.put(message_id);
+				JSONObject res = oe.call_kw(db.getModelName(), "vote_toggle",
+						new JSONArray("[" + args.toString() + "]"));
+				ContentValues values = new ContentValues();
+				boolean vote = false;
+				if (!this.has_voted) {
+					vote = true;
+					vote_nb = vote_nb + 1;
+				} else {
+					vote_nb = vote_nb - 1;
+				}
+
+				values.put("has_voted", vote);
+				values.put("vote_nb", vote_nb);
+				return db.write(db, values, message_id, true);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
 		}
 
 	}
