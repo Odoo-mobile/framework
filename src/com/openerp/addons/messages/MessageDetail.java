@@ -157,16 +157,26 @@ public class MessageDetail extends BaseFragment {
 				}
 				final boolean hasVoted = Boolean.parseBoolean(row_data
 						.getRow_data().get("has_voted").toString());
+				if (!hasVoted) {
+					txvVote.setCompoundDrawablesWithIntrinsicBounds(
+							scope.context()
+									.getResources()
+									.getDrawable(
+											R.drawable.ic_action_vote_empty_small),
+							null, null, null);
+				}
 				txvVote.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View arg0) {
 						MessageVoteToggle voteToggle = new MessageVoteToggle(
 								message_id, vote_nb, hasVoted);
 						String newVote = "";
+						boolean btnvoted = false;
 						if (hasVoted) {
 							newVote = (vote_nb - 1) + "";
 							row_values.put("has_voted", false);
 						} else {
+							btnvoted = true;
 							newVote = (vote_nb + 1) + "";
 							row_values.put("has_voted", true);
 						}
@@ -175,6 +185,21 @@ public class MessageDetail extends BaseFragment {
 								message_id, row_values));
 						voteToggle.execute((Void) null);
 						txvVote.setText(newVote);
+						if (!btnvoted) {
+							txvVote.setCompoundDrawablesWithIntrinsicBounds(
+									scope.context()
+											.getResources()
+											.getDrawable(
+													R.drawable.ic_action_vote_empty_small),
+									null, null, null);
+						} else {
+							txvVote.setCompoundDrawablesWithIntrinsicBounds(
+									scope.context()
+											.getResources()
+											.getDrawable(
+													R.drawable.ic_action_rating_filled_small),
+									null, null, null);
+						}
 					}
 				});
 
