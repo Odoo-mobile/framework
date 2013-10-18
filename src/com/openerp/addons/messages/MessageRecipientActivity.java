@@ -75,14 +75,14 @@ public class MessageRecipientActivity extends Activity {
 	}
 
 	private void localPartners() {
-		String[] from = new String[] { "image", "name", "email" };
+		String[] from = new String[] { "image_small", "name", "email" };
 		int[] to = new int[] { R.id.imgUserPicture, R.id.txvPartner,
 				R.id.txvPartnerEmail };
 		listRows = new ArrayList<OEListViewRows>();
 		listRows = getListRows();
 		listAdapters = new OEListViewAdapter(MainActivity.context,
 				R.layout.res_partners, listRows, from, to, res_partners);
-		listAdapters.addImageColumn("image");
+		listAdapters.addImageColumn("image_small");
 		partner_list.setAdapter(listAdapters);
 
 		checkForSelectedPartners(getIntent());

@@ -192,7 +192,10 @@
             android:name="com.openerp.addons.messages.MessageRecipientActivity"
             android:label="@string/app_name" >
         </activity>
-
+        <activity
+            android:name="com.openerp.addons.note.ComposeNoteActivity"
+            android:label="@string/app_name" >
+        </activity>
         <!-- Widget Broad Cast Reciever -->
         <receiver android:name="com.openerp.widget.Mobile_Widget" >
             <intent-filter>
