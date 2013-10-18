@@ -394,7 +394,8 @@ public class Res_PartnerSyncHelper {
 								String city = row_data.get("city").toString();
 								String zip = row_data.get("zip").toString();
 								String company = "OpenERP";
-								String image = row_data.get("image").toString();
+								String image = row_data.get("image_small")
+										.toString();
 
 								addContact(context, account, partnerID, name,
 										userName, mail, number, mobile,

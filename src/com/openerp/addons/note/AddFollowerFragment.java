@@ -41,8 +41,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 import android.widget.SearchView.OnCloseListener;
+import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
@@ -179,7 +179,7 @@ public class AddFollowerFragment extends BaseFragment {
 	}
 
 	public void getPartnersFromLocal() {
-		String[] from = new String[] { "image", "name", "email" };
+		String[] from = new String[] { "image_small", "name", "email" };
 		int[] to = new int[] { R.id.imgUserPicture, R.id.txvPartner,
 				R.id.txvPartnerEmail };
 		listRows = new ArrayList<OEListViewRows>();
@@ -188,7 +188,7 @@ public class AddFollowerFragment extends BaseFragment {
 		}
 		listAdapters = new OEListViewAdapter(scope.context(),
 				R.layout.res_partners, listRows, from, to, db);
-		listAdapters.addImageColumn("image");
+		listAdapters.addImageColumn("image_small");
 		partner_list.setAdapter(listAdapters);
 		flag = false;
 	}

@@ -25,14 +25,13 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -80,6 +79,8 @@ public class Note extends BaseFragment implements
 	HashMap<String, String> stages = null;
 	static boolean rawStrikeStatus = false;
 	String stage_id = "-1";
+	private static final int NOTE_ID = 0;
+	SwipeDismissListViewTouchListener touchListener = null;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -118,14 +119,35 @@ public class Note extends BaseFragment implements
 		// Handling menu item selection
 		switch (item.getItemId()) {
 		case R.id.menu_note_compose:
-			// Creating an instance for composing Note
-			Fragment fragment = new ComposeNoteFragment();
-			scope.context().fragmentHandler.setBackStack(true, null);
-			scope.context().fragmentHandler.replaceFragmnet(fragment);
+			// Opening activity for composing Note
+			Intent composeNote = new Intent(scope.context(),
+					ComposeNoteActivity.class);
+			startActivityForResult(composeNote, NOTE_ID);
 			return true;
-
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+
+		case NOTE_ID:
+			if (resultCode == Activity.RESULT_OK) {
+				int new_id = data.getExtras().getInt("result");
+				@SuppressWarnings("unchecked")
+				HashMap<String, Object> newRow = ((List<HashMap<String, Object>>) db
+						.search(db, new String[] { "id = ?" },
+								new String[] { new_id + "" }).get("records"))
+						.get(0);
+				OEListViewRows listRow = new OEListViewRows(new_id, newRow);
+				listRows.add(listRow);
+				listAdapter.refresh(listRows);
+				lstNotes.setOnTouchListener(touchListener);
+				lstNotes.setOnScrollListener(touchListener.makeScrollListener());
+			}
+			break;
 		}
 	}
 
@@ -363,8 +385,7 @@ public class Note extends BaseFragment implements
 		mPullAttacher.setRefreshableView(lstNotes, this);
 
 		// Setting touch listner for swapping the list rows.
-		SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(
-				lstNotes,
+		touchListener = new SwipeDismissListViewTouchListener(lstNotes,
 				new SwipeDismissListViewTouchListener.DismissCallbacks() {
 					@Override
 					public boolean canDismiss(int position) {
@@ -545,4 +566,5 @@ public class Note extends BaseFragment implements
 			}
 		}
 	}
+
 }

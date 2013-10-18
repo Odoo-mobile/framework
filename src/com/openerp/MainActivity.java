@@ -293,9 +293,6 @@ public class MainActivity extends FragmentActivity {
 							.getModuleInstance());
 					drawer.mDrawerList.setItemChecked(1, true);
 					selectItem(1);
-					// TextView menuTitle = (TextView) drawer.mDrawerList
-					// .getChildAt(1).findViewById(R.id.txvMenuTitle);
-					// setTitle(menuTitle.getText());
 					break;
 				}
 			}
@@ -600,4 +597,12 @@ public class MainActivity extends FragmentActivity {
 		}
 		setTitle(userContext.getUsername(), userContext.getHost());
 	}
+
+	/* Method for updating widget */
+	// public void sendNotificationToWidget(Context context, String counter) {
+	// Intent uiIntent = new Intent(Mobile_Widget.CONSTANT);
+	// uiIntent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+	// uiIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, counter);
+	// context.sendBroadcast(uiIntent);
+	// }
 }

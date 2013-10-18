@@ -29,27 +29,43 @@ import android.widget.RemoteViews;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.addons.messages.Message;
+import com.openerp.addons.messages.MessageComposeActivty;
+import com.openerp.addons.note.ComposeNoteActivity;
 import com.openerp.addons.note.Note;
 
 public class Mobile_Widget extends AppWidgetProvider {
 	public static final String TAG = "android.appwidget.action.APPWIDGET_UPDATE";
+	public static final String CONSTANT = "ACTION.WIDGET.UPDATE.FROM.ACTIVITY";
+
 	int total_Notes = 0;
 	int total_unreadMessges = 0;
 	ComponentName openerpWidget = null;
 	int[] allWidgetIds = null;
 	AppWidgetManager appWidgetManager = null;
+	RemoteViews remoteViews = null;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		appWidgetManager = AppWidgetManager.getInstance(context
-				.getApplicationContext());
-		openerpWidget = new ComponentName(context.getApplicationContext(),
-				Mobile_Widget.class);
-		allWidgetIds = appWidgetManager.getAppWidgetIds(openerpWidget);
+		// if (intent.getAction().equals(
+		// "android.appwidget.action.APPWIDGET_UPDATE")) {
+		// String widgetCounter = intent.getExtras().getString("counter");
+		// remoteViews.setTextViewText(
+		// R.id.widget_notification_counter_messages, widgetCounter);
+		// }
 
-		if (allWidgetIds != null && allWidgetIds.length > 0) {
-			onUpdate(context, appWidgetManager, allWidgetIds);
+		try {
+			appWidgetManager = AppWidgetManager.getInstance(context
+					.getApplicationContext());
+			openerpWidget = new ComponentName(context.getApplicationContext(),
+					Mobile_Widget.class);
+			allWidgetIds = appWidgetManager.getAppWidgetIds(openerpWidget);
+
+			if (allWidgetIds != null && allWidgetIds.length > 0) {
+				onUpdate(context, appWidgetManager, allWidgetIds);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -59,32 +75,41 @@ public class Mobile_Widget extends AppWidgetProvider {
 
 		for (int widgetId : allWidgetIds) {
 
-			// Fetching Notes From Account
-			Note note = new Note();
-			total_Notes = note.getCount("-1", context);
-			if (String.valueOf(total_Notes) == null
-					&& String.valueOf(total_Notes).equalsIgnoreCase("false")) {
-				total_Notes = 0;
+			try {
+
+				// Fetching Notes From Account
+				Note note = new Note();
+				total_Notes = note.getCount("-1", context);
+				if (String.valueOf(total_Notes) == null
+						&& String.valueOf(total_Notes)
+								.equalsIgnoreCase("false")) {
+					total_Notes = 0;
+				}
+
+				// Fetching UNREAD Messages From Account
+				Message message = new Message();
+				total_unreadMessges = message.getCount(Message.TYPE.INBOX,
+						context);
+				if (String.valueOf(total_unreadMessges) == null
+						&& String.valueOf(total_unreadMessges)
+								.equalsIgnoreCase("false")) {
+					total_unreadMessges = 0;
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
-			// Fetching UNREAD Messages From Account
-			Message message = new Message();
-			total_unreadMessges = message.getCount(Message.TYPE.INBOX, context);
-			if (String.valueOf(total_unreadMessges) == null
-					&& String.valueOf(total_unreadMessges).equalsIgnoreCase(
-							"false")) {
-				total_unreadMessges = 0;
-			}
-
-			RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+			remoteViews = new RemoteViews(context.getPackageName(),
 					R.layout.activity_widget);
 
-			// Updating Counter of NOTES
-			remoteViews.setTextViewText(R.id.widget_notes_notification,
+			// Updating NOTES Counter
+			remoteViews.setTextViewText(R.id.widget_notification_counter_notes,
 					String.valueOf(total_Notes));
 
-			// Updating Counter of MESSAGE
-			remoteViews.setTextViewText(R.id.widget_messages_notification,
+			// Updating MESSAGE Counter
+			remoteViews.setTextViewText(
+					R.id.widget_notification_counter_messages,
 					String.valueOf(total_unreadMessges));
 
 			// Openening OpenERP Mobile NOTE[All] Module
@@ -92,7 +117,7 @@ public class Mobile_Widget extends AppWidgetProvider {
 			configIntent.setAction("NOTES");
 			PendingIntent configPendingIntent = PendingIntent.getActivity(
 					context, 0, configIntent, 0);
-			remoteViews.setOnClickPendingIntent(R.id.notes_layout,
+			remoteViews.setOnClickPendingIntent(R.id.widget_label_notes_layout,
 					configPendingIntent);
 
 			// Openening OpenERP Mobile MESSAGE[Inbox] Module
@@ -100,8 +125,25 @@ public class Mobile_Widget extends AppWidgetProvider {
 			messageIntent.setAction("MESSAGE");
 			PendingIntent messagePendingIntent = PendingIntent.getActivity(
 					context, 0, messageIntent, 0);
-			remoteViews.setOnClickPendingIntent(R.id.messages_layout,
-					messagePendingIntent);
+			remoteViews.setOnClickPendingIntent(
+					R.id.widget_label_messages_layout, messagePendingIntent);
+
+			// Openening Screen to COMPOSE MESSAGE
+			Intent composeMessage = new Intent(context,
+					MessageComposeActivty.class);
+			PendingIntent composeMessagePendingIntent = PendingIntent
+					.getActivity(context, 0, composeMessage, 0);
+			remoteViews.setOnClickPendingIntent(
+					R.id.widget_notification_compose_messages,
+					composeMessagePendingIntent);
+
+			// Openening Screen to COMPOSE NOTE
+			Intent composeNote = new Intent(context, ComposeNoteActivity.class);
+			PendingIntent composeNotePendingIntent = PendingIntent.getActivity(
+					context, 0, composeNote, 0);
+			remoteViews.setOnClickPendingIntent(
+					R.id.widget_notification_compose__notes,
+					composeNotePendingIntent);
 
 			// Updating the widget
 			appWidgetManager.updateAppWidget(widgetId, remoteViews);
