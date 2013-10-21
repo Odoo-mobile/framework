@@ -278,7 +278,6 @@ public class MessageDetail extends BaseFragment {
 					@Override
 					public OEListViewRows controlClicked(int position,
 							OEListViewRows row, View view) {
-						// TODO Auto-generated method stub
 						Intent composeIntent = new Intent(scope.context(),
 								MessageComposeActivty.class);
 						composeIntent.putExtra("message_id", message_id);
@@ -322,7 +321,7 @@ public class MessageDetail extends BaseFragment {
 	public void handleArguments(Bundle bundle) {
 		if (bundle != null) {
 			if (bundle.containsKey("message_id")) {
-				int message_id = bundle.getInt("message_id");
+				message_id = bundle.getInt("message_id");
 				LoadMessageDetails messageDetails = new LoadMessageDetails(
 						message_id);
 				messageDetails.execute((Void) null);

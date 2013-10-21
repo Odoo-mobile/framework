@@ -32,6 +32,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -194,7 +195,6 @@ public class Message extends BaseFragment implements
 				new int[] { R.drawable.message_listview_bg_toread_selector,
 						R.drawable.message_listview_bg_tonotread_selector },
 				"to_read");
-
 		// Telling adapter to clean HTML text for key value
 		listAdapter.cleanHtmlToTextOn("body");
 		listAdapter.cleanDate("date", scope.User().getTimezone());
@@ -244,6 +244,24 @@ public class Message extends BaseFragment implements
 				}
 				msgTag.setBackgroundColor(tag_color);
 				msgTag.setText(model_name);
+				TextView txvSubject = (TextView) row_view
+						.findViewById(R.id.txvMessageSubject);
+				TextView txvAuthor = (TextView) row_view
+						.findViewById(R.id.txvMessageFrom);
+				if (row_data.getRow_data().get("to_read").toString()
+						.equals("false")) {
+					txvSubject.setTypeface(null, Typeface.NORMAL);
+					txvSubject.setTextColor(Color.BLACK);
+
+					txvAuthor.setTypeface(null, Typeface.NORMAL);
+					txvAuthor.setTextColor(Color.BLACK);
+				} else {
+					txvSubject.setTypeface(null, Typeface.BOLD);
+					txvSubject.setTextColor(Color.parseColor("#414141"));
+					txvAuthor.setTypeface(null, Typeface.BOLD);
+					txvAuthor.setTextColor(Color.parseColor("#414141"));
+				}
+
 				return row_view;
 			}
 		});
@@ -417,6 +435,7 @@ public class Message extends BaseFragment implements
 				MessageDetail messageDetail = new MessageDetail();
 				Bundle bundle = new Bundle();
 				bundle.putInt("message_id", list.get(index).getRow_id());
+				bundle.putInt("position", index);
 				messageDetail.setArguments(bundle);
 				scope.context().fragmentHandler.setBackStack(true, null);
 				scope.context().fragmentHandler.replaceFragmnet(messageDetail);

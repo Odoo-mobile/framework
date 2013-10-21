@@ -99,20 +99,21 @@ public class MessageComposeActivty extends Activity {
 
 		Intent replyIntent = getIntent();
 		if (replyIntent.hasExtra("send_reply")) {
+			findViewById(R.id.imgBtnAddRecipients).setEnabled(false);
 			is_reply = true;
 			message_id = replyIntent.getExtras().getInt("message_id");
 			MessageDBHelper msgDb = new MessageDBHelper(this);
-			parent_row = ((List<HashMap<String, Object>>) msgDb
-					.search(msgDb, new String[] { "id = ?" },
-							new String[] { message_id + "" }).get("records"))
-					.get(0);
+			parent_row = ((List<HashMap<String, Object>>) msgDb.search(msgDb,
+
+			new String[] { "id = ?" }, new String[] { message_id + "" }).get(
+					"records")).get(0);
 			getActionBar().setTitle("Reply");
 			EditText edtSubject = (EditText) findViewById(R.id.edtMessageSubject);
 			edtSubject.setText("Re: " + parent_row.get("subject").toString());
 			JSONArray partner_ids = new JSONArray();
 			try {
-				JSONArray partners = new JSONArray(parent_row
-						.get("partner_ids").toString());
+
+				JSONArray partners = getPartnersOfMessage(message_id + "");
 				for (int i = 0; i < partners.length(); i++) {
 					JSONArray partner = partners.getJSONArray(i);
 					partner_ids.put(partner.get(0));
@@ -138,6 +139,7 @@ public class MessageComposeActivty extends Activity {
 				}
 				parent_row.put("partners", partner_ids);
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 		} else {
@@ -197,6 +199,27 @@ public class MessageComposeActivty extends Activity {
 				});
 
 		handleIntentFilter(getIntent());
+	}
+
+	public JSONArray getPartnersOfMessage(String message_id) {
+		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(
+				MainActivity.context);
+		String oea_name = OpenERPAccountManager.currentUser(
+				MainActivity.context).getAndroidName();
+		List<HashMap<String, Object>> records = partners
+				.executeSQL(
+						"SELECT id,name,oea_name FROM res_partner where id in (select res_partner_id from mail_message_res_partner_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
+						new String[] { message_id, oea_name, oea_name });
+		JSONArray names = new JSONArray();
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				JSONArray rec = new JSONArray();
+				rec.put(row.get("id"));
+				rec.put(row.get("name"));
+				names.put(rec);
+			}
+		}
+		return names;
 	}
 
 	@Override
