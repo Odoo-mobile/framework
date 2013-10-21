@@ -3,6 +3,7 @@
     android:initialLayout="@layout/activity_widget"
     android:minHeight="72dip"
     android:minWidth="294dip"
+    android:previewImage="@drawable/openerp_widget_preview"
     android:updatePeriodMillis="1800000" >
 
 </appwidget-provider>

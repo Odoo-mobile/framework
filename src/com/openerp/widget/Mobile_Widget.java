@@ -47,13 +47,6 @@ public class Mobile_Widget extends AppWidgetProvider {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		// if (intent.getAction().equals(
-		// "android.appwidget.action.APPWIDGET_UPDATE")) {
-		// String widgetCounter = intent.getExtras().getString("counter");
-		// remoteViews.setTextViewText(
-		// R.id.widget_notification_counter_messages, widgetCounter);
-		// }
-
 		try {
 			appWidgetManager = AppWidgetManager.getInstance(context
 					.getApplicationContext());
@@ -129,8 +122,8 @@ public class Mobile_Widget extends AppWidgetProvider {
 					R.id.widget_label_messages_layout, messagePendingIntent);
 
 			// Openening Screen to COMPOSE MESSAGE
-			Intent composeMessage = new Intent(context,
-					MessageComposeActivty.class);
+			Intent composeMessage = new Intent(context, MainActivity.class);
+			composeMessage.setAction("composeMessage");
 			PendingIntent composeMessagePendingIntent = PendingIntent
 					.getActivity(context, 0, composeMessage, 0);
 			remoteViews.setOnClickPendingIntent(
@@ -138,7 +131,8 @@ public class Mobile_Widget extends AppWidgetProvider {
 					composeMessagePendingIntent);
 
 			// Openening Screen to COMPOSE NOTE
-			Intent composeNote = new Intent(context, ComposeNoteActivity.class);
+			Intent composeNote = new Intent(context, MainActivity.class);
+			composeNote.setAction("composeNote");
 			PendingIntent composeNotePendingIntent = PendingIntent.getActivity(
 					context, 0, composeNote, 0);
 			remoteViews.setOnClickPendingIntent(

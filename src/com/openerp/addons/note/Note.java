@@ -65,7 +65,6 @@ public class Note extends BaseFragment implements
 
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
-	NoteDBHelper db;
 	View rootView = null;
 	TextView noteSyncProcessText, emptyNotesText;
 	ListView lstNotes = null;
@@ -81,6 +80,8 @@ public class Note extends BaseFragment implements
 	String stage_id = "-1";
 	private static final int NOTE_ID = 0;
 	SwipeDismissListViewTouchListener touchListener = null;
+	NoteDBHelper db = null;
+	JSONObject res = null;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -453,8 +454,7 @@ public class Note extends BaseFragment implements
 
 			// Update--> Open[true]-->To-->Close[false]
 			if (open.equalsIgnoreCase("true")) {
-				JSONObject res = oe.call_kw("note.note",
-						"onclick_note_is_done", args);
+				res = oe.call_kw("note.note", "onclick_note_is_done", args);
 				values.put("open", "false");
 				db = new NoteDBHelper(context);
 				db.write(db, values, note_id);
@@ -463,8 +463,7 @@ public class Note extends BaseFragment implements
 			}
 			// Update--> Close[false]-->To-->Open[true]
 			else {
-				JSONObject res = oe.call_kw("note.note",
-						"onclick_note_not_done", args);
+				res = oe.call_kw("note.note", "onclick_note_not_done", args);
 				values.put("open", "true");
 				db.write(db, values, note_id);
 				Toast.makeText(context, "Move to All", Toast.LENGTH_SHORT)

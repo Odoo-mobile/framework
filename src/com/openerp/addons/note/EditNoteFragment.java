@@ -40,7 +40,6 @@ import android.widget.Spinner;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
-import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
@@ -50,7 +49,7 @@ public class EditNoteFragment extends BaseFragment {
 	View rootview;
 	Spinner noteStages;
 	ArrayAdapter<String> stageAdapter = null;
-	HashMap<String, String> stages = null;
+	HashMap<String, String> stages = new HashMap<String, String>();;
 	EditText noteName, noteMemo;
 	int row_id = 0;
 	ArrayList<String> stagelist = null;
@@ -59,6 +58,7 @@ public class EditNoteFragment extends BaseFragment {
 	String memo = null;
 	String name = null;
 	NoteDBHelper db = null;
+	ComposeNoteActivity composeNote = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -179,25 +179,16 @@ public class EditNoteFragment extends BaseFragment {
 		return null;
 	}
 
-	public String generateName(String longName) {
-
-		String[] splitName = (longName).split("\\n");
-		if (splitName.length == 1) {
-			name = longName;
-		} else {
-			name = splitName[0];
-		}
-		return name;
-	}
-
 	public void updateNote(int row_id) {
 		try {
-
+			// For using generateName() of composeNote
+			composeNote = new ComposeNoteActivity();
 			long stage_id = Long.parseLong(stages.get(noteStages
 					.getSelectedItem().toString()));
 			ContentValues values = new ContentValues();
 			values.put("stage_id", stage_id);
-			values.put("name", generateName(noteMemo.getText().toString()));
+			values.put("name",
+					composeNote.generateName(noteMemo.getText().toString()));
 			values.put("memo", Html.toHtml(noteMemo.getText()));
 
 			db = new NoteDBHelper(scope.context());

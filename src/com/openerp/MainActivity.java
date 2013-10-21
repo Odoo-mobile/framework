@@ -44,6 +44,8 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.openerp.addons.messages.MessageComposeActivty;
+import com.openerp.addons.note.ComposeNoteActivity;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
@@ -285,6 +287,16 @@ public class MainActivity extends FragmentActivity {
 				if (getIntent().getAction() != null
 						&& !getIntent().getAction().toString()
 								.equalsIgnoreCase("android.intent.action.MAIN")) {
+					if (getIntent().getAction().toString()
+							.equalsIgnoreCase("composeMessage")) {
+						startActivity(new Intent(context,
+								MessageComposeActivty.class));
+					}
+					if (getIntent().getAction().toString()
+							.equalsIgnoreCase("composeNote")) {
+						startActivity(new Intent(context,
+								ComposeNoteActivity.class));
+					}
 					selectItem(findPosition(getIntent().getAction().toString()));
 					break;
 				} else {
