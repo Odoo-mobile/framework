@@ -78,31 +78,42 @@ public class ContactSyncService extends Service {
 			SyncResult syncResult) {
 		// TODO Auto-generated method stub
 		try {
-			// sync_helper.sendBrodcast(context, authority, "Contacts",
-			// "start");
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
 
-			int company_id = Integer.parseInt(OpenERPAccountManager
-					.currentUser(context).getCompany_id());
+			String saasURL1 = "https://openerp.my.openerp.com";
+			String saasURL2 = "https://accounts.openerp.com";
 			Res_PartnerDBHelper db = new Res_PartnerDBHelper(context);
-			JSONObject domain = new JSONObject();
-			domain.accumulate(
-					"domain",
-					new JSONArray("[[\"company_id\", \"=\", "
-							+ company_id
-							+ "],[\"id\",\"not in\", "
-							+ JSONDataHelper.intArrayToJSONArray(db
-									.localIds(db)) + "]]"));
-
 			OEHelper oe = db.getOEInstance();
-			if (oe.syncWithServer(db, domain, false)) {
-				// Sync Done, Next stuff....
-				Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(
-						context);
+			Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(context);
+
+			if (OpenERPAccountManager.currentUser(context).getHost().toString()
+					.contains(saasURL1)
+					|| OpenERPAccountManager.currentUser(context).getHost()
+							.toString().contains(saasURL2)) {
+				// Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(
+				// context);
 				helper.SyncContect(context, account);
-				// sync_helper.sendBrodcast(context, authority, "Contacts",
-				// "finish");
+
+			} else {
+				int company_id = Integer.parseInt(OpenERPAccountManager
+						.currentUser(context).getCompany_id());
+
+				JSONObject domain = new JSONObject();
+				domain.accumulate(
+						"domain",
+						new JSONArray("[[\"company_id\", \"=\", "
+								+ company_id
+								+ "],[\"id\",\"not in\", "
+								+ JSONDataHelper.intArrayToJSONArray(db
+										.localIds(db)) + "]]"));
+
+				if (oe.syncWithServer(db, domain, false)) {
+					// Sync Done, Next stuff....
+					// Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(
+					// context);
+					helper.SyncContect(context, account);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
