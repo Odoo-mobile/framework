@@ -41,6 +41,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Calendars;
@@ -358,7 +359,7 @@ public class OECalendar {
 		values.put(CalendarContract.Calendars.ACCOUNT_TYPE, account.type);
 		values.put(Calendars.NAME, account.name);
 		values.put(Calendars.CALENDAR_DISPLAY_NAME, account.name);
-		values.put(Calendars.CALENDAR_COLOR, 0xFFFFFFFF);
+		values.put(Calendars.CALENDAR_COLOR, Color.parseColor("#cc0000"));
 		values.put(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.CAL_ACCESS_OWNER);
 		values.put(Calendars.OWNER_ACCOUNT, account.name);
 		values.put(Calendars.SYNC_EVENTS, 1);

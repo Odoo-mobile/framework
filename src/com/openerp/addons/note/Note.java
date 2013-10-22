@@ -420,7 +420,7 @@ public class Note extends BaseFragment implements
 								// Setting text for empty archive list view
 								if (stage_id.equalsIgnoreCase("-2")) {
 									emptyNotesText
-											.setText("Sorry! You don't have any archive notes right now.");
+											.setText("You don't have any archive notes right now.");
 								}
 								// Displaying text message of empty list view
 								emptyNotesText.setVisibility(View.VISIBLE);
@@ -501,13 +501,13 @@ public class Note extends BaseFragment implements
 		int total = Integer.parseInt(results.get("total").toString());
 
 		// Handling text message of empty list view
-		// exa. "Sorry ! you don't have open any notes right now"
+		// exa. "You don't have open any notes right now"
 		if (total == 0) {
 
 			// Setting text for empty archive list view
 			if (stage_id.equalsIgnoreCase("-2")) {
 				emptyNotesText
-						.setText("Sorry! You don't have any archive notes right now.");
+						.setText("You don't have any archive notes right now.");
 			}
 			emptyNotesText.setVisibility(View.VISIBLE);
 		} else {
