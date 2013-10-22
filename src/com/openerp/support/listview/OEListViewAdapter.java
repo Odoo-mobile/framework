@@ -260,7 +260,6 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 					key_col = splits[0];
 					alt_key_col = splits[1];
 				}
-
 				String data = rowdata.get(key_col).toString();
 				if (data.equals("false") || TextUtils.isEmpty(data)) {
 					data = rowdata.get(alt_key_col).toString();
@@ -447,23 +446,25 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
+				try {
+					if (OpenERPServerConnection.isNetworkAvailable(context)) {
+						OEListViewRows newRow = callbacks.get(key)
+								.updateFlagValues(rows.get(position),
+										booleanView);
+						rowdata = newRow.getRow_data();
+						rows.get(position).setRow_data(newRow.getRow_data());
 
-				if (OpenERPServerConnection.isNetworkAvailable(context)) {
-					OEListViewRows newRow = callbacks.get(key)
-							.updateFlagValues(rows.get(position), booleanView);
-					rowdata = newRow.getRow_data();
-					rows.get(position).setRow_data(newRow.getRow_data());
+						isFlagged.put(String.valueOf(position), rowdata
+								.get(key).toString());
 
-					isFlagged.put(String.valueOf(position), rowdata.get(key)
-							.toString());
+					} else {
+						Toast.makeText(context,
+								"Please Check your connection to server.",
+								Toast.LENGTH_LONG).show();
+					}
+				} catch (Exception e) {
 
-				} else {
-					Toast.makeText(context,
-							"Please Check your connection to server.",
-							Toast.LENGTH_LONG).show();
 				}
-
 			}
 		});
 

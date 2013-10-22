@@ -22,18 +22,23 @@ public class OEBinaryDownloadHelper {
 	DownloadTask downloadTask = null;
 
 	public void downloadBinary(int id, BaseDBHelper db) {
-		if (OpenERPServerConnection.isNetworkAvailable(MainActivity.context)) {
-			mProgressDialog = new ProgressDialog(MainActivity.context);
-			mProgressDialog.setMessage("Downloading...");
-			mProgressDialog.setIndeterminate(true);
-			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			mProgressDialog.setCancelable(true);
+		try {
+			if (OpenERPServerConnection
+					.isNetworkAvailable(MainActivity.context)) {
+				mProgressDialog = new ProgressDialog(MainActivity.context);
+				mProgressDialog.setMessage("Downloading...");
+				mProgressDialog.setIndeterminate(true);
+				mProgressDialog
+						.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				mProgressDialog.setCancelable(true);
 
-			downloadTask = new DownloadTask(db);
-			downloadTask.execute(id);
-		} else {
-			Toast.makeText(MainActivity.context, "Unable to connect server !",
-					Toast.LENGTH_LONG).show();
+				downloadTask = new DownloadTask(db);
+				downloadTask.execute(id);
+			} else {
+				Toast.makeText(MainActivity.context,
+						"Unable to connect server !", Toast.LENGTH_LONG).show();
+			}
+		} catch (Exception e) {
 		}
 	}
 

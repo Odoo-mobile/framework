@@ -643,7 +643,7 @@ public class MessageComposeActivty extends Activity {
 				values.put("id", result.getString("result"));
 				int newid = message.create(message, values);
 
-				String query = "select t1.id as message_id , t1.*, t2.name, t2.image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.id desc";
+				String query = "select t1.id as message_id , t1.*, t2.name, t2.image_small, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.id desc";
 				List<HashMap<String, Object>> records = message.executeSQL(
 						query,
 						new String[] { String.valueOf(newid),

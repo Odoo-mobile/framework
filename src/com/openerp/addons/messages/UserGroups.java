@@ -305,13 +305,16 @@ public class UserGroups extends BaseFragment implements
 
 	@Override
 	public void onRefreshStarted(View arg0) {
-		if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
-			Log.i("UserGroupsFragment", "requesting for sync");
-			scope.context().requestSync(UserGroupsProvider.AUTHORITY);
-		} else {
-			Toast.makeText(getActivity(), "Unable to connect server !",
-					Toast.LENGTH_LONG).show();
-			mPullToRefreshAttacher.setRefreshComplete();
+		try {
+			if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
+				Log.i("UserGroupsFragment", "requesting for sync");
+				scope.context().requestSync(UserGroupsProvider.AUTHORITY);
+			} else {
+				Toast.makeText(getActivity(), "Unable to connect server !",
+						Toast.LENGTH_LONG).show();
+				mPullToRefreshAttacher.setRefreshComplete();
+			}
+		} catch (Exception e) {
 		}
 	}
 

@@ -846,51 +846,55 @@ public class ORM extends SQLiteDatabaseHelper {
 
 		boolean flag = false;
 		SQLiteDatabase db = getWritableDatabase();
+		try {
+			if (OpenERPServerConnection.isNetworkAvailable(context)) {
+				String table = modelToTable(dbHelper.getModelName());
+				try {
 
-		if (OpenERPServerConnection.isNetworkAvailable(context)) {
-			String table = modelToTable(dbHelper.getModelName());
-			try {
+					JSONObject arguments = new JSONObject();
+					for (String key : values.keySet()) {
+						try {
+							int keyid = Integer.parseInt(values
+									.getAsString(key));
+							arguments.put(key, keyid);
+						} catch (Exception e) {
+							String temp = values.getAsString(key);
+							if (temp.equals("true") || temp.equals("false")) {
+								arguments.put(key,
+										((temp.equals("true")) ? true : false));
+							} else {
 
-				JSONObject arguments = new JSONObject();
-				for (String key : values.keySet()) {
-					try {
-						int keyid = Integer.parseInt(values.getAsString(key));
-						arguments.put(key, keyid);
-					} catch (Exception e) {
-						String temp = values.getAsString(key);
-						if (temp.equals("true") || temp.equals("false")) {
-							arguments.put(key, ((temp.equals("true")) ? true
-									: false));
-						} else {
+								arguments.put(key, values.get(key).toString());
 
-							arguments.put(key, values.get(key).toString());
+							}
+						}
 
+					}
+					if (fromServer) {
+						int res = db.update(table, values, "id = " + id, null);
+						flag = true;
+					} else {
+
+						if (oe_obj.updateValues(dbHelper.getModelName(),
+								arguments, id)) {
+							int res = db.update(table, values, "id = " + id,
+									null);
+							flag = true;
 						}
 					}
 
-				}
-				if (fromServer) {
-					int res = db.update(table, values, "id = " + id, null);
-					flag = true;
-				} else {
-
-					if (oe_obj.updateValues(dbHelper.getModelName(), arguments,
-							id)) {
-						int res = db.update(table, values, "id = " + id, null);
-						flag = true;
-					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					flag = false;
 				}
 
-			} catch (Exception e) {
-				e.printStackTrace();
+			} else {
+				Toast.makeText(context,
+						"Unable to Connect server ! Please Try again Later. ",
+						Toast.LENGTH_LONG).show();
 				flag = false;
 			}
-
-		} else {
-			Toast.makeText(context,
-					"Unable to Connect server ! Please Try again Later. ",
-					Toast.LENGTH_LONG).show();
-			flag = false;
+		} catch (Exception e) {
 		}
 		db.close();
 		return flag;

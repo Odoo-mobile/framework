@@ -18,10 +18,12 @@
  */
 package com.openerp.base.account;
 
+import openerp.OEVersionException;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -230,11 +232,19 @@ public class AccountFragment extends BaseFragment {
 			}
 
 			OpenERPServerConnection oeConnect = new OpenERPServerConnection();
-			boolean flag = oeConnect.testConnection(getActivity(),
-					openERPServerURL);
-			if (!flag) {
-				errorMsg = "Unable to reach OpenERP 7.0 Server.";
+
+			boolean flag = false;
+			try {
+				flag = oeConnect
+						.testConnection(getActivity(), openERPServerURL);
+				if (!flag) {
+					errorMsg = "Unable to reach OpenERP 7.0 Server.";
+				}
+			} catch (OEVersionException e) {
+				flag = false;
+				errorMsg = e.getMessage();
 			}
+
 			return flag;
 
 		}

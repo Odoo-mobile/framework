@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import openerp.OEVersionException;
 import openerp.OpenERP;
 
 import org.apache.http.client.ClientProtocolException;
@@ -69,9 +70,11 @@ public class OEHelper extends OpenERP {
 	 *             the jSON exception
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
+	 * @throws OEVersionException
 	 */
 	public OEHelper(Context context, String base_url)
-			throws ClientProtocolException, JSONException, IOException {
+			throws ClientProtocolException, JSONException, IOException,
+			OEVersionException {
 		super(base_url);
 		this.mContext = context;
 
@@ -90,9 +93,10 @@ public class OEHelper extends OpenERP {
 	 *             the jSON exception
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
+	 * @throws OEVersionException
 	 */
 	public OEHelper(Context context, UserObject data)
-			throws ClientProtocolException, JSONException, IOException {
+			throws ClientProtocolException, JSONException, IOException, OEVersionException {
 		super(data.getHost(), OpenERPServerConnection
 				.isNetworkAvailable(context));
 		this.mContext = context;

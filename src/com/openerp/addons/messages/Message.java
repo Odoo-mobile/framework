@@ -936,22 +936,26 @@ public class Message extends BaseFragment implements
 
 	@Override
 	public void onRefreshStarted(View view) {
-		if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
-			Log.d("MessageFragment", "requesting for sync");
-			if (group_id != null) {
-				Bundle group_bundle = new Bundle();
-				JSONArray ids = new JSONArray();
-				ids.put(group_id);
-				group_bundle.putString("group_ids", ids.toString());
-				scope.context().requestSync(MessageProvider.AUTHORITY,
-						group_bundle);
+		try {
+			if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
+				Log.d("MessageFragment", "requesting for sync");
+				if (group_id != null) {
+					Bundle group_bundle = new Bundle();
+					JSONArray ids = new JSONArray();
+					ids.put(group_id);
+					group_bundle.putString("group_ids", ids.toString());
+					scope.context().requestSync(MessageProvider.AUTHORITY,
+							group_bundle);
+				} else {
+					scope.context().requestSync(MessageProvider.AUTHORITY);
+				}
 			} else {
-				scope.context().requestSync(MessageProvider.AUTHORITY);
+				Toast.makeText(getActivity(), "Unable to connect server !",
+						Toast.LENGTH_LONG).show();
+				mPullToRefreshAttacher.setRefreshComplete();
 			}
-		} else {
-			Toast.makeText(getActivity(), "Unable to connect server !",
-					Toast.LENGTH_LONG).show();
-			mPullToRefreshAttacher.setRefreshComplete();
+		} catch (Exception e) {
+
 		}
 	}
 

@@ -22,6 +22,8 @@ package com.openerp.addons.messages;
 import java.io.IOException;
 import java.util.HashMap;
 
+import openerp.OEVersionException;
+
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,9 +62,10 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 	 *             the jSON exception
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
+	 * @throws OEVersionException
 	 */
 	public MessageSyncHelper(Context context) throws ClientProtocolException,
-			JSONException, IOException {
+			JSONException, IOException, OEVersionException {
 		super(context, MainActivity.userContext);
 		// TODO Auto-generated constructor stub
 		mContext = context;

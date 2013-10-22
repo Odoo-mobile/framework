@@ -20,6 +20,7 @@ package com.openerp.support;
 
 import java.io.IOException;
 
+import openerp.OEVersionException;
 import openerp.OpenERP;
 
 import org.apache.http.client.ClientProtocolException;
@@ -28,6 +29,7 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.openerp.auth.OpenERPAccountManager;
 
@@ -48,14 +50,18 @@ public class OpenERPServerConnection {
 	 * @param serverURL
 	 *            the server url
 	 * @return true, if successful
+	 * @throws OEVersionException
 	 */
-	public boolean testConnection(Context context, String serverURL) {
+	public boolean testConnection(Context context, String serverURL)
+			throws OEVersionException {
 		if (TextUtils.isEmpty(serverURL)) {
 			return false;
 		}
 		try {
 			openerp = new OpenERP(serverURL);
 			openerp.getDatabaseList();
+		} catch (OEVersionException version) {
+			throw new OEVersionException(version.getMessage());
 		} catch (Exception e) {
 			return false;
 		}
@@ -70,8 +76,10 @@ public class OpenERPServerConnection {
 	 * @param serverURL
 	 *            the server url
 	 * @return the databases
+	 * @throws OEVersionException
 	 */
-	public JSONArray getDatabases(Context context, String serverURL) {
+	public JSONArray getDatabases(Context context, String serverURL)
+			throws OEVersionException {
 		JSONArray dbList = null;
 		if (this.testConnection(context, serverURL)) {
 			try {
@@ -98,8 +106,10 @@ public class OpenERPServerConnection {
 	 * @param context
 	 *            the context
 	 * @return true, if is network available
+	 * @throws OEVersionException
 	 */
-	public static boolean isNetworkAvailable(Context context) {
+	public static boolean isNetworkAvailable(Context context)
+			throws OEVersionException {
 		boolean outcome = false;
 
 		OpenERPServerConnection osc = new OpenERPServerConnection();
@@ -117,8 +127,10 @@ public class OpenERPServerConnection {
 	 * @param url
 	 *            the url
 	 * @return true, if is network available
+	 * @throws OEVersionException
 	 */
-	public static boolean isNetworkAvailable(Context context, String url) {
+	public static boolean isNetworkAvailable(Context context, String url)
+			throws OEVersionException {
 		boolean outcome = false;
 
 		OpenERPServerConnection osc = new OpenERPServerConnection();
