@@ -656,6 +656,7 @@ public class MessageDetail extends BaseFragment {
 
 	public class LoadMessageDetails extends AsyncTask<Void, Void, Boolean> {
 		int message_id = 0;
+		boolean flag = false;
 
 		public LoadMessageDetails(int message_id) {
 			this.message_id = message_id;
@@ -677,7 +678,14 @@ public class MessageDetail extends BaseFragment {
 
 		@Override
 		protected Boolean doInBackground(Void... arg0) {
-			return setupMessageDetail(this.message_id);
+			scope.context().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					flag = setupMessageDetail(message_id);
+				}
+			});
+			return flag;
+
 		}
 
 		@Override
