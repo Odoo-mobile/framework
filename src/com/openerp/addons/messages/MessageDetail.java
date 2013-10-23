@@ -218,15 +218,14 @@ public class MessageDetail extends BaseFragment {
 					LayoutInflater vi = (LayoutInflater) scope.context()
 							.getApplicationContext()
 							.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-					View v = vi
-							.inflate(
-									R.layout.fragment_message_detail_attachment_grid_item,
-									null, false);
 					View insertPoint = row_view
 							.findViewById(R.id.gridAttachments);
 					((ViewGroup) insertPoint).removeAllViews();
 					for (OEListViewRows row : attachments) {
-
+						View v = vi
+								.inflate(
+										R.layout.fragment_message_detail_attachment_grid_item,
+										null, true);
 						TextView txvAttachmentName = (TextView) v
 								.findViewById(R.id.txvFileName);
 
@@ -244,7 +243,6 @@ public class MessageDetail extends BaseFragment {
 						TextView txvAttachmentId = (TextView) v
 								.findViewById(R.id.txvAttachmentId);
 						txvAttachmentId.setText(String.valueOf(row.getRow_id()));
-
 						((ViewGroup) insertPoint).addView(v, index,
 								new ViewGroup.LayoutParams(
 										ViewGroup.LayoutParams.FILL_PARENT,
