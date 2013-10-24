@@ -484,10 +484,14 @@ public class MainActivity extends FragmentActivity {
 	 *            the is on
 	 */
 	public void setAutoSync(String authority, boolean isON) {
-		Account account = OpenERPAccountManager.getAccount(this,
-				MainActivity.userContext.getAndroidName());
-		if (!ContentResolver.isSyncActive(account, authority)) {
-			ContentResolver.setSyncAutomatically(account, authority, isON);
+		try {
+			Account account = OpenERPAccountManager.getAccount(this,
+					MainActivity.userContext.getAndroidName());
+			if (!ContentResolver.isSyncActive(account, authority)) {
+				ContentResolver.setSyncAutomatically(account, authority, isON);
+			}
+		} catch (NullPointerException eNull) {
+			
 		}
 	}
 
@@ -602,19 +606,14 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public void drawerOpenListener() {
-		if (!userContext.getAvatar().equals("false")) {
-			Drawable profPic = new BitmapDrawable(Base64Helper.getBitmapImage(
-					this, userContext.getAvatar()));
-			getActionBar().setIcon(profPic);
+		if (userContext != null) {
+			if (!userContext.getAvatar().equals("false")) {
+				Drawable profPic = new BitmapDrawable(
+						Base64Helper.getBitmapImage(this,
+								userContext.getAvatar()));
+				getActionBar().setIcon(profPic);
+			}
+			setTitle(userContext.getUsername(), userContext.getHost());
 		}
-		setTitle(userContext.getUsername(), userContext.getHost());
 	}
-
-	/* Method for updating widget */
-	// public void sendNotificationToWidget(Context context, String counter) {
-	// Intent uiIntent = new Intent(Mobile_Widget.CONSTANT);
-	// uiIntent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
-	// uiIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, counter);
-	// context.sendBroadcast(uiIntent);
-	// }
 }

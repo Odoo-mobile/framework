@@ -558,14 +558,19 @@ public class Message extends BaseFragment implements
 					} else {
 						newRow = db.search(db, from, new String[] { "id = ?" },
 								new String[] { key });
-						HashMap<String, Object> temp_row = ((List<HashMap<String, Object>>) newRow
-								.get("records")).get(0);
-						temp_row.put(
-								"subject",
-								updateSubject(temp_row.get("subject")
-										.toString(), Integer.parseInt(key)));
-						newRowObj = new OEListViewRows(Integer.parseInt(key),
-								temp_row);
+						HashMap<String, Object> temp_row = new HashMap<String, Object>();
+						try {
+							temp_row = ((List<HashMap<String, Object>>) newRow
+									.get("records")).get(0);
+							temp_row.put(
+									"subject",
+									updateSubject(temp_row.get("subject")
+											.toString(), Integer.parseInt(key)));
+							newRowObj = new OEListViewRows(
+									Integer.parseInt(key), temp_row);
+						} catch (Exception e) {
+						}
+
 					}
 
 					parent_list_details.put(key, newRowObj);
@@ -581,8 +586,10 @@ public class Message extends BaseFragment implements
 				scope.context().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						rootView.findViewById(R.id.messageSyncWaiter)
-								.setVisibility(View.VISIBLE);
+						if (rootView.findViewById(R.id.messageSyncWaiter) != null) {
+							rootView.findViewById(R.id.messageSyncWaiter)
+									.setVisibility(View.VISIBLE);
+						}
 					}
 				});
 
