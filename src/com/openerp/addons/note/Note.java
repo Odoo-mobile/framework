@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -263,6 +264,7 @@ public class Note extends BaseFragment implements
 		super.onResume();
 		scope.context().registerReceiver(syncFinishReceiver,
 				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
+		rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
 	}
 
 	@Override

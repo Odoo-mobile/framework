@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,8 @@ import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 
 public class ComposeNoteActivity extends Activity {
@@ -51,26 +54,34 @@ public class ComposeNoteActivity extends Activity {
 	}
 
 	public void fillNoteStages() {
+		try {
+			OEHelper oe = new OEHelper(scope.context(),
+					OpenERPAccountManager.currentUser(scope.context()));
+			dbhelper = new NoteDBHelper(scope.context());
+			stagesobj = dbhelper.new NoteStages(scope.context());
 
-		noteStages = (Spinner) findViewById(R.id.txv_composeNote_Stage);
-		note_Stages = new HashMap<String, Long>();
-		dbhelper = new NoteDBHelper(scope.context());
-		stagesobj = dbhelper.new NoteStages(scope.context());
-		HashMap<String, Object> data = stagesobj.search(stagesobj);
-		int total = Integer.parseInt(data.get("total").toString());
+			if (oe.syncWithServer(stagesobj)) {
+				noteStages = (Spinner) findViewById(R.id.txv_composeNote_Stage);
+				note_Stages = new HashMap<String, Long>();
+				HashMap<String, Object> data = stagesobj.search(stagesobj);
+				int total = Integer.parseInt(data.get("total").toString());
 
-		if (total > 0) {
-			@SuppressWarnings("unchecked")
-			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
-					.get("records");
-			for (HashMap<String, Object> row_data : rows) {
-				stages.add(row_data.get("name").toString());
-				note_Stages.put(row_data.get("name").toString(),
-						Long.parseLong(row_data.get("id").toString()));
+				if (total > 0) {
+					@SuppressWarnings("unchecked")
+					List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
+							.get("records");
+					for (HashMap<String, Object> row_data : rows) {
+						stages.add(row_data.get("name").toString());
+						note_Stages.put(row_data.get("name").toString(),
+								Long.parseLong(row_data.get("id").toString()));
+					}
+					stages.add("Add New");
+				} else {
+					stages.add("Add New");
+				}
 			}
-			stages.add("Add New");
+		} catch (Exception e) {
 		}
-
 		adapter = new ArrayAdapter<String>(scope.context(),
 				android.R.layout.simple_spinner_dropdown_item, stages);
 		noteStages.setAdapter(adapter);
