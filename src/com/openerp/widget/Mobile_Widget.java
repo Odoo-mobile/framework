@@ -29,8 +29,6 @@ import android.widget.RemoteViews;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.addons.messages.Message;
-import com.openerp.addons.messages.MessageComposeActivty;
-import com.openerp.addons.note.ComposeNoteActivity;
 import com.openerp.addons.note.Note;
 
 public class Mobile_Widget extends AppWidgetProvider {
@@ -105,6 +103,7 @@ public class Mobile_Widget extends AppWidgetProvider {
 					R.id.widget_notification_counter_messages,
 					String.valueOf(total_unreadMessges));
 
+			// Click on Notes
 			// Openening OpenERP Mobile NOTE[All] Module
 			Intent configIntent = new Intent(context, MainActivity.class);
 			configIntent.setAction("NOTES");
@@ -113,6 +112,7 @@ public class Mobile_Widget extends AppWidgetProvider {
 			remoteViews.setOnClickPendingIntent(R.id.widget_label_notes_layout,
 					configPendingIntent);
 
+			// Click on Messages
 			// Openening OpenERP Mobile MESSAGE[Inbox] Module
 			Intent messageIntent = new Intent(context, MainActivity.class);
 			messageIntent.setAction("MESSAGE");
@@ -121,6 +121,7 @@ public class Mobile_Widget extends AppWidgetProvider {
 			remoteViews.setOnClickPendingIntent(
 					R.id.widget_label_messages_layout, messagePendingIntent);
 
+			// Click on Compose Messages
 			// Openening Screen to COMPOSE MESSAGE
 			Intent composeMessage = new Intent(context, MainActivity.class);
 			composeMessage.setAction("composeMessage");
@@ -130,6 +131,7 @@ public class Mobile_Widget extends AppWidgetProvider {
 					R.id.widget_notification_compose_messages,
 					composeMessagePendingIntent);
 
+			// Click on Compose Note
 			// Openening Screen to COMPOSE NOTE
 			Intent composeNote = new Intent(context, MainActivity.class);
 			composeNote.setAction("composeNote");
@@ -138,6 +140,14 @@ public class Mobile_Widget extends AppWidgetProvider {
 			remoteViews.setOnClickPendingIntent(
 					R.id.widget_notification_compose__notes,
 					composeNotePendingIntent);
+
+			// Click on ICON
+			// Openening Application
+			Intent openApp = new Intent(context, MainActivity.class);
+			PendingIntent openAppPendingIntent = PendingIntent.getActivity(
+					context, 0, openApp, 0);
+			remoteViews.setOnClickPendingIntent(R.id.widget_icon_logo_layout,
+					openAppPendingIntent);
 
 			// Updating the widget
 			appWidgetManager.updateAppWidget(widgetId, remoteViews);
