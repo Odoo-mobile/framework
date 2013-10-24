@@ -20,7 +20,7 @@
         android:layout_marginRight="15dp"
         android:layout_marginTop="15dp"
         android:gravity="top|center_horizontal"
-        android:text="Sorry! You don&apos;t have any open notes right now."
+        android:text="You don&apos;t have any open notes right now."
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#77778f"
         android:visibility="gone" />
