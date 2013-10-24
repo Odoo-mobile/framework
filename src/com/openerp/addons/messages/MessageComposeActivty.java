@@ -31,7 +31,6 @@ import android.accounts.Account;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -40,7 +39,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Html;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -266,9 +264,9 @@ public class MessageComposeActivty extends Activity {
 						MainActivity.context);
 				JSONArray newAttachmentIds = new JSONArray();
 				for (Uri file : file_uris) {
-					File fileData = new File(getRealPathFromURI(file));
+					File fileData = new File(file.getPath());
 					ContentValues values = new ContentValues();
-					values.put("datas_fname", fileData.getName());
+					values.put("datas_fname", getFilenameFromUri(file));
 					values.put("res_model", "mail.compose.message");
 					values.put("company_id", scope.User().getCompany_id());
 					values.put("type", "binary");
@@ -276,7 +274,7 @@ public class MessageComposeActivty extends Activity {
 					values.put("file_size", fileData.length());
 					values.put("db_datas", Base64Helper.fileUriToBase64(file,
 							getContentResolver()));
-					values.put("name", fileData.getName());
+					values.put("name", getFilenameFromUri(file));
 					int newId = attachment.create(attachment, values);
 					newAttachmentIds.put(newId);
 				}
@@ -361,15 +359,24 @@ public class MessageComposeActivty extends Activity {
 	 * @param contentUri
 	 * @return
 	 */
-	private String getRealPathFromURI(Uri contentUri) {
-		String[] proj = { MediaStore.Images.Media.DATA };
-		CursorLoader loader = new CursorLoader(this, contentUri, proj, null,
-				null, null);
-		Cursor cursor = loader.loadInBackground();
-		int column_index = cursor
-				.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-		cursor.moveToFirst();
-		return cursor.getString(column_index);
+	private String getFilenameFromUri(Uri contentUri) {
+		String filename = "unknown";
+		if (contentUri.getScheme().toString().compareTo("content") == 0) {
+			Cursor cursor = getContentResolver().query(contentUri, null, null,
+					null, null);
+			if (cursor.moveToFirst()) {
+				int column_index = cursor
+						.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+				filename = cursor.getString(column_index);
+				File fl = new File(filename);
+				filename = fl.getName();
+			}
+		} else if (contentUri.getScheme().compareTo("file") == 0) {
+			filename = contentUri.getLastPathSegment().toString();
+		} else {
+			filename = filename + "_" + contentUri.getLastPathSegment();
+		}
+		return filename;
 	}
 
 	/*
@@ -417,14 +424,15 @@ public class MessageComposeActivty extends Activity {
 
 	private void handleReceivedFile() {
 		attachments.clear();
+		int row_id = 1;// Integer.parseInt(uri.getLastPathSegment().toString());
 		for (Uri uri : file_uris) {
-			int row_id = Integer.parseInt(uri.getLastPathSegment().toString());
-			File file = new File(getRealPathFromURI(uri));
+			// File file = new File(uri.getPath());
 			HashMap<String, Object> data = new HashMap<String, Object>();
-			data.put("name", file.getName());
+			data.put("name", getFilenameFromUri(uri));
 			OEListViewRows row = new OEListViewRows(row_id, data);
 			attachments.add(row);
 			lstAttachmentAdapter.refresh(attachments);
+			row_id++;
 		}
 	}
 
@@ -437,8 +445,6 @@ public class MessageComposeActivty extends Activity {
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-
 			// Message Details
 			String subject = values.get("subject").toString();
 			String body = values.get("body").toString();
