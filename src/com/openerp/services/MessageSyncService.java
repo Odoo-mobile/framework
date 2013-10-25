@@ -242,7 +242,7 @@ public class MessageSyncService extends Service {
 						notification.showNotification(context, totalNewMessage
 								+ " new messages", totalNewMessage
 								+ " new message received (OpneERP)", authority,
-								R.drawable.ic_stat_oe_logo);
+								R.drawable.ic_oe_notification);
 					}
 					intent.putExtra("data_update", response.get("update_ids")
 							.toString());

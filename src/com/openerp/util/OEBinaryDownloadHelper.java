@@ -1,18 +1,25 @@
 package com.openerp.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.FileNameMap;
+import java.net.URLConnection;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
+import com.openerp.R;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.OpenERPServerConnection;
@@ -46,6 +53,8 @@ public class OEBinaryDownloadHelper {
 
 		int attachment_id = 0;
 		BaseDBHelper db = null;
+		String downloadPath = "";
+		String downloadFileName = "";
 
 		public DownloadTask(BaseDBHelper db) {
 			this.db = db;
@@ -90,6 +99,8 @@ public class OEBinaryDownloadHelper {
 				InputStream is = new ByteArrayInputStream(fileAsBytes);
 				filename = filename.replaceAll("[-+^:, ]", "_");
 				String path = "/sdcard/Download/" + filename;
+				downloadPath = path;
+				downloadFileName = filename;
 				FileOutputStream fos = new FileOutputStream(path);
 				byte data[] = new byte[1024];
 				long total = 0;
@@ -119,10 +130,24 @@ public class OEBinaryDownloadHelper {
 			mProgressDialog.dismiss();
 			if (!result) {
 				Toast.makeText(MainActivity.context,
-						"Download error: " + result, Toast.LENGTH_LONG).show();
+						"Server not responding. Try again later.",
+						Toast.LENGTH_LONG).show();
 			} else {
 				Toast.makeText(MainActivity.context, "File downloaded",
 						Toast.LENGTH_SHORT).show();
+				OENotificationHelper notification = new OENotificationHelper();
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				File fl = new File(downloadPath);
+				FileNameMap mime = URLConnection.getFileNameMap();
+				Uri uri = Uri.fromFile(fl);
+				String mimeType = mime.getContentTypeFor(uri.getPath());
+				intent.setDataAndType(uri, mimeType);
+				Log.e(">> uri mime content", mimeType);
+				notification.setResultIntent(intent, MainActivity.context);
+				notification.showNotification(MainActivity.context,
+						downloadFileName + " Download complete", downloadPath,
+						"", R.drawable.ic_stat_av_download);
+
 			}
 		}
 	}

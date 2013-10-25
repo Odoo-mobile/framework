@@ -33,7 +33,6 @@
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:paddingTop="10dp"
-            android:singleLine="true"
             android:text="Message Title"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#414141"
