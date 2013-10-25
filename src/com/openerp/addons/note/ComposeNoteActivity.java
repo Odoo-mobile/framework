@@ -14,7 +14,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,8 +26,6 @@ import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
-import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 
 public class ComposeNoteActivity extends Activity {
@@ -54,33 +51,24 @@ public class ComposeNoteActivity extends Activity {
 	}
 
 	public void fillNoteStages() {
-		try {
-			OEHelper oe = new OEHelper(scope.context(),
-					OpenERPAccountManager.currentUser(scope.context()));
-			dbhelper = new NoteDBHelper(scope.context());
-			stagesobj = dbhelper.new NoteStages(scope.context());
-
-			if (oe.syncWithServer(stagesobj)) {
-				noteStages = (Spinner) findViewById(R.id.txv_composeNote_Stage);
-				note_Stages = new HashMap<String, Long>();
-				HashMap<String, Object> data = stagesobj.search(stagesobj);
-				int total = Integer.parseInt(data.get("total").toString());
-
-				if (total > 0) {
-					@SuppressWarnings("unchecked")
-					List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
-							.get("records");
-					for (HashMap<String, Object> row_data : rows) {
-						stages.add(row_data.get("name").toString());
-						note_Stages.put(row_data.get("name").toString(),
-								Long.parseLong(row_data.get("id").toString()));
-					}
-					stages.add("Add New");
-				} else {
-					stages.add("Add New");
-				}
+		noteStages = (Spinner) findViewById(R.id.txv_composeNote_Stage);
+		note_Stages = new HashMap<String, Long>();
+		dbhelper = new NoteDBHelper(scope.context());
+		stagesobj = dbhelper.new NoteStages(scope.context());
+		HashMap<String, Object> data = stagesobj.search(stagesobj);
+		int total = Integer.parseInt(data.get("total").toString());
+		if (total > 0) {
+			@SuppressWarnings("unchecked")
+			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
+					.get("records");
+			for (HashMap<String, Object> row_data : rows) {
+				stages.add(row_data.get("name").toString());
+				note_Stages.put(row_data.get("name").toString(),
+						Long.parseLong(row_data.get("id").toString()));
 			}
-		} catch (Exception e) {
+			stages.add("Add New");
+		} else {
+			stages.add("Add New");
 		}
 		adapter = new ArrayAdapter<String>(scope.context(),
 				android.R.layout.simple_spinner_dropdown_item, stages);
@@ -96,7 +84,6 @@ public class ComposeNoteActivity extends Activity {
 						position).toString();
 				if (selectedStageName.equalsIgnoreCase("Add New")) {
 					createNoteStage();
-					// noteStages.setAdapter(adapter);
 				}
 			}
 
@@ -154,6 +141,7 @@ public class ComposeNoteActivity extends Activity {
 					stages.add(stages.size() - 1, stage.getText().toString());
 					adapter.notifyDataSetChanged();
 					noteStages.setSelection(stages.size() - 2);
+					scope.context().refreshMenu(scope.context());
 				}
 			}
 		});
@@ -197,29 +185,35 @@ public class ComposeNoteActivity extends Activity {
 					.toString()));
 			values.put("memo", noteDescription.getText().toString());
 			values.put("open", "true");
-			values.put("stage_id",
-					note_Stages.get(noteStages.getSelectedItem().toString()));
-			JSONArray tag_ids = new JSONArray();
-			tag_ids.put(6);
-			tag_ids.put(false);
-			JSONArray c_ids = new JSONArray();
-			tag_ids.put(c_ids);
-			values.put("current_partner_id",
-					Integer.parseInt(scope.User().getUser_id().toString()));
-			values.put("tag_ids",
-					new JSONArray("[" + tag_ids.toString() + "]").toString());
+			Long stageid = note_Stages.get(noteStages.getSelectedItem()
+					.toString());
+			if (stageid != null) {
+				values.put("stage_id", note_Stages.get(noteStages
+						.getSelectedItem().toString()));
+				JSONArray tag_ids = new JSONArray();
+				tag_ids.put(6);
+				tag_ids.put(false);
+				JSONArray c_ids = new JSONArray();
+				tag_ids.put(c_ids);
+				values.put("current_partner_id",
+						Integer.parseInt(scope.User().getUser_id().toString()));
+				values.put("tag_ids", new JSONArray("[" + tag_ids.toString()
+						+ "]").toString());
 
-			dbhelper = new NoteDBHelper(scope.context());
-			int newId = dbhelper.createRecordOnserver(dbhelper, values);
-			values.put("id", newId);
-			values.put("date_done", "false");
-			int new_id = dbhelper.create(dbhelper, values);
-
-			Intent resultIntent = new Intent();
-			resultIntent.putExtra("result", new_id);
-			setResult(Activity.RESULT_OK, resultIntent);
-			finish();
-
+				dbhelper = new NoteDBHelper(scope.context());
+				int newId = dbhelper.createRecordOnserver(dbhelper, values);
+				values.put("id", newId);
+				values.put("date_done", "false");
+				int new_id = dbhelper.create(dbhelper, values);
+				Intent resultIntent = new Intent();
+				resultIntent.putExtra("result", new_id);
+				setResult(Activity.RESULT_OK, resultIntent);
+				finish();
+			} else {
+				Toast.makeText(scope.context(),
+						"You can't keep Stage empty..!", Toast.LENGTH_SHORT)
+						.show();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

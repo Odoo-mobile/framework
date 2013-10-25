@@ -32,7 +32,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,6 +48,7 @@ import android.widget.Toast;
 import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
+import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.note.NoteProvider;
 import com.openerp.receivers.SyncFinishReceiver;
@@ -549,23 +549,30 @@ public class Note extends BaseFragment implements
 
 	/* Method for fetching stages of notes */
 	public void setNoteStages(Context context) {
-
 		stages = new HashMap<String, String>();
-		db = new NoteDBHelper(context);
-		NoteDBHelper.NoteStages stagesobj = db.new NoteStages(context);
-		HashMap<String, Object> data = stagesobj.search(stagesobj);
+		try {
+			OEHelper oe = new OEHelper(context,
+					OpenERPAccountManager.currentUser(context));
+			db = new NoteDBHelper(context);
+			NoteDBHelper.NoteStages stagesobj = db.new NoteStages(context);
 
-		int total = Integer.parseInt(data.get("total").toString());
-		if (total > 0) {
-			@SuppressWarnings("unchecked")
-			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
-					.get("records");
-			for (HashMap<String, Object> row_data : rows) {
-				String row_id = row_data.get("id").toString();
-				String name = row_data.get("name").toString();
-				stages.put(row_id, name);
+			if (stagesobj.isEmptyTable(stagesobj)) {
+				oe.syncWithServer(stagesobj);
 			}
+			HashMap<String, Object> data = stagesobj.search(stagesobj);
+			int total = Integer.parseInt(data.get("total").toString());
+			if (total > 0) {
+				@SuppressWarnings("unchecked")
+				List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
+						.get("records");
+				for (HashMap<String, Object> row_data : rows) {
+					String row_id = row_data.get("id").toString();
+					String name = row_data.get("name").toString();
+					stages.put(row_id, name);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
-
 }
