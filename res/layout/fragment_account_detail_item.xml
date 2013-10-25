@@ -24,6 +24,7 @@
             android:id="@+id/txvAccountName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:singleLine="true"
             android:text="Dummy Name"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
