@@ -28,6 +28,7 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncAdapterType;
@@ -176,6 +177,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	String[] accountNames = null;
+	String selectedAccountName = "";
 
 	public Dialog onCreateDialogSingleChoice() {
 
@@ -191,7 +193,6 @@ public class MainActivity extends FragmentActivity {
 			accountNames[i] = user.getAndroidName();
 			i++;
 		}
-
 		// Set the dialog title
 		builder.setTitle("Select Account")
 				// Specify the list array, the items to be selected by default
@@ -204,16 +205,26 @@ public class MainActivity extends FragmentActivity {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								OpenERPAccountManager.loginUser(context,
-										accountNames[which]);
+								selectedAccountName = accountNames[which];
 							}
 						})
+				.setNeutralButton("New", new OnClickListener() {
 
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						getActionBar().setDisplayHomeAsUpEnabled(false);
+						getActionBar().setHomeButtonEnabled(false);
+						Fragment fragment = new AccountFragment();
+						fragmentHandler.startNewFragmnet(fragment);
+					}
+				})
 				// Set the action buttons
 				.setPositiveButton("Login",
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
+								OpenERPAccountManager.loginUser(context,
+										selectedAccountName);
 								finish();
 								startActivity(getIntent());
 							}
@@ -491,7 +502,7 @@ public class MainActivity extends FragmentActivity {
 				ContentResolver.setSyncAutomatically(account, authority, isON);
 			}
 		} catch (NullPointerException eNull) {
-			
+
 		}
 	}
 

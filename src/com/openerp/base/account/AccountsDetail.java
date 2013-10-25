@@ -77,7 +77,9 @@ public class AccountsDetail extends BaseFragment {
 
 					@Override
 					public void onClick(View v) {
-						Dialog deleteAccount = deleteAccount();
+						String accountName = row_data.getRow_data().get("name")
+								.toString();
+						Dialog deleteAccount = deleteAccount(accountName);
 						deleteAccount.show();
 
 					}
@@ -208,7 +210,7 @@ public class AccountsDetail extends BaseFragment {
 		return builder.create();
 	}
 
-	private Dialog deleteAccount() {
+	private Dialog deleteAccount(final String accountName) {
 
 		// Initialize the Alert Dialog
 		AlertDialog.Builder builder = new AlertDialog.Builder(scope.context());
@@ -226,12 +228,11 @@ public class AccountsDetail extends BaseFragment {
 								// User clicked OK, so save the result somewhere
 								// or return them to the component that opened
 								// the dialog
-								// TODO Auto-generated method stub
-								OpenERPAccountManager.removeAccount(scope
-										.context(), MainActivity.userContext
-										.getAndroidName());
+								OpenERPAccountManager.removeAccount(
+										scope.context(), accountName);
 								scope.context().finish();
-
+								scope.context().startActivity(
+										scope.context().getIntent());
 							}
 						})
 				.setNegativeButton("Cancel",
