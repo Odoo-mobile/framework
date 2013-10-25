@@ -409,8 +409,10 @@ public class MessageDetail extends BaseFragment {
 		List<String> names = new ArrayList<String>();
 		if (records.size() > 0) {
 			for (HashMap<String, Object> row : records) {
-				if (row.get("name").toString()
-						.equals(scope.User().getPartner_id())) {
+				if (row.get("name")
+						.toString()
+						.equals(OpenERPAccountManager.currentUser(
+								MainActivity.context).getPartner_id())) {
 					names.add("me");
 				} else {
 					names.add(row.get("name").toString());
@@ -547,7 +549,10 @@ public class MessageDetail extends BaseFragment {
 		case R.id.menu_message_detail_unread:
 			markAsReadUnreadArchive(false);
 			return true;
-
+		case R.id.menu_message_compose:
+			scope.context().startActivity(
+					new Intent(scope.context(), MessageComposeActivty.class));
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

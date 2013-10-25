@@ -32,11 +32,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
+import android.widget.SearchView.OnQueryTextListener;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
@@ -58,7 +61,7 @@ public class MessageRecipientActivity extends Activity {
 	Res_PartnerDBHelper res_partners = null;
 	OEHelper oe = null;
 	Context context = null;
-
+	SearchView searchView = null;
 	HashMap<String, Object> selectedPartners = new HashMap<String, Object>();
 
 	@Override
@@ -181,8 +184,46 @@ public class MessageRecipientActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_message_recipient_activty, menu);
+		// Associate searchable configuration with the SearchView
+		searchView = (SearchView) menu.findItem(R.id.menu_partners_search)
+				.getActionView();
+		searchView.setOnQueryTextListener(queryListener);
 		return true;
 	}
+
+	/* list search handler */
+	/** The grid_current query. */
+	private String grid_currentQuery = null; // holds the current query...
+
+	/** The query listener. */
+	public OnQueryTextListener queryListener = new OnQueryTextListener() {
+
+		private boolean isSearched = false;
+
+		@Override
+		public boolean onQueryTextChange(String newText) {
+
+			if (TextUtils.isEmpty(newText)) {
+				grid_currentQuery = null;
+				newText = "";
+				if (isSearched && listAdapters != null) {
+					listAdapters.getFilter().filter(null);
+				}
+
+			} else {
+				isSearched = true;
+				grid_currentQuery = newText;
+				listAdapters.getFilter().filter(newText);
+			}
+
+			return false;
+		}
+
+		@Override
+		public boolean onQueryTextSubmit(String query) {
+			return false;
+		}
+	};
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

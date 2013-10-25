@@ -38,7 +38,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Html;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -142,6 +144,15 @@ public class MessageComposeActivty extends Activity {
 
 		} else {
 			getActionBar().setTitle("Compose");
+			EditText edtTo = (EditText) findViewById(R.id.edtMessageTo);
+			edtTo.setInputType(InputType.TYPE_NULL);
+			edtTo.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					startActivityAddRecipients();
+				}
+			});
 		}
 
 		lstAttachments = (ListView) findViewById(R.id.lstAttachments);
@@ -188,15 +199,18 @@ public class MessageComposeActivty extends Activity {
 
 					@Override
 					public void onClick(View arg0) {
-						// TODO Auto-generated method stub
-						Intent intent = new Intent(MessageComposeActivty.this,
-								MessageRecipientActivity.class);
-						intent.putExtra("selected_ids", selectedPartners);
-						startActivityForResult(intent, ADD_RECIPIENT);
+						startActivityAddRecipients();
 					}
 				});
 
 		handleIntentFilter(getIntent());
+	}
+
+	public void startActivityAddRecipients() {
+		Intent intent = new Intent(MessageComposeActivty.this,
+				MessageRecipientActivity.class);
+		intent.putExtra("selected_ids", selectedPartners);
+		startActivityForResult(intent, ADD_RECIPIENT);
 	}
 
 	public JSONArray getPartnersOfMessage(String message_id) {
@@ -585,10 +599,11 @@ public class MessageComposeActivty extends Activity {
 			// Message Details
 			String subject = values.get("subject").toString();
 			String body = values.get("body").toString();
-			JSONArray partner_ids = (JSONArray) values.get("partner_ids");
-			JSONArray attachment_ids = (JSONArray) values.get("attachment_ids");
-
 			try {
+				JSONArray partner_ids = new JSONArray(values.get("partner_ids")
+						.toString());
+				JSONArray attachment_ids = new JSONArray(values.get(
+						"attachment_ids").toString());
 				MessageDBHelper message = new MessageDBHelper(
 						MainActivity.context);
 				OEHelper oe = message.getOEInstance();
@@ -598,13 +613,9 @@ public class MessageComposeActivty extends Activity {
 				String crate_date = OEDate.getDate();
 				JSONObject kwargs = new JSONObject();
 				kwargs.put("body", body);
-				values.put("body", body);
-
 				kwargs.put("subject", subject);
 				kwargs.put("date", crate_date);
 				kwargs.put("parent_id", message_id);
-				values.put("parent_id", message_id);
-				values.put("attachment_ids", attachment_ids.toString());
 				kwargs.put("attachment_ids", attachment_ids);
 				kwargs.put("partner_ids", partner_ids);
 
@@ -627,13 +638,15 @@ public class MessageComposeActivty extends Activity {
 						new JSONArray());
 
 				kwargs.put("context", oecontext);
-
 				kwargs.put("type", "comment");
-				values.put("type", "comment");
-
 				kwargs.put("content_subtype", "plaintext");
 				kwargs.put("subtype", "mail.mt_comment");
-
+				
+				
+				values.put("type", "comment");
+				values.put("body", body);
+				values.put("parent_id", message_id);
+				values.put("attachment_ids", attachment_ids.toString());
 				values.put("email_from", "false");
 				values.put("record_name", "false");
 				values.put("to_read", "false");
@@ -642,7 +655,7 @@ public class MessageComposeActivty extends Activity {
 				values.put("res_id", oecontext.getString("default_res_id"));
 				values.put("date", crate_date);
 				values.put("starred", "false");
-				values.put("partner_ids", parent_row.get("partners").toString());
+				values.put("partner_ids", partner_ids.toString());
 				oe.updateKWargs(kwargs);
 				JSONObject result = oe.call_kw("mail.thread", "message_post",
 						arguments);

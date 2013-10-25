@@ -7,6 +7,13 @@
         android:title="Get from server">
     </item>
     <item
+        android:id="@+id/menu_partners_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_action_search"
+        android:showAsAction="always"
+        android:title="Search">
+    </item>
+    <item
         android:id="@+id/menu_add_recipients"
         android:icon="@drawable/ic_action_done"
         android:showAsAction="always"
