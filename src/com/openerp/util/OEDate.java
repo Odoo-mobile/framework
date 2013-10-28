@@ -18,16 +18,11 @@
  */
 package com.openerp.util;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Currency;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-
-import android.text.TextUtils;
-import android.util.Log;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -167,5 +162,18 @@ public class OEDate {
 		TimeZone gmtTime = TimeZone.getTimeZone("GMT");
 		gmtFormat.setTimeZone(gmtTime);
 		return gmtFormat.format(new Date());
+	}
+
+	public static String getDateBefore(int days) {
+		Date today = new Date();
+		Calendar cal = new GregorianCalendar();
+		cal.setTime(today);
+		cal.add(Calendar.DAY_OF_MONTH, days * -1);
+		Date date = cal.getTime();
+		SimpleDateFormat gmtFormat = new SimpleDateFormat();
+		gmtFormat.applyPattern("yyyy-MM-dd 00:00:00");
+		TimeZone gmtTime = TimeZone.getTimeZone("GMT");
+		gmtFormat.setTimeZone(gmtTime);
+		return gmtFormat.format(date);
 	}
 }

@@ -32,9 +32,11 @@ import android.content.ComponentName;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.openerp.MainActivity;
@@ -46,6 +48,7 @@ import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
+import com.openerp.util.OEDate;
 import com.openerp.util.OENotificationHelper;
 import com.openerp.widget.Mobile_Widget;
 
@@ -147,8 +150,18 @@ public class MessageSyncService extends Service {
 				arg1.addArgCondition("id", "not in", JSONDataHelper
 						.intArrayToJSONArray(msgDb.localIds(msgDb)));
 
+				// Handling setting argument for sync data limit.
+				OEArgsHelper arg_date = new OEArgsHelper();
+				SharedPreferences pref = PreferenceManager
+						.getDefaultSharedPreferences(context);
+				int data_limit = Integer.parseInt(pref.getString(
+						"sync_data_limit", "60"));
+				arg_date.addArgCondition("create_date", ">=",
+						OEDate.getDateBefore(data_limit));
+
 				OEArgsHelper mainArg_2 = new OEArgsHelper();
 				mainArg_2.addArg(arg1.getArgs());
+				mainArg_2.addArg(arg_date.getArgs());
 				if (!extras.containsKey("group_ids")) {
 
 					// Argument for check partner_ids.user_id is current user

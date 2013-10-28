@@ -34,6 +34,8 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -42,6 +44,7 @@ import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.UserObject;
 import com.openerp.support.listview.OEListViewRows;
+import com.openerp.util.OEDate;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -96,7 +99,8 @@ public class OEHelper extends OpenERP {
 	 * @throws OEVersionException
 	 */
 	public OEHelper(Context context, UserObject data)
-			throws ClientProtocolException, JSONException, IOException, OEVersionException {
+			throws ClientProtocolException, JSONException, IOException,
+			OEVersionException {
 		super(data.getHost(), OpenERPServerConnection
 				.isNetworkAvailable(context));
 		this.mContext = context;
@@ -504,6 +508,18 @@ public class OEHelper extends OpenERP {
 		JSONObject fields = getFieldsFromCols(getSyncCols(db.getServerColumns()));
 		String model = db.getModelName();
 		try {
+			JSONArray domainArgs = new JSONArray();
+			if (domain == null) {
+				domain = new JSONObject();
+			} else {
+				domainArgs = domain.getJSONArray("domain");
+			}
+			SharedPreferences pref = PreferenceManager
+					.getDefaultSharedPreferences(mContext);
+			int data_limit = Integer.parseInt(pref.getString("sync_data_limit",
+					"60"));
+			domainArgs.put(new JSONArray("[\"create_date\", \">=\", \""
+					+ OEDate.getDateBefore(data_limit) + "\"]"));
 			return search_read(model, fields, domain, 0, 50, null, null);
 		} catch (Exception e) {
 		}
