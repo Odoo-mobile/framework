@@ -954,7 +954,6 @@ public class ORM extends SQLiteDatabaseHelper {
 		List<HashMap<String, Object>> data = getResult(dbHelper, columns,
 				cursor);
 		db.close();
-		cursor.close();
 		return data;
 	}
 
