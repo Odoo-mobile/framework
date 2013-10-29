@@ -29,7 +29,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -83,7 +82,6 @@ public class DetailNoteFragment extends BaseFragment {
 
 		// handling Menubutton[Marks As Done or Open] depending upon note status
 		if (getArguments() != null) {
-			Bundle bundle = this.getArguments();
 			row_status = getArguments().getString("row_status");
 
 			if (row_status.equalsIgnoreCase("true")) {
