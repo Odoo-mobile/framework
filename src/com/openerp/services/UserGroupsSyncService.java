@@ -137,7 +137,8 @@ public class UserGroupsSyncService extends Service {
 									+ partner_id + "],[\"res_model\",\"=\", \""
 									+ usergroups.getModelName() + "\"]]"));
 
-					if (oe_1.syncWithServer(group_follower, domain)) {
+					if (oe_1.syncWithServer(group_follower, domain, false,
+							false)) {
 						Log.i(TAG, "UserGroups Sync Finished");
 						MailFollowerDb follower = new MailFollowerDb(context);
 						List<HashMap<String, Object>> user_groups = follower
