@@ -55,6 +55,7 @@ import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.FragmentHandler;
+import com.openerp.support.JSONDataHelper;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
@@ -564,9 +565,19 @@ public class Note extends BaseFragment implements
 					OpenERPAccountManager.currentUser(context));
 			db = new NoteDBHelper(context);
 			NoteDBHelper.NoteStages stagesobj = db.new NoteStages(context);
+			int user_id = Integer.parseInt(OpenERPAccountManager.currentUser(
+					context).getUser_id());
 
+			JSONObject domain = new JSONObject();
+			domain.accumulate(
+					"domain",
+					new JSONArray("[[\"user_id\",\"=\","
+							+ user_id
+							+ "],[\"id\",\"not in\","
+							+ JSONDataHelper.intArrayToJSONArray(stagesobj
+									.localIds(stagesobj)) + "]]"));
 			if (stagesobj.isEmptyTable(stagesobj)) {
-				oe.syncWithServer(stagesobj);
+				oe.syncWithServer(stagesobj, domain);
 			}
 			HashMap<String, Object> data = stagesobj.search(stagesobj);
 			int total = Integer.parseInt(data.get("total").toString());
