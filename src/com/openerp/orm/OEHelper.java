@@ -320,6 +320,20 @@ public class OEHelper extends OpenERP {
 		return success;
 	}
 
+	public boolean syncWithServer(BaseDBHelper db, JSONObject domain,
+			boolean delete, boolean syncLimitedData) {
+		deleted_rows = new HashMap<String, List<HashMap<String, Object>>>();
+		boolean success = false;
+		try {
+			JSONObject result = getDataFromServer(db, domain, syncLimitedData);
+			if (result != null) {
+				success = handleServerData(db, result, delete);
+			}
+		} catch (Exception e) {
+		}
+		return success;
+	}
+
 	/**
 	 * sync with server
 	 * 
@@ -495,6 +509,33 @@ public class OEHelper extends OpenERP {
 		return deleted_rows;
 	}
 
+	private JSONObject getDataFromServer(BaseDBHelper db, JSONObject domain,
+			boolean loadLimitedData) {
+		JSONObject fields = getFieldsFromCols(getSyncCols(db.getServerColumns()));
+		String model = db.getModelName();
+		try {
+			if (loadLimitedData) {
+				JSONArray domainArgs = new JSONArray();
+				if (domain == null) {
+					domain = new JSONObject();
+				} else {
+					domainArgs = domain.getJSONArray("domain");
+				}
+				SharedPreferences pref = PreferenceManager
+						.getDefaultSharedPreferences(mContext);
+				int data_limit = Integer.parseInt(pref.getString(
+						"sync_data_limit", "60"));
+				domainArgs.put(new JSONArray("[\"create_date\", \">=\", \""
+						+ OEDate.getDateBefore(data_limit) + "\"]"));
+				domain.put("domain", domainArgs);
+			}
+			return search_read(model, fields, domain, 0, 50, null, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	/**
 	 * Gets the data from server.
 	 * 
@@ -505,26 +546,7 @@ public class OEHelper extends OpenERP {
 	 * @return the data from server
 	 */
 	private JSONObject getDataFromServer(BaseDBHelper db, JSONObject domain) {
-		JSONObject fields = getFieldsFromCols(getSyncCols(db.getServerColumns()));
-		String model = db.getModelName();
-		try {
-			JSONArray domainArgs = new JSONArray();
-			if (domain == null) {
-				domain = new JSONObject();
-			} else {
-				domainArgs = domain.getJSONArray("domain");
-			}
-			SharedPreferences pref = PreferenceManager
-					.getDefaultSharedPreferences(mContext);
-			int data_limit = Integer.parseInt(pref.getString("sync_data_limit",
-					"60"));
-			domainArgs.put(new JSONArray("[\"create_date\", \">=\", \""
-					+ OEDate.getDateBefore(data_limit) + "\"]"));
-			return search_read(model, fields, domain, 0, 50, null, null);
-		} catch (Exception e) {
-		}
-		return null;
-
+		return getDataFromServer(db, domain, true);
 	}
 
 	/**
@@ -601,7 +623,7 @@ public class OEHelper extends OpenERP {
 			JSONObject domain = new JSONObject();
 			domain.accumulate("domain", new JSONArray().put(args.getArgs()));
 
-			JSONObject result = getDataFromServer(db, domain);
+			JSONObject result = getDataFromServer(db, domain, false);
 			if (result != null) {
 				success = handleServerData(db, result, can_delete);
 			}
