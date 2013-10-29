@@ -33,8 +33,10 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import com.openerp.addons.meeting.MeetingDBHelper;
+import com.openerp.addons.note.NoteDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.JSONDataHelper;
@@ -164,12 +166,18 @@ public class MeetingSyncService extends Service {
 				account = OpenERPAccountManager.getAccount(mContext,
 						OpenERPAccountManager.currentUser(mContext)
 								.getAndroidName());
+
 				try {
-					// checking whether user exist with this account name
-					if (account != null) {
-						// creating object to call performing sync operation
-						new MeetingSyncService().performSync(mContext, account,
-								bundle, str, providerClient, syncResult);
+					db = new MeetingDBHelper(mContext);
+					// checking whether crm.meeting module installed or not
+					if (db.getOEInstance().isInstalled("note.note")) {
+						// checking whether user exist with this account name
+						if (account != null) {
+							// creating object to call performing sync operation
+							new MeetingSyncService().performSync(mContext,
+									account, bundle, str, providerClient,
+									syncResult);
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

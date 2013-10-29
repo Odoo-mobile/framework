@@ -208,54 +208,59 @@ public class UserGroups extends BaseFragment implements
 	@Override
 	public OEMenu menuHelper(Context context) {
 		db = (BaseDBHelper) databaseHelper(context);
-		OEMenu group_menu = new OEMenu();
-		group_menu.setMenuTitle("My Groups");
-		group_menu.setId(0);
+		if (db.getOEInstance().isInstalled("mail.group")) {
+			OEMenu group_menu = new OEMenu();
+			group_menu.setMenuTitle("My Groups");
+			group_menu.setId(0);
 
-		List<OEMenuItems> group_menu_items = new ArrayList<OEMenuItems>();
-		// default join group menu
-		group_menu_items.add(new OEMenuItems("Join a Group", new UserGroups(),
-				0));
+			List<OEMenuItems> group_menu_items = new ArrayList<OEMenuItems>();
+			// default join group menu
+			group_menu_items.add(new OEMenuItems("Join a Group",
+					new UserGroups(), 0));
 
-		// Add dynamic groups
-		MailFollowerDb followers = new MailFollowerDb(context);
-		HashMap<String, Object> user_groups = followers.search(followers,
-				new String[] { "res_model = ?", "AND", "partner_id = ? " },
-				new String[] {
-						db.getModelName(),
-						OpenERPAccountManager.currentUser(context)
-								.getPartner_id() });
-		int total = Integer.parseInt(user_groups.get("total").toString());
-		if (total > 0) {
-			int i = 0;
-			List<HashMap<String, Object>> records = (List<HashMap<String, Object>>) user_groups
-					.get("records");
-			for (HashMap<String, Object> row : records) {
-				if (i > tag_colors.length - 1) {
-					i = 0;
-				}
-
-				List<HashMap<String, Object>> group_rec = (List<HashMap<String, Object>>) db
-						.search(db, new String[] { "id = ?" },
-								new String[] { row.get("res_id").toString() })
+			// Add dynamic groups
+			MailFollowerDb followers = new MailFollowerDb(context);
+			HashMap<String, Object> user_groups = followers.search(followers,
+					new String[] { "res_model = ?", "AND", "partner_id = ? " },
+					new String[] {
+							db.getModelName(),
+							OpenERPAccountManager.currentUser(context)
+									.getPartner_id() });
+			int total = Integer.parseInt(user_groups.get("total").toString());
+			if (total > 0) {
+				int i = 0;
+				List<HashMap<String, Object>> records = (List<HashMap<String, Object>>) user_groups
 						.get("records");
-				String group_name = group_rec.get(0).get("name").toString();
-				int key = Integer.parseInt(group_rec.get(0).get("id")
-						.toString());
-				OEMenuItems group_menu_item = new OEMenuItems(group_name,
-						getGroupInstance(key), getGroupCount(context, key));
-				group_menu_item.setAutoMenuTagColor(true);
-				group_menu_item
-						.setMenuTagColor(Color.parseColor(tag_colors[i]));
-				menu_color.put("group_" + key,
-						group_menu_item.getMenuTagColor());
-				group_names.put("group_" + key, group_menu_item.getTitle());
-				group_menu_items.add(group_menu_item);
-				i++;
+				for (HashMap<String, Object> row : records) {
+					if (i > tag_colors.length - 1) {
+						i = 0;
+					}
+
+					List<HashMap<String, Object>> group_rec = (List<HashMap<String, Object>>) db
+							.search(db,
+									new String[] { "id = ?" },
+									new String[] { row.get("res_id").toString() })
+							.get("records");
+					String group_name = group_rec.get(0).get("name").toString();
+					int key = Integer.parseInt(group_rec.get(0).get("id")
+							.toString());
+					OEMenuItems group_menu_item = new OEMenuItems(group_name,
+							getGroupInstance(key), getGroupCount(context, key));
+					group_menu_item.setAutoMenuTagColor(true);
+					group_menu_item.setMenuTagColor(Color
+							.parseColor(tag_colors[i]));
+					menu_color.put("group_" + key,
+							group_menu_item.getMenuTagColor());
+					group_names.put("group_" + key, group_menu_item.getTitle());
+					group_menu_items.add(group_menu_item);
+					i++;
+				}
 			}
+			group_menu.setMenuItems(group_menu_items);
+			return group_menu;
+		} else {
+			return null;
 		}
-		group_menu.setMenuItems(group_menu_items);
-		return group_menu;
 	}
 
 	private Message getGroupInstance(int key) {

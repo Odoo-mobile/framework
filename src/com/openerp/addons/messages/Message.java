@@ -57,6 +57,7 @@ import android.widget.Toast;
 import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
+import com.openerp.addons.note.NoteDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.DataSetChangeReceiver;
@@ -702,28 +703,35 @@ public class Message extends BaseFragment implements
 	@Override
 	public OEMenu menuHelper(Context context) {
 		// TODO Auto-generated method stub
-		OEMenu menu = new OEMenu();
-		List<OEMenuItems> menuitems = new ArrayList<OEMenuItems>();
-		menu.setId(1);
-		menu.setMenuTitle("Messages");
+		db = (MessageDBHelper) databaseHelper(context);
+		if (db.getOEInstance().isInstalled("mail.message")) {
+			OEMenu menu = new OEMenu();
+			List<OEMenuItems> menuitems = new ArrayList<OEMenuItems>();
+			menu.setId(1);
+			menu.setMenuTitle("Messages");
 
-		menuitems.add(new OEMenuItems(R.drawable.ic_menu_inbox_main_holo_light,
-				"Inbox", this.getObjectOFClass("type", "inbox"), getCount(
-						TYPE.INBOX, context)));
-		int tomeTotal = getCount(TYPE.TOME, context);
-		if (tomeTotal > 0) {
-			tomeTotal = tomeTotal - 1;
+			menuitems.add(new OEMenuItems(
+					R.drawable.ic_menu_inbox_main_holo_light, "Inbox", this
+							.getObjectOFClass("type", "inbox"), getCount(
+							TYPE.INBOX, context)));
+			int tomeTotal = getCount(TYPE.TOME, context);
+			if (tomeTotal > 0) {
+				tomeTotal = tomeTotal - 1;
+			}
+			menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To: me",
+					this.getObjectOFClass("type", "to-me"), tomeTotal));
+			menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-do",
+					this.getObjectOFClass("type", "to-do"), getCount(TYPE.TODO,
+							context)));
+			menuitems.add(new OEMenuItems(
+					R.drawable.ic_menu_archive_holo_light, "Archives", this
+							.getObjectOFClass("type", "archive"), 0));
+
+			menu.setMenuItems(menuitems);
+			return menu;
+		} else {
+			return null;
 		}
-		menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To: me", this
-				.getObjectOFClass("type", "to-me"), tomeTotal));
-		menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-do", this
-				.getObjectOFClass("type", "to-do"),
-				getCount(TYPE.TODO, context)));
-		menuitems.add(new OEMenuItems(R.drawable.ic_menu_archive_holo_light,
-				"Archives", this.getObjectOFClass("type", "archive"), 0));
-
-		menu.setMenuItems(menuitems);
-		return menu;
 	}
 
 	public int getCount(TYPE type, Context context) {

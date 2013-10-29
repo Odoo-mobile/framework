@@ -217,9 +217,7 @@ public class Note extends BaseFragment implements
 			return menu;
 		} else {
 			return null;
-
 		}
-
 	}
 
 	private Note getFragBundle(String key, String val) {

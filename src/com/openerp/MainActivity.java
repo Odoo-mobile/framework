@@ -447,11 +447,13 @@ public class MainActivity extends FragmentActivity {
 	public void selectItem(int position) {
 		set_setting_menu = false;
 		Fragment fragment = null;
-		if (this.systemMenus != null) {
+		if (this.systemMenus != null && this.systemMenus.length > 0) {
 			getActionBar().setDisplayShowTitleEnabled(true);
 			getActionBar()
 					.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+
 			setTitle(this.systemMenus[position].getTitle());
+
 			Object instance = this.systemMenus[position].getFragmentInstance();
 			if (instance instanceof Intent) {
 				startActivity((Intent) instance);
@@ -466,6 +468,10 @@ public class MainActivity extends FragmentActivity {
 					fragment.setArguments(tagcolor);
 				}
 			}
+		} else {
+			Toast.makeText(this, "No Module installed on server !",
+					Toast.LENGTH_LONG).show();
+			finish();
 		}
 		if (fragment != null) {
 
