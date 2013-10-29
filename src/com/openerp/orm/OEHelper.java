@@ -35,10 +35,13 @@ import org.json.JSONObject;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.base.ir.Ir_model;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
@@ -724,5 +727,61 @@ public class OEHelper extends OpenERP {
 		} catch (Exception e) {
 		}
 		return oeFields;
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean isInstalled(String modelname) {
+		String oea_name = OpenERPAccountManager.currentUser(mContext)
+				.getAndroidName();
+		Ir_model modelObj = new Ir_model(mContext);
+		boolean flag = false;
+		try {
+			JSONObject fields = new JSONObject();
+			fields.accumulate("fields", "model");
+			JSONObject domain = new JSONObject();
+			JSONArray domainArgs = new JSONArray();
+			domainArgs.put(new JSONArray("[\"model\",\"=\",\"" + modelname
+					+ "\"]"));
+			domain.put("domain", domainArgs);
+			JSONObject res = search_read("ir.model", fields, domain, 0, 0,
+					null, null);
+			if (res.getInt("length") > 0) {
+				flag = true;
+			} else {
+				flag = false;
+			}
+		} catch (Exception e) {
+			HashMap<String, Object> records = modelObj.search(modelObj,
+					new String[] { "is_installed" }, new String[] {
+							"model = ?", " AND ", "oea_name = ?" },
+					new String[] { modelname, oea_name });
+			if (Integer.parseInt(records.get("total").toString()) > 0) {
+				flag = Boolean
+						.parseBoolean(((List<HashMap<String, Object>>) records
+								.get("records")).get(0).get("is_installed")
+								.toString());
+			} else {
+				flag = false;
+			}
+		}
+		/* updating user install module info */
+		int records = modelObj
+				.count(modelObj, new String[] { "model = ?", " AND ",
+						"oea_name = ?" }, new String[] { modelname, oea_name });
+		if (records > 0) {
+			// updating
+			SQLiteDatabase db = modelObj.getWritableDatabase();
+			db.execSQL(
+					"update ir_model set is_installed = ? where model = ? and oea_name = ?",
+					new String[] { String.valueOf(flag), modelname, oea_name });
+			db.close();
+		} else {
+			ContentValues data_values = new ContentValues();
+			data_values.put("id", 0);
+			data_values.put("model", modelname);
+			data_values.put("is_installed", String.valueOf(flag));
+			modelObj.create(modelObj, data_values);
+		}
+		return flag;
 	}
 }

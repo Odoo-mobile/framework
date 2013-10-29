@@ -87,10 +87,10 @@ public class Note extends BaseFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		setHasOptionsMenu(true);
 		scope = new AppScope(MainActivity.userContext,
 				(MainActivity) getActivity());
 		db = (NoteDBHelper) getModel();
+		setHasOptionsMenu(true);
 		rootView = inflater.inflate(R.layout.fragment_note, container, false);
 		lstNotes = (ListView) rootView.findViewById(R.id.lstNotes);
 		emptyNotesText = (TextView) rootView
@@ -181,35 +181,43 @@ public class Note extends BaseFragment implements
 	public OEMenu menuHelper(Context context) {
 		// TODO Auto-generated method stub
 
-		OEMenu menu = new OEMenu();
-		menu.setId(1);
-		menu.setMenuTitle("Notes");
-		setNoteStages(context);
+		db = (NoteDBHelper) databaseHelper(context);
+		if (db.getOEInstance().isInstalled("note.note")) {
+			OEMenu menu = new OEMenu();
+			menu.setId(1);
+			menu.setMenuTitle("Notes");
+			setNoteStages(context);
 
-		// Setting list of stages under Note in Drawable menu
-		List<OEMenuItems> items = new ArrayList<OEMenuItems>();
-		items.add(new OEMenuItems("All", getFragBundle("stage", "-1"),
-				getCount("-1", context)));
-		items.add(new OEMenuItems("Archive", getFragBundle("stage", "-2"), 0));
+			// Setting list of stages under Note in Drawable menu
+			List<OEMenuItems> items = new ArrayList<OEMenuItems>();
+			items.add(new OEMenuItems("All", getFragBundle("stage", "-1"),
+					getCount("-1", context)));
+			items.add(new OEMenuItems("Archive", getFragBundle("stage", "-2"),
+					0));
 
-		if (stages != null) {
-			int i = 0;
-			for (String key : stages.keySet()) {
-				if (i > tag_colors.length - 1) {
-					i = 0;
+			if (stages != null) {
+				int i = 0;
+				for (String key : stages.keySet()) {
+					if (i > tag_colors.length - 1) {
+						i = 0;
+					}
+					OEMenuItems stageMenu = new OEMenuItems(stages.get(key)
+							.toString(), getFragBundle("stage", key), getCount(
+							key, context));
+					stageMenu.setAutoMenuTagColor(true);
+					stageMenu.setMenuTagColor(Color.parseColor(tag_colors[i]));
+					stage_colors.put("stage_" + key,
+							stageMenu.getMenuTagColor());
+					items.add(stageMenu);
+					i++;
 				}
-				OEMenuItems stageMenu = new OEMenuItems(stages.get(key)
-						.toString(), getFragBundle("stage", key), getCount(key,
-						context));
-				stageMenu.setAutoMenuTagColor(true);
-				stageMenu.setMenuTagColor(Color.parseColor(tag_colors[i]));
-				stage_colors.put("stage_" + key, stageMenu.getMenuTagColor());
-				items.add(stageMenu);
-				i++;
 			}
+			menu.setMenuItems(items);
+			return menu;
+		} else {
+			return null;
+
 		}
-		menu.setMenuItems(items);
-		return menu;
 
 	}
 
@@ -549,6 +557,7 @@ public class Note extends BaseFragment implements
 
 	/* Method for fetching stages of notes */
 	public void setNoteStages(Context context) {
+
 		stages = new HashMap<String, String>();
 		try {
 			OEHelper oe = new OEHelper(context,

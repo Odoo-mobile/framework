@@ -26,6 +26,7 @@ import android.content.Context;
 
 import com.openerp.MainActivity;
 import com.openerp.base.ir.AttachmentFragment;
+import com.openerp.base.ir.Ir_modelFragment;
 import com.openerp.base.res.ResFragment;
 import com.openerp.config.ModulesConfig;
 import com.openerp.orm.BaseDBHelper;
@@ -77,6 +78,8 @@ public class Boot {
 				new ResFragment(), 0));
 		this.modules.add(new Module("ir_attachment", "Ir_Attachment",
 				new AttachmentFragment(), 0));
+		this.modules.add(new Module("ir_model", "Ir_Model",
+				new Ir_modelFragment(), 0));
 	}
 
 	/**
