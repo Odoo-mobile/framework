@@ -705,7 +705,7 @@ public class Message extends BaseFragment implements
 		OEMenu menu = new OEMenu();
 		List<OEMenuItems> menuitems = new ArrayList<OEMenuItems>();
 		menu.setId(1);
-		menu.setMenuTitle("Message");
+		menu.setMenuTitle("Messages");
 
 		menuitems.add(new OEMenuItems(R.drawable.ic_menu_inbox_main_holo_light,
 				"Inbox", this.getObjectOFClass("type", "inbox"), getCount(
@@ -714,13 +714,13 @@ public class Message extends BaseFragment implements
 		if (tomeTotal > 0) {
 			tomeTotal = tomeTotal - 1;
 		}
-		menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To:Me", this
+		menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To: me", this
 				.getObjectOFClass("type", "to-me"), tomeTotal));
-		menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-Do", this
+		menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-do", this
 				.getObjectOFClass("type", "to-do"),
 				getCount(TYPE.TODO, context)));
 		menuitems.add(new OEMenuItems(R.drawable.ic_menu_archive_holo_light,
-				"Archive", this.getObjectOFClass("type", "archive"), 0));
+				"Archives", this.getObjectOFClass("type", "archive"), 0));
 
 		menu.setMenuItems(menuitems);
 		return menu;
