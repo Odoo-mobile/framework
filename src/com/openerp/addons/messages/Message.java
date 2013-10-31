@@ -1208,13 +1208,15 @@ public class Message extends BaseFragment implements
 								.setVisibility(View.GONE);
 						rootView.findViewById(R.id.lstMessages).setVisibility(
 								View.VISIBLE);
+						setupListView(message_list);
+						searchView
+								.setOnQueryTextListener(getQueryListener(listAdapter));
+						loadMessage = null;
 					} catch (Exception e) {
 					}
 				}
 			});
-			setupListView(this.message_list);
-			searchView.setOnQueryTextListener(getQueryListener(listAdapter));
-			loadMessage = null;
+
 		}
 
 	}
