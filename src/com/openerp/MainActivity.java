@@ -59,6 +59,7 @@ import com.openerp.support.Module;
 import com.openerp.support.UserObject;
 import com.openerp.support.menu.OEMenuItems;
 import com.openerp.util.Base64Helper;
+import com.openerp.util.OnBackButtonPressedListener;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -78,6 +79,7 @@ public class MainActivity extends FragmentActivity {
 	private OEMenuItems[] systemMenus = null;
 	public static boolean set_setting_menu = false;
 	ListView drawablelist = null;
+	OnBackButtonPressedListener backPressed = null;
 
 	/*
 	 * (non-Javadoc)
@@ -633,4 +635,20 @@ public class MainActivity extends FragmentActivity {
 			setTitle(userContext.getUsername(), userContext.getHost());
 		}
 	}
+
+	@Override
+	public void onBackPressed() {
+		if (backPressed != null) {
+			if (backPressed.onBackPressed()) {
+				super.onBackPressed();
+			}
+		} else {
+			super.onBackPressed();
+		}
+	}
+
+	public void setOnBackPressed(OnBackButtonPressedListener callback) {
+		backPressed = callback;
+	}
+
 }
