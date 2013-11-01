@@ -138,7 +138,8 @@ public class MessageDetail extends BaseFragment {
 		listAdapter.addImageColumn("image");
 		// listAdapter.layoutBackgroundColor("parent_id",
 		// Color.parseColor("#aaaaaa"), Color.parseColor("#0099cc"));
-		listAdapter.cleanDate("date", scope.User().getTimezone());
+		listAdapter.cleanDate("date", scope.User().getTimezone(),
+				"MMM dd, yyyy,  hh:mm a");
 		listAdapter.addViewListener(new OEListViewOnCreateListener() {
 
 			@Override
@@ -361,7 +362,11 @@ public class MessageDetail extends BaseFragment {
 					}
 					rowObj = new OEListViewRows(msg_id, row_detail);
 					parent_row = row_detail;
-					messages_sorted.add(0, rowObj);
+					if (!row_detail.get("model").toString().equals("false")) {
+						messages_sorted.add(rowObj);
+					} else {
+						messages_sorted.add(0, rowObj);
+					}
 					String sub = rowObj.getRow_data().get("subject").toString();
 					if (sub.equals("false")) {
 						sub = rowObj.getRow_data().get("type").toString();
@@ -704,6 +709,9 @@ public class MessageDetail extends BaseFragment {
 								.setVisibility(View.VISIBLE);
 					} catch (Exception e) {
 					}
+
+					MarkingAsRead read = new MarkingAsRead(message_id);
+					read.execute((Void) null);
 				}
 			});
 		}
@@ -751,6 +759,21 @@ public class MessageDetail extends BaseFragment {
 
 		@Override
 		protected void onPostExecute(Boolean result) {
+		}
+
+	}
+
+	private class MarkingAsRead extends AsyncTask<Void, Void, Boolean> {
+		int message_id = 0;
+
+		public MarkingAsRead(int message_id) {
+			this.message_id = message_id;
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			markAsReadUnreadArchive(true);
+			return true;
 		}
 
 	}

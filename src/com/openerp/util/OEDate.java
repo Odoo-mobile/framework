@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import android.util.Log;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class OEDate.
@@ -37,6 +39,10 @@ public class OEDate {
 	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
 
 	public static String getDate(String date, String toTimezone) {
+		return OEDate.getDate(date, toTimezone, null);
+	}
+
+	public static String getDate(String date, String toTimezone, String format) {
 		Calendar cal = Calendar.getInstance();
 		// cal.setTimeZone(TimeZone.getTimeZone("GMT-1"));
 		Date originalDate = convertToDate(date);
@@ -44,18 +50,28 @@ public class OEDate {
 
 		Date oDate = removeTime(originalDate);
 		Date today = removeTime(currentDate());
-		dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
-		timeFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
 		String finalDateTime = "";
-		if (today.compareTo(oDate) > 0) {
-			// sending date
-			finalDateTime = dateFormat.format(oDate);
+		if (format == null) {
+			dateFormat = new SimpleDateFormat("dd MMM");
+			timeFormat = new SimpleDateFormat("hh:mm a");
+			dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
+			timeFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
+			if (today.compareTo(oDate) > 0) {
+				// sending date
+				finalDateTime = dateFormat.format(oDate);
 
+			} else {
+				// sending time because it's today.
+				finalDateTime = timeFormat.format(convertToTimezone(cal,
+						toTimezone).getTime());
+			}
 		} else {
-			// sending time because it's today.
-			finalDateTime = timeFormat
-					.format(convertToTimezone(cal, toTimezone).getTime());
+			dateFormat = new SimpleDateFormat(format);
+			dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
+			finalDateTime = dateFormat.format(convertFullToTimezone(cal,
+					toTimezone).getTime());
 		}
+
 		return finalDateTime;
 
 	}
@@ -69,29 +85,29 @@ public class OEDate {
 	 *            the timezone
 	 * @return the date
 	 */
-	public static String getDate(String date, String toTimezone,
-			String fromTimezone) {
-		Calendar cal = Calendar.getInstance();
-		// cal.setTimeZone(TimeZone.getTimeZone(fromTimezone));
-		Date originalDate = convertToDate(date);
-		cal.setTime(originalDate);
-
-		Date oDate = removeTime(originalDate);
-		Date today = removeTime(currentDate());
-		dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
-		timeFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
-		String finalDateTime = "";
-		if (today.compareTo(oDate) > 0) {
-			// sending date
-			finalDateTime = dateFormat.format(oDate);
-		} else {
-			// sending time because it's today.
-			finalDateTime = timeFormat
-					.format(convertToTimezone(cal, toTimezone).getTime());
-		}
-		return finalDateTime;
-
-	}
+	// public static String getDate(String date, String toTimezone,
+	// String fromTimezone) {
+	// Calendar cal = Calendar.getInstance();
+	// // cal.setTimeZone(TimeZone.getTimeZone(fromTimezone));
+	// Date originalDate = convertToDate(date);
+	// cal.setTime(originalDate);
+	//
+	// Date oDate = removeTime(originalDate);
+	// Date today = removeTime(currentDate());
+	// dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
+	// timeFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
+	// String finalDateTime = "";
+	// if (today.compareTo(oDate) > 0) {
+	// // sending date
+	// finalDateTime = dateFormat.format(oDate);
+	// } else {
+	// // sending time because it's today.
+	// finalDateTime = timeFormat
+	// .format(convertToTimezone(cal, toTimezone).getTime());
+	// }
+	// return finalDateTime;
+	//
+	// }
 
 	private static Date currentDate() {
 		return new Date();
@@ -136,6 +152,13 @@ public class OEDate {
 		Calendar convertedTime = new GregorianCalendar(
 				TimeZone.getTimeZone(timezone));
 		convertedTime.setTimeInMillis(localTime.getTimeInMillis());
+		return convertedTime;
+	}
+
+	private static Calendar convertFullToTimezone(Calendar cal, String timezone) {
+		Calendar convertedTime = new GregorianCalendar(
+				TimeZone.getTimeZone(timezone));
+		convertedTime.setTimeInMillis(cal.getTimeInMillis());
 		return convertedTime;
 	}
 

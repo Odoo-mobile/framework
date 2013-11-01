@@ -130,6 +130,8 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 
 	/** The timezone. */
 	String timezone = null;
+	/** The date format */
+	String date_format = null;
 
 	/**
 	 * Instantiates a new oE list view adapter.
@@ -269,7 +271,13 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 				}
 
 				if (datecols.contains(key_col)) {
-					data = OEDate.getDate(data, TimeZone.getDefault().getID());
+					if (date_format != null) {
+						data = OEDate.getDate(data, TimeZone.getDefault()
+								.getID(), date_format);
+					} else {
+						data = OEDate.getDate(data, TimeZone.getDefault()
+								.getID());
+					}
 				}
 
 				if (!data.equals("false")) {
@@ -379,6 +387,13 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	public void cleanDate(String column, String timezone) {
 		datecols.add(column);
 		this.timezone = timezone;
+		this.date_format = null;
+	}
+
+	public void cleanDate(String column, String timezone, String format) {
+		datecols.add(column);
+		this.timezone = timezone;
+		this.date_format = format;
 	}
 
 	/**
@@ -484,7 +499,6 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 		rows.get(position).setRow_data(newRowVal.getRow_data());
 		rowdata = newRowVal.getRow_data();
 		isFlagged.put(String.valueOf(position), rowdata.get(column).toString());
-		Log.e("UpdateRows", "ListView Adapter");
 	}
 
 	/*

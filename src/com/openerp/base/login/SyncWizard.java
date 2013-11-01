@@ -1,12 +1,10 @@
 package com.openerp.base.login;
 
-import java.security.Provider;
 import java.util.HashMap;
 
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter.AuthorityEntry;
 import android.content.SyncAdapterType;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -24,7 +22,6 @@ import android.widget.LinearLayout;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.providers.meeting.MeetingProvider;
-import com.openerp.services.ContactSyncService;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
@@ -45,7 +42,7 @@ public class SyncWizard extends BaseFragment {
 				(MainActivity) getActivity());
 		rootView = inflater.inflate(R.layout.fragment_sync_wizard, container,
 				false);
-		getActivity().setTitle("Sync Config");
+		getActivity().setTitle("Configuration");
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		getActivity().getActionBar().setHomeButtonEnabled(false);
 
@@ -68,9 +65,22 @@ public class SyncWizard extends BaseFragment {
 		checkbox = new CheckBox[types.length];
 		int i = 0;
 		int id = 1;
+		for (SyncAdapterType type : types) {
+			if (type.authority.contains("com.openerp")) {
+				String[] parts = TextUtils.split(type.authority, "\\.");
+				String name = parts[parts.length - 1];
+				checkbox[i] = new CheckBox(scope.context());
+				checkbox[i].setId(id);
+				checkbox[i].setText(name);
+				layout.addView(checkbox[i]);
+				authorities.put(id + "", type.authority);
+				i++;
+				id++;
+			}
+		}
 		// meeting
 		checkbox[i] = new CheckBox(scope.context());
-		checkbox[i].setText("Sync meeting");
+		checkbox[i].setText("meetings");
 		checkbox[i].setId(id);
 		layout.addView(checkbox[i]);
 		authorities.put(id + "", MeetingProvider.AUTHORITY);
@@ -80,25 +90,11 @@ public class SyncWizard extends BaseFragment {
 		// contacts
 		checkbox[i] = new CheckBox(scope.context());
 		checkbox[i].setId(id);
-		checkbox[i].setText("Sync contacts");
+		checkbox[i].setText("contacts");
 		layout.addView(checkbox[i]);
 		authorities.put(id + "", ContactsContract.AUTHORITY);
 		i++;
 		id++;
-
-		for (SyncAdapterType type : types) {
-			if (type.authority.contains("com.openerp")) {
-				String[] parts = TextUtils.split(type.authority, "\\.");
-				String name = parts[parts.length - 1];
-				checkbox[i] = new CheckBox(scope.context());
-				checkbox[i].setId(id);
-				checkbox[i].setText("Sync " + name);
-				layout.addView(checkbox[i]);
-				authorities.put(id + "", type.authority);
-				i++;
-				id++;
-			}
-		}
 
 	}
 

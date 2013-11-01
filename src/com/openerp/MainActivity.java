@@ -19,6 +19,7 @@
 package com.openerp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.accounts.Account;
@@ -52,6 +53,7 @@ import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
 import com.openerp.base.account.AccountsDetail;
 import com.openerp.base.account.UserProfile;
+import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.Boot;
 import com.openerp.support.FragmentHandler;
@@ -632,7 +634,20 @@ public class MainActivity extends FragmentActivity {
 								userContext.getAvatar()));
 				getActionBar().setIcon(profPic);
 			}
-			setTitle(userContext.getUsername(), userContext.getHost());
+			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(context);
+			Object obj = partner.search(partner, new String[] { "name" },
+					new String[] { "id = ?" },
+					new String[] { userContext.getPartner_id() })
+					.get("records");
+			String user_name = "";
+			if (obj instanceof Boolean) {
+				user_name = userContext.getUsername();
+			} else {
+				user_name = ((List<HashMap<String, Object>>) obj).get(0)
+						.get("name").toString();
+			}
+
+			setTitle(user_name, userContext.getHost());
 		}
 	}
 
@@ -651,4 +666,35 @@ public class MainActivity extends FragmentActivity {
 		backPressed = callback;
 	}
 
+	private Dialog appCloseConfirmDialog() {
+
+		// Initialize the Alert Dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Source of the data in the DIalog
+
+		// Set the dialog title
+		builder.setTitle("Confirm")
+				.setMessage("Are you sure want to exit?")
+
+				// Set the action buttons
+				.setPositiveButton("Yes",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								// User clicked OK, so save the result somewhere
+								// or return them to the component that opened
+								// the dialog
+								finish();
+							}
+						})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								return;
+							}
+						});
+
+		return builder.create();
+	}
 }

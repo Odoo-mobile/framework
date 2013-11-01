@@ -213,7 +213,8 @@ public class Message extends BaseFragment implements
 				String model = model_name;
 				String res_id = row_data.getRow_data().get("res_id").toString();
 				if (model_name.equals("false")) {
-					model_name = row_data.getRow_data().get("type").toString();
+					model_name = capitalizeString(row_data.getRow_data()
+							.get("type").toString());
 				} else {
 					String[] model_parts = TextUtils.split(model_name, "\\.");
 					HashSet unique_parts = new HashSet(Arrays
@@ -440,6 +441,8 @@ public class Message extends BaseFragment implements
 				messageDetail.setArguments(bundle);
 				scope.context().fragmentHandler.setBackStack(true, null);
 				scope.context().fragmentHandler.replaceFragmnet(messageDetail);
+				list.remove(index);
+				listAdapter.refresh(list);
 			}
 		});
 

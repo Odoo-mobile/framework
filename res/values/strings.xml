@@ -24,8 +24,8 @@
     <string name="action_settings">Settings</string>
 
     <!-- SyncWizard fragment strings -->
-    <string name="syncwizard_title">Enable/Disable your Sync Settings</string>
-    <string name="syncwizard_description">Select your auto sync option so application will get up to-date automatically.</string>
+    <string name="syncwizard_title">Choose your data to load</string>
+    <string name="syncwizard_description">Select your options for the data you want to load from server for this account.</string>
     <string name="account_sync_wizard_button">Continue</string>
     <!-- Message Fragment all read messages -->
     <string name="message_inbox_all_read"><b>Good Job!</b> Your inbox is empty.\n \n
