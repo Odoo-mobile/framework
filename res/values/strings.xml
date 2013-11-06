@@ -11,7 +11,7 @@
     <string name="account_title">Setup Your OpenERP Server</string>
     <string name="account_description">Provide your OpenERP 7.0 Server URL and click on Continue button to test Connection and go next step.</string>
     <string name="account_edit_server_url">Server URL</string>
-    <string name="account_edit_server_port">Port Number (Optional)</string>
+    <string name="account_edit_server_port">Port Number (If any)</string>
     <string name="account_continue_button">Continue</string>
     <string name="account_login_button">Login</string>
 
