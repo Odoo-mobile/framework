@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -38,7 +39,10 @@ public class ComposeNoteActivity extends Activity {
 	HashMap<String, Long> note_Stages = null;
 	ArrayList<String> stages = new ArrayList<String>();
 	String name, memo, open, stage_name;
-	EditText noteDescription;
+	EditText noteDescription, noteTags;
+	private static final int NOTE_ID = 0;
+	JSONArray tagID = new JSONArray();
+	ArrayList<String> tagName = new ArrayList<String>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +51,32 @@ public class ComposeNoteActivity extends Activity {
 		setContentView(R.layout.fragment_compose_note);
 		scope = new AppScope(MainActivity.userContext,
 				(MainActivity) MainActivity.context);
+		noteTags = (EditText) findViewById(R.id.txv_composeNote_Tag);
 		fillNoteStages();
+	}
+
+	public void addTags(View v) {
+		Intent composeNote = new Intent(scope.context(), AddTags.class);
+		startActivityForResult(composeNote, NOTE_ID);
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+
+		case NOTE_ID:
+			if (resultCode == Activity.RESULT_OK) {
+				try {
+					tagID = new JSONArray(data.getExtras().get("result")
+							.toString());
+				} catch (Exception e) {
+				}
+				tagName = data.getExtras().getStringArrayList("result1");
+				noteTags.setText(tagName.toString().replace("[", "")
+						.replace("]", ""));
+			}
+			break;
+		}
 	}
 
 	public void fillNoteStages() {
@@ -181,29 +210,39 @@ public class ComposeNoteActivity extends Activity {
 
 		try {
 			ContentValues values = new ContentValues();
+			JSONObject vals = new JSONObject();
 			values.put("name", generateName(noteDescription.getText()
 					.toString()));
+			vals.put("name", values.get("name").toString());
+
 			values.put("memo", noteDescription.getText().toString());
+			vals.put("memo", values.get("memo").toString());
 			values.put("open", "true");
+			vals.put("open", true);
 			Long stageid = note_Stages.get(noteStages.getSelectedItem()
 					.toString());
 			if (stageid != null) {
 				values.put("stage_id", note_Stages.get(noteStages
 						.getSelectedItem().toString()));
+				vals.put("stage_id",
+						Integer.parseInt(values.get("stage_id").toString()));
 				JSONArray tag_ids = new JSONArray();
 				tag_ids.put(6);
 				tag_ids.put(false);
-				JSONArray c_ids = new JSONArray();
+				JSONArray c_ids = new JSONArray(tagID.toString());
 				tag_ids.put(c_ids);
 				values.put("current_partner_id",
 						Integer.parseInt(scope.User().getUser_id().toString()));
-				values.put("tag_ids", new JSONArray("[" + tag_ids.toString()
-						+ "]").toString());
-
+				vals.put("current_partner_id", values.get("current_partner_id")
+						.toString());
+				vals.put("tag_ids", new JSONArray("[" + tag_ids.toString()
+						+ "]"));
 				dbhelper = new NoteDBHelper(scope.context());
-				int newId = dbhelper.createRecordOnserver(dbhelper, values);
+				int newId = dbhelper.createRecordOnserver(dbhelper, vals);
 				values.put("id", newId);
 				values.put("date_done", "false");
+				values.put("tag_ids", tagID.toString());
+
 				int new_id = dbhelper.create(dbhelper, values);
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra("result", new_id);

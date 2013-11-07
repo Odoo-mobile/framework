@@ -18,16 +18,16 @@
  */
 package com.openerp.addons.note;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.json.JSONArray;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +40,7 @@ import android.widget.TextView;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.addons.messages.MessageComposeActivty;
+import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
@@ -53,8 +54,11 @@ public class DetailNoteFragment extends BaseFragment {
 	String message;
 	String row_status = null;
 	String stageid = null;
+	String tagid = null;
 	Note note = new Note();
 	NoteDBHelper db = null;
+	String[] note_tags = null;
+	String tags = "";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -140,6 +144,7 @@ public class DetailNoteFragment extends BaseFragment {
 			editNoteID.putInt("row_id", row_id);
 			editNoteID.putString("row_details", noteMemo.getText().toString());
 			editNoteID.putString("stage_id", stageid);
+			editNoteID.putString("tag_id", tagid);
 			editnote_fragment.setArguments(editNoteID);
 			scope.context().fragmentHandler.setBackStack(true, null);
 			scope.context().fragmentHandler.replaceFragmnet(editnote_fragment);
@@ -190,7 +195,7 @@ public class DetailNoteFragment extends BaseFragment {
 		noteTags = (TextView) rootview.findViewById(R.id.txv_detailNote_Tags);
 		// Enabling Scrollview
 		noteMemo.setMovementMethod(new ScrollingMovementMethod());
-
+		
 		db = new NoteDBHelper(scope.context());
 		HashMap<String, Object> result = db.search(db, new String[] { "id=?" },
 				new String[] { String.valueOf(note_id) });
@@ -199,24 +204,17 @@ public class DetailNoteFragment extends BaseFragment {
 			@SuppressWarnings("unchecked")
 			HashMap<String, Object> row = ((List<HashMap<String, Object>>) result
 					.get("records")).get(0);
-			message = row.get("memo").toString(); // paassing to next fragment
+			message = row.get("memo").toString(); // paassing to next
+													// followerfragment
 			try {
-				if (row.containsKey("tag_ids")) {
-					JSONArray arr = new JSONArray(row.get("tag_ids").toString());
-					String tags = "";
-					for (int i = 0; i < arr.length(); i++) {
-						try {
-							tags = tags.concat(arr.getJSONArray(i).getString(1)
-									+ ",");
-							tags = tags.substring(0, tags.length() - 1);
-							noteTags.setText(tags);
-						} catch (Exception e) {
-							noteTags.setVisibility(View.GONE);
-						}
-					}
+				note_tags = getNoteTags(String.valueOf(note_id));
+				if (note_tags.length > 0) {
+					tags = TextUtils.join(", ", note_tags);
 				} else {
 					noteTags.setVisibility(View.GONE);
 				}
+				noteTags.setText(tags);
+				tagid = tags;
 				noteMemo.setText(HTMLHelper.stringToHtml(row.get("memo")
 						.toString()));
 			} catch (Exception e) {
@@ -244,5 +242,21 @@ public class DetailNoteFragment extends BaseFragment {
 
 		deleteDialogConfirm.setNegativeButton("Cancel", null);
 		deleteDialogConfirm.show();
+	}
+
+	public String[] getNoteTags(String note_note_id) {
+		String oea_name = OpenERPAccountManager.currentUser(
+				MainActivity.context).getAndroidName();
+		List<HashMap<String, Object>> records = db
+				.executeSQL(
+						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
+						new String[] { note_note_id, oea_name, oea_name });
+		List<String> note_tags = new ArrayList<String>();
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				note_tags.add(row.get("name").toString());
+			}
+		}
+		return note_tags.toArray(new String[note_tags.size()]);
 	}
 }

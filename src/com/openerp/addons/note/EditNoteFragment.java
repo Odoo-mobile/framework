@@ -23,42 +23,62 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
+import com.openerp.util.OnBackButtonPressedListener;
 
 public class EditNoteFragment extends BaseFragment {
 
 	View rootview;
+	ImageView addTags;
 	Spinner noteStages;
 	ArrayAdapter<String> stageAdapter = null;
 	HashMap<String, String> stages = new HashMap<String, String>();;
-	EditText noteName, noteMemo;
+	EditText noteName, noteMemo, noteTag;
 	int row_id = 0;
 	ArrayList<String> stagelist = null;
 	String row_status = null;
 	String stageid = null;
+	String tagid = null;
 	String memo = null;
 	String name = null;
 	NoteDBHelper db = null;
 	ComposeNoteActivity composeNote = null;
+	JSONArray stage_name = null;
+	String originalMemo, originialStage, originialtag;
+	private static final int NOTE_ID = 0;
+	JSONArray tagID = new JSONArray();
+	ArrayList<String> tagName = new ArrayList<String>();
+	private static OEHelper oe_obj = null;
+	boolean flag = false;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +91,60 @@ public class EditNoteFragment extends BaseFragment {
 		rootview = inflater.inflate(R.layout.fragment_edit_note, container,
 				false);
 		handleArguments((Bundle) getArguments());
+
+		addTags = (ImageView) rootview.findViewById(R.id.imgBtnEditTags);
+		addTags.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent EditNoteTags = new Intent(scope.context(), AddTags.class);
+				startActivityForResult(EditNoteTags, NOTE_ID);
+			}
+		});
+
+		scope.context().setOnBackPressed(new OnBackButtonPressedListener() {
+
+			@Override
+			public boolean onBackPressed() {
+				if (isContentChanged(noteMemo.getText().toString(), noteTag
+						.getText().toString())) {
+					if (flag != true) {
+						openDailogview(
+								"Are you sure..?",
+								"Your changes will be discarded. Are you sure?",
+								"Discard", "Cancel");
+						return false;
+					}
+				}
+				return true;
+			}
+		});
+
+		if (oe_obj == null) {
+			oe_obj = getOEInstance();
+		}
+
 		return rootview;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+
+		case NOTE_ID:
+			if (resultCode == Activity.RESULT_OK) {
+				try {
+					tagID = new JSONArray(data.getExtras().get("result")
+							.toString());
+				} catch (Exception e) {
+				}
+				tagName = data.getExtras().getStringArrayList("result1");
+				noteTag.setText(tagName.toString().replace("[", "")
+						.replace("]", ""));
+			}
+			break;
+		}
 	}
 
 	@Override
@@ -81,11 +154,19 @@ public class EditNoteFragment extends BaseFragment {
 
 		case R.id.menu_note_edit_save:
 			updateNote(row_id);
+			flag = true;
 			getActivity().getSupportFragmentManager().popBackStack();
 			return true;
 
 		case R.id.menu_note_edit_cancel:
-			getActivity().getSupportFragmentManager().popBackStack();
+			if (isContentChanged(noteMemo.getText().toString(), noteTag
+					.getText().toString())) {
+				openDailogview("Are you sure..?",
+						"Your changes will be discarded. Are you sure?",
+						"Discard", "Cancel");
+			} else {
+				getActivity().getSupportFragmentManager().popBackStack();
+			}
 			return true;
 
 		default:
@@ -115,9 +196,14 @@ public class EditNoteFragment extends BaseFragment {
 		if (bundle.containsKey("row_id")) {
 			noteMemo = (EditText) rootview
 					.findViewById(R.id.txv_editNote_Description);
+			noteTag = (EditText) rootview.findViewById(R.id.txv_editNote_Tag);
 			row_id = bundle.getInt("row_id");
 			stageid = bundle.getString("stage_id");
+			tagid = bundle.getString("tag_id");
+			originialtag = tagid;
+			noteTag.setText(tagid);
 			setNoteStages(scope.context());
+			originalMemo = bundle.getString("row_details");
 			noteMemo.setText(bundle.getString("row_details"));
 		}
 	}
@@ -167,9 +253,12 @@ public class EditNoteFragment extends BaseFragment {
 		try {
 			// Format stage_id = [[6,"Today"]]
 			if (!stageid.equalsIgnoreCase("false")) {
-				JSONArray tem = new JSONArray(stageid);
-				return tem.getJSONArray(0).getString(1).toString();
+				stage_name = new JSONArray(stageid);
+				originialStage = stage_name.getJSONArray(0).getString(1)
+						.toString();
+				return stage_name.getJSONArray(0).getString(1).toString();
 			} else {
+				originialStage = "New";
 				return "New";
 			}
 
@@ -185,6 +274,7 @@ public class EditNoteFragment extends BaseFragment {
 			composeNote = new ComposeNoteActivity();
 			long stage_id = Long.parseLong(stages.get(noteStages
 					.getSelectedItem().toString()));
+
 			ContentValues values = new ContentValues();
 			values.put("stage_id", stage_id);
 			values.put("name",
@@ -192,10 +282,70 @@ public class EditNoteFragment extends BaseFragment {
 			values.put("memo", Html.toHtml(noteMemo.getText()));
 
 			db = new NoteDBHelper(scope.context());
-			db.write(db, values, row_id);
 
+			JSONObject vals = new JSONObject();
+			vals.put("stage_id",
+					Integer.parseInt(values.get("stage_id").toString()));
+			vals.put("memo", values.get("memo").toString());
+			vals.put("name", values.get("name").toString());
+			JSONArray tag_ids = new JSONArray();
+			tag_ids.put(6);
+			tag_ids.put(false);
+			JSONArray c_ids = new JSONArray(tagID.toString());
+			tag_ids.put(c_ids);
+			vals.put("tag_ids", new JSONArray("[" + tag_ids.toString() + "]"));
+
+			if (oe_obj.updateValues(db.getModelName(), vals, row_id)) {
+				db.executeSQL(
+						"delete from note_note_note_tag_rel where note_note_id = ? and oea_name = ?",
+						new String[] { row_id + "",
+								scope.User().getAndroidName() });
+				for (int i = 0; i < tagID.length(); i++) {
+					ContentValues rel_vals = new ContentValues();
+					rel_vals.put("note_note_id", row_id);
+					rel_vals.put("note_tag_id", tagID.getInt(i));
+					rel_vals.put("oea_name", scope.User().getAndroidName());
+					SQLiteDatabase insertDb = db.getWritableDatabase();
+					insertDb.insert("note_note_note_tag_rel", null, rel_vals);
+					insertDb.close();
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public boolean isContentChanged(String memo, String tag) {
+		if ((originalMemo.length() != memo.length())
+				|| (!originialStage.equalsIgnoreCase(noteStages
+						.getSelectedItem().toString()))
+				|| (originialtag.length() != tag.length())) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+
+	public void openDailogview(String title, String message,
+			String positivebtnText, String negativebtnText) {
+		AlertDialog.Builder deleteDialogConfirm = new AlertDialog.Builder(
+				scope.context());
+		deleteDialogConfirm.setTitle(title);
+		deleteDialogConfirm.setMessage(message);
+		deleteDialogConfirm.setCancelable(true);
+
+		deleteDialogConfirm.setPositiveButton(positivebtnText,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						getActivity().getSupportFragmentManager()
+								.popBackStack();
+					}
+				});
+		deleteDialogConfirm.setNegativeButton(negativebtnText, null);
+		deleteDialogConfirm.show();
 	}
 }
