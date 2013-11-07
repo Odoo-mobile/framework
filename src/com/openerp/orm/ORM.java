@@ -521,6 +521,27 @@ public class ORM extends SQLiteDatabaseHelper {
 	}
 
 	/**
+	 * Creates the record onserver.
+	 * 
+	 * @param dbHelper
+	 *            the db helper
+	 * @param values
+	 *            the values
+	 * @return the int
+	 */
+	public int createRecordOnserver(BaseDBHelper dbHelper, JSONObject values) {
+		String model = dbHelper.getModelName();
+		int newId = 0;
+		try {
+			JSONObject arguments = values;
+			newId = oe_obj.createNew(model, arguments).getInt("result");
+		} catch (Exception e) {
+		}
+		return newId;
+
+	}
+
+	/**
 	 * Search.
 	 * 
 	 * @param db

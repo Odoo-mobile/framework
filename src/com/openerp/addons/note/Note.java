@@ -20,6 +20,7 @@ package com.openerp.addons.note;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -77,7 +78,7 @@ public class Note extends BaseFragment implements
 			"#EBB035" };
 	String[] from = new String[] { "name", "memo", "stage_id" };
 	static HashMap<String, Integer> stage_colors = new HashMap<String, Integer>();
-	HashMap<String, String> stages = null;
+	LinkedHashMap<String, String> stages = null;
 	static boolean rawStrikeStatus = false;
 	String stage_id = "-1";
 	private static final int NOTE_ID = 0;
@@ -149,6 +150,10 @@ public class Note extends BaseFragment implements
 				listAdapter.refresh(listRows);
 				lstNotes.setOnTouchListener(touchListener);
 				lstNotes.setOnScrollListener(touchListener.makeScrollListener());
+
+				// checking if list view is empty ? if not then
+				// Hiding text message of empty list view
+				emptyNotesText.setVisibility(View.GONE);
 			}
 			break;
 		}
@@ -191,10 +196,10 @@ public class Note extends BaseFragment implements
 
 			// Setting list of stages under Note in Drawable menu
 			List<OEMenuItems> items = new ArrayList<OEMenuItems>();
-			items.add(new OEMenuItems("All", getFragBundle("stage", "-1"),
-					getCount("-1", context)));
-			items.add(new OEMenuItems("Archive", getFragBundle("stage", "-2"),
-					0));
+			items.add(new OEMenuItems(R.drawable.ic_menu_notes, "Notes",
+					getFragBundle("stage", "-1"), getCount("-1", context)));
+			items.add(new OEMenuItems(R.drawable.ic_menu_archive_holo_light,
+					"Archive", getFragBundle("stage", "-2"), 0));
 
 			if (stages != null) {
 				int i = 0;
@@ -425,11 +430,10 @@ public class Note extends BaseFragment implements
 
 							// Checking whether list view is empty !
 							if (listAdapter.isEmpty()) {
-
 								// Setting text for empty archive list view
 								if (stage_id.equalsIgnoreCase("-2")) {
 									emptyNotesText
-											.setText("You don't have any archive notes right now.");
+											.setText("You don't have any archived notes right now.");
 								}
 								// Displaying text message of empty list view
 								emptyNotesText.setVisibility(View.VISIBLE);
@@ -452,7 +456,6 @@ public class Note extends BaseFragment implements
 	/* Method for handling STRIKE/UNSTRIKE functionality of notes */
 	public void strikeNote(int note_id, String open, Context context) {
 		try {
-
 			JSONArray args = new JSONArray();
 			JSONArray id = new JSONArray();
 			id.put(note_id);
@@ -465,9 +468,8 @@ public class Note extends BaseFragment implements
 			if (open.equalsIgnoreCase("true")) {
 				res = oe.call_kw("note.note", "onclick_note_is_done", args);
 				values.put("open", "false");
-				db = new NoteDBHelper(context);
 				db.write(db, values, note_id);
-				Toast.makeText(context, "Move to Archive", Toast.LENGTH_SHORT)
+				Toast.makeText(context, "Moved to Archive.", Toast.LENGTH_LONG)
 						.show();
 			}
 			// Update--> Close[false]-->To-->Open[true]
@@ -475,12 +477,12 @@ public class Note extends BaseFragment implements
 				res = oe.call_kw("note.note", "onclick_note_not_done", args);
 				values.put("open", "true");
 				db.write(db, values, note_id);
-				Toast.makeText(context, "Move to All", Toast.LENGTH_SHORT)
-						.show();
+				Toast.makeText(context, "Moved to Active notes.",
+						Toast.LENGTH_LONG).show();
 			}
 			// Refreshing list view after synchronisation
 			// complete
-			scope.context().refreshMenu(context);
+			// scope.context().refreshMenu(scope.context());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -510,13 +512,14 @@ public class Note extends BaseFragment implements
 		int total = Integer.parseInt(results.get("total").toString());
 
 		// Handling text message of empty list view
-		// exa. "You don't have open any notes right now"
+		// exa.
+		// "You don't have any notes right now. / You don't have any active notes right now."
 		if (total == 0) {
 
 			// Setting text for empty archive list view
 			if (stage_id.equalsIgnoreCase("-2")) {
 				emptyNotesText
-						.setText("You don't have any archive notes right now.");
+						.setText("You don't have any archived notes right now.");
 			}
 			emptyNotesText.setVisibility(View.VISIBLE);
 		} else {
@@ -557,7 +560,7 @@ public class Note extends BaseFragment implements
 	/* Method for fetching stages of notes */
 	public void setNoteStages(Context context) {
 
-		stages = new HashMap<String, String>();
+		stages = new LinkedHashMap<String, String>();
 		try {
 			OEHelper oe = new OEHelper(context,
 					OpenERPAccountManager.currentUser(context));
@@ -577,7 +580,8 @@ public class Note extends BaseFragment implements
 			if (stagesobj.isEmptyTable(stagesobj)) {
 				oe.syncWithServer(stagesobj, domain);
 			}
-			HashMap<String, Object> data = stagesobj.search(stagesobj);
+			HashMap<String, Object> data = stagesobj.search(stagesobj, null,
+					null, null, null, null, "id", "ASC");
 			int total = Integer.parseInt(data.get("total").toString());
 			if (total > 0) {
 				@SuppressWarnings("unchecked")
