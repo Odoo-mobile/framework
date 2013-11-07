@@ -57,7 +57,6 @@ import android.widget.Toast;
 import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
-import com.openerp.addons.note.NoteDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.DataSetChangeReceiver;

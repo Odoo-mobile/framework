@@ -21,7 +21,10 @@ import android.widget.LinearLayout;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.providers.groups.UserGroupsProvider;
 import com.openerp.providers.meeting.MeetingProvider;
+import com.openerp.providers.message.MessageProvider;
+import com.openerp.providers.note.NoteProvider;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
@@ -65,34 +68,61 @@ public class SyncWizard extends BaseFragment {
 		checkbox = new CheckBox[types.length];
 		int i = 0;
 		int id = 1;
-		for (SyncAdapterType type : types) {
-			if (type.authority.contains("com.openerp")) {
-				String[] parts = TextUtils.split(type.authority, "\\.");
-				String name = parts[parts.length - 1];
-				checkbox[i] = new CheckBox(scope.context());
-				checkbox[i].setId(id);
-				checkbox[i].setText(name);
-				layout.addView(checkbox[i]);
-				authorities.put(id + "", type.authority);
-				i++;
-				id++;
-			}
-		}
-		// meeting
+		// for (SyncAdapterType type : types) {
+		// if (type.authority.contains("com.openerp")) {
+		// String[] parts = TextUtils.split(type.authority, "\\.");
+		// String name = parts[parts.length - 1];
+		// checkbox[i] = new CheckBox(scope.context());
+		// checkbox[i].setId(id);
+		// checkbox[i].setText(name);
+		// layout.addView(checkbox[i]);
+		// authorities.put(id + "", type.authority);
+		// i++;
+		// id++;
+		// }
+		// }
+		// messages
 		checkbox[i] = new CheckBox(scope.context());
-		checkbox[i].setText("meetings");
 		checkbox[i].setId(id);
+		checkbox[i].setText("Messages");
 		layout.addView(checkbox[i]);
-		authorities.put(id + "", MeetingProvider.AUTHORITY);
+		authorities.put(id + "", MessageProvider.AUTHORITY);
+		i++;
+		id++;
+
+		// groups
+		checkbox[i] = new CheckBox(scope.context());
+		checkbox[i].setId(id);
+		checkbox[i].setText("Groups");
+		layout.addView(checkbox[i]);
+		authorities.put(id + "", UserGroupsProvider.AUTHORITY);
 		i++;
 		id++;
 
 		// contacts
 		checkbox[i] = new CheckBox(scope.context());
 		checkbox[i].setId(id);
-		checkbox[i].setText("contacts");
+		checkbox[i].setText("Contacts");
 		layout.addView(checkbox[i]);
 		authorities.put(id + "", ContactsContract.AUTHORITY);
+		i++;
+		id++;
+
+		// Notes
+		checkbox[i] = new CheckBox(scope.context());
+		checkbox[i].setId(id);
+		checkbox[i].setText("Notes");
+		layout.addView(checkbox[i]);
+		authorities.put(id + "", NoteProvider.AUTHORITY);
+		i++;
+		id++;
+
+		// meeting
+		checkbox[i] = new CheckBox(scope.context());
+		checkbox[i].setText("Meetings");
+		checkbox[i].setId(id);
+		layout.addView(checkbox[i]);
+		authorities.put(id + "", MeetingProvider.AUTHORITY);
 		i++;
 		id++;
 

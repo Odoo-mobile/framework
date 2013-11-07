@@ -2,14 +2,14 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:padding="5dp" >
+    android:padding="3dp" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/container_drop_shadow"
         android:orientation="vertical"
-        android:padding="8dp" >
+        android:padding="4dp" >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -78,7 +78,7 @@
                         android:layout_height="match_parent"
                         android:background="@drawable/oe_background_selector"
                         android:padding="5dp"
-                        android:src="@drawable/ic_action_rating_not_important" />
+                        android:src="@drawable/ic_action_unstarred" />
 
                     <ImageView
                         android:id="@+id/imgBtnReply"

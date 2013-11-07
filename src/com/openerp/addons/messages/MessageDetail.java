@@ -288,8 +288,8 @@ public class MessageDetail extends BaseFragment {
 				});
 		// Setting callback handler for boolean field value change.
 		listAdapter.setBooleanEventOperation("starred",
-				R.drawable.ic_action_rating_important,
-				R.drawable.ic_action_rating_not_important, updateStarred);
+				R.drawable.ic_action_starred, R.drawable.ic_action_unstarred,
+				updateStarred);
 		GridView lstview = (GridView) rootView
 				.findViewById(R.id.lstMessageDetail);
 		// Providing adapter to listview
@@ -479,9 +479,9 @@ public class MessageDetail extends BaseFragment {
 			ImageView img = (ImageView) view;
 			if (rowData.get("starred").toString().equals("false")) {
 				flag = true;
-				img.setImageResource(R.drawable.ic_action_rating_important);
+				img.setImageResource(R.drawable.ic_action_starred);
 			} else {
-				img.setImageResource(R.drawable.ic_action_rating_not_important);
+				img.setImageResource(R.drawable.ic_action_unstarred);
 			}
 			OEArgsHelper messageIds = new OEArgsHelper();
 			messageIds.addArg(row.getRow_id());
