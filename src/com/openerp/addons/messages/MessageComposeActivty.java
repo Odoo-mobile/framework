@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -40,7 +41,6 @@ import android.provider.MediaStore;
 import android.text.Html;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +54,7 @@ import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.orm.Fields;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.support.AppScope;
@@ -64,6 +65,8 @@ import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.OEDate;
+import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.TagsView;
 
 public class MessageComposeActivty extends Activity {
 	private static final int PICKFILE_RESULT_CODE = 1;
@@ -78,8 +81,11 @@ public class MessageComposeActivty extends Activity {
 	boolean is_reply = false;
 	int message_id = 0;
 	AppScope scope = null;
+	TagsView receipients_view = null;
+	List<TagsItems> parters = new ArrayList<TagsItems>();
 	/** The parent_row. */
 	HashMap<String, Object> parent_row = null;
+	ReceipientsTagsCustomAdapter partner_adapter = null;
 
 	enum ATTACHMENT_TYPE {
 		IMAGE, TEXT_FILE
@@ -96,6 +102,15 @@ public class MessageComposeActivty extends Activity {
 				(MainActivity) MainActivity.context);
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+
+		receipients_view = (TagsView) findViewById(R.id.receipients_view);
+		partner_adapter = new ReceipientsTagsCustomAdapter(this,
+				R.layout.message_receipient_item_layout, parters);
+		receipients_view.setAdapter(partner_adapter);
+		/* tags component */
+		parters.addAll(getAllPartners());
+		receipients_view.setPrefix("To: ");
+		receipients_view.allowDuplicates(false);
 
 		Intent replyIntent = getIntent();
 		if (replyIntent.hasExtra("send_reply")) {
@@ -204,6 +219,74 @@ public class MessageComposeActivty extends Activity {
 				});
 
 		handleIntentFilter(getIntent());
+	}
+
+	private List<TagsItems> getAllPartners() {
+		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(this);
+		HashMap<String, Object> records = partners.search(partners,
+				new String[] { "oea_name = ?" },
+				new String[] { OpenERPAccountManager.currentUser(this)
+						.getAndroidName() });
+		if (Integer.parseInt(records.get("total").toString()) > 0) {
+			ArrayList<TagsItems> rows = new ArrayList<TagsItems>();
+			for (HashMap<String, Object> row : (List<HashMap<String, Object>>) records
+					.get("records")) {
+				rows.add(new TagsItems(Integer.parseInt(row.get("id")
+						.toString()), row.get("name").toString(), row.get(
+						"email").toString(), row.get("image_small").toString()));
+			}
+			getPartnersFromServer();
+			return rows;
+		} else {
+			return new ArrayList<TagsItems>();
+		}
+	}
+
+	public Boolean getPartnersFromServer() {
+		boolean flag = true;
+		Res_PartnerDBHelper res_partners = new Res_PartnerDBHelper(this);
+		OEHelper oe = res_partners.getOEInstance();
+		try {
+			ArrayList<Fields> cols = res_partners.getServerColumns();
+			JSONObject fields = new JSONObject();
+			for (Fields field : cols) {
+				fields.accumulate("fields", field.getName());
+			}
+			JSONObject domain = new JSONObject();
+			JSONArray ids = JSONDataHelper.intArrayToJSONArray(oe
+					.getAllIds(res_partners));
+
+			domain.accumulate("domain", new JSONArray("[[\"id\", \"not in\", "
+					+ ids.toString() + "]]"));
+
+			// oe.debugMode(true);
+			JSONObject result = oe.search_read("res.partner", fields, domain,
+					0, 0, null, null);
+
+			for (int i = 0; i < result.getInt("length"); i++) {
+				JSONObject row = result.getJSONArray("records")
+						.getJSONObject(i);
+
+				int id = row.getInt("id");
+				final TagsItems item = new TagsItems(id, row.getString("name")
+						.toString(), row.getString("email").toString(),
+						row.getString("image_small"));
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						parters.add(item);
+					}
+				});
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		partner_adapter.notifyDataSetChanged();
+		return flag;
+
 	}
 
 	public void startActivityAddRecipients() {
@@ -641,8 +724,7 @@ public class MessageComposeActivty extends Activity {
 				kwargs.put("type", "comment");
 				kwargs.put("content_subtype", "plaintext");
 				kwargs.put("subtype", "mail.mt_comment");
-				
-				
+
 				values.put("type", "comment");
 				values.put("body", body);
 				values.put("parent_id", message_id);

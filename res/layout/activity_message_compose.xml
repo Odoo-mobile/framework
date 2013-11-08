@@ -1,7 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="#ffffff"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     android:fillViewport="true" >
 
     <LinearLayout
@@ -15,6 +15,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="3" >
+
+            <com.openerp.util.tags.TagsView
+                android:id="@+id/receipients_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textFilter"
+                android:nextFocusDown="@+id/edtMessageSubject"
+                android:textColor="#414141" />
 
             <EditText
                 android:id="@+id/edtMessageTo"

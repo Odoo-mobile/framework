@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ebebeb"
+    android:orientation="horizontal"
+    android:weightSum="4" >
+
+    <TextView
+        android:id="@+id/txvTagSubject"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="4"
+        android:gravity="center_vertical"
+        android:paddingBottom="4dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="8dp"
+        android:paddingTop="4dp"
+        android:text="Subject"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageView
+        android:id="@+id/imgTagImage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="#cccccc"
+        android:src="@drawable/ic_action_user" />
+
+</LinearLayout>
