@@ -1,7 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="#ffffff"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     android:fillViewport="true" >
 
     <LinearLayout
@@ -16,24 +16,13 @@
             android:orientation="horizontal"
             android:weightSum="3" >
 
-            <EditText
-                android:id="@+id/edtMessageTo"
-                android:layout_width="0dp"
+            <com.openerp.util.tags.TagsView
+                android:id="@+id/receipients_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_weight="3"
-                android:clickable="true"
-                android:hint="To" >
-            </EditText>
-
-            <ImageView
-                android:id="@+id/imgBtnAddRecipients"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/oe_listview_background_selector"
-                android:padding="5dp"
-                android:src="@drawable/ic_action_add_users" />
+                android:inputType="textFilter"
+                android:nextFocusDown="@+id/edtMessageSubject"
+                android:textColor="#828182" />
         </LinearLayout>
 
         <EditText
