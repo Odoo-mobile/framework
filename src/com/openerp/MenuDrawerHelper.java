@@ -21,19 +21,24 @@ package com.openerp;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.openerp.addons.note.Note;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.config.ModulesConfig;
 import com.openerp.support.Module;
+import com.openerp.support.ModulesConfigHelper;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuAdapter;
 import com.openerp.support.menu.OEMenuItems;
@@ -129,6 +134,7 @@ public class MenuDrawerHelper {
 	 */
 	private OEMenuItems[] getMenuList() {
 		List<OEMenuItems> mList = getMenuItemsList();
+		mList.addAll(getSettingMenu());
 		menus = new OEMenuItems[mList.size()];
 		int i = 0;
 		for (OEMenuItems menu : mList) {
@@ -137,6 +143,38 @@ public class MenuDrawerHelper {
 		}
 		this.instance.setSystemMenus(menus);
 		return menus;
+	}
+
+	private List<OEMenuItems> getSettingMenu() {
+		List<OEMenuItems> allMenus = new ArrayList<OEMenuItems>();
+		allMenus.add(new OEMenuItems("SETTINGS", null, 0, true));
+		allMenus.add(new OEMenuItems(R.drawable.ic_action_user, "Profile",
+				getFragBundle(new Fragment(), "settings",
+						MainActivity.SETTING_KEYS.PROFILE), 0, false));
+		allMenus.add(new OEMenuItems(R.drawable.ic_action_settings, "Settings",
+				getFragBundle(new Fragment(), "settings",
+						MainActivity.SETTING_KEYS.GLOBAL_SETTING), 0, false));
+		allMenus.add(new OEMenuItems(R.drawable.ic_action_accounts, "Accounts",
+				getFragBundle(new Fragment(), "settings",
+						MainActivity.SETTING_KEYS.ACCOUNTS), 0, false));
+		allMenus.add(new OEMenuItems(R.drawable.ic_action_add_account,
+				"Add account", getFragBundle(new Fragment(), "settings",
+						MainActivity.SETTING_KEYS.ADD_ACCOUNT), 0, false));
+		allMenus.add(new OEMenuItems(R.drawable.ic_action_about, "About Us",
+				getFragBundle(new Fragment(), "settings",
+						MainActivity.SETTING_KEYS.ABOUT_US), 0, false));
+		allMenus.add(new OEMenuItems(R.drawable.ic_action_logout, "Logout",
+				getFragBundle(new Fragment(), "settings",
+						MainActivity.SETTING_KEYS.LOGOUT), 0, false));
+		return allMenus;
+	}
+
+	private Fragment getFragBundle(Fragment fragment, String key,
+			MainActivity.SETTING_KEYS val) {
+		Bundle bundle = new Bundle();
+		bundle.putString(key, val.toString());
+		fragment.setArguments(bundle);
+		return fragment;
 	}
 
 	/**

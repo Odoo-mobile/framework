@@ -83,6 +83,10 @@ public class MainActivity extends FragmentActivity {
 	ListView drawablelist = null;
 	OnBackButtonPressedListener backPressed = null;
 
+	public enum SETTING_KEYS {
+		GLOBAL_SETTING, PROFILE, LOGOUT, ACCOUNTS, ADD_ACCOUNT, ABOUT_US
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -340,20 +344,24 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// The action bar home/up action should open or close the drawer.
-		// ActionBarDrawerToggle will take care of this.
-		// Handle action buttons
-		switch (item.getItemId()) {
-		case R.id.menu_global_settings:
+		if (drawer.mDrawerToggle.onOptionsItemSelected(item)) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	public boolean onSettingItemSelected(SETTING_KEYS key) {
+		switch (key) {
+		case GLOBAL_SETTING:
 			set_setting_menu = false;
 			Intent i = new Intent(this, AppSettingsActivity.class);
 			startActivityForResult(i, RESULT_SETTINGS);
 			return true;
-		case R.id.menu_logout:
+		case LOGOUT:
 			Dialog logoutConfirm = this.logoutConfirmDialog();
 			logoutConfirm.show();
 			return true;
-		case R.id.menu_about:
+		case ABOUT_US:
 			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
@@ -362,7 +370,7 @@ public class MainActivity extends FragmentActivity {
 			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(about);
 			return true;
-		case R.id.menu_new_account:
+		case ADD_ACCOUNT:
 			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
@@ -371,14 +379,14 @@ public class MainActivity extends FragmentActivity {
 			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(fragment);
 			return true;
-		case R.id.menu_accounts:
+		case ACCOUNTS:
 			set_setting_menu = true;
 			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 			Fragment acFragment = new AccountsDetail();
 			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(acFragment);
 			return true;
-		case R.id.menu_user_profile:
+		case PROFILE:
 			set_setting_menu = true;
 			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 			Fragment profileFragment = new UserProfile();
@@ -386,10 +394,7 @@ public class MainActivity extends FragmentActivity {
 			fragmentHandler.replaceFragmnet(profileFragment);
 			return true;
 		default:
-			if (drawer.mDrawerToggle.onOptionsItemSelected(item)) {
-				return true;
-			}
-			return super.onOptionsItemSelected(item);
+			return true;
 		}
 
 	}
@@ -423,7 +428,6 @@ public class MainActivity extends FragmentActivity {
 		} else {
 			return super.onPrepareOptionsMenu(menu);
 		}
-		// menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 
 	}
 
@@ -464,12 +468,20 @@ public class MainActivity extends FragmentActivity {
 				return;
 			} else {
 				fragment = (Fragment) instance;
-				if (this.systemMenus[position].hasMenuTagColor()
-						&& !fragment.getArguments().containsKey("tag_color")) {
-					Bundle tagcolor = fragment.getArguments();
-					tagcolor.putInt("tag_color",
-							this.systemMenus[position].getMenuTagColor());
-					fragment.setArguments(tagcolor);
+				if (fragment.getArguments().containsKey("settings")) {
+					Log.e(">> Setting Menu", "setting menu");
+					onSettingItemSelected(SETTING_KEYS.valueOf(fragment
+							.getArguments().get("settings").toString()));
+
+				} else {
+					if (this.systemMenus[position].hasMenuTagColor()
+							&& !fragment.getArguments()
+									.containsKey("tag_color")) {
+						Bundle tagcolor = fragment.getArguments();
+						tagcolor.putInt("tag_color",
+								this.systemMenus[position].getMenuTagColor());
+						fragment.setArguments(tagcolor);
+					}
 				}
 			}
 		} else {
@@ -477,8 +489,8 @@ public class MainActivity extends FragmentActivity {
 					Toast.LENGTH_LONG).show();
 			finish();
 		}
-		if (fragment != null) {
-
+		if (fragment != null
+				&& !fragment.getArguments().containsKey("settings")) {
 			fragmentHandler.setBackStack(false, null);
 			fragmentHandler.replaceFragmnet(fragment);
 		}
