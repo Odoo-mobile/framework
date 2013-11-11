@@ -23,25 +23,6 @@
                 android:inputType="textFilter"
                 android:nextFocusDown="@+id/edtMessageSubject"
                 android:textColor="#414141" />
-
-            <EditText
-                android:id="@+id/edtMessageTo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_weight="3"
-                android:clickable="true"
-                android:hint="To" >
-            </EditText>
-
-            <ImageView
-                android:id="@+id/imgBtnAddRecipients"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/oe_listview_background_selector"
-                android:padding="5dp"
-                android:src="@drawable/ic_action_add_users" />
         </LinearLayout>
 
         <EditText

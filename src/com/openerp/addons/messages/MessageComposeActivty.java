@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -39,12 +38,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Html;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -68,15 +65,15 @@ import com.openerp.util.OEDate;
 import com.openerp.util.tags.TagsItems;
 import com.openerp.util.tags.TagsView;
 
-public class MessageComposeActivty extends Activity {
+public class MessageComposeActivty extends Activity implements
+		TagsView.TokenListener {
 	private static final int PICKFILE_RESULT_CODE = 1;
-	private static final int ADD_RECIPIENT = 2;
 	List<Uri> file_uris = new ArrayList<Uri>();
 	ListView lstAttachments = null;
 	List<OEListViewRows> attachments = new ArrayList<OEListViewRows>();
 	OEListViewAdapter lstAttachmentAdapter = null;
 	List<OEListViewRows> partners_list = new ArrayList<OEListViewRows>();
-	HashMap<String, Object> selectedPartners = new HashMap<String, Object>();
+	HashMap<String, TagsItems> selectedPartners = new HashMap<String, TagsItems>();
 	boolean is_note_body = false;
 	boolean is_reply = false;
 	int message_id = 0;
@@ -102,20 +99,21 @@ public class MessageComposeActivty extends Activity {
 				(MainActivity) MainActivity.context);
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
+		Intent replyIntent = getIntent();
 		receipients_view = (TagsView) findViewById(R.id.receipients_view);
 		partner_adapter = new ReceipientsTagsCustomAdapter(this,
 				R.layout.message_receipient_item_layout, parters);
 		receipients_view.setAdapter(partner_adapter);
 		/* tags component */
-		parters.addAll(getAllPartners());
+		if (replyIntent.hasExtra("send_reply")) {
+			is_reply = true;
+		} else {
+			parters.addAll(getAllPartners());
+		}
 		receipients_view.setPrefix("To: ");
 		receipients_view.allowDuplicates(false);
-
-		Intent replyIntent = getIntent();
-		if (replyIntent.hasExtra("send_reply")) {
-			findViewById(R.id.imgBtnAddRecipients).setEnabled(false);
-			is_reply = true;
+		receipients_view.setTokenListener(this);
+		if (is_reply) {
 			message_id = replyIntent.getExtras().getInt("message_id");
 			MessageDBHelper msgDb = new MessageDBHelper(this);
 			parent_row = ((List<HashMap<String, Object>>) msgDb.search(msgDb,
@@ -128,28 +126,11 @@ public class MessageComposeActivty extends Activity {
 			JSONArray partner_ids = new JSONArray();
 			try {
 
-				JSONArray partners = getPartnersOfMessage(message_id + "");
-				for (int i = 0; i < partners.length(); i++) {
-					JSONArray partner = partners.getJSONArray(i);
-					partner_ids.put(partner.get(0));
-
-					String display_name = partner.getString(1);
-
-					ContentValues value = new ContentValues();
-					value.put("pos", -1);
-					value.put("id", partner.getInt(0));
-					value.put("email", "");
-
-					selectedPartners.put(display_name, value);
-
-					StringBuffer users_list = new StringBuffer();
-
-					users_list.append(TextUtils.join(", ",
-							selectedPartners.keySet()));
-
-					EditText edtTo = (EditText) findViewById(R.id.edtMessageTo);
-					edtTo.setText(users_list.toString());
-
+				List<TagsItems> partners = getPartnersOfMessage(message_id + "");
+				for (TagsItems item : partners) {
+					selectedPartners.put("key_" + item.getId(), item);
+					partner_ids.put(item.getId());
+					receipients_view.addObject(item);
 					findViewById(R.id.edtMessageBody).requestFocus();
 				}
 				parent_row.put("partners", partner_ids);
@@ -159,17 +140,7 @@ public class MessageComposeActivty extends Activity {
 
 		} else {
 			getActionBar().setTitle("Compose");
-			EditText edtTo = (EditText) findViewById(R.id.edtMessageTo);
-			edtTo.setInputType(InputType.TYPE_NULL);
-			edtTo.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					startActivityAddRecipients();
-				}
-			});
 		}
-
 		lstAttachments = (ListView) findViewById(R.id.lstAttachments);
 		String[] from = new String[] { "name" };
 		int[] to = new int[] { R.id.txvFileName };
@@ -200,24 +171,6 @@ public class MessageComposeActivty extends Activity {
 				partners_list.add(newRow);
 			}
 		}
-		OEHelper oe = partners.getOEInstance();
-		JSONObject domain = new JSONObject();
-		try {
-			domain.put("domain", new JSONArray("[[\"id\", \"not in\", "
-					+ JSONDataHelper
-							.intArrayToJSONArray(oe.getAllIds(partners))
-							.toString() + "]]"));
-		} catch (Exception e) {
-		}
-		findViewById(R.id.imgBtnAddRecipients).setOnClickListener(
-				new OnClickListener() {
-
-					@Override
-					public void onClick(View arg0) {
-						startActivityAddRecipients();
-					}
-				});
-
 		handleIntentFilter(getIntent());
 	}
 
@@ -258,27 +211,15 @@ public class MessageComposeActivty extends Activity {
 
 			domain.accumulate("domain", new JSONArray("[[\"id\", \"not in\", "
 					+ ids.toString() + "]]"));
-
-			// oe.debugMode(true);
 			JSONObject result = oe.search_read("res.partner", fields, domain,
 					0, 0, null, null);
-
 			for (int i = 0; i < result.getInt("length"); i++) {
 				JSONObject row = result.getJSONArray("records")
 						.getJSONObject(i);
-
 				int id = row.getInt("id");
-				final TagsItems item = new TagsItems(id, row.getString("name")
-						.toString(), row.getString("email").toString(),
-						row.getString("image_small"));
-				runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-						parters.add(item);
-					}
-				});
-
+				parters.add(new TagsItems(id, row.getString("name").toString(),
+						row.getString("email").toString(), row
+								.getString("image_small")));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -289,29 +230,22 @@ public class MessageComposeActivty extends Activity {
 
 	}
 
-	public void startActivityAddRecipients() {
-		Intent intent = new Intent(MessageComposeActivty.this,
-				MessageRecipientActivity.class);
-		intent.putExtra("selected_ids", selectedPartners);
-		startActivityForResult(intent, ADD_RECIPIENT);
-	}
-
-	public JSONArray getPartnersOfMessage(String message_id) {
+	public List<TagsItems> getPartnersOfMessage(String message_id) {
 		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(
 				MainActivity.context);
 		String oea_name = OpenERPAccountManager.currentUser(
 				MainActivity.context).getAndroidName();
 		List<HashMap<String, Object>> records = partners
 				.executeSQL(
-						"SELECT id,name,oea_name FROM res_partner where id in (select res_partner_id from mail_message_res_partner_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
+						"SELECT id,email,name,image_small,oea_name FROM res_partner where id in (select res_partner_id from mail_message_res_partner_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { message_id, oea_name, oea_name });
-		JSONArray names = new JSONArray();
+		List<TagsItems> names = new ArrayList<TagsItems>();
 		if (records.size() > 0) {
 			for (HashMap<String, Object> row : records) {
-				JSONArray rec = new JSONArray();
-				rec.put(row.get("id"));
-				rec.put(row.get("name"));
-				names.put(rec);
+				int id = Integer.parseInt(row.get("id").toString());
+				names.add(new TagsItems(id, row.get("name").toString(), row
+						.get("email").toString(), row.get("image_small")
+						.toString()));
 			}
 		}
 		return names;
@@ -406,8 +340,7 @@ public class MessageComposeActivty extends Activity {
 	private JSONArray getPartnersId() {
 		JSONArray list = new JSONArray();
 		for (String key : selectedPartners.keySet()) {
-			ContentValues val = (ContentValues) selectedPartners.get(key);
-			list.put(val.getAsInteger("id"));
+			list.put(selectedPartners.get(key).getId());
 		}
 		return list;
 	}
@@ -491,17 +424,6 @@ public class MessageComposeActivty extends Activity {
 				Uri fileUri = Uri.parse(FilePath);
 				file_uris.add(fileUri);
 				handleReceivedFile();
-			}
-			break;
-		case ADD_RECIPIENT:
-			if (resultCode == RESULT_OK) {
-				selectedPartners = (HashMap<String, Object>) data.getExtras()
-						.get("result");
-				StringBuffer users_list = new StringBuffer();
-				users_list.append(TextUtils.join(", ",
-						selectedPartners.keySet()));
-				EditText edtTo = (EditText) findViewById(R.id.edtMessageTo);
-				edtTo.setText(users_list.toString());
 			}
 			break;
 		}
@@ -659,7 +581,7 @@ public class MessageComposeActivty extends Activity {
 			if (success) {
 				Toast.makeText(getApplicationContext(),
 						"Message sent succussfull.", Toast.LENGTH_LONG).show();
-				selectedPartners = new HashMap<String, Object>();
+				selectedPartners = new HashMap<String, TagsItems>();
 				finish();
 			} else {
 				Toast.makeText(getApplicationContext(),
@@ -790,7 +712,7 @@ public class MessageComposeActivty extends Activity {
 			if (success) {
 				Toast.makeText(getApplicationContext(),
 						"Message sent succussfull.", Toast.LENGTH_LONG).show();
-				selectedPartners = new HashMap<String, Object>();
+				selectedPartners = new HashMap<String, TagsItems>();
 				setResult(RESULT_OK);
 				finish();
 			} else {
@@ -799,5 +721,26 @@ public class MessageComposeActivty extends Activity {
 			}
 		}
 
+	}
+
+	@Override
+	public void onTokenAdded(Object token, View view) {
+		TagsItems item = (TagsItems) token;
+		selectedPartners.put("key_" + item.getId(), item);
+	}
+
+	@Override
+	public void onTokenSelected(Object token, View view) {
+
+	}
+
+	@Override
+	public void onTokenRemoved(Object token) {
+		TagsItems item = (TagsItems) token;
+		if (!is_reply) {
+			selectedPartners.remove("key_" + item.getId());
+		} else {
+			receipients_view.addObject(item);
+		}
 	}
 }
