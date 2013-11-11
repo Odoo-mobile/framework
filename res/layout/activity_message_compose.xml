@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textFilter"
                 android:nextFocusDown="@+id/edtMessageSubject"
-                android:textColor="#414141" />
+                android:textColor="#828182" />
         </LinearLayout>
 
         <EditText
