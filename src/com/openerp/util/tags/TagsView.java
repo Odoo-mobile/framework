@@ -24,6 +24,7 @@ public class TagsView extends MultiTagsTextView implements
 
 	HashMap<String, TagsItems> selectedTags = new HashMap<String, TagsItems>();
 	Context mContext = null;
+	private boolean showImage = true;
 
 	public TagsView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -54,7 +55,11 @@ public class TagsView extends MultiTagsTextView implements
 				(ViewGroup) TagsView.this.getParent(), false);
 		((TextView) view.findViewById(R.id.txvTagSubject)).setText(item
 				.getSubject());
-		if (item.getImage() != null && !item.getImage().equals("false")) {
+		if (!this.showImage) {
+			view.findViewById(R.id.imgTagImage).setVisibility(View.GONE);
+		}
+		if (this.showImage && item.getImage() != null
+				&& !item.getImage().equals("false")) {
 			((ImageView) view.findViewById(R.id.imgTagImage))
 					.setImageBitmap(Base64Helper.getBitmapImage(mContext,
 							item.getImage()));
@@ -82,6 +87,10 @@ public class TagsView extends MultiTagsTextView implements
 			items.add(selectedTags.get(key));
 		}
 		return items;
+	}
+
+	public void showImage(boolean flag) {
+		this.showImage = flag;
 	}
 
 	@Override

@@ -18,7 +18,6 @@
  */
 package com.openerp.addons.note;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,7 +39,6 @@ import android.widget.TextView;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.addons.messages.MessageComposeActivty;
-import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
@@ -195,7 +193,7 @@ public class DetailNoteFragment extends BaseFragment {
 		noteTags = (TextView) rootview.findViewById(R.id.txv_detailNote_Tags);
 		// Enabling Scrollview
 		noteMemo.setMovementMethod(new ScrollingMovementMethod());
-		
+
 		db = new NoteDBHelper(scope.context());
 		HashMap<String, Object> result = db.search(db, new String[] { "id=?" },
 				new String[] { String.valueOf(note_id) });
@@ -207,7 +205,8 @@ public class DetailNoteFragment extends BaseFragment {
 			message = row.get("memo").toString(); // paassing to next
 													// followerfragment
 			try {
-				note_tags = getNoteTags(String.valueOf(note_id));
+				note_tags = note.getNoteTags(String.valueOf(note_id),
+						scope.context());
 				if (note_tags.length > 0) {
 					tags = TextUtils.join(", ", note_tags);
 				} else {
@@ -242,21 +241,5 @@ public class DetailNoteFragment extends BaseFragment {
 
 		deleteDialogConfirm.setNegativeButton("Cancel", null);
 		deleteDialogConfirm.show();
-	}
-
-	public String[] getNoteTags(String note_note_id) {
-		String oea_name = OpenERPAccountManager.currentUser(
-				MainActivity.context).getAndroidName();
-		List<HashMap<String, Object>> records = db
-				.executeSQL(
-						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
-						new String[] { note_note_id, oea_name, oea_name });
-		List<String> note_tags = new ArrayList<String>();
-		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
-				note_tags.add(row.get("name").toString());
-			}
-		}
-		return note_tags.toArray(new String[note_tags.size()]);
 	}
 }

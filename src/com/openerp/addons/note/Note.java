@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -62,6 +63,8 @@ import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.TagsView;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
@@ -70,6 +73,8 @@ public class Note extends BaseFragment implements
 	private PullToRefreshAttacher mPullAttacher;
 	View rootView = null;
 	TextView noteSyncProcessText, emptyNotesText;
+	TagsView noteTags;
+	List<TagsItems> note_tags_items = new ArrayList<TagsItems>();
 	ListView lstNotes = null;
 	List<OEListViewRows> listRows = null;
 	OEListViewAdapter listAdapter = null;
@@ -85,6 +90,8 @@ public class Note extends BaseFragment implements
 	SwipeDismissListViewTouchListener touchListener = null;
 	NoteDBHelper db = null;
 	JSONObject res = null;
+	String[] note_tags = null;
+	String tags = "";
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -333,8 +340,19 @@ public class Note extends BaseFragment implements
 				View newView = row_view;
 				TextView txvTag = (TextView) newView
 						.findViewById(R.id.txvNoteListTags);
-
+				noteTags = (TagsView) newView
+						.findViewById(R.id.txv_detailNote_Tags);
 				try {
+					String noteID = row_data.getRow_data().get("id").toString();
+					getNoteTags(String.valueOf(noteID), scope.context());
+					noteTags.showImage(false);
+					for (TagsItems item : note_tags_items) {
+						noteTags.addObject(item);
+					}
+					if (note_tags_items.size() <= 0) {
+						noteTags.setVisibility(View.GONE);
+					}
+
 					// Fetching Note Stage and Setting Background color for that
 					String stageInfo = row_data.getRow_data().get("stage_id")
 							.toString();
@@ -347,10 +365,9 @@ public class Note extends BaseFragment implements
 											"stage_" + stageid).toString()));
 						}
 					} else {
-						txvTag.setBackgroundColor(Color.parseColor("#ffffff"));
+						txvTag.setBackgroundColor(Color.parseColor("#aaaaaa"));
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
 				}
 				return newView;
 			}
@@ -597,4 +614,25 @@ public class Note extends BaseFragment implements
 			e.printStackTrace();
 		}
 	}
+
+	public String[] getNoteTags(String note_note_id, Context context) {
+		note_tags_items = new ArrayList<TagsItems>();
+		String oea_name = OpenERPAccountManager.currentUser(
+				MainActivity.context).getAndroidName();
+		db = new NoteDBHelper(context);
+		List<String> note_tags = new ArrayList<String>();
+		List<HashMap<String, Object>> records = db
+				.executeSQL(
+						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
+						new String[] { note_note_id, oea_name, oea_name });
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				note_tags.add(row.get("name").toString());
+				note_tags_items.add(new TagsItems(0,
+						row.get("name").toString(), ""));
+			}
+		}
+		return note_tags.toArray(new String[note_tags.size()]);
+	}
+
 }

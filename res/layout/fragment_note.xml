@@ -3,7 +3,9 @@
     android:id="@+id/notelistview"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:background="#dddddd"
+    android:orientation="vertical"
+    android:padding="5dp" >
 
     <include
         android:id="@+id/noteSyncWaiter"
@@ -28,10 +30,10 @@
     <ListView
         android:id="@+id/lstNotes"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:animateLayoutChanges="true"
-        android:divider="#f3f3f3"
-        android:dividerHeight="1dp"
+        android:divider="#dddddd"
+        android:dividerHeight="5dp"
         android:fadingEdge="none" >
     </ListView>
 
