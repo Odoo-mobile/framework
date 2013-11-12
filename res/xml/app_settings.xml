@@ -7,7 +7,7 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="perform_sync"
-            android:summary="Enable or disable data sync"
+            android:summary="Enable or disable data synchronization"
             android:title="Enable Sync" />
 
         <ListPreference
@@ -16,7 +16,7 @@
             android:entries="@array/syncInterval"
             android:entryValues="@array/syncIntervalValues"
             android:key="sync_interval"
-            android:summary="Define how often sync will be performed"
+            android:summary="Define how often synchronization will be performed"
             android:title="Sync interval" />
     </PreferenceCategory>
     <PreferenceCategory
@@ -27,7 +27,7 @@
             android:entries="@array/syncDataLimit"
             android:entryValues="@array/syncDataLimitValues"
             android:key="sync_data_limit"
-            android:summary="Define how many old data to be synced"
+            android:summary="Define how old data to be synchronized"
             android:title="Sync data limit" />
     </PreferenceCategory>
 

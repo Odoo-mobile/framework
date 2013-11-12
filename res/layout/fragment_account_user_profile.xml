@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
     android:background="#ffffff"
+    android:orientation="vertical"
     android:weightSum="10" >
 
     <ImageView
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:text="Login Name"
+            android:text="User Login"
             android:textAllCaps="true"
             android:textColor="#0099CC"
             android:textStyle="bold" />
@@ -45,14 +45,14 @@
             android:layout_marginBottom="10dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:text="Login Name" />
+            android:text="User Name" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:text="OpenERP Username"
+            android:text="User name"
             android:textAllCaps="true"
             android:textColor="#0099CC"
             android:textStyle="bold" />
