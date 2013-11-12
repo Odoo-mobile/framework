@@ -46,7 +46,7 @@ public class UserProfile extends BaseFragment {
 				container, false);
 		scope = new AppScope(OpenERPAccountManager.currentUser(getActivity()),
 				(MainActivity) getActivity());
-		scope.context().setTitle("Profile");
+		scope.context().setTitle("OpenERP User Profile");
 
 		setupView();
 		return rootView;
