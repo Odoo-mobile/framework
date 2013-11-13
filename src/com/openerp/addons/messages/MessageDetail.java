@@ -42,6 +42,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -128,13 +129,13 @@ public class MessageDetail extends BaseFragment {
 				"email_from|email", "body", "date", "partners", "starred",
 				"vote_nb" };
 		int[] to = new int[] { R.id.imgUserPicture, R.id.txvMessageAuthor,
-				R.id.txvAuthorEmail, R.id.txvBody, R.id.txvTime, R.id.txvTo,
-				R.id.imgBtnStar, R.id.txvmessageVotenb };
+				R.id.txvAuthorEmail, R.id.webViewMessageBody, R.id.txvTime,
+				R.id.txvTo, R.id.imgBtnStar, R.id.txvmessageVotenb };
 
 		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
 				R.layout.message_detail_listview_items, list, from, to, db);
-		// listAdapter.toHTML("body");
+		listAdapter.toHTML("body", true);
 		listAdapter.addImageColumn("image");
 		// listAdapter.layoutBackgroundColor("parent_id",
 		// Color.parseColor("#aaaaaa"), Color.parseColor("#0099cc"));
@@ -203,13 +204,6 @@ public class MessageDetail extends BaseFragment {
 						}
 					}
 				});
-
-				TextView txvBody = (TextView) row_view
-						.findViewById(R.id.txvBody);
-				txvBody.setMovementMethod(LinkMovementMethod.getInstance());
-
-				txvBody.setText(HTMLHelper.stringToHtml(row_data.getRow_data()
-						.get("body").toString()));
 
 				/* handling attachments */
 				List<OEListViewRows> attachments = getAttachmentsOfMessage(row_data

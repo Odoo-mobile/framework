@@ -107,7 +107,6 @@ public class MainActivity extends FragmentActivity {
 				mPullToRefreshAttacher = new PullToRefreshAttacher(this);
 				return;
 			}
-
 			/**
 			 * Getting Application users list. If it's null that means
 			 * application does not contain any account and it will request user
@@ -468,7 +467,8 @@ public class MainActivity extends FragmentActivity {
 				return;
 			} else {
 				fragment = (Fragment) instance;
-				if (fragment.getArguments().containsKey("settings")) {
+				if (fragment.getArguments() != null
+						&& fragment.getArguments().containsKey("settings")) {
 					onSettingItemSelected(SETTING_KEYS.valueOf(fragment
 							.getArguments().get("settings").toString()));
 

@@ -215,9 +215,10 @@ public class UserGroups extends BaseFragment implements
 
 			List<OEMenuItems> group_menu_items = new ArrayList<OEMenuItems>();
 			// default join group menu
+			UserGroups grp = new UserGroups();
+			grp.setArguments(new Bundle());
 			group_menu_items.add(new OEMenuItems(
-					R.drawable.ic_action_social_group, "Join a Group",
-					new UserGroups(), 0));
+					R.drawable.ic_action_social_group, "Join a Group", grp, 0));
 
 			// Add dynamic groups
 			MailFollowerDb followers = new MailFollowerDb(context);

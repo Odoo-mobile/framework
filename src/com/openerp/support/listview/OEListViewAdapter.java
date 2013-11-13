@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.ImageView;
@@ -132,6 +133,8 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	String timezone = null;
 	/** The date format */
 	String date_format = null;
+
+	HashMap<String, Boolean> webViewControls = new HashMap<String, Boolean>();
 
 	/**
 	 * Instantiates a new oE list view adapter.
@@ -254,7 +257,20 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 							data));
 				}
 			} else {
-				TextView txvObj = (TextView) viewRow.findViewById(this.to[i]);
+				TextView txvObj = null;
+				WebView webview = null;
+				if (!webViewControls.containsKey(this.from[i])) {
+					txvObj = (TextView) viewRow.findViewById(this.to[i]);
+				} else {
+					if (webViewControls.get(this.from[i])) {
+						webview = (WebView) viewRow.findViewById(this.to[i]);
+						webview.getSettings().setJavaScriptEnabled(true);
+						webview.getSettings().setBuiltInZoomControls(true);
+					} else {
+						txvObj = (TextView) viewRow.findViewById(this.to[i]);
+					}
+				}
+
 				String key_col = this.from[i];
 				String alt_key_col = key_col;
 				if (key_col.contains("|")) {
@@ -303,7 +319,13 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 						txvObj.setText(inputdata.toString());
 					} catch (Exception e) {
 						if (this.toHtml.contains(key_col)) {
-							txvObj.setText(HTMLHelper.stringToHtml(data));
+							if (webViewControls.get(this.from[i])) {
+								String customHtml = data;
+								webview.loadData(customHtml, "text/html",
+										"UTF-8");
+							} else {
+								txvObj.setText(HTMLHelper.stringToHtml(data));
+							}
 						} else {
 							txvObj.setText(data);
 						}
@@ -603,10 +625,15 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	 */
 	public void toHTML(String column) {
 		toHtml.add(column);
+		webViewControls.put(column, false);
+	}
+
+	public void toHTML(String column, boolean isWebView) {
+		toHtml.add(column);
+		webViewControls.put(column, isWebView);
 	}
 
 	public void addViewListener(OEListViewOnCreateListener viewListener) {
 		this.viewListener = viewListener;
 	}
-
 }
