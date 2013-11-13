@@ -78,6 +78,7 @@ public class Message extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
 
 	PerformOperation markasTodoTask = null;
+	String type = "inbox";
 	PerformReadUnreadArchiveOperation readunreadoperation = null;
 	ActionMode mActionMode;
 	private PullToRefreshAttacher mPullToRefreshAttacher;
@@ -440,7 +441,9 @@ public class Message extends BaseFragment implements
 				messageDetail.setArguments(bundle);
 				scope.context().fragmentHandler.setBackStack(true, null);
 				scope.context().fragmentHandler.replaceFragmnet(messageDetail);
-				list.remove(index);
+				if (!type.equals("archive")) {
+					list.remove(index);
+				}
 				listAdapter.refresh(list);
 			}
 		});
@@ -776,7 +779,7 @@ public class Message extends BaseFragment implements
 	public void handleArguments(Bundle bundle) {
 		if (bundle != null) {
 			if (bundle.containsKey("type")) {
-				String type = bundle.getString("type");
+				type = bundle.getString("type");
 				String title = "Archive";
 				if (type.equals("inbox")) {
 					// setupListView(TYPE.INBOX);

@@ -185,14 +185,10 @@
             android:orientation="vertical"
             android:padding="8dp" >
 
-            <TextView
-                android:id="@+id/txvBody"
+            <WebView
+                android:id="@+id/webViewMessageBody"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:gravity="left|top"
-                android:text="Body Text"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <LinearLayout
