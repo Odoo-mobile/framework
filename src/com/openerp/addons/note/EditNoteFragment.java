@@ -20,21 +20,21 @@ package com.openerp.addons.note;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,24 +45,30 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.util.OnBackButtonPressedListener;
+import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.TagsView;
 
-public class EditNoteFragment extends BaseFragment {
+public class EditNoteFragment extends BaseFragment implements
+		TagsView.TokenListener {
 
 	View rootview;
 	ImageView addTags;
 	Spinner noteStages;
 	ArrayAdapter<String> stageAdapter = null;
 	HashMap<String, String> stages = new HashMap<String, String>();;
-	EditText noteName, noteMemo, noteTag;
+	EditText noteName, noteMemo;
 	int row_id = 0;
 	ArrayList<String> stagelist = null;
 	String row_status = null;
@@ -73,12 +79,17 @@ public class EditNoteFragment extends BaseFragment {
 	NoteDBHelper db = null;
 	ComposeNoteActivity composeNote = null;
 	JSONArray stage_name = null;
-	String originalMemo, originialStage, originialtag;
-	private static final int NOTE_ID = 0;
+	String originalMemo, originialStage;
 	JSONArray tagID = new JSONArray();
 	ArrayList<String> tagName = new ArrayList<String>();
 	private static OEHelper oe_obj = null;
 	boolean flag = false;
+
+	LinkedHashMap<String, String> note_tags = null;
+	ArrayList<String> keyList = null;
+	String[] stringArray = null;
+	TagsView noteTags;
+	HashMap<String, TagsItems> selectedTags = new HashMap<String, TagsItems>();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,12 +105,10 @@ public class EditNoteFragment extends BaseFragment {
 
 		addTags = (ImageView) rootview.findViewById(R.id.imgBtnEditTags);
 		addTags.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Intent EditNoteTags = new Intent(scope.context(), AddTags.class);
-				startActivityForResult(EditNoteTags, NOTE_ID);
+				// opening tag list in dialogview
+				openTagList();
 			}
 		});
 
@@ -107,8 +116,7 @@ public class EditNoteFragment extends BaseFragment {
 
 			@Override
 			public boolean onBackPressed() {
-				if (isContentChanged(noteMemo.getText().toString(), noteTag
-						.getText().toString())) {
+				if (isContentChanged(noteMemo.getText().toString())) {
 					if (flag != true) {
 						openDailogview(
 								"Are you sure..?",
@@ -120,36 +128,115 @@ public class EditNoteFragment extends BaseFragment {
 				return true;
 			}
 		});
-
 		if (oe_obj == null) {
 			oe_obj = getOEInstance();
 		}
-
 		return rootview;
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
+	public void openTagList() {
+		note_tags = getNoteTag();
+		keyList = new ArrayList<String>(note_tags.keySet());
+		stringArray = new String[keyList.size() - 1];
+		stringArray = keyList.toArray(stringArray);
 
-		case NOTE_ID:
-			if (resultCode == Activity.RESULT_OK) {
-				try {
-					tagID = new JSONArray(data.getExtras().get("result")
-							.toString());
-				} catch (Exception e) {
-				}
-				tagName = data.getExtras().getStringArrayList("result1");
-				noteTag.setText(tagName.toString().replace("[", "")
-						.replace("]", ""));
-			}
-			break;
+		AlertDialog.Builder builder = new AlertDialog.Builder(scope.context());
+		builder.setTitle("Select Tags");
+		builder.setMultiChoiceItems(stringArray, null,
+				new DialogInterface.OnMultiChoiceClickListener() {
+					public void onClick(DialogInterface dialog, int item,
+							boolean isChecked) {
+					}
+				});
+
+		builder.setPositiveButton("Select",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						AlertDialog d = (AlertDialog) dialog;
+						ListView v = d.getListView();
+						int i = 0;
+						while (i < stringArray.length) {
+							if (v.isItemChecked(i)) {
+								Integer id = Integer.parseInt(note_tags.get(
+										v.getItemAtPosition(i).toString())
+										.toString());
+								noteTags.addObject(new TagsItems(id,
+										stringArray[i], ""));
+							}
+							i++;
+						}
+
+					}
+				});
+
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface di, int i) {
+					}
+				});
+
+		builder.setNeutralButton("Create",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						createNotetag();
+					}
+				});
+		final Dialog dialog = builder.create();
+		dialog.show();
+	}
+
+	public void createNotetag() {
+
+		AlertDialog.Builder builder = new Builder(scope.context());
+		final EditText tag = new EditText(scope.context());
+		builder.setTitle("Tag Name").setMessage("Enter new Tag").setView(tag);
+
+		builder.setPositiveButton("Create",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface di, int i) {
+						// do something with onClick
+						if (tag.getText().length() > 0) {
+							writeNoteTags(tag.getText().toString());
+						} else {
+							Toast.makeText(scope.context(), "Enter Tag First",
+									Toast.LENGTH_LONG).show();
+						}
+					}
+				});
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface di, int i) {
+					}
+				});
+		builder.create().show();
+	}
+
+	public void writeNoteTags(String tagname) {
+
+		ContentValues values = new ContentValues();
+		values.put("name", tagname);
+		db = new NoteDBHelper(scope.context());
+		NoteDBHelper.NoteTags notetagObj = db.new NoteTags(scope.context());
+		int newId = notetagObj.createRecordOnserver(notetagObj, values);
+		values.put("id", newId);
+		notetagObj.create(notetagObj, values);
+		noteTags.addObject(new TagsItems(newId, tagname, ""));
+	}
+
+	private JSONArray getSelectedTagId() {
+		JSONArray list = new JSONArray();
+		for (String key : selectedTags.keySet()) {
+			list.put(selectedTags.get(key).getId());
 		}
+		return list;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 
 		case R.id.menu_note_edit_save:
@@ -159,8 +246,7 @@ public class EditNoteFragment extends BaseFragment {
 			return true;
 
 		case R.id.menu_note_edit_cancel:
-			if (isContentChanged(noteMemo.getText().toString(), noteTag
-					.getText().toString())) {
+			if (isContentChanged(noteMemo.getText().toString())) {
 				openDailogview("Are you sure..?",
 						"Your changes will be discarded. Are you sure?",
 						"Discard", "Cancel");
@@ -196,12 +282,11 @@ public class EditNoteFragment extends BaseFragment {
 		if (bundle.containsKey("row_id")) {
 			noteMemo = (EditText) rootview
 					.findViewById(R.id.txv_editNote_Description);
-			noteTag = (EditText) rootview.findViewById(R.id.txv_editNote_Tag);
 			row_id = bundle.getInt("row_id");
 			stageid = bundle.getString("stage_id");
 			tagid = bundle.getString("tag_id");
-			originialtag = tagid;
-			noteTag.setText(tagid);
+
+			setNoteTags(tagid);
 			setNoteStages(scope.context());
 			originalMemo = bundle.getString("row_details");
 			noteMemo.setText(bundle.getString("row_details"));
@@ -210,8 +295,38 @@ public class EditNoteFragment extends BaseFragment {
 
 	@Override
 	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void setNoteTags(String tagid) {
+		noteTags = (TagsView) rootview.findViewById(R.id.txv_editNote_Tag);
+		noteTags.allowDuplicates(false);
+		noteTags.setTokenListener(this);
+		noteTags.showImage(false);
+		// noteTags.allowDuplicates(false);
+		@SuppressWarnings("unused")
+		String[] note_tags_items = getNoteTags(String.valueOf(tagid),
+				scope.context());
+	}
+
+	public String[] getNoteTags(String note_note_id, Context context) {
+
+		String oea_name = OpenERPAccountManager.currentUser(
+				MainActivity.context).getAndroidName();
+		db = new NoteDBHelper(context);
+		List<String> note_tags = new ArrayList<String>();
+		List<HashMap<String, Object>> records = db
+				.executeSQL(
+						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
+						new String[] { note_note_id, oea_name, oea_name });
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				note_tags.add(row.get("name").toString());
+				noteTags.addObject(new TagsItems(Integer.parseInt(row.get("id")
+						.toString()), row.get("name").toString(), ""));
+			}
+		}
+		return note_tags.toArray(new String[note_tags.size()]);
 	}
 
 	public void setNoteStages(Context context) {
@@ -270,6 +385,9 @@ public class EditNoteFragment extends BaseFragment {
 
 	public void updateNote(int row_id) {
 		try {
+
+			tagID = getSelectedTagId();
+
 			// For using generateName() of composeNote
 			composeNote = new ComposeNoteActivity();
 			long stage_id = Long.parseLong(stages.get(noteStages
@@ -315,11 +433,10 @@ public class EditNoteFragment extends BaseFragment {
 		}
 	}
 
-	public boolean isContentChanged(String memo, String tag) {
+	public boolean isContentChanged(String memo) {
 		if ((originalMemo.length() != memo.length())
 				|| (!originialStage.equalsIgnoreCase(noteStages
-						.getSelectedItem().toString()))
-				|| (originialtag.length() != tag.length())) {
+						.getSelectedItem().toString()))) {
 			return true;
 		}
 		return false;
@@ -347,5 +464,41 @@ public class EditNoteFragment extends BaseFragment {
 				});
 		deleteDialogConfirm.setNegativeButton(negativebtnText, null);
 		deleteDialogConfirm.show();
+	}
+
+	public LinkedHashMap<String, String> getNoteTag() {
+		String oea_name = OpenERPAccountManager.currentUser(
+				MainActivity.context).getAndroidName();
+		db = new NoteDBHelper(scope.context());
+		List<HashMap<String, Object>> records = db.executeSQL(
+				"SELECT id,name,oea_name FROM note_tag where oea_name = ?",
+				new String[] { oea_name });
+		LinkedHashMap<String, String> note_tag = new LinkedHashMap<String, String>();
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				note_tag.put(row.get("name").toString(), row.get("id")
+						.toString());
+			}
+		}
+		return note_tag;
+	}
+
+	@Override
+	public void onTokenAdded(Object token, View view) {
+		// TODO Auto-generated method stub
+		TagsItems item = (TagsItems) token;
+		selectedTags.put("" + item.getId(), item);
+	}
+
+	@Override
+	public void onTokenSelected(Object token, View view) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onTokenRemoved(Object token) {
+		// TODO Auto-generated method stub
+		TagsItems item = (TagsItems) token;
+		selectedTags.remove("" + item.getId());
 	}
 }

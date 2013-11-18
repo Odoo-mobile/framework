@@ -29,6 +29,7 @@ import android.text.method.QwertyKeyListener;
 import android.text.style.ReplacementSpan;
 import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -630,8 +631,9 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 		post(new Runnable() {
 			@Override
 			public void run() {
-				if (!allowDuplicates && objects.contains(object))
+				if (!allowDuplicates && objects.contains(object)) {
 					return;
+				}
 
 				SpannableStringBuilder ssb = buildSpannableForText(sourceText);
 				TokenImageSpan tokenSpan = buildSpanForObject(object);
@@ -1141,7 +1143,6 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 	@Override
 	public Parcelable onSaveInstanceState() {
 		ArrayList<Serializable> baseObjects = getSerializableObjects();
-
 		// ARGH! Apparently, saving the parent state on 2.3 mutates the
 		// spannable
 		// prevent this mutation from triggering add or removes of token objects
@@ -1156,7 +1157,6 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 		state.tokenClickStyle = tokenClickStyle;
 		state.tokenDeleteStyle = deletionStyle;
 		state.baseObjects = baseObjects;
-
 		return state;
 	}
 
@@ -1169,19 +1169,21 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 
 		SavedState ss = (SavedState) state;
 		super.onRestoreInstanceState(ss.getSuperState());
-
 		setText(ss.prefix);
 		prefix = ss.prefix;
 		updateHint();
 		allowDuplicates = ss.allowDuplicates;
 		tokenClickStyle = ss.tokenClickStyle;
 		deletionStyle = ss.tokenDeleteStyle;
-
 		resetListeners();
-		for (Object obj : convertSerializableArrayToObjectArray(ss.baseObjects)) {
-			addObject(obj);
-		}
-
+		ss.baseObjects.clear();
+		/*
+		 * Creates duplicate tags when restoring from cache. EC01
+		 */
+		// for (Object obj :
+		// convertSerializableArrayToObjectArray(ss.baseObjects)) {
+		// addObject(obj);
+		// }
 		// This needs to happen after all the objects get added (which also get
 		// posted)
 		// or the view truncates really oddly

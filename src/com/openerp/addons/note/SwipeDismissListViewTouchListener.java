@@ -219,7 +219,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 			}
 
 			// setting background color[gray] while swapping the rows.
-			view.setBackgroundColor(Color.parseColor("#aaaaaa"));
+			view.setBackgroundColor(Color.parseColor("#dddddd"));
 
 			// TODO: ensure this is a finger, and set a flag
 			// Find the child view that was touched (perform a hit test)
@@ -261,7 +261,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 
 			// setting original background color[white] while swapping the rows
 			// COMPLETE.
-			view.setBackgroundColor(Color.WHITE);
+			//view.setBackgroundColor(Color.WHITE);
 
 			float deltaX = motionEvent.getRawX() - mDownX;
 			mVelocityTracker.addMovement(motionEvent);

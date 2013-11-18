@@ -2,6 +2,7 @@ package com.openerp.addons.note;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -10,6 +11,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -22,14 +24,19 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.support.AppScope;
+import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.TagsView;
 
-public class ComposeNoteActivity extends Activity {
+public class ComposeNoteActivity extends Activity implements
+		TagsView.TokenListener {
 
 	Spinner noteStages = null;
 	ArrayAdapter<String> adapter;
@@ -39,10 +46,16 @@ public class ComposeNoteActivity extends Activity {
 	HashMap<String, Long> note_Stages = null;
 	ArrayList<String> stages = new ArrayList<String>();
 	String name, memo, open, stage_name;
-	EditText noteDescription, noteTags;
-	private static final int NOTE_ID = 0;
+	EditText noteDescription;
 	JSONArray tagID = new JSONArray();
 	ArrayList<String> tagName = new ArrayList<String>();
+	List<TagsItems> arr = new ArrayList<TagsItems>();
+	HashMap<String, TagsItems> selectedTags = new HashMap<String, TagsItems>();
+	ArrayList<String> keyList = null;
+	ListView modeList;
+	LinkedHashMap<String, String> note_tags = null;
+	String[] stringArray = null;
+	TagsView noteTags;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,32 +64,69 @@ public class ComposeNoteActivity extends Activity {
 		setContentView(R.layout.fragment_compose_note);
 		scope = new AppScope(MainActivity.userContext,
 				(MainActivity) MainActivity.context);
-		noteTags = (EditText) findViewById(R.id.txv_composeNote_Tag);
+		noteTags = (TagsView) findViewById(R.id.txv_composeNote_Tag);
+		noteTags.allowDuplicates(false);
+		noteTags.setTokenListener(this);
+		noteTags.showImage(false);
 		fillNoteStages();
 	}
 
+	// Called when + button pressed for adding tags
 	public void addTags(View v) {
-		Intent composeNote = new Intent(scope.context(), AddTags.class);
-		startActivityForResult(composeNote, NOTE_ID);
-	}
+		note_tags = getNoteTag();
+		keyList = new ArrayList<String>(note_tags.keySet());
+		stringArray = new String[keyList.size() - 1];
+		stringArray = keyList.toArray(stringArray);
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Select Tags");
 
-		case NOTE_ID:
-			if (resultCode == Activity.RESULT_OK) {
-				try {
-					tagID = new JSONArray(data.getExtras().get("result")
-							.toString());
-				} catch (Exception e) {
-				}
-				tagName = data.getExtras().getStringArrayList("result1");
-				noteTags.setText(tagName.toString().replace("[", "")
-						.replace("]", ""));
-			}
-			break;
-		}
+		builder.setMultiChoiceItems(stringArray, null,
+				new DialogInterface.OnMultiChoiceClickListener() {
+					public void onClick(DialogInterface dialog, int item,
+							boolean isChecked) {
+					}
+				});
+
+		builder.setPositiveButton("Select",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						AlertDialog d = (AlertDialog) dialog;
+						ListView v = d.getListView();
+						int i = 0;
+						while (i < stringArray.length) {
+							if (v.isItemChecked(i)) {
+								Integer id = Integer.parseInt(note_tags.get(
+										v.getItemAtPosition(i).toString())
+										.toString());
+								noteTags.addObject(new TagsItems(id,
+										stringArray[i], ""));
+							}
+							i++;
+						}
+
+					}
+				});
+
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface di, int i) {
+					}
+				});
+		builder.setNeutralButton("Create",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						createNotetag();
+					}
+				});
+
+		final Dialog dialog = builder.create();
+		dialog.show();
 	}
 
 	public void fillNoteStages() {
@@ -181,6 +231,29 @@ public class ComposeNoteActivity extends Activity {
 		builder.create().show();
 	}
 
+	public void createNotetag() {
+
+		AlertDialog.Builder builder = new Builder(this);
+		final EditText tag = new EditText(this);
+		builder.setTitle("Tag Name").setMessage("Enter new Tag").setView(tag);
+		builder.setPositiveButton("Create", new OnClickListener() {
+			public void onClick(DialogInterface di, int i) {
+				// do something with onClick
+				if (tag.getText().length() > 0) {
+					writeNoteTags(tag.getText().toString());
+				} else {
+					Toast.makeText(scope.context(), "Enter Tag First",
+							Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+		builder.setNegativeButton("Cancel", new OnClickListener() {
+			public void onClick(DialogInterface di, int i) {
+			}
+		});
+		builder.create().show();
+	}
+
 	public void writeNoteStages(String stagename) {
 
 		ContentValues values = new ContentValues();
@@ -192,6 +265,19 @@ public class ComposeNoteActivity extends Activity {
 		note_Stages.put(stagename, Long.parseLong(String.valueOf(newId)));
 		values.put("id", newId);
 		notestageObj.create(notestageObj, values);
+	}
+
+	public void writeNoteTags(String tagname) {
+
+		ContentValues values = new ContentValues();
+		values.put("name", tagname);
+		dbhelper = new NoteDBHelper(scope.context());
+		NoteDBHelper.NoteTags notetagObj = dbhelper.new NoteTags(
+				scope.context());
+		int newId = notetagObj.createRecordOnserver(notetagObj, values);
+		values.put("id", newId);
+		notetagObj.create(notetagObj, values);
+		noteTags.addObject(new TagsItems(newId, tagname, ""));
 	}
 
 	public String generateName(String longName) {
@@ -207,6 +293,7 @@ public class ComposeNoteActivity extends Activity {
 	private void writeNote() {
 
 		noteDescription = (EditText) findViewById(R.id.txv_composeNote_Description);
+		tagID = getSelectedTagId();
 
 		try {
 			ContentValues values = new ContentValues();
@@ -242,7 +329,6 @@ public class ComposeNoteActivity extends Activity {
 				values.put("id", newId);
 				values.put("date_done", "false");
 				values.put("tag_ids", tagID.toString());
-
 				int new_id = dbhelper.create(dbhelper, values);
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra("result", new_id);
@@ -256,5 +342,49 @@ public class ComposeNoteActivity extends Activity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private JSONArray getSelectedTagId() {
+		JSONArray list = new JSONArray();
+		for (String key : selectedTags.keySet()) {
+			list.put(selectedTags.get(key).getId());
+		}
+		return list;
+	}
+
+	@Override
+	public void onTokenAdded(Object token, View view) {
+		TagsItems item = (TagsItems) token;
+		selectedTags.put("" + item.getId(), item);
+	}
+
+	@Override
+	public void onTokenSelected(Object token, View view) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onTokenRemoved(Object token) {
+		// TODO Auto-generated method stub
+		TagsItems item = (TagsItems) token;
+		selectedTags.remove("" + item.getId());
+	}
+
+	public LinkedHashMap<String, String> getNoteTag() {
+		String oea_name = OpenERPAccountManager.currentUser(
+				MainActivity.context).getAndroidName();
+		dbhelper = new NoteDBHelper(scope.context());
+		List<HashMap<String, Object>> records = dbhelper.executeSQL(
+				"SELECT id,name,oea_name FROM note_tag where oea_name = ?",
+				new String[] { oea_name });
+		LinkedHashMap<String, String> note_tag = new LinkedHashMap<String, String>();
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				note_tag.put(row.get("name").toString(), row.get("id")
+						.toString());
+			}
+		}
+		return note_tag;
 	}
 }

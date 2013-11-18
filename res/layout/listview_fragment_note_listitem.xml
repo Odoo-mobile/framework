@@ -1,31 +1,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#ffffff"
+    android:background="@drawable/note_container_drop_shadow"
     android:orientation="vertical"
     android:padding="10dp" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/txvNoteListItem"
-            android:layout_width="0dp"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.75"
             android:singleLine="true"
             android:text="Note Listview"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
 
-        <Button
-            android:id="@+id/btnNoteListItemDelete"
-            android:layout_width="65dp"
-            android:layout_height="25dp"
-            android:text="Delete"
-            android:textSize="10sp"
-            android:visibility="invisible" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <com.openerp.util.tags.TagsView
+            android:id="@+id/txv_detailNote_Tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="#ffffff"
+            android:enabled="false"
+            android:paddingBottom="3dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:paddingTop="3dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -50,8 +60,8 @@
             android:layout_weight="0.25"
             android:background="#ffffff"
             android:gravity="center"
-            android:text="New"
             android:padding="3dp"
+            android:text="New"
             android:textColor="#ffffff"
             android:textSize="12sp" />
     </LinearLayout>

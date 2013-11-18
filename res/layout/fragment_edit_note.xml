@@ -19,15 +19,15 @@
         android:orientation="horizontal"
         android:weightSum="3" >
 
-        <EditText
+        <com.openerp.util.tags.TagsView
             android:id="@+id/txv_editNote_Tag"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginTop="2dp"
             android:layout_weight="3"
-            android:focusable="false" >
-        </EditText>
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="5dp" />
 
         <ImageView
             android:id="@+id/imgBtnEditTags"

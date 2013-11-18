@@ -18,7 +18,6 @@
  */
 package com.openerp.addons.note;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +26,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,11 +38,12 @@ import android.widget.TextView;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.addons.messages.MessageComposeActivty;
-import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.util.HTMLHelper;
+import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.TagsView;
 
 public class DetailNoteFragment extends BaseFragment {
 
@@ -54,7 +53,7 @@ public class DetailNoteFragment extends BaseFragment {
 	String message;
 	String row_status = null;
 	String stageid = null;
-	String tagid = null;
+	String noteid = null;
 	Note note = new Note();
 	NoteDBHelper db = null;
 	String[] note_tags = null;
@@ -144,7 +143,7 @@ public class DetailNoteFragment extends BaseFragment {
 			editNoteID.putInt("row_id", row_id);
 			editNoteID.putString("row_details", noteMemo.getText().toString());
 			editNoteID.putString("stage_id", stageid);
-			editNoteID.putString("tag_id", tagid);
+			editNoteID.putString("tag_id", noteid);
 			editnote_fragment.setArguments(editNoteID);
 			scope.context().fragmentHandler.setBackStack(true, null);
 			scope.context().fragmentHandler.replaceFragmnet(editnote_fragment);
@@ -192,10 +191,12 @@ public class DetailNoteFragment extends BaseFragment {
 	private void showNoteDetails(int note_id) {
 
 		noteMemo = (TextView) rootview.findViewById(R.id.txv_detailNote_Memo);
-		noteTags = (TextView) rootview.findViewById(R.id.txv_detailNote_Tags);
+		TagsView noteTags = (TagsView) rootview
+				.findViewById(R.id.txv_detailNote_Tags);
+		noteTags.allowDuplicates(false);
 		// Enabling Scrollview
 		noteMemo.setMovementMethod(new ScrollingMovementMethod());
-		
+
 		db = new NoteDBHelper(scope.context());
 		HashMap<String, Object> result = db.search(db, new String[] { "id=?" },
 				new String[] { String.valueOf(note_id) });
@@ -207,14 +208,19 @@ public class DetailNoteFragment extends BaseFragment {
 			message = row.get("memo").toString(); // paassing to next
 													// followerfragment
 			try {
-				note_tags = getNoteTags(String.valueOf(note_id));
-				if (note_tags.length > 0) {
-					tags = TextUtils.join(", ", note_tags);
-				} else {
+				noteid = String.valueOf(note_id);
+				String[] note_tags_items = note.getNoteTags(
+						String.valueOf(noteid), scope.context());
+				noteTags.showImage(false);
+
+				for (String tag : note_tags_items) {
+					noteTags.addObject(new TagsItems(0, tag, ""));
+				}
+
+				if (note_tags_items.length <= 0) {
 					noteTags.setVisibility(View.GONE);
 				}
-				noteTags.setText(tags);
-				tagid = tags;
+
 				noteMemo.setText(HTMLHelper.stringToHtml(row.get("memo")
 						.toString()));
 			} catch (Exception e) {
@@ -244,19 +250,4 @@ public class DetailNoteFragment extends BaseFragment {
 		deleteDialogConfirm.show();
 	}
 
-	public String[] getNoteTags(String note_note_id) {
-		String oea_name = OpenERPAccountManager.currentUser(
-				MainActivity.context).getAndroidName();
-		List<HashMap<String, Object>> records = db
-				.executeSQL(
-						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
-						new String[] { note_note_id, oea_name, oea_name });
-		List<String> note_tags = new ArrayList<String>();
-		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
-				note_tags.add(row.get("name").toString());
-			}
-		}
-		return note_tags.toArray(new String[note_tags.size()]);
-	}
 }

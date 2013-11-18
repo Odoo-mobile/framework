@@ -62,6 +62,7 @@ import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.tags.TagsView;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
@@ -85,6 +86,8 @@ public class Note extends BaseFragment implements
 	SwipeDismissListViewTouchListener touchListener = null;
 	NoteDBHelper db = null;
 	JSONObject res = null;
+	String[] note_tags = null;
+	String tags = "";
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -172,7 +175,6 @@ public class Note extends BaseFragment implements
 			setNoteStages(scope.context());
 			stage_id = bundle.getString("stage");
 			if (bundle.containsKey("tag_color")) {
-				// current_stage_color = bundle.getInt("tag_color");
 				stage_colors.put("stage_" + stage_id,
 						bundle.getInt("tag_color"));
 			}
@@ -333,8 +335,21 @@ public class Note extends BaseFragment implements
 				View newView = row_view;
 				TextView txvTag = (TextView) newView
 						.findViewById(R.id.txvNoteListTags);
+				TagsView noteTags = (TagsView) newView
+						.findViewById(R.id.txv_detailNote_Tags);
 
 				try {
+					// String noteID =
+					// row_data.getRow_data().get("id").toString();
+					// String[] note_tags_items = getNoteTags(
+					// String.valueOf(noteID), scope.context());
+					// noteTags.showImage(false);
+					// for (String tag : note_tags_items) {
+					// noteTags.addObject(new TagsItems(0, tag, ""));
+					// }
+					// if (note_tags_items.length <= 0) {
+					noteTags.setVisibility(View.GONE);
+					// }
 					// Fetching Note Stage and Setting Background color for that
 					String stageInfo = row_data.getRow_data().get("stage_id")
 							.toString();
@@ -350,7 +365,6 @@ public class Note extends BaseFragment implements
 						txvTag.setBackgroundColor(Color.parseColor("#ffffff"));
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
 				}
 				return newView;
 			}
@@ -597,4 +611,23 @@ public class Note extends BaseFragment implements
 			e.printStackTrace();
 		}
 	}
+
+	public String[] getNoteTags(String note_note_id, Context context) {
+
+		String oea_name = OpenERPAccountManager.currentUser(
+				MainActivity.context).getAndroidName();
+		db = new NoteDBHelper(context);
+		List<String> note_tags = new ArrayList<String>();
+		List<HashMap<String, Object>> records = db
+				.executeSQL(
+						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
+						new String[] { note_note_id, oea_name, oea_name });
+		if (records.size() > 0) {
+			for (HashMap<String, Object> row : records) {
+				note_tags.add(row.get("name").toString());
+			}
+		}
+		return note_tags.toArray(new String[note_tags.size()]);
+	}
+
 }

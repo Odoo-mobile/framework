@@ -208,10 +208,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_provider" />
         </receiver>
-        <activity
-            android:name="com.openerp.addons.note.AddTags"
-            android:label="@string/app_name" >
-        </activity>
     </application>
 
 </manifest>
