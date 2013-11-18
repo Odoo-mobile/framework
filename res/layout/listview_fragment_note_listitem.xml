@@ -33,8 +33,8 @@
             android:background="#ffffff"
             android:enabled="false"
             android:paddingBottom="3dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
             android:paddingTop="3dp" />
     </LinearLayout>
 

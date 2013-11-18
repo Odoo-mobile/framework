@@ -10,20 +10,15 @@
         android:layout_height="5dp"
         android:background="#ffffff" />
 
-    <TextView
+    <com.openerp.util.tags.TagsView
         android:id="@+id/txv_detailNote_Tags"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/tag_style"
-        android:paddingBottom="5dp"
+        android:layout_marginTop="2dp"
+        android:background="#ffffff"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="5dp"
-        android:text="Hello, How are you..!"
-        android:textAppearance="?android:attr/textAppearanceSmallPopupMenu" />
+        android:paddingTop="5dp" />
 
     <TextView
         android:id="@+id/txv_detailNote_Memo"
