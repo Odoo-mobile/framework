@@ -28,6 +28,7 @@ public class ModulesConfigHelper {
 
 	/** The modules. */
 	ArrayList<Module> modules = new ArrayList<Module>();
+	Module default_module = null;
 
 	/**
 	 * Adds the module to list.
@@ -39,6 +40,13 @@ public class ModulesConfigHelper {
 		modules.add(module);
 	}
 
+	public void add(Module module, boolean isDefault) {
+		modules.add(module);
+		if (isDefault) {
+			default_module = module;
+		}
+	}
+
 	/**
 	 * Modules.
 	 * 
@@ -48,4 +56,11 @@ public class ModulesConfigHelper {
 		return modules;
 	}
 
+	public Module getDefaultModule() {
+		if (default_module == null && modules.size() > 0) {
+			return modules.get(0);
+		} else {
+			return default_module;
+		}
+	}
 }

@@ -23,7 +23,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,10 +35,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.base.login.Login;
-import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEDialog;
@@ -92,8 +89,7 @@ public class AccountFragment extends BaseFragment {
 		rootView = inflater
 				.inflate(R.layout.fragment_account, container, false);
 
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 
 		rootView.findViewById(R.id.edtServerURL).requestFocus();
 		getActivity().setTitle("Setup Account");
@@ -262,11 +258,6 @@ public class AccountFragment extends BaseFragment {
 				Login loginFragment = new Login();
 				Bundle bundle = new Bundle();
 				bundle.putString("openERPServerURL", openERPServerURL);
-				try {
-					MainActivity.openerp = new OEHelper(context,
-							openERPServerURL);
-				} catch (Exception e) {
-				}
 				scope.context().fragmentHandler.setFragmentArguments(bundle);
 				scope.context().fragmentHandler.setBackStack(true, null);
 				scope.context().fragmentHandler.replaceFragmnet(loginFragment);

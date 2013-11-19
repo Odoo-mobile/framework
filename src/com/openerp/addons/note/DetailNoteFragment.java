@@ -64,8 +64,7 @@ public class DetailNoteFragment extends BaseFragment {
 			Bundle savedInstanceState) {
 
 		setHasOptionsMenu(true);
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		db = (NoteDBHelper) getModel();
 		rootview = inflater.inflate(R.layout.fragment_detail_note, container,
 				false);

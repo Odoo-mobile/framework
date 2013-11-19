@@ -45,7 +45,7 @@ import com.openerp.base.ir.Ir_model;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
-import com.openerp.support.UserObject;
+import com.openerp.support.OEUser;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.OEDate;
 
@@ -56,7 +56,7 @@ import com.openerp.util.OEDate;
 public class OEHelper extends OpenERP {
 
 	/** The user context. */
-	UserObject userContext = null;
+	OEUser userContext = null;
 
 	/** The m context. */
 	Context mContext = null;
@@ -101,7 +101,7 @@ public class OEHelper extends OpenERP {
 	 *             Signals that an I/O exception has occurred.
 	 * @throws OEVersionException
 	 */
-	public OEHelper(Context context, UserObject data)
+	public OEHelper(Context context, OEUser data)
 			throws ClientProtocolException, JSONException, IOException,
 			OEVersionException {
 		super(data.getHost(), OpenERPServerConnection
@@ -117,7 +117,7 @@ public class OEHelper extends OpenERP {
 	 * 
 	 * @return the user context
 	 */
-	public UserObject getUserContext() {
+	public OEUser getUserContext() {
 		return this.userContext;
 	}
 
@@ -134,9 +134,9 @@ public class OEHelper extends OpenERP {
 	 *            the server url
 	 * @return the user object
 	 */
-	public UserObject login(String username, String password, String database,
+	public OEUser login(String username, String password, String database,
 			String serverURL) {
-		UserObject userObj = null;
+		OEUser userObj = null;
 		JSONObject domain = new JSONObject();
 		try {
 			JSONObject response = this.authenticate(username, password,
@@ -156,7 +156,7 @@ public class OEHelper extends OpenERP {
 						.search_read("res.users", fields, domain, 0, 0, null,
 								null).getJSONArray("records").getJSONObject(0);
 
-				userObj = new UserObject();
+				userObj = new OEUser();
 				userObj.setAvatar(res.getString("image"));
 
 				userObj.setDatabase(database);

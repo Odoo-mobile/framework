@@ -41,8 +41,7 @@ public class SyncWizard extends BaseFragment {
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		context = (MainActivity) getActivity();
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		rootView = inflater.inflate(R.layout.fragment_sync_wizard, container,
 				false);
 		getActivity().setTitle("Configuration");

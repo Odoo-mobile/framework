@@ -77,8 +77,7 @@ public class AddFollowerFragment extends BaseFragment {
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		setHasOptionsMenu(true);
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		rootview = inflater.inflate(R.layout.fragment_add_follower, container,
 				false);
 		addFollower = (Button) rootview.findViewById(R.id.btn_note_addfollower);

@@ -21,7 +21,6 @@ package com.openerp;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
@@ -34,14 +33,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.openerp.addons.note.Note;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.config.ModulesConfig;
 import com.openerp.support.Module;
-import com.openerp.support.ModulesConfigHelper;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuAdapter;
 import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.logger.OELog;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -61,8 +59,8 @@ public class MenuDrawerHelper {
 	/** The instance. */
 	private MainActivity instance = null;
 
-	/** The m menu items. */
-	private String[] mMenuItems;
+	/** The menu items. */
+	private List<OEMenuItems> mMenuItems = new ArrayList<OEMenuItems>();
 
 	/** The modules. */
 	ArrayList<Module> modules = null;
@@ -83,8 +81,24 @@ public class MenuDrawerHelper {
 		super();
 		this.instance = object;
 		modules = new ModulesConfig().modules();
+		mMenuItems = null;
 		this.init();
+		OELog.log("refreshing menu");
+	}
 
+	/**
+	 * Instantiates a new menu drawer helper.
+	 * 
+	 * @param object
+	 *            the object
+	 */
+	public MenuDrawerHelper(MainActivity object, List<OEMenuItems> app_menu) {
+		super();
+		this.instance = object;
+		modules = new ModulesConfig().modules();
+		mMenuItems = app_menu;
+		this.init();
+		OELog.log("refreshing menu , app_menu");
 	}
 
 	/**
@@ -118,12 +132,9 @@ public class MenuDrawerHelper {
 				}
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
 		}
-
 		return allMenus;
 	}
 
@@ -133,7 +144,10 @@ public class MenuDrawerHelper {
 	 * @return the menu list
 	 */
 	private OEMenuItems[] getMenuList() {
-		List<OEMenuItems> mList = getMenuItemsList();
+		if (mMenuItems == null) {
+			mMenuItems = getMenuItemsList();
+		}
+		List<OEMenuItems> mList = mMenuItems;
 		mList.addAll(getSettingMenu());
 		menus = new OEMenuItems[mList.size()];
 		int i = 0;
@@ -192,11 +206,9 @@ public class MenuDrawerHelper {
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
 
-		if (OpenERPAccountManager.fetchAllAccounts(instance) != null
-				&& OpenERPAccountManager.isAnyUser(instance)) {
+		if (OpenERPAccountManager.isAnyUser(instance)) {
 			mDrawerList.setAdapter(new OEMenuAdapter(this.instance,
 					R.layout.drawer_menu_item, this.getMenuList()));
-
 		}
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 		// enable ActionBar app icon to behave as action to toggle nav drawer

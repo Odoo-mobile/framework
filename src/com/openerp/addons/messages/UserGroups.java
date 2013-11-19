@@ -60,8 +60,7 @@ public class UserGroups extends BaseFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		db = (BaseDBHelper) databaseHelper(scope.context());
 		rootView = inflater.inflate(R.layout.fragment_message_groups_list,
 				container, false);

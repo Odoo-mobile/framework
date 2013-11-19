@@ -102,10 +102,7 @@ public class MessageDetail extends BaseFragment {
 			Bundle savedInstanceState) {
 
 		setHasOptionsMenu(true);
-
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
-
+		scope = new AppScope(this);
 		db = (MessageDBHelper) getModel();
 
 		rootView = inflater.inflate(R.layout.fragment_message_detail_view,

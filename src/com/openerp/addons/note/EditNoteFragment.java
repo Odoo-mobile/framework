@@ -96,8 +96,7 @@ public class EditNoteFragment extends BaseFragment implements
 			Bundle savedInstanceState) {
 
 		setHasOptionsMenu(true);
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		db = (NoteDBHelper) getModel();
 		rootview = inflater.inflate(R.layout.fragment_edit_note, container,
 				false);

@@ -39,7 +39,7 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.config.ModulesConfig;
 import com.openerp.support.Module;
 import com.openerp.support.OpenERPServerConnection;
-import com.openerp.support.UserObject;
+import com.openerp.support.OEUser;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -79,7 +79,7 @@ public class ORM extends SQLiteDatabaseHelper {
 		this.context = context;
 		modules = new ModulesConfig().modules();
 		this.statements = new HashMap<String, String>();
-		UserObject obj = OpenERPAccountManager.currentUser(context);
+		OEUser obj = OpenERPAccountManager.currentUser(context);
 		if (obj != null) {
 			user_name = obj.getAndroidName();
 		}

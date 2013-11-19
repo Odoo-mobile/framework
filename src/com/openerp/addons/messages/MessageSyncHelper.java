@@ -39,6 +39,7 @@ import com.openerp.orm.OEHelper;
 import com.openerp.receivers.DataSetChangeReceiver;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
+import com.openerp.support.OEUser;
 import com.openerp.support.SyncHelper;
 
 // TODO: Auto-generated Javadoc
@@ -66,8 +67,7 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 	 */
 	public MessageSyncHelper(Context context) throws ClientProtocolException,
 			JSONException, IOException, OEVersionException {
-		super(context, MainActivity.userContext);
-		// TODO Auto-generated constructor stub
+		super(context, OEUser.current(context));
 		mContext = context;
 	}
 
@@ -126,7 +126,7 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 			argsObj1.addArgCondition("message_id", "in", localIds);
 			OEArgsHelper argsObj2 = new OEArgsHelper();
 			argsObj2.addArgCondition("partner_id", "=",
-					Integer.parseInt(MainActivity.userContext.getPartner_id()));
+					Integer.parseInt(OEUser.current(mContext).getPartner_id()));
 
 			OEArgsHelper argsObj = new OEArgsHelper();
 			argsObj.addArg(argsObj1.getArgs());

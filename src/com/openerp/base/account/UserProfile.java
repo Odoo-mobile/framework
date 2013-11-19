@@ -23,9 +23,10 @@ import android.widget.Toast;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.UserObject;
+import com.openerp.support.OEUser;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.util.Base64Helper;
 
@@ -44,8 +45,7 @@ public class UserProfile extends BaseFragment {
 		setHasOptionsMenu(true);
 		rootView = inflater.inflate(R.layout.fragment_account_user_profile,
 				container, false);
-		scope = new AppScope(OpenERPAccountManager.currentUser(getActivity()),
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		scope.context().setTitle("OpenERP User Profile");
 
 		setupView();
@@ -124,9 +124,16 @@ public class UserProfile extends BaseFragment {
 				.setView(password);
 		builder.setPositiveButton("Update Info", new OnClickListener() {
 			public void onClick(DialogInterface di, int i) {
-				UserObject userData = MainActivity.openerp.login(scope.User()
-						.getUsername(), password.getText().toString(), scope
-						.User().getDatabase(), scope.User().getHost());
+				OEUser userData = null;
+				try {
+					OEHelper openerp = new OEHelper(scope.context(), scope
+							.User().getHost());
+
+					userData = openerp.login(scope.User().getUsername(),
+							password.getText().toString(), scope.User()
+									.getDatabase(), scope.User().getHost());
+				} catch (Exception e) {
+				}
 				if (userData != null) {
 					if (OpenERPAccountManager.updateAccountDetails(
 							scope.context(), userData)) {

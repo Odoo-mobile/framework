@@ -18,15 +18,18 @@
  */
 package com.openerp.support;
 
+import com.openerp.auth.OpenERPAccountManager;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.Context;
 import android.os.Bundle;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class UserObject.
  */
-public class UserObject {
+public class OEUser {
 
 	/** The username. */
 	private String username;
@@ -334,4 +337,7 @@ public class UserObject {
 		this.host = host;
 	}
 
+	public static OEUser current(Context context) {
+		return OpenERPAccountManager.currentUser(context);
+	}
 }
