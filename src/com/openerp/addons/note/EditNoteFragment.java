@@ -135,41 +135,45 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	public void openTagList() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(scope.context());
 		note_tags = getNoteTag();
 		keyList = new ArrayList<String>(note_tags.keySet());
-		stringArray = new String[keyList.size() - 1];
-		stringArray = keyList.toArray(stringArray);
+		if (keyList.size() > 0) {
+			stringArray = new String[keyList.size() - 1];
+			stringArray = keyList.toArray(stringArray);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(scope.context());
-		builder.setTitle("Select Tags");
-		builder.setMultiChoiceItems(stringArray, null,
-				new DialogInterface.OnMultiChoiceClickListener() {
-					public void onClick(DialogInterface dialog, int item,
-							boolean isChecked) {
-					}
-				});
-
-		builder.setPositiveButton("Select",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						AlertDialog d = (AlertDialog) dialog;
-						ListView v = d.getListView();
-						int i = 0;
-						while (i < stringArray.length) {
-							if (v.isItemChecked(i)) {
-								Integer id = Integer.parseInt(note_tags.get(
-										v.getItemAtPosition(i).toString())
-										.toString());
-								noteTags.addObject(new TagsItems(id,
-										stringArray[i], ""));
-							}
-							i++;
+			builder.setTitle("Select Tags");
+			builder.setMultiChoiceItems(stringArray, null,
+					new DialogInterface.OnMultiChoiceClickListener() {
+						public void onClick(DialogInterface dialog, int item,
+								boolean isChecked) {
 						}
+					});
 
-					}
-				});
+			builder.setPositiveButton("Select",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							AlertDialog d = (AlertDialog) dialog;
+							ListView v = d.getListView();
+							int i = 0;
+							while (i < stringArray.length) {
+								if (v.isItemChecked(i)) {
+									Integer id = Integer.parseInt(note_tags
+											.get(v.getItemAtPosition(i)
+													.toString()).toString());
+									noteTags.addObject(new TagsItems(id,
+											stringArray[i], ""));
+								}
+								i++;
+							}
 
+						}
+					});
+
+		} else {
+			builder.setTitle("You don't have any tags \ncreate tag");
+		}
 		builder.setNegativeButton("Cancel",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface di, int i) {
