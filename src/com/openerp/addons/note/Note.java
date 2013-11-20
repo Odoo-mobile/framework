@@ -88,6 +88,7 @@ public class Note extends BaseFragment implements
 	JSONObject res = null;
 	String[] note_tags = null;
 	String tags = "";
+	boolean isSynced = false;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -262,7 +263,6 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public void onRefreshStarted(View view) {
-		// TODO Auto-generated method stub
 		scope.context().requestSync(NoteProvider.AUTHORITY);
 	}
 
@@ -551,8 +551,8 @@ public class Note extends BaseFragment implements
 				lists.add(row);
 			}
 		} else {
-			if (db.isEmptyTable(db)) {
-
+			if (db.isEmptyTable(db) && !isSynced) {
+				isSynced = true;
 				// Hiding text message of empty list view
 				// due to visibility of sync process message
 				emptyNotesText.setVisibility(View.GONE);

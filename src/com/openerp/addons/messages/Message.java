@@ -97,6 +97,7 @@ public class Message extends BaseFragment implements
 			"#EBB035" };
 	HashMap<String, Integer> message_model_colors = new HashMap<String, Integer>();
 	int tag_color_count = 0;
+	boolean isSynced = false;
 
 	public enum TYPE {
 		INBOX, TODO, TOME, ARCHIVE, GROUP
@@ -588,7 +589,8 @@ public class Message extends BaseFragment implements
 			}
 
 		} else {
-			if (db.isEmptyTable(db)) {
+			if (db.isEmptyTable(db) && !isSynced) {
+				isSynced = true;
 				scope.context().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
