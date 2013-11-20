@@ -162,15 +162,18 @@ public class EditNoteFragment extends BaseFragment implements
 									Integer id = Integer.parseInt(note_tags
 											.get(v.getItemAtPosition(i)
 													.toString()).toString());
-									noteTags.addObject(new TagsItems(id,
-											stringArray[i], ""));
+
+									if (!selectedTags.containsKey(note_tags
+											.get(v.getItemAtPosition(i)
+													.toString()))) {
+										noteTags.addObject(new TagsItems(id,
+												stringArray[i], ""));
+									}
 								}
 								i++;
 							}
-
 						}
 					});
-
 		} else {
 			builder.setTitle("You don't have any tags \ncreate tag");
 		}
