@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -25,9 +26,14 @@ public class AboutFragment extends BaseFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		scope = new AppScope(this);
+		// TODO Auto-generated method stub
+		getActivity().getActionBar().setHomeButtonEnabled(true);
+		getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+
 		rootView = inflater.inflate(R.layout.fragment_about_company, container,
 				false);
 		versionName = (TextView) rootView.findViewById(R.id.txvVersionName);
+
 		try {
 			// setting version name from manifest file
 			String version = getActivity().getPackageManager().getPackageInfo(
@@ -70,6 +76,19 @@ public class AboutFragment extends BaseFragment {
 	public OEMenu menuHelper(Context context) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			// app icon in action bar clicked; go home
+			getActivity().getSupportFragmentManager().popBackStack();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override

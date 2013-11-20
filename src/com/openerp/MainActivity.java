@@ -63,7 +63,6 @@ import com.openerp.support.OEUser;
 import com.openerp.support.menu.OEMenuItems;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.OnBackButtonPressedListener;
-import com.openerp.util.logger.OELog;
 
 /**
  * The Class MainActivity.

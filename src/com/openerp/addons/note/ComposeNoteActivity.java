@@ -63,6 +63,8 @@ public class ComposeNoteActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_compose_note);
 		scope = new AppScope((MainActivity) MainActivity.context);
+		getActionBar().setHomeButtonEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		noteTags = (TagsView) findViewById(R.id.txv_composeNote_Tag);
 		noteTags.allowDuplicates(false);
 		noteTags.setTokenListener(this);
@@ -100,8 +102,12 @@ public class ComposeNoteActivity extends Activity implements
 									Integer id = Integer.parseInt(note_tags
 											.get(v.getItemAtPosition(i)
 													.toString()).toString());
-									noteTags.addObject(new TagsItems(id,
-											stringArray[i], ""));
+									if (!selectedTags.containsKey(note_tags
+											.get(v.getItemAtPosition(i)
+													.toString()))) {
+										noteTags.addObject(new TagsItems(id,
+												stringArray[i], ""));
+									}
 								}
 								i++;
 							}
@@ -191,6 +197,10 @@ public class ComposeNoteActivity extends Activity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
+		case android.R.id.home:
+			// app icon in action bar clicked; go home
+			finish();
+			return true;
 		case R.id.menu_note_write:
 			writeNote();
 			return true;

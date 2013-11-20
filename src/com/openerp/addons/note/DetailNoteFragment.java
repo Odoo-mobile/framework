@@ -34,9 +34,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.MainActivity;
 import com.openerp.addons.messages.MessageComposeActivty;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
@@ -248,5 +247,4 @@ public class DetailNoteFragment extends BaseFragment {
 		deleteDialogConfirm.setNegativeButton("Cancel", null);
 		deleteDialogConfirm.show();
 	}
-
 }

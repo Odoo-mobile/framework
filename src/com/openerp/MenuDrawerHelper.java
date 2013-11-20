@@ -98,7 +98,6 @@ public class MenuDrawerHelper {
 		modules = new ModulesConfig().modules();
 		mMenuItems = app_menu;
 		this.init();
-		OELog.log("refreshing menu , app_menu");
 	}
 
 	/**

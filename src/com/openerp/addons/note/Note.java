@@ -71,7 +71,7 @@ public class Note extends BaseFragment implements
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
 	View rootView = null;
-	TextView noteSyncProcessText, emptyNotesText;
+	TextView noteSyncProcessText, emptyNotesText, noteTags;
 	ListView lstNotes = null;
 	List<OEListViewRows> listRows = null;
 	OEListViewAdapter listAdapter = null;
@@ -89,6 +89,7 @@ public class Note extends BaseFragment implements
 	JSONObject res = null;
 	String[] note_tags = null;
 	String tags = "";
+	boolean isSynced = false;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -262,7 +263,6 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public void onRefreshStarted(View view) {
-		// TODO Auto-generated method stub
 		scope.context().requestSync(NoteProvider.AUTHORITY);
 	}
 
@@ -350,6 +350,7 @@ public class Note extends BaseFragment implements
 					// if (note_tags_items.length <= 0) {
 					noteTags.setVisibility(View.GONE);
 					// }
+
 					// Fetching Note Stage and Setting Background color for that
 					String stageInfo = row_data.getRow_data().get("stage_id")
 							.toString();
@@ -551,8 +552,8 @@ public class Note extends BaseFragment implements
 				lists.add(row);
 			}
 		} else {
-			if (db.isEmptyTable(db)) {
-
+			if (db.isEmptyTable(db) && !isSynced) {
+				isSynced = true;
 				// Hiding text message of empty list view
 				// due to visibility of sync process message
 				emptyNotesText.setVisibility(View.GONE);
