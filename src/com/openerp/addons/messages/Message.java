@@ -135,8 +135,7 @@ public class Message extends BaseFragment implements
 		 * 
 		 * @param MainActivity
 		 */
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 
 		/*
 		 * db
@@ -709,7 +708,6 @@ public class Message extends BaseFragment implements
 
 	@Override
 	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
 		db = (MessageDBHelper) databaseHelper(context);
 		if (db.getOEInstance().isInstalled("mail.message")) {
 			OEMenu menu = new OEMenu();

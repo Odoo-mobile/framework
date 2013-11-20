@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
@@ -26,11 +25,11 @@ public class AboutFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		scope = new AppScope(this);
 		// TODO Auto-generated method stub
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
 		getActivity().getActionBar().setHomeButtonEnabled(true);
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+
 		rootView = inflater.inflate(R.layout.fragment_about_company, container,
 				false);
 		versionName = (TextView) rootView.findViewById(R.id.txvVersionName);

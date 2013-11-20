@@ -50,7 +50,7 @@ import android.provider.CalendarContract.Events;
 import com.openerp.addons.meeting.MeetingDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
-import com.openerp.support.UserObject;
+import com.openerp.support.OEUser;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -495,7 +495,7 @@ public class OECalendar {
 					cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY),
 					cal.get(Calendar.MINUTE));
 
-			UserObject user = OpenERPAccountManager.currentUser(context);
+			OEUser user = OpenERPAccountManager.currentUser(context);
 			cr = context.getContentResolver();
 			values = new ContentValues();
 			values.put(Events.DTSTART, eventBeginTime.getTimeInMillis());

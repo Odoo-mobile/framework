@@ -48,16 +48,13 @@ public class Module {
 	 *            the module name
 	 * @param moduleInstance
 	 *            the module instance
-	 * @param icon
-	 *            the icon
 	 */
-	public Module(String keyId, String moduleName, Object moduleInstance,
-			int icon) {
+	public Module(String keyId, String moduleName, Object moduleInstance) {
 		super();
 		this.keyId = keyId;
 		this.moduleName = moduleName;
 		this.moduleInstance = moduleInstance;
-		this.icon = icon;
+		this.icon = 0;
 	}
 
 	/**
@@ -71,17 +68,14 @@ public class Module {
 	 *            the module instance
 	 * @param icon
 	 *            the icon
-	 * @param loadDefault
-	 *            the load default
 	 */
 	public Module(String keyId, String moduleName, Object moduleInstance,
-			int icon, boolean loadDefault) {
+			int icon) {
 		super();
 		this.keyId = keyId;
 		this.moduleName = moduleName;
 		this.moduleInstance = moduleInstance;
 		this.icon = icon;
-		this.loadDefault = loadDefault;
 	}
 
 	/**

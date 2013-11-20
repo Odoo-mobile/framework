@@ -44,11 +44,12 @@ import android.widget.Toast;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
-import com.openerp.support.UserObject;
+import com.openerp.support.OEUser;
 import com.openerp.support.menu.OEMenu;
 
 // TODO: Auto-generated Javadoc
@@ -90,6 +91,9 @@ public class Login extends BaseFragment {
 	/** The edt password. */
 	EditText edtPassword = null;
 
+	/** The OpenERP Object */
+	OEHelper openerp = null;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -102,8 +106,7 @@ public class Login extends BaseFragment {
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		this.context = getActivity();
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		// Inflate the layout for this fragment
 		rootView = inflater.inflate(R.layout.fragment_login, container, false);
 		dbListSpinner = (Spinner) rootView.findViewById(R.id.lstDatabases);
@@ -135,9 +138,9 @@ public class Login extends BaseFragment {
 	 */
 	private void loadDatabaseList() {
 		try {
-			// MainActivity.openerp = new OEHelper(openERPServerURL);
+			openerp = new OEHelper(context, openERPServerURL);
 			List<String> dbList = new JSONDataHelper()
-					.arrayToStringList(MainActivity.openerp.getDatabaseList());
+					.arrayToStringList(openerp.getDatabaseList());
 			dbList.add(0,
 					getActivity().getString(R.string.login_select_database));
 			ArrayAdapter<String> dbAdapter = new ArrayAdapter<String>(
@@ -145,14 +148,7 @@ public class Login extends BaseFragment {
 			dbAdapter
 					.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			dbListSpinner.setAdapter(dbAdapter);
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -167,7 +163,6 @@ public class Login extends BaseFragment {
 	 */
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new LoginDBHelper(context);
 	}
 
@@ -193,7 +188,6 @@ public class Login extends BaseFragment {
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		// handle item selection
 
 		switch (item.getItemId()) {
@@ -233,7 +227,7 @@ public class Login extends BaseFragment {
 		String errorMsg = "";
 
 		/** The user data. */
-		UserObject userData = null;
+		OEUser userData = null;
 
 		/*
 		 * (non-Javadoc)
@@ -254,22 +248,20 @@ public class Login extends BaseFragment {
 		 */
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			// TODO Auto-generated method stub
 			try {
 				// Simulate network access.
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				return false;
 			}
-			if (MainActivity.openerp != null) {
+			if (openerp != null) {
 				String userName = edtUsername.getText().toString();
 				String password = edtPassword.getText().toString();
 				String database = dbListSpinner.getSelectedItem().toString();
 
-				userData = MainActivity.openerp.login(userName, password,
-						database, openERPServerURL);
+				userData = openerp.login(userName, password, database,
+						openERPServerURL);
 				if (userData != null) {
-					MainActivity.userContext = userData;
 					return true;
 				} else {
 					errorMsg = "Invalid Username or Password !";
@@ -289,7 +281,7 @@ public class Login extends BaseFragment {
 		protected void onPostExecute(final Boolean success) {
 			if (success) {
 				Log.d("Creating Account For Username :",
-						MainActivity.userContext.getAndroidName());
+						userData.getAndroidName());
 				if (OpenERPAccountManager.fetchAllAccounts(getActivity()) != null) {
 					if (OpenERPAccountManager.isAnyUser(getActivity())) {
 						OpenERPAccountManager.logoutUser(getActivity(),
@@ -298,8 +290,8 @@ public class Login extends BaseFragment {
 										.getAndroidName());
 					}
 				}
-				if (OpenERPAccountManager.createAccount(getActivity(),
-						MainActivity.userContext)) {
+				if (OpenERPAccountManager
+						.createAccount(getActivity(), userData)) {
 					loginUserASync.cancel(true);
 					pdialog.hide();
 					SyncWizard syncWizard = new SyncWizard();

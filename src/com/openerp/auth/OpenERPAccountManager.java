@@ -25,9 +25,8 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.openerp.support.UserObject;
+import com.openerp.support.OEUser;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -37,6 +36,7 @@ public class OpenERPAccountManager {
 
 	/** The Constant PARAM_AUTHTOKEN_TYPE. */
 	private static final String PARAM_AUTHTOKEN_TYPE = "com.openerp.auth";
+	public static OEUser current_user = null;
 
 	/**
 	 * Fetch all accounts.
@@ -45,20 +45,37 @@ public class OpenERPAccountManager {
 	 *            the context
 	 * @return the list
 	 */
-	public static List<UserObject> fetchAllAccounts(Context context) {
-		List<UserObject> userObjs = null;
+	public static List<OEUser> fetchAllAccounts(Context context) {
+		List<OEUser> userObjs = null;
 
 		AccountManager accMgr = AccountManager.get(context);
 		Account[] accounts = accMgr.getAccountsByType(PARAM_AUTHTOKEN_TYPE);
 		if (accounts.length > 0) {
-			userObjs = new ArrayList<UserObject>();
+			userObjs = new ArrayList<OEUser>();
 			for (Account account : accounts) {
-				UserObject userobj = new UserObject();
+				OEUser userobj = new OEUser();
 				userobj.fillFromAccount(accMgr, account);
 				userObjs.add(userobj);
 			}
 		}
 		return userObjs;
+	}
+
+	/**
+	 * hasAccounts
+	 * 
+	 * checks for availability of any account for OpenERP
+	 * 
+	 * @param context
+	 * @return true if there is any account related to type
+	 */
+	public static boolean hasAccounts(Context context) {
+		boolean flag = false;
+		AccountManager accMgr = AccountManager.get(context);
+		if (accMgr.getAccountsByType(PARAM_AUTHTOKEN_TYPE).length > 0) {
+			flag = true;
+		}
+		return flag;
 	}
 
 	/**
@@ -70,7 +87,7 @@ public class OpenERPAccountManager {
 	 *            the bundle data
 	 * @return true, if successful
 	 */
-	public static boolean createAccount(Context context, UserObject bundleData) {
+	public static boolean createAccount(Context context, OEUser bundleData) {
 		AccountManager accMgr = null;
 		accMgr = AccountManager.get(context);
 		String accountType = PARAM_AUTHTOKEN_TYPE;
@@ -90,18 +107,21 @@ public class OpenERPAccountManager {
 	 */
 	public static boolean isAnyUser(Context context) {
 		boolean flag = false;
-
-		List<UserObject> accounts = OpenERPAccountManager
-				.fetchAllAccounts(context);
-		if (accounts != null) {
-			for (UserObject user : accounts) {
-				if (user.isIsactive()) {
-					flag = true;
-					break;
+		if (current_user != null) {
+			flag = true;
+		} else {
+			List<OEUser> accounts = OpenERPAccountManager
+					.fetchAllAccounts(context);
+			if (accounts != null) {
+				for (OEUser user : accounts) {
+					if (user.isIsactive()) {
+						flag = true;
+						current_user = user;
+						break;
+					}
 				}
 			}
 		}
-
 		return flag;
 	}
 
@@ -112,14 +132,18 @@ public class OpenERPAccountManager {
 	 *            the context
 	 * @return the user object
 	 */
-	public static UserObject currentUser(Context context) {
-		if (OpenERPAccountManager.isAnyUser(context)) {
-			List<UserObject> accounts = OpenERPAccountManager
-					.fetchAllAccounts(context);
-			for (UserObject user : accounts) {
+	public static OEUser currentUser(Context context) {
+		if (current_user != null) {
+			return current_user;
+		} else {
+			if (OpenERPAccountManager.isAnyUser(context)) {
+				List<OEUser> accounts = OpenERPAccountManager
+						.fetchAllAccounts(context);
+				for (OEUser user : accounts) {
 
-				if (user.isIsactive()) {
-					return user;
+					if (user.isIsactive()) {
+						return user;
+					}
 				}
 			}
 		}
@@ -135,11 +159,11 @@ public class OpenERPAccountManager {
 	 *            the username
 	 * @return the account detail
 	 */
-	public static UserObject getAccountDetail(Context context, String username) {
+	public static OEUser getAccountDetail(Context context, String username) {
 
-		List<UserObject> allAccounts = OpenERPAccountManager
+		List<OEUser> allAccounts = OpenERPAccountManager
 				.fetchAllAccounts(context);
-		for (UserObject user : allAccounts) {
+		for (OEUser user : allAccounts) {
 			if (user.getAndroidName().equals(username)) {
 				return user;
 			}
@@ -163,7 +187,7 @@ public class OpenERPAccountManager {
 		Account userAc = null;
 		for (Account account : accounts) {
 
-			UserObject userData = new UserObject();
+			OEUser userData = new OEUser();
 			userData.fillFromAccount(accMgr, account);
 
 			if (userData != null) {
@@ -187,7 +211,7 @@ public class OpenERPAccountManager {
 	 */
 	public static boolean logoutUser(Context context, String username) {
 		boolean flag = false;
-		UserObject user = OpenERPAccountManager.getAccountDetail(context,
+		OEUser user = OpenERPAccountManager.getAccountDetail(context,
 				username);
 		if (user != null) {
 			AccountManager accMgr = AccountManager.get(context);
@@ -197,6 +221,7 @@ public class OpenERPAccountManager {
 					OpenERPAccountManager.getAccount(context,
 							user.getAndroidName()), "isactive", "0");
 			flag = true;
+			current_user = null;
 		}
 		return flag;
 
@@ -211,12 +236,12 @@ public class OpenERPAccountManager {
 	 *            the username
 	 * @return the user object
 	 */
-	public static UserObject loginUser(Context context, String username) {
-		UserObject userData = null;
+	public static OEUser loginUser(Context context, String username) {
+		OEUser userData = null;
 
-		List<UserObject> allAccounts = OpenERPAccountManager
+		List<OEUser> allAccounts = OpenERPAccountManager
 				.fetchAllAccounts(context);
-		for (UserObject user : allAccounts) {
+		for (OEUser user : allAccounts) {
 			OpenERPAccountManager.logoutUser(context, user.getAndroidName());
 		}
 
@@ -228,6 +253,7 @@ public class OpenERPAccountManager {
 					OpenERPAccountManager.getAccount(context,
 							userData.getAndroidName()), "isactive", "true");
 		}
+		current_user = userData;
 		return userData;
 	}
 
@@ -247,10 +273,10 @@ public class OpenERPAccountManager {
 	}
 
 	public static boolean updateAccountDetails(Context context,
-			UserObject userObject) {
+			OEUser userObject) {
 
 		boolean flag = false;
-		UserObject user = OpenERPAccountManager.getAccountDetail(context,
+		OEUser user = OpenERPAccountManager.getAccountDetail(context,
 				userObject.getAndroidName());
 		Bundle userBundle = userObject.getAsBundle();
 		if (user != null) {

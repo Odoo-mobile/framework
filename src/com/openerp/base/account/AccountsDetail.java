@@ -29,7 +29,7 @@ import com.openerp.addons.messages.MessageComposeActivty;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.UserObject;
+import com.openerp.support.OEUser;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
@@ -47,8 +47,7 @@ public class AccountsDetail extends BaseFragment {
 		setHasOptionsMenu(true);
 		rootView = inflater.inflate(R.layout.fragment_all_accounts_detail,
 				container, false);
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		scope.context().setTitle("Accounts");
 		setupGrid();
 		return rootView;
@@ -121,7 +120,7 @@ public class AccountsDetail extends BaseFragment {
 
 	private List<OEListViewRows> getAccounts() {
 		List<OEListViewRows> list = new ArrayList<OEListViewRows>();
-		for (UserObject account : OpenERPAccountManager.fetchAllAccounts(scope
+		for (OEUser account : OpenERPAccountManager.fetchAllAccounts(scope
 				.context())) {
 			HashMap<String, Object> row_data = new HashMap<String, Object>();
 
@@ -194,7 +193,7 @@ public class AccountsDetail extends BaseFragment {
 								// the dialog
 								// TODO Auto-generated method stub
 								OpenERPAccountManager.logoutUser(scope
-										.context(), MainActivity.userContext
+										.context(), scope.User()
 										.getAndroidName());
 								scope.context().finish();
 							}

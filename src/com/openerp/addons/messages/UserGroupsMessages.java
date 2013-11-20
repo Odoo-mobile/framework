@@ -6,14 +6,11 @@ import java.util.List;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ListView;
 
-import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
 import com.openerp.orm.BaseDBHelper;
@@ -35,8 +32,7 @@ public class UserGroupsMessages extends BaseFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		db = (BaseDBHelper) databaseHelper(scope.context());
 		rootView = inflater
 				.inflate(R.layout.fragment_message, container, false);
@@ -51,7 +47,6 @@ public class UserGroupsMessages extends BaseFragment implements
 		List<OEListViewRows> messages = new ArrayList<OEListViewRows>();
 		messages = getMessages(group_id);
 
-		
 		// Getting Pull To Refresh Attacher from Main Activity
 		mPullToRefreshAttacher = scope.context().getPullToRefreshAttacher();
 

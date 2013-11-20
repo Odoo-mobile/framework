@@ -57,6 +57,7 @@ import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.FragmentHandler;
 import com.openerp.support.JSONDataHelper;
+import com.openerp.support.OEUser;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
@@ -93,8 +94,7 @@ public class Note extends BaseFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) getActivity());
+		scope = new AppScope(this);
 		db = (NoteDBHelper) getModel();
 		setHasOptionsMenu(true);
 		rootView = inflater.inflate(R.layout.fragment_note, container, false);
@@ -475,7 +475,7 @@ public class Note extends BaseFragment implements
 			JSONArray id = new JSONArray();
 			id.put(note_id);
 			args.put(id);
-			OEHelper oe = new OEHelper(context, MainActivity.userContext);
+			OEHelper oe = new OEHelper(context, OEUser.current(context));
 			db = new NoteDBHelper(context);
 			ContentValues values = new ContentValues();
 
@@ -497,7 +497,7 @@ public class Note extends BaseFragment implements
 			}
 			// Refreshing list view after synchronisation
 			// complete
-			// scope.context().refreshMenu(scope.context());
+			scope.context().refreshMenu(scope.context());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

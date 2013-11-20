@@ -56,6 +56,7 @@ import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.support.AppScope;
 import com.openerp.support.JSONDataHelper;
+import com.openerp.support.OEUser;
 import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
@@ -95,8 +96,7 @@ public class MessageComposeActivty extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_message_compose);
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) MainActivity.context);
+		scope = new AppScope((MainActivity) MainActivity.context);
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		Intent replyIntent = getIntent();
@@ -561,8 +561,7 @@ public class MessageComposeActivty extends Activity implements
 
 				// Requesting for sync
 				Account account = OpenERPAccountManager.getAccount(
-						getApplicationContext(),
-						MainActivity.userContext.getAndroidName());
+						getApplicationContext(), scope.User().getAndroidName());
 				Bundle settingsBundle = new Bundle();
 				settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL,
 						true);

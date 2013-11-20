@@ -62,8 +62,7 @@ public class ComposeNoteActivity extends Activity implements
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_compose_note);
-		scope = new AppScope(MainActivity.userContext,
-				(MainActivity) MainActivity.context);
+		scope = new AppScope((MainActivity) MainActivity.context);
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		noteTags = (TagsView) findViewById(R.id.txv_composeNote_Tag);

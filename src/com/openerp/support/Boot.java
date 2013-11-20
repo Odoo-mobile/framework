@@ -18,11 +18,12 @@
  */
 package com.openerp.support;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.openerp.MainActivity;
 import com.openerp.base.ir.AttachmentFragment;
@@ -31,16 +32,14 @@ import com.openerp.base.res.ResFragment;
 import com.openerp.config.ModulesConfig;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.SQLStatement;
+import com.openerp.support.menu.OEMenu;
+import com.openerp.support.menu.OEMenuItems;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Boot.
  */
 public class Boot {
-
-	/** The logger. */
-	private final java.util.logging.Logger logger = java.util.logging.Logger
-			.getLogger(this.getClass().toString());
 
 	/** The context. */
 	private Context context;
@@ -50,6 +49,9 @@ public class Boot {
 
 	/** The statements. */
 	private ArrayList<SQLStatement> statements = null;
+
+	/** The application menus */
+	private List<OEMenuItems> app_menus = null;
 
 	/**
 	 * Instantiates a new boot.
@@ -88,12 +90,15 @@ public class Boot {
 	 * @return true, if successful
 	 */
 	private boolean initDatabase() {
+		app_menus = new ArrayList<OEMenuItems>();
 		for (Module module : this.modules) {
 			try {
 				Class newClass = Class.forName(module.getModuleInstance()
 						.getClass().getName());
 				if (newClass.isInstance(module.getModuleInstance())) {
 					Object receiver = newClass.newInstance();
+
+					// Method databaseHelper
 					Class params[] = new Class[1];
 					params[0] = Context.class;
 
@@ -104,25 +109,28 @@ public class Boot {
 					BaseDBHelper dbInfo = (BaseDBHelper) obj;
 					SQLStatement statement = dbInfo.createStatement(dbInfo);
 					dbInfo.createTable(statement);
+
+					if (OEUser.current(this.context) != null) {
+						// Method menuHelper
+						params = new Class[1];
+						params[0] = Context.class;
+						method = newClass.getDeclaredMethod("menuHelper",
+								params);
+						Object menu_obj = method.invoke(receiver, this.context);
+
+						if (menu_obj != null) {
+							OEMenu menu = (OEMenu) menu_obj;
+							app_menus.add(new OEMenuItems(menu.getMenuTitle()
+									.toUpperCase(), null, 0, true));
+							for (OEMenuItems menuItem : menu.getMenuItems()) {
+								app_menus.add(menuItem);
+							}
+						}
+					}
+
 				}
 
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -137,6 +145,10 @@ public class Boot {
 	 */
 	public ArrayList<SQLStatement> getAllStatements() {
 		return this.statements;
+	}
+
+	public List<OEMenuItems> getAppMenu() {
+		return this.app_menus;
 	}
 
 	/**

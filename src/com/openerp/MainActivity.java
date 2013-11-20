@@ -36,6 +36,7 @@ import android.content.SyncAdapterType;
 import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -54,44 +55,40 @@ import com.openerp.base.account.AccountFragment;
 import com.openerp.base.account.AccountsDetail;
 import com.openerp.base.account.UserProfile;
 import com.openerp.base.res.Res_PartnerDBHelper;
-import com.openerp.orm.OEHelper;
+import com.openerp.config.ModulesConfig;
 import com.openerp.support.Boot;
 import com.openerp.support.FragmentHandler;
 import com.openerp.support.Module;
-import com.openerp.support.UserObject;
+import com.openerp.support.OEUser;
 import com.openerp.support.menu.OEMenuItems;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.OnBackButtonPressedListener;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class MainActivity.
  */
 public class MainActivity extends FragmentActivity {
 
 	public static final int RESULT_SETTINGS = 1;
-	public static OEHelper openerp = null;
-	public static UserObject userContext = new UserObject();
-	MenuDrawerHelper drawer = null;
-	private CharSequence mTitle;
-	ArrayList<Module> moduleLists = null;
-	public FragmentHandler fragmentHandler;
-	private PullToRefreshAttacher mPullToRefreshAttacher;
-	public static Context context = null;
-	private OEMenuItems[] systemMenus = null;
 	public static boolean set_setting_menu = false;
-	ListView drawablelist = null;
-	OnBackButtonPressedListener backPressed = null;
+	public static Context context = null;
+	public FragmentHandler fragmentHandler;
 
 	public enum SETTING_KEYS {
 		GLOBAL_SETTING, PROFILE, LOGOUT, ACCOUNTS, ADD_ACCOUNT, ABOUT_US
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onCreate(android.os.Bundle)
-	 */
+	private MenuDrawerHelper drawer = null;
+	private CharSequence mTitle;
+	private List<Module> moduleLists = null;
+	private PullToRefreshAttacher mPullToRefreshAttacher;
+	private OEMenuItems[] systemMenus = null;
+	private ListView drawablelist = null;
+	private OnBackButtonPressedListener backPressed = null;
+	private OEUser oeUser = null;
+	private Boot boot = null;
+
+	// TODO: Optimise code for better performance
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -99,10 +96,10 @@ public class MainActivity extends FragmentActivity {
 		context = this;
 		drawablelist = (ListView) findViewById(R.id.left_drawer);
 		if (findViewById(R.id.fragment_container) != null) {
-			fragmentHandler = new FragmentHandler(MainActivity.this);
-			Boot boot = new Boot(this);
+			fragmentHandler = new FragmentHandler(this);
+			boot = new Boot(this);
 			moduleLists = boot.getModules();
-			refreshMenu(this);
+			refreshMenu(this, boot.getAppMenu());
 			if (savedInstanceState != null) {
 				mPullToRefreshAttacher = new PullToRefreshAttacher(this);
 				return;
@@ -112,7 +109,7 @@ public class MainActivity extends FragmentActivity {
 			 * application does not contain any account and it will request user
 			 * to create new one.
 			 */
-			if (OpenERPAccountManager.fetchAllAccounts(this) == null) {
+			if (OpenERPAccountManager.hasAccounts(this) == false) {
 				getActionBar().setDisplayHomeAsUpEnabled(false);
 				getActionBar().setHomeButtonEnabled(false);
 				drawer.lockDrawer(true);
@@ -134,8 +131,10 @@ public class MainActivity extends FragmentActivity {
 				// checking for logged in user and not request for new account
 				// setup.
 				if (OpenERPAccountManager.isAnyUser(this) && !reqForNewAccount) {
-					// Starting user addon.
-					startup();
+					oeUser = OEUser.current(context);
+					// The attacher should always be created in the Activity's
+					// onCreate
+					mPullToRefreshAttacher = new PullToRefreshAttacher(this);
 					if (savedInstanceState != null) {
 						return;
 					}
@@ -160,7 +159,6 @@ public class MainActivity extends FragmentActivity {
 						dialog.show();
 					}
 				}
-
 			}
 
 		}
@@ -168,19 +166,28 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public void refreshMenu(Context context) {
-		// TODO Auto-generated method stub
-		drawer = new MenuDrawerHelper((MainActivity) context);
+		RefreshMenu menurefresh = new RefreshMenu();
+		menurefresh.execute((Void) null);
 	}
 
-	private void startup() {
-		MainActivity.userContext = OpenERPAccountManager.currentUser(this);
-		try {
-			MainActivity.openerp = new OEHelper(this, MainActivity.userContext);
-		} catch (Exception e) {
+	class RefreshMenu extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					drawer = new MenuDrawerHelper((MainActivity) context);
+				}
+			});
+			return null;
 		}
-		// The attacher should always be created in the Activity's
-		// onCreate
-		mPullToRefreshAttacher = new PullToRefreshAttacher(this);
+
+	}
+
+	public void refreshMenu(Context context, List<OEMenuItems> menu_list) {
+		drawer = new MenuDrawerHelper((MainActivity) context, menu_list);
 	}
 
 	String[] accountNames = null;
@@ -192,11 +199,10 @@ public class MainActivity extends FragmentActivity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		// Source of the data in the DIalog
 
-		List<UserObject> accounts = OpenERPAccountManager
-				.fetchAllAccounts(this);
+		List<OEUser> accounts = OpenERPAccountManager.fetchAllAccounts(this);
 		accountNames = new String[accounts.size()];
 		int i = 0;
-		for (UserObject user : accounts) {
+		for (OEUser user : accounts) {
 			accountNames[i] = user.getAndroidName();
 			i++;
 		}
@@ -267,8 +273,7 @@ public class MainActivity extends FragmentActivity {
 								// the dialog
 								// TODO Auto-generated method stub
 								OpenERPAccountManager.logoutUser(context,
-										MainActivity.userContext
-												.getAndroidName());
+										oeUser.getAndroidName());
 								finish();
 							}
 						})
@@ -283,10 +288,11 @@ public class MainActivity extends FragmentActivity {
 		return builder.create();
 	}
 
-	public UserObject getUserContext() {
-		return MainActivity.userContext;
+	public OEUser getUserContext() {
+		return oeUser;
 	}
 
+	// TODO: Optimize this method code.
 	/* Find menu's position in left drawable listview */
 	public int findPosition(String moduleName) {
 		for (int i = 0; i < drawablelist.getCount(); i++) {
@@ -298,34 +304,27 @@ public class MainActivity extends FragmentActivity {
 		return 0;
 	}
 
+	// TODO: Optimize this method code.
 	private void loadDefaultModule() {
-		for (Module module : drawer.modules) {
-			if (module.isLoadDefault()) {
-				// application open by App WIDGET
-				if (getIntent().getAction() != null
-						&& !getIntent().getAction().toString()
-								.equalsIgnoreCase("android.intent.action.MAIN")) {
-					if (getIntent().getAction().toString()
-							.equalsIgnoreCase("composeMessage")) {
-						startActivity(new Intent(context,
-								MessageComposeActivty.class));
-					}
-					if (getIntent().getAction().toString()
-							.equalsIgnoreCase("composeNote")) {
-						startActivity(new Intent(context,
-								ComposeNoteActivity.class));
-					}
-					selectItem(findPosition(getIntent().getAction().toString()));
-					break;
-				} else {
-					// application open by App ICON
-					fragmentHandler.startNewFragmnet((Fragment) module
-							.getModuleInstance());
-					drawer.mDrawerList.setItemChecked(1, true);
-					selectItem(1);
-					break;
-				}
+		Module module = new ModulesConfig().getDefaultModule();
+		if (getIntent().getAction() != null
+				&& !getIntent().getAction().toString()
+						.equalsIgnoreCase("android.intent.action.MAIN")) {
+			if (getIntent().getAction().toString()
+					.equalsIgnoreCase("composeMessage")) {
+				startActivity(new Intent(context, MessageComposeActivty.class));
 			}
+			if (getIntent().getAction().toString()
+					.equalsIgnoreCase("composeNote")) {
+				startActivity(new Intent(context, ComposeNoteActivity.class));
+			}
+			selectItem(findPosition(getIntent().getAction().toString()));
+		} else {
+			// application open by App ICON
+			fragmentHandler.startNewFragmnet((Fragment) module
+					.getModuleInstance());
+			drawer.mDrawerList.setItemChecked(1, true);
+			selectItem(1);
 		}
 	}
 
@@ -416,7 +415,8 @@ public class MainActivity extends FragmentActivity {
 		// If the nav drawer is open, hide action items related to the content
 		// view
 		if (drawer == null) {
-			drawer = new MenuDrawerHelper((MainActivity) context);
+			drawer = new MenuDrawerHelper((MainActivity) context,
+					boot.getAppMenu());
 		}
 		boolean drawerOpen = drawer.mDrawerLayout
 				.isDrawerOpen(drawer.mDrawerList);
@@ -451,6 +451,7 @@ public class MainActivity extends FragmentActivity {
 		drawer.mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
+	// TODO: Optimize this method code.
 	public void selectItem(int position) {
 		set_setting_menu = false;
 		Fragment fragment = null;
@@ -517,8 +518,8 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void setAutoSync(String authority, boolean isON) {
 		try {
-			Account account = OpenERPAccountManager.getAccount(this,
-					MainActivity.userContext.getAndroidName());
+			Account account = OpenERPAccountManager.getAccount(this, OEUser
+					.current(context).getAndroidName());
 			if (!ContentResolver.isSyncActive(account, authority)) {
 				ContentResolver.setSyncAutomatically(account, authority, isON);
 			}
@@ -536,8 +537,8 @@ public class MainActivity extends FragmentActivity {
 	 *            the extra data
 	 */
 	public void requestSync(String authority, Bundle bundle) {
-		Account account = OpenERPAccountManager.getAccount(this,
-				MainActivity.userContext.getAndroidName());
+		Account account = OpenERPAccountManager.getAccount(this, OEUser
+				.current(context).getAndroidName());
 		Bundle settingsBundle = new Bundle();
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -571,8 +572,8 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void setSyncPeriodic(String authority, long interval_in_minute,
 			long seconds_per_minute, long milliseconds_per_second) {
-		Account account = OpenERPAccountManager.getAccount(this,
-				MainActivity.userContext.getAndroidName());
+		Account account = OpenERPAccountManager.getAccount(this, OEUser
+				.current(context).getAndroidName());
 		Bundle extras = new Bundle();
 		this.setAutoSync(authority, true);
 		ContentResolver.setIsSyncable(account, authority, 1);
@@ -590,8 +591,8 @@ public class MainActivity extends FragmentActivity {
 	 *            the authority
 	 */
 	public void cancelSync(String authority) {
-		Account account = OpenERPAccountManager.getAccount(this,
-				MainActivity.userContext.getAndroidName());
+		Account account = OpenERPAccountManager.getAccount(this, OEUser
+				.current(context).getAndroidName());
 		ContentResolver.cancelSync(account, authority);
 	}
 
@@ -603,7 +604,6 @@ public class MainActivity extends FragmentActivity {
 		SharedPreferences sharedPrefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		boolean sync_enable = sharedPrefs.getBoolean("perform_sync", false);
-		String data_limit = sharedPrefs.getString("sync_data_limit", "60");
 		int sync_interval = Integer.parseInt(sharedPrefs.getString(
 				"sync_interval", "1440"));
 
@@ -638,27 +638,25 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public void drawerOpenListener() {
-		if (userContext != null) {
-			if (!userContext.getAvatar().equals("false")) {
+		if (oeUser != null) {
+			if (!oeUser.getAvatar().equals("false")) {
 				Drawable profPic = new BitmapDrawable(
-						Base64Helper.getBitmapImage(this,
-								userContext.getAvatar()));
+						Base64Helper.getBitmapImage(this, oeUser.getAvatar()));
 				getActionBar().setIcon(profPic);
 			}
 			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(context);
 			Object obj = partner.search(partner, new String[] { "name" },
 					new String[] { "id = ?" },
-					new String[] { userContext.getPartner_id() })
-					.get("records");
+					new String[] { oeUser.getPartner_id() }).get("records");
 			String user_name = "";
 			if (obj instanceof Boolean) {
-				user_name = userContext.getUsername();
+				user_name = oeUser.getUsername();
 			} else {
 				user_name = ((List<HashMap<String, Object>>) obj).get(0)
 						.get("name").toString();
 			}
 
-			setTitle(user_name, userContext.getHost());
+			setTitle(user_name, oeUser.getHost());
 		}
 	}
 
