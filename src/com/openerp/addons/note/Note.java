@@ -70,7 +70,7 @@ public class Note extends BaseFragment implements
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
 	View rootView = null;
-	TextView noteSyncProcessText, emptyNotesText;
+	TextView noteSyncProcessText, emptyNotesText, noteTags;
 	ListView lstNotes = null;
 	List<OEListViewRows> listRows = null;
 	OEListViewAdapter listAdapter = null;
@@ -350,6 +350,7 @@ public class Note extends BaseFragment implements
 					// if (note_tags_items.length <= 0) {
 					noteTags.setVisibility(View.GONE);
 					// }
+
 					// Fetching Note Stage and Setting Background color for that
 					String stageInfo = row_data.getRow_data().get("stage_id")
 							.toString();
