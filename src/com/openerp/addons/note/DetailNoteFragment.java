@@ -34,8 +34,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.openerp.R;
+
 import com.openerp.MainActivity;
+import com.openerp.R;
 import com.openerp.addons.messages.MessageComposeActivty;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
@@ -67,7 +68,6 @@ public class DetailNoteFragment extends BaseFragment {
 		db = (NoteDBHelper) getModel();
 		rootview = inflater.inflate(R.layout.fragment_detail_note, container,
 				false);
-		handleArguments((Bundle) getArguments());
 		return rootview;
 	}
 
@@ -159,14 +159,13 @@ public class DetailNoteFragment extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle.containsKey("row_id")) {
 			row_id = bundle.getInt("row_id");
 			row_status = bundle.getString("row_status");

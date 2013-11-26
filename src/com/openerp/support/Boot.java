@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.openerp.MainActivity;
 import com.openerp.base.ir.AttachmentFragment;
@@ -104,7 +103,6 @@ public class Boot {
 
 					Method method = newClass.getDeclaredMethod(
 							"databaseHelper", params);
-
 					Object obj = method.invoke(receiver, this.context);
 					BaseDBHelper dbInfo = (BaseDBHelper) obj;
 					SQLStatement statement = dbInfo.createStatement(dbInfo);

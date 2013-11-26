@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ResFragment.
  */
@@ -60,7 +59,6 @@ public class ResFragment extends BaseFragment {
 	 */
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new Res_PartnerDBHelper(context);
 	}
 
@@ -73,7 +71,6 @@ public class ResFragment extends BaseFragment {
 	 */
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -104,20 +101,6 @@ public class ResFragment extends BaseFragment {
 	 */
 	@Override
 	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#handleArguments(android.os.Bundle)
-	 */
-	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

@@ -3,9 +3,6 @@ package com.openerp.addons.messages;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.openerp.util.Base64Helper;
-import com.openerp.util.tags.TagsItems;
-
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -18,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.openerp.R;
+import com.openerp.util.Base64Helper;
+import com.openerp.util.tags.TagsItems;
 
 public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItems>
 		implements Filterable {

@@ -18,11 +18,7 @@
  */
 package com.openerp.base.login;
 
-import java.io.IOException;
 import java.util.List;
-
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -41,7 +37,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;

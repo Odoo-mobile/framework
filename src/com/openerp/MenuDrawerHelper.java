@@ -39,7 +39,6 @@ import com.openerp.support.Module;
 import com.openerp.support.menu.OEMenu;
 import com.openerp.support.menu.OEMenuAdapter;
 import com.openerp.support.menu.OEMenuItems;
-import com.openerp.util.logger.OELog;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -83,7 +82,6 @@ public class MenuDrawerHelper {
 		modules = new ModulesConfig().modules();
 		mMenuItems = null;
 		this.init();
-		OELog.log("refreshing menu");
 	}
 
 	/**

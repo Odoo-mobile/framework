@@ -56,7 +56,6 @@ import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.support.AppScope;
 import com.openerp.support.JSONDataHelper;
-import com.openerp.support.OEUser;
 import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;

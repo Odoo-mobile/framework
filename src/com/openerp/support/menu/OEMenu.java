@@ -20,8 +20,6 @@ package com.openerp.support.menu;
 
 import java.util.List;
 
-import com.openerp.support.menu.OEMenuItems;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class OEMenu.

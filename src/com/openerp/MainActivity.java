@@ -88,7 +88,6 @@ public class MainActivity extends FragmentActivity {
 	private OEUser oeUser = null;
 	private Boot boot = null;
 
-	// TODO: Optimise code for better performance
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -271,7 +270,6 @@ public class MainActivity extends FragmentActivity {
 								// User clicked OK, so save the result somewhere
 								// or return them to the component that opened
 								// the dialog
-								// TODO Auto-generated method stub
 								OpenERPAccountManager.logoutUser(context,
 										oeUser.getAndroidName());
 								finish();
@@ -292,7 +290,6 @@ public class MainActivity extends FragmentActivity {
 		return oeUser;
 	}
 
-	// TODO: Optimize this method code.
 	/* Find menu's position in left drawable listview */
 	public int findPosition(String moduleName) {
 		for (int i = 0; i < drawablelist.getCount(); i++) {
@@ -304,7 +301,6 @@ public class MainActivity extends FragmentActivity {
 		return 0;
 	}
 
-	// TODO: Optimize this method code.
 	private void loadDefaultModule() {
 		Module module = new ModulesConfig().getDefaultModule();
 		if (getIntent().getAction() != null
@@ -451,7 +447,6 @@ public class MainActivity extends FragmentActivity {
 		drawer.mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
-	// TODO: Optimize this method code.
 	public void selectItem(int position) {
 		set_setting_menu = false;
 		Fragment fragment = null;

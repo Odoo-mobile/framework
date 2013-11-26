@@ -54,7 +54,6 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
 import com.openerp.orm.OEHelper;
@@ -160,7 +159,6 @@ public class Message extends BaseFragment implements
 		 * see method for more information about it.
 		 */
 		scope.context().setAutoSync(MessageProvider.AUTHORITY, true);
-		handleArguments((Bundle) getArguments());
 		return rootView;
 	}
 
@@ -776,7 +774,9 @@ public class Message extends BaseFragment implements
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle != null) {
 			if (bundle.containsKey("type")) {
 				type = bundle.getString("type");

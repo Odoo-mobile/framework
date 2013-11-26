@@ -20,7 +20,6 @@
 package com.openerp.base.res;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.Fields;

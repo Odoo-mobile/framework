@@ -18,7 +18,6 @@
  */
 package com.openerp.support.menu;
 
-import android.graphics.Color;
 
 // TODO: Auto-generated Javadoc
 /**

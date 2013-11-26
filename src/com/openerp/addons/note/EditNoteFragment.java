@@ -100,8 +100,6 @@ public class EditNoteFragment extends BaseFragment implements
 		db = (NoteDBHelper) getModel();
 		rootview = inflater.inflate(R.layout.fragment_edit_note, container,
 				false);
-		handleArguments((Bundle) getArguments());
-
 		addTags = (ImageView) rootview.findViewById(R.id.imgBtnEditTags);
 		addTags.setOnClickListener(new OnClickListener() {
 			@Override
@@ -283,8 +281,9 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
-
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle.containsKey("row_id")) {
 			noteMemo = (EditText) rootview
 					.findViewById(R.id.txv_editNote_Description);

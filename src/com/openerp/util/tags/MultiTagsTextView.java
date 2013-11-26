@@ -29,7 +29,6 @@ import android.text.method.QwertyKeyListener;
 import android.text.style.ReplacementSpan;
 import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.MotionEvent;

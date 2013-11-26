@@ -24,7 +24,6 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
@@ -64,7 +63,6 @@ public class UserGroups extends BaseFragment implements
 		db = (BaseDBHelper) databaseHelper(scope.context());
 		rootView = inflater.inflate(R.layout.fragment_message_groups_list,
 				container, false);
-		handleArguments(getArguments());
 		return rootView;
 	}
 
@@ -76,12 +74,14 @@ public class UserGroups extends BaseFragment implements
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
+	public void onStart() {
+		super.onStart();
 		follower = new MailFollowerDb(scope.context());
 		scope.context().setTitle("Join a Group");
 		lstGroups = (GridView) rootView.findViewById(R.id.listGroups);
 		groups_loader = new LoadGroups();
 		groups_loader.execute((Void) null);
+
 	}
 
 	private Boolean setupView() {
