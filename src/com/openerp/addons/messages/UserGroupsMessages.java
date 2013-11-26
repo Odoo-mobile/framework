@@ -36,7 +36,6 @@ public class UserGroupsMessages extends BaseFragment implements
 		db = (BaseDBHelper) databaseHelper(scope.context());
 		rootView = inflater
 				.inflate(R.layout.fragment_message, container, false);
-		handleArguments(getArguments());
 		return rootView;
 	}
 
@@ -135,7 +134,9 @@ public class UserGroupsMessages extends BaseFragment implements
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle != null) {
 			int group_id = bundle.getInt("group_id");
 			setupView(group_id);

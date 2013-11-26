@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -261,7 +260,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 
 			// setting original background color[white] while swapping the rows
 			// COMPLETE.
-			//view.setBackgroundColor(Color.WHITE);
+			// view.setBackgroundColor(Color.WHITE);
 
 			float deltaX = motionEvent.getRawX() - mDownX;
 			mVelocityTracker.addMovement(motionEvent);
@@ -459,12 +458,6 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 	public Object databaseHelper(Context context) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

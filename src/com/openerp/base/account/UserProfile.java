@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
@@ -101,12 +99,6 @@ public class UserProfile extends BaseFragment {
 	public Object databaseHelper(Context context) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

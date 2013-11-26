@@ -101,14 +101,11 @@ public class Note extends BaseFragment implements
 		lstNotes = (ListView) rootView.findViewById(R.id.lstNotes);
 		emptyNotesText = (TextView) rootView
 				.findViewById(R.id.txvNoteAllArchive);
-		handleArguments((Bundle) getArguments());
 		return rootView;
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
-
 		// Setting required menu for the action bar
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 		SearchView searchView = (SearchView) menu.findItem(
@@ -165,13 +162,13 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new NoteDBHelper(context);
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle != null) {
 			setNoteStages(scope.context());
 			stage_id = bundle.getString("stage");

@@ -66,18 +66,6 @@ public class Idea extends BaseFragment {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.openerp.support.FragmentHelper#handleArguments(android.os.Bundle)
-	 */
-	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * com.openerp.support.FragmentHelper#menuHelper(android.content.Context)
 	 */
 	@Override

@@ -68,11 +68,6 @@ public class AboutFragment extends BaseFragment {
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public OEMenu menuHelper(Context context) {
 		// TODO Auto-generated method stub
 		return null;

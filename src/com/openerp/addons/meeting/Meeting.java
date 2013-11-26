@@ -19,7 +19,7 @@
 package com.openerp.addons.meeting;
 
 import android.content.Context;
-import android.os.Bundle;
+
 import com.openerp.support.BaseFragment;
 import com.openerp.support.menu.OEMenu;
 
@@ -29,11 +29,6 @@ public class Meeting extends BaseFragment {
 	public Object databaseHelper(Context context) {
 		// TODO Auto-generated method stub
 		return new MeetingDBHelper(context);
-	}
-
-	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override

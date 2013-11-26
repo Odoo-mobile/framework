@@ -44,7 +44,6 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.Fields;
@@ -84,7 +83,6 @@ public class AddFollowerFragment extends BaseFragment {
 		morePartners = (Button) rootview
 				.findViewById(R.id.btn_note_loadpartners);
 		partner_list = (ListView) rootview.findViewById(R.id.lstfollowers);
-		handleArguments((Bundle) getArguments());
 		addFollower.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -108,9 +106,9 @@ public class AddFollowerFragment extends BaseFragment {
 		return new NoteDBHelper(context);
 	}
 
-	@Override
-	public void handleArguments(Bundle bundle) {
-
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle.containsKey("res_id")) {
 			record_id = bundle.getInt("res_id");
 			message = bundle.getString("message");

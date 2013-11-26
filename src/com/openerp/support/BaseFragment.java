@@ -132,8 +132,6 @@ interface FragmentHelper {
 
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
 
-	public void handleArguments(Bundle bundle);
-
 	public OEMenu menuHelper(Context context);
 
 }

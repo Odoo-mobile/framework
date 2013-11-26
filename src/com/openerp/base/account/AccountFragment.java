@@ -156,8 +156,6 @@ public class AccountFragment extends BaseFragment {
 		case R.id.menu_account_next:
 			StringBuffer serverURL = new StringBuffer();
 			edtServerUrl = (EditText) rootView.findViewById(R.id.edtServerURL);
-			EditText edtServerPort = (EditText) rootView
-					.findViewById(R.id.edtServerPort);
 			edtServerUrl.setError(null);
 			if (TextUtils.isEmpty(edtServerUrl.getText())) {
 				edtServerUrl.setError("Provide Server URL");
@@ -174,10 +172,6 @@ public class AccountFragment extends BaseFragment {
 				}
 
 				serverURL.append(edtServerUrl.getText());
-				if (!TextUtils.isEmpty(edtServerPort.getText())) {
-					serverURL.append(":");
-					serverURL.append(edtServerPort.getText());
-				}
 				this.openERPServerURL = serverURL.toString();
 				serverConnectASync = new ConnectToServer();
 				serverConnectASync.execute((Void) null);
@@ -285,18 +279,6 @@ public class AccountFragment extends BaseFragment {
 	public OEMenu menuHelper(Context context) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#handleArguments(android.os.Bundle)
-	 */
-	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
