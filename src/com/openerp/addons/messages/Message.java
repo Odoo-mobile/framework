@@ -70,8 +70,7 @@ import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
-import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.drawer.DrawerItem;
 
 public class Message extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
@@ -502,8 +501,8 @@ public class Message extends BaseFragment implements
 			message_resource = R.string.message_tome_all_read;
 			break;
 		case TODO:
-			where = new String[] { "starred  = ? " };
-			whereArgs = new String[] { "true" };
+			where = new String[] { "starred  = ? ", "AND", "to_read = ?" };
+			whereArgs = new String[] { "true", "true" };
 			message_resource = R.string.message_todo_all_read;
 			break;
 		case GROUP:
@@ -705,33 +704,29 @@ public class Message extends BaseFragment implements
 	};
 
 	@Override
-	public OEMenu menuHelper(Context context) {
+	public List<DrawerItem> drawerMenus(Context context) {
+		List<DrawerItem> drawerItems = new ArrayList<DrawerItem>();
 		db = (MessageDBHelper) databaseHelper(context);
 		if (db.getOEInstance().isInstalled("mail.message")) {
-			OEMenu menu = new OEMenu();
-			List<OEMenuItems> menuitems = new ArrayList<OEMenuItems>();
-			menu.setId(1);
-			menu.setMenuTitle("Messages");
+			drawerItems.add(new DrawerItem("Messages", true));
+			drawerItems.add(new DrawerItem("Inbox", getCount(TYPE.INBOX,
+					context), R.drawable.ic_action_inbox, getObjectOFClass(
+					"type", "inbox")));
 
-			menuitems.add(new OEMenuItems(
-					R.drawable.ic_menu_inbox_main_holo_light, "Inbox", this
-							.getObjectOFClass("type", "inbox"), getCount(
-							TYPE.INBOX, context)));
 			int tomeTotal = getCount(TYPE.TOME, context);
 			if (tomeTotal > 0) {
 				tomeTotal = tomeTotal - 1;
 			}
-			menuitems.add(new OEMenuItems(R.drawable.ic_action_user, "To: me",
-					this.getObjectOFClass("type", "to-me"), tomeTotal));
-			menuitems.add(new OEMenuItems(R.drawable.ic_action_todo, "To-do",
-					this.getObjectOFClass("type", "to-do"), getCount(TYPE.TODO,
-							context)));
-			menuitems.add(new OEMenuItems(
-					R.drawable.ic_menu_archive_holo_light, "Archives", this
-							.getObjectOFClass("type", "archive"), 0));
-
-			menu.setMenuItems(menuitems);
-			return menu;
+			drawerItems.add(new DrawerItem("To: me", tomeTotal,
+					R.drawable.ic_action_user,
+					getObjectOFClass("type", "to-me")));
+			drawerItems.add(new DrawerItem("To-do",
+					getCount(TYPE.TODO, context), R.drawable.ic_action_todo,
+					getObjectOFClass("type", "to-do")));
+			drawerItems.add(new DrawerItem("Archives", 0,
+					R.drawable.ic_action_archive, getObjectOFClass("type",
+							"archive")));
+			return drawerItems;
 		} else {
 			return null;
 		}
@@ -752,7 +747,7 @@ public class Message extends BaseFragment implements
 			whereArgs = new String[] { "true", "0" };
 			break;
 		case TODO:
-			where = new String[] { "to_read = ?", "AND", "starred = ?" };
+			where = new String[] { "starred = ?", "AND", "to_read = ? " };
 			whereArgs = new String[] { "true", "true" };
 			break;
 		default:
@@ -924,7 +919,7 @@ public class Message extends BaseFragment implements
 				if (!data_update.equals("false")) {
 
 				}
-				scope.context().refreshMenu(getActivity());
+				scope.context().refreshDrawer(getActivity());
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
@@ -936,9 +931,7 @@ public class Message extends BaseFragment implements
 
 			} catch (Exception e) {
 			}
-			Log.d("Message::syncFinishReceiver::onReceive()",
-					"Resetting listview messages to INBOX");
-
+			scope.context().refreshDrawer(getActivity());
 			if (mPullToRefreshAttacher == null && listAdapter != null) {
 				listAdapter.clear();
 				list.clear();

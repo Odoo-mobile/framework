@@ -40,8 +40,8 @@ import com.openerp.R;
 import com.openerp.addons.messages.MessageComposeActivty;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
 import com.openerp.util.HTMLHelper;
+import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.tags.TagsItems;
 import com.openerp.util.tags.TagsView;
 
@@ -99,7 +99,6 @@ public class DetailNoteFragment extends BaseFragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 
 		case R.id.menu_note_invite_people:
@@ -180,8 +179,7 @@ public class DetailNoteFragment extends BaseFragment {
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 
@@ -246,4 +244,5 @@ public class DetailNoteFragment extends BaseFragment {
 		deleteDialogConfirm.setNegativeButton("Cancel", null);
 		deleteDialogConfirm.show();
 	}
+
 }

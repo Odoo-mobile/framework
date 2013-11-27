@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.accounts.Account;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -34,16 +33,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncAdapterType;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -55,37 +58,44 @@ import com.openerp.base.account.AccountFragment;
 import com.openerp.base.account.AccountsDetail;
 import com.openerp.base.account.UserProfile;
 import com.openerp.base.res.Res_PartnerDBHelper;
-import com.openerp.config.ModulesConfig;
 import com.openerp.support.Boot;
 import com.openerp.support.FragmentHandler;
-import com.openerp.support.Module;
 import com.openerp.support.OEUser;
-import com.openerp.support.menu.OEMenuItems;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.OnBackButtonPressedListener;
+import com.openerp.util.drawer.DrawerAdatper;
+import com.openerp.util.drawer.DrawerItem;
 
 /**
  * The Class MainActivity.
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements
+		DrawerItem.DrawerItemClickListener {
 
 	public static final int RESULT_SETTINGS = 1;
 	public static boolean set_setting_menu = false;
 	public static Context context = null;
+
+	DrawerLayout mDrawerLayout = null;
+	ActionBarDrawerToggle mDrawerToggle = null;
+	List<DrawerItem> mDrawerListItems = new ArrayList<DrawerItem>();
+	DrawerAdatper mDrawerAdatper = null;
+	String mAppTitle = "";
+	String mDrawerTitle = "";
+	String mDrawerSubtitle = "";
+	int mDrawerItemSelectedPosition = -1;
+	ListView mDrawerListView = null;
+
 	public FragmentHandler fragmentHandler;
 
 	public enum SETTING_KEYS {
 		GLOBAL_SETTING, PROFILE, LOGOUT, ACCOUNTS, ADD_ACCOUNT, ABOUT_US
 	}
 
-	private MenuDrawerHelper drawer = null;
+	// private MenuDrawerHelper drawer = null;
 	private CharSequence mTitle;
-	private List<Module> moduleLists = null;
 	private PullToRefreshAttacher mPullToRefreshAttacher;
-	private OEMenuItems[] systemMenus = null;
-	private ListView drawablelist = null;
 	private OnBackButtonPressedListener backPressed = null;
-	private OEUser oeUser = null;
 	private Boot boot = null;
 
 	@Override
@@ -93,14 +103,13 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		context = this;
-		drawablelist = (ListView) findViewById(R.id.left_drawer);
 		if (findViewById(R.id.fragment_container) != null) {
+			initDrawerControls();
 			fragmentHandler = new FragmentHandler(this);
 			boot = new Boot(this);
-			moduleLists = boot.getModules();
-			refreshMenu(this, boot.getAppMenu());
 			if (savedInstanceState != null) {
 				mPullToRefreshAttacher = new PullToRefreshAttacher(this);
+				initDrawer(boot.getDrawerItems());
 				return;
 			}
 			/**
@@ -111,7 +120,7 @@ public class MainActivity extends FragmentActivity {
 			if (OpenERPAccountManager.hasAccounts(this) == false) {
 				getActionBar().setDisplayHomeAsUpEnabled(false);
 				getActionBar().setHomeButtonEnabled(false);
-				drawer.lockDrawer(true);
+				lockDrawer(true);
 				// Starting New account setup wizard.
 				Fragment fragment = new AccountFragment();
 				fragmentHandler.setBackStack(true, null);
@@ -122,7 +131,7 @@ public class MainActivity extends FragmentActivity {
 				// Application contain user account, so going for next stuff.
 				// Checking that rather user have requested to create new
 				// account from application account setting.
-				drawer.lockDrawer(false);
+				lockDrawer(false);
 				Intent intent = getIntent();
 				boolean reqForNewAccount = intent.getBooleanExtra(
 						"create_new_account", false);
@@ -130,15 +139,13 @@ public class MainActivity extends FragmentActivity {
 				// checking for logged in user and not request for new account
 				// setup.
 				if (OpenERPAccountManager.isAnyUser(this) && !reqForNewAccount) {
-					oeUser = OEUser.current(context);
 					// The attacher should always be created in the Activity's
 					// onCreate
+					initDrawer(boot.getDrawerItems());
 					mPullToRefreshAttacher = new PullToRefreshAttacher(this);
 					if (savedInstanceState != null) {
 						return;
 					}
-					this.loadDefaultModule();
-
 				} else {
 
 					// Load new account setup wizard if user have requested to
@@ -164,12 +171,12 @@ public class MainActivity extends FragmentActivity {
 
 	}
 
-	public void refreshMenu(Context context) {
-		RefreshMenu menurefresh = new RefreshMenu();
-		menurefresh.execute((Void) null);
+	public void refreshDrawer(Context context) {
+		RefreshDrawer drawerrefresh = new RefreshDrawer();
+		drawerrefresh.execute((Void) null);
 	}
 
-	class RefreshMenu extends AsyncTask<Void, Void, Void> {
+	class RefreshDrawer extends AsyncTask<Void, Void, Void> {
 
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -177,16 +184,12 @@ public class MainActivity extends FragmentActivity {
 
 				@Override
 				public void run() {
-					drawer = new MenuDrawerHelper((MainActivity) context);
+					setDrawerItems(boot.getDrawerItemsList());
 				}
 			});
 			return null;
 		}
 
-	}
-
-	public void refreshMenu(Context context, List<OEMenuItems> menu_list) {
-		drawer = new MenuDrawerHelper((MainActivity) context, menu_list);
 	}
 
 	String[] accountNames = null;
@@ -271,7 +274,8 @@ public class MainActivity extends FragmentActivity {
 								// or return them to the component that opened
 								// the dialog
 								OpenERPAccountManager.logoutUser(context,
-										oeUser.getAndroidName());
+										OEUser.current(context)
+												.getAndroidName());
 								finish();
 							}
 						})
@@ -287,41 +291,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public OEUser getUserContext() {
-		return oeUser;
-	}
-
-	/* Find menu's position in left drawable listview */
-	public int findPosition(String moduleName) {
-		for (int i = 0; i < drawablelist.getCount(); i++) {
-			OEMenuItems menu = (OEMenuItems) drawablelist.getItemAtPosition(i);
-			if ((menu.getTitle()).equalsIgnoreCase(moduleName)) {
-				return i + 1;
-			}
-		}
-		return 0;
-	}
-
-	private void loadDefaultModule() {
-		Module module = new ModulesConfig().getDefaultModule();
-		if (getIntent().getAction() != null
-				&& !getIntent().getAction().toString()
-						.equalsIgnoreCase("android.intent.action.MAIN")) {
-			if (getIntent().getAction().toString()
-					.equalsIgnoreCase("composeMessage")) {
-				startActivity(new Intent(context, MessageComposeActivty.class));
-			}
-			if (getIntent().getAction().toString()
-					.equalsIgnoreCase("composeNote")) {
-				startActivity(new Intent(context, ComposeNoteActivity.class));
-			}
-			selectItem(findPosition(getIntent().getAction().toString()));
-		} else {
-			// application open by App ICON
-			fragmentHandler.startNewFragmnet((Fragment) module
-					.getModuleInstance());
-			drawer.mDrawerList.setItemChecked(1, true);
-			selectItem(1);
-		}
+		return OEUser.current(context);
 	}
 
 	@Override
@@ -338,7 +308,7 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (drawer.mDrawerToggle.onOptionsItemSelected(item)) {
+		if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -359,7 +329,6 @@ public class MainActivity extends FragmentActivity {
 			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
-			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 			Fragment about = new AboutFragment();
 			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(about);
@@ -368,21 +337,18 @@ public class MainActivity extends FragmentActivity {
 			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
-			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 			Fragment fragment = new AccountFragment();
 			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(fragment);
 			return true;
 		case ACCOUNTS:
 			set_setting_menu = true;
-			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 			Fragment acFragment = new AccountsDetail();
 			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(acFragment);
 			return true;
 		case PROFILE:
 			set_setting_menu = true;
-			drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 			Fragment profileFragment = new UserProfile();
 			fragmentHandler.setBackStack(true, null);
 			fragmentHandler.replaceFragmnet(profileFragment);
@@ -408,22 +374,7 @@ public class MainActivity extends FragmentActivity {
 	/* Called whenever we call invalidateOptionsMenu() */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		// If the nav drawer is open, hide action items related to the content
-		// view
-		if (drawer == null) {
-			drawer = new MenuDrawerHelper((MainActivity) context,
-					boot.getAppMenu());
-		}
-		boolean drawerOpen = drawer.mDrawerLayout
-				.isDrawerOpen(drawer.mDrawerList);
-		if (drawerOpen) {
-			menu.clear();
-			getMenuInflater().inflate(R.menu.main_menu_drawer_open, menu);
-			return true;
-		} else {
-			return super.onPrepareOptionsMenu(menu);
-		}
-
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	/**
@@ -435,8 +386,8 @@ public class MainActivity extends FragmentActivity {
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
-		if (drawer != null) {
-			drawer.mDrawerToggle.syncState();
+		if (mDrawerToggle != null) {
+			mDrawerToggle.syncState();
 		}
 	}
 
@@ -444,63 +395,14 @@ public class MainActivity extends FragmentActivity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		// Pass any configuration change to the drawer toggls
-		drawer.mDrawerToggle.onConfigurationChanged(newConfig);
-	}
-
-	public void selectItem(int position) {
-		set_setting_menu = false;
-		Fragment fragment = null;
-		if (this.systemMenus != null && this.systemMenus.length > 0) {
-			getActionBar().setDisplayShowTitleEnabled(true);
-			getActionBar()
-					.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-
-			setTitle(this.systemMenus[position].getTitle());
-
-			Object instance = this.systemMenus[position].getFragmentInstance();
-			if (instance instanceof Intent) {
-				startActivity((Intent) instance);
-				return;
-			} else {
-				fragment = (Fragment) instance;
-				if (fragment.getArguments() != null
-						&& fragment.getArguments().containsKey("settings")) {
-					onSettingItemSelected(SETTING_KEYS.valueOf(fragment
-							.getArguments().get("settings").toString()));
-
-				} else {
-					if (this.systemMenus[position].hasMenuTagColor()
-							&& !fragment.getArguments()
-									.containsKey("tag_color")) {
-						Bundle tagcolor = fragment.getArguments();
-						tagcolor.putInt("tag_color",
-								this.systemMenus[position].getMenuTagColor());
-						fragment.setArguments(tagcolor);
-					}
-				}
-			}
-		} else {
-			Toast.makeText(this, "No Module installed on server !",
-					Toast.LENGTH_LONG).show();
-			finish();
+		if (mDrawerToggle != null) {
+			mDrawerToggle.onConfigurationChanged(newConfig);
 		}
-		if (fragment != null
-				&& !fragment.getArguments().containsKey("settings")) {
-			fragmentHandler.setBackStack(false, null);
-			fragmentHandler.replaceFragmnet(fragment);
-		}
-		// update selected item and title, then close the drawer
-		drawer.mDrawerList.setItemChecked(position, true);
-		drawer.mDrawerLayout.closeDrawer(drawer.mDrawerList);
 	}
 
 	// PullToRefresh
 	public PullToRefreshAttacher getPullToRefreshAttacher() {
 		return mPullToRefreshAttacher;
-	}
-
-	public void setSystemMenus(OEMenuItems[] menus) {
-		this.systemMenus = menus;
 	}
 
 	/**
@@ -622,39 +524,6 @@ public class MainActivity extends FragmentActivity {
 		Toast.makeText(this, "Setting saved.", Toast.LENGTH_LONG).show();
 	}
 
-	public void drawerCloseListener(String title) {
-		Log.d("MenuDrawer", "Closed");
-		getActionBar().setIcon(R.drawable.ic_launcher);
-		if (!set_setting_menu) {
-			setTitle(title, null);
-		} else {
-			getActionBar().setSubtitle(null);
-		}
-	}
-
-	public void drawerOpenListener() {
-		if (oeUser != null) {
-			if (!oeUser.getAvatar().equals("false")) {
-				Drawable profPic = new BitmapDrawable(
-						Base64Helper.getBitmapImage(this, oeUser.getAvatar()));
-				getActionBar().setIcon(profPic);
-			}
-			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(context);
-			Object obj = partner.search(partner, new String[] { "name" },
-					new String[] { "id = ?" },
-					new String[] { oeUser.getPartner_id() }).get("records");
-			String user_name = "";
-			if (obj instanceof Boolean) {
-				user_name = oeUser.getUsername();
-			} else {
-				user_name = ((List<HashMap<String, Object>>) obj).get(0)
-						.get("name").toString();
-			}
-
-			setTitle(user_name, oeUser.getHost());
-		}
-	}
-
 	@Override
 	public void onBackPressed() {
 		if (backPressed != null) {
@@ -670,35 +539,188 @@ public class MainActivity extends FragmentActivity {
 		backPressed = callback;
 	}
 
-	private Dialog appCloseConfirmDialog() {
+	@Override
+	public void onItemClick(AdapterView<?> adapter, View view, int position,
+			long id) {
+		DrawerItem item = mDrawerListItems.get(position);
+		if (!item.isGroupTitle()) {
+			mDrawerItemSelectedPosition = position;
+			loadFragment(item);
+			mDrawerLayout.closeDrawers();
+		}
+		mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
+	}
 
-		// Initialize the Alert Dialog
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		// Source of the data in the DIalog
+	private void initDrawerControls() {
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+				R.drawable.ic_drawer, R.string.drawer_open, R.string.app_name) {
 
-		// Set the dialog title
-		builder.setTitle("Confirm")
-				.setMessage("Are you sure want to exit?")
+			@Override
+			public void onDrawerClosed(View drawerView) {
+				super.onDrawerClosed(drawerView);
+				getActionBar().setIcon(R.drawable.ic_launcher);
+				setTitle(mAppTitle, null);
+			}
 
-				// Set the action buttons
-				.setPositiveButton("Yes",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								// User clicked OK, so save the result somewhere
-								// or return them to the component that opened
-								// the dialog
-								finish();
-							}
-						})
-				.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								return;
-							}
-						});
+			@Override
+			public void onDrawerOpened(View drawerView) {
+				super.onDrawerOpened(drawerView);
+				setTitle(mDrawerTitle, mDrawerSubtitle);
+				setUserPicIcon(context);
+			}
+		};
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+	}
 
-		return builder.create();
+	private void initDrawer(List<DrawerItem> drawerItems) {
+
+		Res_PartnerDBHelper partner = new Res_PartnerDBHelper(context);
+		Object obj = partner.search(partner, new String[] { "name" },
+				new String[] { "id = ?" },
+				new String[] { OEUser.current(context).getPartner_id() }).get(
+				"records");
+		String user_name = "";
+		if (obj instanceof Boolean) {
+			user_name = OEUser.current(context).getUsername();
+		} else {
+			user_name = ((List<HashMap<String, Object>>) obj).get(0)
+					.get("name").toString();
+		}
+		// Setting titles
+		mAppTitle = getResources().getString(R.string.app_name);
+		mDrawerTitle = user_name;
+		mDrawerSubtitle = OEUser.current(context).getHost();
+		getActionBar().setHomeButtonEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		setDrawerItems(drawerItems);
+	}
+
+	private void setDrawerItems(List<DrawerItem> drawerItems) {
+		mDrawerListItems = new ArrayList<DrawerItem>();
+		mDrawerListItems.addAll(drawerItems);
+		mDrawerListItems.addAll(setSettingMenu());
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		mDrawerAdatper = new DrawerAdatper(this, R.layout.drawer_item_layout,
+				R.layout.drawer_item_group_layout, mDrawerListItems);
+		mDrawerListView.setAdapter(mDrawerAdatper);
+		mDrawerListView.setOnItemClickListener(this);
+		int position = -1;
+		if (mDrawerListItems.size() > 0) {
+			if (!mDrawerListItems.get(0).isGroupTitle()) {
+				mDrawerListView.setItemChecked(0, true);
+				position = 0;
+			} else {
+				mDrawerListView.setItemChecked(1, true);
+				position = 1;
+			}
+		}
+		if (getIntent().getAction() != null
+				&& !getIntent().getAction().toString()
+						.equalsIgnoreCase("android.intent.action.MAIN")) {
+			if (getIntent().getAction().toString()
+					.equalsIgnoreCase("composeMessage")) {
+				startActivity(new Intent(context, MessageComposeActivty.class));
+			}
+			if (getIntent().getAction().toString()
+					.equalsIgnoreCase("composeNote")) {
+				startActivity(new Intent(context, ComposeNoteActivity.class));
+			}
+		} else {
+			if (position > 0) {
+				loadFragment(mDrawerListItems.get(position));
+			}
+		}
+
+	}
+
+	private void loadFragment(DrawerItem item) {
+		mAppTitle = item.getTitle();
+		Object instance = item.getFragmentInstace();
+		if (instance instanceof Intent) {
+			startActivity((Intent) instance);
+		} else {
+			Fragment fragment = (Fragment) instance;
+			if (fragment.getArguments() != null
+					&& fragment.getArguments().containsKey("settings")) {
+				onSettingItemSelected(SETTING_KEYS.valueOf(fragment
+						.getArguments().get("settings").toString()));
+			} else {
+				if (item.getTagColor() != null
+						&& !fragment.getArguments().containsKey("tag_color")) {
+					Bundle tagcolor = fragment.getArguments();
+					tagcolor.putInt("tag_color",
+							Color.parseColor(item.getTagColor()));
+					fragment.setArguments(tagcolor);
+				}
+			}
+			if (fragment != null
+					&& !fragment.getArguments().containsKey("settings")) {
+				fragmentHandler.setBackStack(false, null);
+				fragmentHandler.replaceFragmnet(fragment);
+			}
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private void setUserPicIcon(Context context) {
+		if (!OEUser.current(context).getAvatar().equals("false")) {
+			Drawable profPic = new BitmapDrawable(Base64Helper.getBitmapImage(
+					this, OEUser.current(context).getAvatar()));
+			getActionBar().setIcon(profPic);
+		}
+	}
+
+	private List<DrawerItem> setSettingMenu() {
+		List<DrawerItem> sys = new ArrayList<DrawerItem>();
+		sys.add(new DrawerItem("Settings", true));
+		sys.add(new DrawerItem("Profile", 0, R.drawable.ic_action_user,
+				getFragBundle(new Fragment(), "settings", SETTING_KEYS.PROFILE)));
+
+		sys.add(new DrawerItem("Settings", 0, R.drawable.ic_action_settings,
+				getFragBundle(new Fragment(), "settings",
+						SETTING_KEYS.GLOBAL_SETTING)));
+
+		sys.add(new DrawerItem(
+				"Accounts",
+				0,
+				R.drawable.ic_action_accounts,
+				getFragBundle(new Fragment(), "settings", SETTING_KEYS.ACCOUNTS)));
+
+		sys.add(new DrawerItem("Add Account", 0,
+				R.drawable.ic_action_add_account, getFragBundle(new Fragment(),
+						"settings", SETTING_KEYS.ADD_ACCOUNT)));
+		sys.add(new DrawerItem(
+				"About Us",
+				0,
+				R.drawable.ic_action_about,
+				getFragBundle(new Fragment(), "settings", SETTING_KEYS.ABOUT_US)));
+		sys.add(new DrawerItem("Logout", 0, R.drawable.ic_action_logout,
+				getFragBundle(new Fragment(), "settings", SETTING_KEYS.LOGOUT)));
+
+		return sys;
+	}
+
+	private Fragment getFragBundle(Fragment fragment, String key,
+			SETTING_KEYS val) {
+		Bundle bundle = new Bundle();
+		bundle.putString(key, val.toString());
+		fragment.setArguments(bundle);
+		return fragment;
+	}
+
+	private void lockDrawer(boolean flag) {
+		if (!flag) {
+			mDrawerLayout.setDrawerLockMode(DrawerLayout.STATE_IDLE);
+		} else {
+			mDrawerLayout
+					.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+		}
 	}
 }

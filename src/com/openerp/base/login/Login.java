@@ -45,9 +45,8 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OEUser;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Login.
  */
@@ -170,7 +169,6 @@ public class Login extends BaseFragment {
 	 */
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 		inflater.inflate(R.menu.menu_fragment_login, menu);
 	}
 
@@ -324,15 +322,8 @@ public class Login extends BaseFragment {
 		rootView = null; // now cleaning up!
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#menuHelper(android.content.Context)
-	 */
 	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 }

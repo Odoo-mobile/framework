@@ -18,6 +18,8 @@
  */
 package com.openerp.base.ir;
 
+import java.util.List;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,9 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class AttachmentFragment.
  */
@@ -60,7 +61,6 @@ public class AttachmentFragment extends BaseFragment {
 	 */
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new Ir_AttachmentDBHelper(context);
 	}
 
@@ -73,7 +73,6 @@ public class AttachmentFragment extends BaseFragment {
 	 */
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -86,7 +85,6 @@ public class AttachmentFragment extends BaseFragment {
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		// handle item selection
 
 		switch (item.getItemId()) {
@@ -96,15 +94,8 @@ public class AttachmentFragment extends BaseFragment {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#menuHelper(android.content.Context)
-	 */
 	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 }

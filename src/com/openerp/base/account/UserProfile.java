@@ -1,5 +1,7 @@
 package com.openerp.base.account;
 
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -25,8 +27,8 @@ import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
-import com.openerp.support.menu.OEMenu;
 import com.openerp.util.Base64Helper;
+import com.openerp.util.drawer.DrawerItem;
 
 public class UserProfile extends BaseFragment {
 	View rootView = null;
@@ -77,13 +79,11 @@ public class UserProfile extends BaseFragment {
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 		inflater.inflate(R.menu.menu_fragment_account_user_profile, menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 		case R.id.menu_account_user_profile_sync:
 			dialog = inputPasswordDialog();
@@ -97,13 +97,6 @@ public class UserProfile extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -149,5 +142,10 @@ public class UserProfile extends BaseFragment {
 		});
 		return builder.create();
 
+	}
+
+	@Override
+	public List<DrawerItem> drawerMenus(Context context) {
+		return null;
 	}
 }

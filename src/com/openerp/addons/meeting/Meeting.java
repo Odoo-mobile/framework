@@ -18,22 +18,22 @@
  */
 package com.openerp.addons.meeting;
 
+import java.util.List;
+
 import android.content.Context;
 
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 public class Meeting extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new MeetingDBHelper(context);
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 }

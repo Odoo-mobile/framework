@@ -60,9 +60,9 @@ import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
 import com.openerp.util.OEBinaryDownloadHelper;
 import com.openerp.util.OEFileSizeHelper;
+import com.openerp.util.drawer.DrawerItem;
 
 /**
  * The Class MessageDetail.
@@ -435,15 +435,8 @@ public class MessageDetail extends BaseFragment {
 		return lists;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#menuHelper(android.content.Context)
-	 */
 	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 

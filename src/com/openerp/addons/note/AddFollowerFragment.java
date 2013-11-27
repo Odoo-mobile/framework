@@ -55,7 +55,7 @@ import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 public class AddFollowerFragment extends BaseFragment {
 
@@ -74,7 +74,6 @@ public class AddFollowerFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		setHasOptionsMenu(true);
 		scope = new AppScope(this);
 		rootview = inflater.inflate(R.layout.fragment_add_follower, container,
@@ -102,7 +101,6 @@ public class AddFollowerFragment extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new NoteDBHelper(context);
 	}
 
@@ -117,13 +115,12 @@ public class AddFollowerFragment extends BaseFragment {
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 
 		SearchView searchView = (SearchView) menu.findItem(
@@ -149,7 +146,6 @@ public class AddFollowerFragment extends BaseFragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -320,7 +316,6 @@ public class AddFollowerFragment extends BaseFragment {
 		OEDialog pdialog = null;
 
 		public LoadPartners() {
-			// TODO Auto-generated constructor stub
 			pdialog = new OEDialog(scope.context(), true, "Loading Partners...");
 		}
 
@@ -331,7 +326,6 @@ public class AddFollowerFragment extends BaseFragment {
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			// TODO Auto-generated method stub
 
 			return getPartnersFromServer();
 
@@ -346,5 +340,4 @@ public class AddFollowerFragment extends BaseFragment {
 			}
 		}
 	}
-
 }
