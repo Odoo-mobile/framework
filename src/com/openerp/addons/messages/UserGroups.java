@@ -41,7 +41,7 @@ import com.openerp.util.drawer.DrawerItem;
 
 public class UserGroups extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
-	public static final String TAG = "UserGroups";
+	public static final String TAG = "com.openerp.addons.UserGroups";
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 	View rootView = null;
 	GridView lstGroups = null;
@@ -208,12 +208,12 @@ public class UserGroups extends BaseFragment implements
 		db = (BaseDBHelper) databaseHelper(context);
 		List<DrawerItem> drawer_items = new ArrayList<DrawerItem>();
 		if (db.getOEInstance().isInstalled("mail.group")) {
-			drawer_items.add(new DrawerItem("My Groups", true));
+			drawer_items.add(new DrawerItem(TAG, "My Groups", true));
 
 			// default join group menu
 			UserGroups grp = new UserGroups();
 			grp.setArguments(new Bundle());
-			drawer_items.add(new DrawerItem("Join a Group", 0,
+			drawer_items.add(new DrawerItem(TAG, "Join a Group", 0,
 					R.drawable.ic_action_social_group, grp));
 
 			// Add dynamic groups
@@ -242,10 +242,9 @@ public class UserGroups extends BaseFragment implements
 					String group_name = group_rec.get(0).get("name").toString();
 					int key = Integer.parseInt(group_rec.get(0).get("id")
 							.toString());
-					drawer_items
-							.add(new DrawerItem(group_name, getGroupCount(
-									context, key), tag_colors[i],
-									getGroupInstance(key)));
+					drawer_items.add(new DrawerItem(TAG, group_name,
+							getGroupCount(context, key), tag_colors[i],
+							getGroupInstance(key)));
 					menu_color.put("group_" + key,
 							Color.parseColor(tag_colors[i]));
 					group_names.put("group_" + key, group_name);
@@ -299,7 +298,7 @@ public class UserGroups extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 			mPullToRefreshAttacher.setRefreshComplete();
 			setupView();
-			scope.context().refreshDrawer(context);
+			scope.context().refreshDrawer(TAG, context);
 		}
 
 	};
@@ -390,7 +389,7 @@ public class UserGroups extends BaseFragment implements
 							}
 						} catch (Exception e) {
 						}
-						scope.context().refreshDrawer(scope.context());
+						scope.context().refreshDrawer(TAG, scope.context());
 					}
 				});
 				return true;

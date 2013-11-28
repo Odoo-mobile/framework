@@ -7,6 +7,7 @@ import android.widget.AdapterView.OnItemClickListener;
 public class DrawerItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private String key_tag = null;
 	private int id = 0;
 	private String title = "";
 	private int counter = 0;
@@ -15,55 +16,65 @@ public class DrawerItem implements Serializable {
 	private String tagColor = null;
 	private Object instance = null;
 
-	public DrawerItem(String title) {
+	public DrawerItem(String key, String title) {
 		this.id = DrawerItemCounter.getNext();
 		this.title = title;
+		this.key_tag = key;
 	}
 
-	public DrawerItem(String title, int counter) {
-		this.id = DrawerItemCounter.getNext();
-		this.title = title;
-		this.counter = counter;
-	}
-
-	public DrawerItem(String title, int counter, int icon) {
+	public DrawerItem(String key, String title, int counter) {
 		this.id = DrawerItemCounter.getNext();
 		this.title = title;
 		this.counter = counter;
-		this.icon = icon;
+		this.key_tag = key;
 	}
 
-	public DrawerItem(String title, int counter, int icon, Object instance) {
+	public DrawerItem(String key, String title, int counter, int icon) {
 		this.id = DrawerItemCounter.getNext();
 		this.title = title;
 		this.counter = counter;
 		this.icon = icon;
-		this.instance = instance;
+		this.key_tag = key;
 	}
 
-	public DrawerItem(String title, int counter, String tagColor,
+	public DrawerItem(String key, String title, int counter, int icon,
 			Object instance) {
 		this.id = DrawerItemCounter.getNext();
+		this.key_tag = key;
+		this.title = title;
+		this.counter = counter;
+		this.icon = icon;
+		this.instance = instance;
+	}
+
+	public DrawerItem(String key, String title, int counter, String tagColor,
+			Object instance) {
+		this.key_tag = key;
+		this.id = DrawerItemCounter.getNext();
 		this.title = title;
 		this.counter = counter;
 		this.tagColor = tagColor;
 		this.instance = instance;
 	}
 
-	public DrawerItem(String title, int counter, String tagColor) {
+	public DrawerItem(String key, String title, int counter, String tagColor) {
+		this.key_tag = key;
 		this.id = DrawerItemCounter.getNext();
 		this.title = title;
 		this.counter = counter;
 		this.tagColor = tagColor;
 	}
 
-	public DrawerItem(String title, boolean isGroupTitle) {
+	public DrawerItem(String key, String title, boolean isGroupTitle) {
 		this.id = DrawerItemCounter.getNext();
+		this.key_tag = key;
 		this.title = title;
 		this.isGroupTitle = isGroupTitle;
 	}
 
-	public DrawerItem(String title, int counter, boolean isGroupTitle) {
+	public DrawerItem(String key, String title, int counter,
+			boolean isGroupTitle) {
+		this.key_tag = key;
 		this.id = DrawerItemCounter.getNext();
 		this.title = title;
 		this.counter = counter;
@@ -124,6 +135,14 @@ public class DrawerItem implements Serializable {
 
 	public Object getFragmentInstace() {
 		return this.instance;
+	}
+
+	public void setKey(String key) {
+		this.key_tag = key;
+	}
+
+	public String getKey() {
+		return this.key_tag;
 	}
 
 	public interface DrawerItemClickListener extends OnItemClickListener {

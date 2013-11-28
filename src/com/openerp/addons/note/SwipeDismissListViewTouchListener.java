@@ -448,7 +448,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 			mPullAttacher.setRefreshing(false);
 			// refreshing list view after synchronisation
-			((MainActivity) context).refreshDrawer(context);
+			((MainActivity) context).refreshDrawer(Note.TAG, context);
 			mPullAttacher.setRefreshComplete();
 		}
 	};

@@ -33,7 +33,6 @@
         android:layout_weight="2"
         android:gravity="center_vertical"
         android:padding="10dp"
-        android:text="Title"
         android:textColor="@color/drawer_textview_color_selector" />
 
     <TextView
@@ -43,7 +42,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:padding="10dp"
-        android:text="99+"
+        android:text="0"
         android:textColor="@color/drawer_counter_textview_color_selector"
         android:textStyle="bold" />
 

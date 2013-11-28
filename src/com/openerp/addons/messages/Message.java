@@ -74,7 +74,7 @@ import com.openerp.util.drawer.DrawerItem;
 
 public class Message extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
-
+	public static String TAG = "com.openerp.addons.Message";
 	PerformOperation markasTodoTask = null;
 	String type = "inbox";
 	PerformReadUnreadArchiveOperation readunreadoperation = null;
@@ -708,22 +708,17 @@ public class Message extends BaseFragment implements
 		List<DrawerItem> drawerItems = new ArrayList<DrawerItem>();
 		db = (MessageDBHelper) databaseHelper(context);
 		if (db.getOEInstance().isInstalled("mail.message")) {
-			drawerItems.add(new DrawerItem("Messages", true));
-			drawerItems.add(new DrawerItem("Inbox", getCount(TYPE.INBOX,
+			drawerItems.add(new DrawerItem(TAG, "Messages", true));
+			drawerItems.add(new DrawerItem(TAG, "Inbox", getCount(TYPE.INBOX,
 					context), R.drawable.ic_action_inbox, getObjectOFClass(
 					"type", "inbox")));
-
-			int tomeTotal = getCount(TYPE.TOME, context);
-			if (tomeTotal > 0) {
-				tomeTotal = tomeTotal - 1;
-			}
-			drawerItems.add(new DrawerItem("To: me", tomeTotal,
-					R.drawable.ic_action_user,
-					getObjectOFClass("type", "to-me")));
-			drawerItems.add(new DrawerItem("To-do",
-					getCount(TYPE.TODO, context), R.drawable.ic_action_todo,
-					getObjectOFClass("type", "to-do")));
-			drawerItems.add(new DrawerItem("Archives", 0,
+			drawerItems.add(new DrawerItem(TAG, "To: me", getCount(TYPE.TOME,
+					context), R.drawable.ic_action_user, getObjectOFClass(
+					"type", "to-me")));
+			drawerItems.add(new DrawerItem(TAG, "To-do", getCount(TYPE.TODO,
+					context), R.drawable.ic_action_todo, getObjectOFClass(
+					"type", "to-do")));
+			drawerItems.add(new DrawerItem(TAG, "Archives", 0,
 					R.drawable.ic_action_archive, getObjectOFClass("type",
 							"archive")));
 			return drawerItems;
@@ -919,7 +914,6 @@ public class Message extends BaseFragment implements
 				if (!data_update.equals("false")) {
 
 				}
-				scope.context().refreshDrawer(getActivity());
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
@@ -931,7 +925,7 @@ public class Message extends BaseFragment implements
 
 			} catch (Exception e) {
 			}
-			scope.context().refreshDrawer(getActivity());
+			scope.context().refreshDrawer(TAG, getActivity());
 			if (mPullToRefreshAttacher == null && listAdapter != null) {
 				listAdapter.clear();
 				list.clear();

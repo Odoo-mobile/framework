@@ -36,7 +36,6 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -58,6 +57,7 @@ import com.openerp.base.account.AccountFragment;
 import com.openerp.base.account.AccountsDetail;
 import com.openerp.base.account.UserProfile;
 import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.support.BaseFragment;
 import com.openerp.support.Boot;
 import com.openerp.support.FragmentHandler;
 import com.openerp.support.OEUser;
@@ -171,25 +171,25 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-	public void refreshDrawer(Context context) {
-		RefreshDrawer drawerrefresh = new RefreshDrawer();
-		drawerrefresh.execute((Void) null);
-	}
-
-	class RefreshDrawer extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			runOnUiThread(new Runnable() {
-
-				@Override
-				public void run() {
-					setDrawerItems(boot.getDrawerItemsList());
+	public void refreshDrawer(String tag_key, Context context) {
+		int start_index = -1;
+		List<DrawerItem> updated_menus = new ArrayList<DrawerItem>();
+		for (int i = 0; i < mDrawerListItems.size(); i++) {
+			DrawerItem item = mDrawerListItems.get(i);
+			if (item.getKey().equals(tag_key) && !item.isGroupTitle()) {
+				if (start_index < 0) {
+					start_index = i - 1;
+					BaseFragment instance = (BaseFragment) item
+							.getFragmentInstace();
+					updated_menus.addAll(instance.drawerMenus(context));
+					break;
 				}
-			});
-			return null;
+			}
 		}
-
+		for (DrawerItem item : updated_menus) {
+			mDrawerAdatper.updateDrawerItem(start_index, item);
+			start_index++;
+		}
 	}
 
 	String[] accountNames = null;
@@ -544,11 +544,15 @@ public class MainActivity extends FragmentActivity implements
 			long id) {
 		DrawerItem item = mDrawerListItems.get(position);
 		if (!item.isGroupTitle()) {
-			mDrawerItemSelectedPosition = position;
+			if (!item.getKey().equals("com.openerp.settings")) {
+				mDrawerItemSelectedPosition = position;
+			}
+			mAppTitle = item.getTitle();
 			loadFragment(item);
 			mDrawerLayout.closeDrawers();
 		}
 		mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
+
 	}
 
 	private void initDrawerControls() {
@@ -598,18 +602,20 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void setDrawerItems(List<DrawerItem> drawerItems) {
-		mDrawerListItems = new ArrayList<DrawerItem>();
 		mDrawerListItems.addAll(drawerItems);
 		mDrawerListItems.addAll(setSettingMenu());
+		mDrawerAdatper = new DrawerAdatper(this, R.layout.drawer_item_layout,
+				R.layout.drawer_item_group_layout, mDrawerListItems);
+		mDrawerListView.setAdapter(mDrawerAdatper);
+		mDrawerAdatper.notifyDataSetChanged();
+		if (mDrawerItemSelectedPosition >= 0) {
+			mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
+		}
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-
-		mDrawerAdatper = new DrawerAdatper(this, R.layout.drawer_item_layout,
-				R.layout.drawer_item_group_layout, mDrawerListItems);
-		mDrawerListView.setAdapter(mDrawerAdatper);
 		mDrawerListView.setOnItemClickListener(this);
 		int position = -1;
 		if (mDrawerListItems.size() > 0) {
@@ -620,6 +626,7 @@ public class MainActivity extends FragmentActivity implements
 				mDrawerListView.setItemChecked(1, true);
 				position = 1;
 			}
+			mDrawerItemSelectedPosition = position;
 		}
 		if (getIntent().getAction() != null
 				&& !getIntent().getAction().toString()
@@ -637,11 +644,9 @@ public class MainActivity extends FragmentActivity implements
 				loadFragment(mDrawerListItems.get(position));
 			}
 		}
-
 	}
 
 	private void loadFragment(DrawerItem item) {
-		mAppTitle = item.getTitle();
 		Object instance = item.getFragmentInstace();
 		if (instance instanceof Intent) {
 			startActivity((Intent) instance);
@@ -679,29 +684,29 @@ public class MainActivity extends FragmentActivity implements
 
 	private List<DrawerItem> setSettingMenu() {
 		List<DrawerItem> sys = new ArrayList<DrawerItem>();
-		sys.add(new DrawerItem("Settings", true));
-		sys.add(new DrawerItem("Profile", 0, R.drawable.ic_action_user,
+		String key = "com.openerp.settings";
+		sys.add(new DrawerItem(key, "Settings", true));
+		sys.add(new DrawerItem(key, "Profile", 0, R.drawable.ic_action_user,
 				getFragBundle(new Fragment(), "settings", SETTING_KEYS.PROFILE)));
 
-		sys.add(new DrawerItem("Settings", 0, R.drawable.ic_action_settings,
-				getFragBundle(new Fragment(), "settings",
-						SETTING_KEYS.GLOBAL_SETTING)));
+		sys.add(new DrawerItem(key, "Settings", 0,
+				R.drawable.ic_action_settings, getFragBundle(new Fragment(),
+						"settings", SETTING_KEYS.GLOBAL_SETTING)));
 
-		sys.add(new DrawerItem(
-				"Accounts",
-				0,
-				R.drawable.ic_action_accounts,
-				getFragBundle(new Fragment(), "settings", SETTING_KEYS.ACCOUNTS)));
+		sys.add(new DrawerItem(key, "Accounts", 0,
+				R.drawable.ic_action_accounts, getFragBundle(new Fragment(),
+						"settings", SETTING_KEYS.ACCOUNTS)));
 
-		sys.add(new DrawerItem("Add Account", 0,
+		sys.add(new DrawerItem(key, "Add Account", 0,
 				R.drawable.ic_action_add_account, getFragBundle(new Fragment(),
 						"settings", SETTING_KEYS.ADD_ACCOUNT)));
 		sys.add(new DrawerItem(
+				key,
 				"About Us",
 				0,
 				R.drawable.ic_action_about,
 				getFragBundle(new Fragment(), "settings", SETTING_KEYS.ABOUT_US)));
-		sys.add(new DrawerItem("Logout", 0, R.drawable.ic_action_logout,
+		sys.add(new DrawerItem(key, "Logout", 0, R.drawable.ic_action_logout,
 				getFragBundle(new Fragment(), "settings", SETTING_KEYS.LOGOUT)));
 
 		return sys;

@@ -66,7 +66,7 @@ import com.openerp.util.tags.TagsView;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
-
+	public static String TAG = "com.openerp.addons.Note";
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
 	View rootView = null;
@@ -187,13 +187,14 @@ public class Note extends BaseFragment implements
 		List<DrawerItem> drawerItems = new ArrayList<DrawerItem>();
 		db = (NoteDBHelper) databaseHelper(context);
 		if (db.getOEInstance().isInstalled("note.note")) {
-			drawerItems.add(new DrawerItem("Notes", true));
+			drawerItems.add(new DrawerItem(TAG, "Notes", true));
 			setNoteStages(context);
 			// Setting list of stages under Note in Drawable menu
-			drawerItems.add(new DrawerItem("Notes", getCount("-1", context),
-					R.drawable.ic_menu_notes, getFragBundle("stage", "-1")));
+			drawerItems.add(new DrawerItem(TAG, "Notes",
+					getCount("-1", context), R.drawable.ic_action_notes,
+					getFragBundle("stage", "-1")));
 			drawerItems
-					.add(new DrawerItem("Archive", 0,
+					.add(new DrawerItem(TAG, "Archive", 0,
 							R.drawable.ic_action_archive, getFragBundle(
 									"stage", "-2")));
 			if (stages != null) {
@@ -202,8 +203,8 @@ public class Note extends BaseFragment implements
 					if (i > tag_colors.length - 1) {
 						i = 0;
 					}
-					drawerItems.add(new DrawerItem(stages.get(key).toString(),
-							getCount(key, context), tag_colors[i],
+					drawerItems.add(new DrawerItem(TAG, stages.get(key)
+							.toString(), getCount(key, context), tag_colors[i],
 							getFragBundle("stage", key)));
 					stage_colors.put("stage_" + key,
 							Color.parseColor(tag_colors[i]));
@@ -289,7 +290,7 @@ public class Note extends BaseFragment implements
 			mPullAttacher.setRefreshComplete();
 
 			// Refreshing Menulist [counter] after synchronisation complete
-			scope.context().refreshDrawer(context);
+			scope.context().refreshDrawer(TAG, context);
 			setupListView(stage_id);
 		}
 	};
@@ -484,7 +485,7 @@ public class Note extends BaseFragment implements
 			}
 			// Refreshing list view after synchronisation
 			// complete
-			scope.context().refreshDrawer(scope.context());
+			scope.context().refreshDrawer(TAG, scope.context());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

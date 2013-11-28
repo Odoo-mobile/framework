@@ -79,4 +79,9 @@ public class DrawerAdatper extends ArrayAdapter<DrawerItem> {
 		return mView;
 	}
 
+	public void updateDrawerItem(int position, DrawerItem item) {
+		mObjects.set(position, item);
+		notifyDataSetChanged();
+	}
+
 }
