@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:oe="http://schemas.android.com/apk/res/com.openerp"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/drawer_item_selector"
+    android:orientation="horizontal"
+    android:weightSum="2" >
+
+    <com.openerp.util.drawer.DrawerIconView
+        android:id="@+id/imgDrawerItemIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_action_inbox"
+        android:visibility="gone"
+        oe:tint="@color/drawer_imageview_tint_color_selector" />
+
+    <View
+        android:id="@+id/drawerTagColor"
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:background="#ffffff"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/txvDrawerItemTitle"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:textColor="@color/drawer_textview_color_selector" />
+
+    <TextView
+        android:id="@+id/txvDrawerItemCounter"
+        style="?android:attr/textAppearanceSmall"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="0"
+        android:textColor="@color/drawer_counter_textview_color_selector"
+        android:textStyle="bold" />
+
+</LinearLayout>

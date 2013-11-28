@@ -231,7 +231,7 @@ public class ComposeNoteActivity extends Activity implements
 					stages.add(stages.size() - 1, stage.getText().toString());
 					adapter.notifyDataSetChanged();
 					noteStages.setSelection(stages.size() - 2);
-					scope.context().refreshMenu(scope.context());
+					scope.context().refreshDrawer(Note.TAG, scope.context());
 				}
 			}
 		});

@@ -19,6 +19,8 @@
 
 package com.openerp.addons.idea;
 
+import java.util.List;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,9 +29,8 @@ import android.view.ViewGroup;
 
 import com.openerp.R;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Idea.
  */
@@ -58,19 +59,11 @@ public class Idea extends BaseFragment {
 	 */
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new IdeaDBHelper(context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#menuHelper(android.content.Context)
-	 */
 	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 

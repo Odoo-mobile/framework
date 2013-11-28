@@ -61,13 +61,12 @@ import com.openerp.support.OEUser;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
-import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.tags.TagsView;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
-
+	public static String TAG = "com.openerp.addons.Note";
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
 	View rootView = null;
@@ -184,42 +183,35 @@ public class Note extends BaseFragment implements
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
-
+	public List<DrawerItem> drawerMenus(Context context) {
+		List<DrawerItem> drawerItems = new ArrayList<DrawerItem>();
 		db = (NoteDBHelper) databaseHelper(context);
 		if (db.getOEInstance().isInstalled("note.note")) {
-			OEMenu menu = new OEMenu();
-			menu.setId(1);
-			menu.setMenuTitle("Notes");
+			drawerItems.add(new DrawerItem(TAG, "Notes", true));
 			setNoteStages(context);
-
 			// Setting list of stages under Note in Drawable menu
-			List<OEMenuItems> items = new ArrayList<OEMenuItems>();
-			items.add(new OEMenuItems(R.drawable.ic_menu_notes, "Notes",
-					getFragBundle("stage", "-1"), getCount("-1", context)));
-			items.add(new OEMenuItems(R.drawable.ic_menu_archive_holo_light,
-					"Archive", getFragBundle("stage", "-2"), 0));
-
+			drawerItems.add(new DrawerItem(TAG, "Notes",
+					getCount("-1", context), R.drawable.ic_action_notes,
+					getFragBundle("stage", "-1")));
+			drawerItems
+					.add(new DrawerItem(TAG, "Archive", 0,
+							R.drawable.ic_action_archive, getFragBundle(
+									"stage", "-2")));
 			if (stages != null) {
 				int i = 0;
 				for (String key : stages.keySet()) {
 					if (i > tag_colors.length - 1) {
 						i = 0;
 					}
-					OEMenuItems stageMenu = new OEMenuItems(stages.get(key)
-							.toString(), getFragBundle("stage", key), getCount(
-							key, context));
-					stageMenu.setAutoMenuTagColor(true);
-					stageMenu.setMenuTagColor(Color.parseColor(tag_colors[i]));
+					drawerItems.add(new DrawerItem(TAG, stages.get(key)
+							.toString(), getCount(key, context), tag_colors[i],
+							getFragBundle("stage", key)));
 					stage_colors.put("stage_" + key,
-							stageMenu.getMenuTagColor());
-					items.add(stageMenu);
+							Color.parseColor(tag_colors[i]));
 					i++;
 				}
 			}
-			menu.setMenuItems(items);
-			return menu;
+			return drawerItems;
 		} else {
 			return null;
 		}
@@ -298,7 +290,7 @@ public class Note extends BaseFragment implements
 			mPullAttacher.setRefreshComplete();
 
 			// Refreshing Menulist [counter] after synchronisation complete
-			scope.context().refreshMenu(context);
+			scope.context().refreshDrawer(TAG, context);
 			setupListView(stage_id);
 		}
 	};
@@ -373,7 +365,6 @@ public class Note extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
-				// TODO Auto-generated method stub
 
 				int rowId = listRows.get(position).getRow_id();
 				String rowStatus = listRows.get(position).getRow_data()
@@ -494,9 +485,8 @@ public class Note extends BaseFragment implements
 			}
 			// Refreshing list view after synchronisation
 			// complete
-			scope.context().refreshMenu(scope.context());
+			scope.context().refreshDrawer(TAG, scope.context());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -28,7 +28,7 @@ import com.openerp.support.OEUser;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 public class AccountsDetail extends BaseFragment {
 	View rootView = null;
@@ -132,19 +132,16 @@ public class AccountsDetail extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 		inflater.inflate(R.menu.menu_fragment_all_accounts, menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 		case R.id.menu_add_new_account:
 			Fragment fragment = new AccountFragment();
@@ -154,12 +151,6 @@ public class AccountsDetail extends BaseFragment {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	private Dialog logoutConfirmDialog() {
@@ -232,5 +223,10 @@ public class AccountsDetail extends BaseFragment {
 						});
 
 		return builder.create();
+	}
+
+	@Override
+	public List<DrawerItem> drawerMenus(Context context) {
+		return null;
 	}
 }

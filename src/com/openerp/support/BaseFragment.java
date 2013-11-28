@@ -18,6 +18,8 @@
  */
 package com.openerp.support;
 
+import java.util.List;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -33,9 +35,8 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.listview.OEListViewAdapter;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class BaseFragment.
  */
@@ -132,6 +133,5 @@ interface FragmentHelper {
 
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
 
-	public OEMenu menuHelper(Context context);
-
+	public List<DrawerItem> drawerMenus(Context context);
 }

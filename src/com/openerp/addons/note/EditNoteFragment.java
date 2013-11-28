@@ -55,8 +55,8 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
 import com.openerp.util.OnBackButtonPressedListener;
+import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.tags.TagsItems;
 import com.openerp.util.tags.TagsView;
 
@@ -299,7 +299,7 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 
@@ -490,19 +490,16 @@ public class EditNoteFragment extends BaseFragment implements
 
 	@Override
 	public void onTokenAdded(Object token, View view) {
-		// TODO Auto-generated method stub
 		TagsItems item = (TagsItems) token;
 		selectedTags.put("" + item.getId(), item);
 	}
 
 	@Override
 	public void onTokenSelected(Object token, View view) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onTokenRemoved(Object token) {
-		// TODO Auto-generated method stub
 		TagsItems item = (TagsItems) token;
 		selectedTags.remove("" + item.getId());
 	}

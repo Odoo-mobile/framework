@@ -20,6 +20,7 @@ package com.openerp.support;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
@@ -31,10 +32,8 @@ import com.openerp.base.res.ResFragment;
 import com.openerp.config.ModulesConfig;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.SQLStatement;
-import com.openerp.support.menu.OEMenu;
-import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.drawer.DrawerItem;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Boot.
  */
@@ -50,7 +49,7 @@ public class Boot {
 	private ArrayList<SQLStatement> statements = null;
 
 	/** The application menus */
-	private List<OEMenuItems> app_menus = null;
+	private List<DrawerItem> drawer_items = null;
 
 	/**
 	 * Instantiates a new boot.
@@ -89,7 +88,7 @@ public class Boot {
 	 * @return true, if successful
 	 */
 	private boolean initDatabase() {
-		app_menus = new ArrayList<OEMenuItems>();
+		drawer_items = new ArrayList<DrawerItem>();
 		for (Module module : this.modules) {
 			try {
 				Class newClass = Class.forName(module.getModuleInstance()
@@ -107,22 +106,17 @@ public class Boot {
 					BaseDBHelper dbInfo = (BaseDBHelper) obj;
 					SQLStatement statement = dbInfo.createStatement(dbInfo);
 					dbInfo.createTable(statement);
-
 					if (OEUser.current(this.context) != null) {
 						// Method menuHelper
 						params = new Class[1];
 						params[0] = Context.class;
-						method = newClass.getDeclaredMethod("menuHelper",
+						method = newClass.getDeclaredMethod("drawerMenus",
 								params);
 						Object menu_obj = method.invoke(receiver, this.context);
 
 						if (menu_obj != null) {
-							OEMenu menu = (OEMenu) menu_obj;
-							app_menus.add(new OEMenuItems(menu.getMenuTitle()
-									.toUpperCase(), null, 0, true));
-							for (OEMenuItems menuItem : menu.getMenuItems()) {
-								app_menus.add(menuItem);
-							}
+							drawer_items
+									.addAll((Collection<? extends DrawerItem>) menu_obj);
 						}
 					}
 
@@ -136,6 +130,33 @@ public class Boot {
 		return false;
 	}
 
+	public List<DrawerItem> getDrawerItemsList() {
+		List<DrawerItem> drawer_items = new ArrayList<DrawerItem>();
+		for (Module module : modules) {
+			try {
+				Class newClass = Class.forName(module.getModuleInstance()
+						.getClass().getName());
+
+				Object receiver = newClass.newInstance();
+				Class params[] = new Class[1];
+				params[0] = Context.class;
+
+				Method method = newClass.getDeclaredMethod("drawerMenus",
+						params);
+
+				Object obj = method.invoke(receiver, this.context);
+
+				if (obj != null) {
+					drawer_items.addAll((Collection<? extends DrawerItem>) obj);
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return drawer_items;
+	}
+
 	/**
 	 * Gets the all statements.
 	 * 
@@ -145,18 +166,17 @@ public class Boot {
 		return this.statements;
 	}
 
-	public List<OEMenuItems> getAppMenu() {
-		return this.app_menus;
-	}
-
 	/**
 	 * Gets the modules.
 	 * 
 	 * @return the modules
 	 */
 	public ArrayList<Module> getModules() {
-		// TODO Auto-generated method stub
 		return modules;
+	}
+
+	public List<DrawerItem> getDrawerItems() {
+		return drawer_items;
 	}
 
 }
