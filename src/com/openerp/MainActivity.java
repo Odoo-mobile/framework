@@ -83,7 +83,7 @@ public class MainActivity extends FragmentActivity implements
 	String mAppTitle = "";
 	String mDrawerTitle = "";
 	String mDrawerSubtitle = "";
-	int mDrawerItemSelectedPosition = -1;
+	static int mDrawerItemSelectedPosition = -1;
 	ListView mDrawerListView = null;
 
 	public FragmentHandler fragmentHandler;
@@ -592,8 +592,6 @@ public class MainActivity extends FragmentActivity implements
 			user_name = ((List<HashMap<String, Object>>) obj).get(0)
 					.get("name").toString();
 		}
-		// Setting titles
-		mAppTitle = getResources().getString(R.string.app_name);
 		mDrawerTitle = user_name;
 		mDrawerSubtitle = OEUser.current(context).getHost();
 		getActionBar().setHomeButtonEnabled(true);
@@ -626,7 +624,9 @@ public class MainActivity extends FragmentActivity implements
 				mDrawerListView.setItemChecked(1, true);
 				position = 1;
 			}
-			mDrawerItemSelectedPosition = position;
+		}
+		if (mDrawerItemSelectedPosition >= 0) {
+			position = mDrawerItemSelectedPosition;
 		}
 		if (getIntent().getAction() != null
 				&& !getIntent().getAction().toString()
