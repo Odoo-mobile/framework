@@ -85,7 +85,7 @@ public class MainActivity extends FragmentActivity implements
 	String mAppTitle = "";
 	String mDrawerTitle = "";
 	String mDrawerSubtitle = "";
-	static int mDrawerItemSelectedPosition = -1;
+	int mDrawerItemSelectedPosition = -1;
 	ListView mDrawerListView = null;
 
 	public FragmentHandler fragmentHandler;
@@ -94,7 +94,6 @@ public class MainActivity extends FragmentActivity implements
 		GLOBAL_SETTING, PROFILE, LOGOUT, ACCOUNTS, ADD_ACCOUNT, ABOUT_US
 	}
 
-	// private MenuDrawerHelper drawer = null;
 	private CharSequence mTitle;
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 	private OnBackButtonPressedListener backPressed = null;
@@ -105,7 +104,6 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		context = this;
-
 		if (isStateExist == null) {
 			NoteDBHelper db = new NoteDBHelper(context);
 			isStateExist = String.valueOf(db.isPadExist());
@@ -115,6 +113,8 @@ public class MainActivity extends FragmentActivity implements
 			fragmentHandler = new FragmentHandler(this);
 			boot = new Boot(this);
 			if (savedInstanceState != null) {
+				mDrawerItemSelectedPosition = savedInstanceState
+						.getInt("current_drawer_item");
 				mPullToRefreshAttacher = new PullToRefreshAttacher(this);
 				initDrawer(boot.getDrawerItems());
 				return;
@@ -381,11 +381,6 @@ public class MainActivity extends FragmentActivity implements
 	/* Called whenever we call invalidateOptionsMenu() */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		// boolean drawerOpen = mDrawerLayout.isDrawerVisible(mDrawerLayout);
-		// if (drawerOpen) {
-		// menu.clear();
-		// return true;
-		// }
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -615,6 +610,11 @@ public class MainActivity extends FragmentActivity implements
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setDrawerItems(drawerItems);
+		if (mDrawerItemSelectedPosition > 0) {
+			mAppTitle = mDrawerListItems.get(mDrawerItemSelectedPosition)
+					.getTitle();
+			setTitle(mAppTitle);
+		}
 	}
 
 	private void setDrawerItems(List<DrawerItem> drawerItems) {
@@ -659,7 +659,9 @@ public class MainActivity extends FragmentActivity implements
 			}
 		} else {
 			if (position > 0) {
-				loadFragment(mDrawerListItems.get(position));
+				if (position != mDrawerItemSelectedPosition) {
+					loadFragment(mDrawerListItems.get(position));
+				}
 			}
 		}
 	}
@@ -746,4 +748,11 @@ public class MainActivity extends FragmentActivity implements
 					.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		}
 	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putInt("current_drawer_item", mDrawerItemSelectedPosition);
+		super.onSaveInstanceState(outState);
+	}
+
 }
