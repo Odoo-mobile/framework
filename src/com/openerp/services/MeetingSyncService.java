@@ -33,10 +33,8 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import com.openerp.addons.meeting.MeetingDBHelper;
-import com.openerp.addons.note.NoteDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.JSONDataHelper;

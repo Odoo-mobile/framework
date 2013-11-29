@@ -18,12 +18,12 @@
  */
 package com.openerp.support;
 
-import com.openerp.auth.OpenERPAccountManager;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.os.Bundle;
+
+import com.openerp.auth.OpenERPAccountManager;
 
 // TODO: Auto-generated Javadoc
 /**

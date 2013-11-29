@@ -24,7 +24,6 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
@@ -38,12 +37,11 @@ import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
-import com.openerp.support.menu.OEMenuItems;
+import com.openerp.util.drawer.DrawerItem;
 
 public class UserGroups extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
-	public static final String TAG = "UserGroups";
+	public static final String TAG = "com.openerp.addons.UserGroups";
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 	View rootView = null;
 	GridView lstGroups = null;
@@ -64,7 +62,6 @@ public class UserGroups extends BaseFragment implements
 		db = (BaseDBHelper) databaseHelper(scope.context());
 		rootView = inflater.inflate(R.layout.fragment_message_groups_list,
 				container, false);
-		handleArguments(getArguments());
 		return rootView;
 	}
 
@@ -76,12 +73,14 @@ public class UserGroups extends BaseFragment implements
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
+	public void onStart() {
+		super.onStart();
 		follower = new MailFollowerDb(scope.context());
 		scope.context().setTitle("Join a Group");
 		lstGroups = (GridView) rootView.findViewById(R.id.listGroups);
 		groups_loader = new LoadGroups();
 		groups_loader.execute((Void) null);
+
 	}
 
 	private Boolean setupView() {
@@ -205,19 +204,17 @@ public class UserGroups extends BaseFragment implements
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
+	public List<DrawerItem> drawerMenus(Context context) {
 		db = (BaseDBHelper) databaseHelper(context);
+		List<DrawerItem> drawer_items = new ArrayList<DrawerItem>();
 		if (db.getOEInstance().isInstalled("mail.group")) {
-			OEMenu group_menu = new OEMenu();
-			group_menu.setMenuTitle("My Groups");
-			group_menu.setId(0);
+			drawer_items.add(new DrawerItem(TAG, "My Groups", true));
 
-			List<OEMenuItems> group_menu_items = new ArrayList<OEMenuItems>();
 			// default join group menu
 			UserGroups grp = new UserGroups();
 			grp.setArguments(new Bundle());
-			group_menu_items.add(new OEMenuItems(
-					R.drawable.ic_action_social_group, "Join a Group", grp, 0));
+			drawer_items.add(new DrawerItem(TAG, "Join a Group", 0,
+					R.drawable.ic_action_social_group, grp));
 
 			// Add dynamic groups
 			MailFollowerDb followers = new MailFollowerDb(context);
@@ -245,20 +242,17 @@ public class UserGroups extends BaseFragment implements
 					String group_name = group_rec.get(0).get("name").toString();
 					int key = Integer.parseInt(group_rec.get(0).get("id")
 							.toString());
-					OEMenuItems group_menu_item = new OEMenuItems(group_name,
-							getGroupInstance(key), getGroupCount(context, key));
-					group_menu_item.setAutoMenuTagColor(true);
-					group_menu_item.setMenuTagColor(Color
-							.parseColor(tag_colors[i]));
+					drawer_items.add(new DrawerItem(TAG, group_name,
+							getGroupCount(context, key), tag_colors[i],
+							getGroupInstance(key)));
 					menu_color.put("group_" + key,
-							group_menu_item.getMenuTagColor());
-					group_names.put("group_" + key, group_menu_item.getTitle());
-					group_menu_items.add(group_menu_item);
+							Color.parseColor(tag_colors[i]));
+					group_names.put("group_" + key, group_name);
+
 					i++;
 				}
 			}
-			group_menu.setMenuItems(group_menu_items);
-			return group_menu;
+			return drawer_items;
 		} else {
 			return null;
 		}
@@ -304,7 +298,7 @@ public class UserGroups extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 			mPullToRefreshAttacher.setRefreshComplete();
 			setupView();
-			scope.context().refreshMenu(context);
+			scope.context().refreshDrawer(TAG, context);
 		}
 
 	};
@@ -395,7 +389,7 @@ public class UserGroups extends BaseFragment implements
 							}
 						} catch (Exception e) {
 						}
-						scope.context().refreshMenu(scope.context());
+						scope.context().refreshDrawer(TAG, scope.context());
 					}
 				});
 				return true;
@@ -446,5 +440,4 @@ public class UserGroups extends BaseFragment implements
 		}
 
 	}
-
 }

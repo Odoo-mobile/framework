@@ -18,6 +18,8 @@
  */
 package com.openerp.base.account;
 
+import java.util.List;
+
 import openerp.OEVersionException;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -41,9 +43,8 @@ import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OpenERPServerConnection;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class AccountFragment.
  */
@@ -123,7 +124,6 @@ public class AccountFragment extends BaseFragment {
 	 */
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new AccountDBHelper(context);
 	}
 
@@ -136,7 +136,6 @@ public class AccountFragment extends BaseFragment {
 	 */
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 		inflater.inflate(R.menu.menu_fragment_account, menu);
 	}
 
@@ -149,15 +148,12 @@ public class AccountFragment extends BaseFragment {
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		// handle item selection
 
 		switch (item.getItemId()) {
 		case R.id.menu_account_next:
 			StringBuffer serverURL = new StringBuffer();
 			edtServerUrl = (EditText) rootView.findViewById(R.id.edtServerURL);
-			EditText edtServerPort = (EditText) rootView
-					.findViewById(R.id.edtServerPort);
 			edtServerUrl.setError(null);
 			if (TextUtils.isEmpty(edtServerUrl.getText())) {
 				edtServerUrl.setError("Provide Server URL");
@@ -174,10 +170,6 @@ public class AccountFragment extends BaseFragment {
 				}
 
 				serverURL.append(edtServerUrl.getText());
-				if (!TextUtils.isEmpty(edtServerPort.getText())) {
-					serverURL.append(":");
-					serverURL.append(edtServerPort.getText());
-				}
 				this.openERPServerURL = serverURL.toString();
 				serverConnectASync = new ConnectToServer();
 				serverConnectASync.execute((Void) null);
@@ -218,7 +210,6 @@ public class AccountFragment extends BaseFragment {
 		 */
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			// TODO Auto-generated method stub
 
 			try {
 				// Simulate network access.
@@ -275,37 +266,17 @@ public class AccountFragment extends BaseFragment {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#menuHelper(android.content.Context)
-	 */
-	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#handleArguments(android.os.Bundle)
-	 */
-	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
-	}
-
 	@Override
 	public void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		scope.context().getActionBar().setDisplayHomeAsUpEnabled(true);
 		scope.context().getActionBar().setHomeButtonEnabled(true);
 
+	}
+
+	@Override
+	public List<DrawerItem> drawerMenus(Context context) {
+		return null;
 	}
 
 }

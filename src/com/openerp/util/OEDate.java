@@ -24,8 +24,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import android.util.Log;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class OEDate.

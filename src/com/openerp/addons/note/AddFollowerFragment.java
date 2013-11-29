@@ -55,7 +55,7 @@ import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 public class AddFollowerFragment extends BaseFragment {
 
@@ -74,7 +74,6 @@ public class AddFollowerFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
 		setHasOptionsMenu(true);
 		scope = new AppScope(this);
 		rootview = inflater.inflate(R.layout.fragment_add_follower, container,
@@ -83,8 +82,6 @@ public class AddFollowerFragment extends BaseFragment {
 		morePartners = (Button) rootview
 				.findViewById(R.id.btn_note_loadpartners);
 		partner_list = (ListView) rootview.findViewById(R.id.lstfollowers);
-		handleArguments((Bundle) getArguments());
-
 		addFollower.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -107,9 +104,9 @@ public class AddFollowerFragment extends BaseFragment {
 		return new NoteDBHelper(context);
 	}
 
-	@Override
-	public void handleArguments(Bundle bundle) {
-
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle.containsKey("res_id")) {
 			record_id = bundle.getInt("res_id");
 			message = bundle.getString("message");
@@ -118,13 +115,12 @@ public class AddFollowerFragment extends BaseFragment {
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 		SearchView searchView = (SearchView) menu.findItem(
 				R.id.menu_note_search).getActionView();

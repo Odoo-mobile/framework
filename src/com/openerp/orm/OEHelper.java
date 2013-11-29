@@ -37,15 +37,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.ir.Ir_model;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
-import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.OEUser;
+import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.OEDate;
 

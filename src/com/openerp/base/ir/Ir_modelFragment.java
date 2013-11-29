@@ -1,10 +1,11 @@
 package com.openerp.base.ir;
 
+import java.util.List;
+
 import android.content.Context;
-import android.os.Bundle;
 
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 public class Ir_modelFragment extends BaseFragment {
 
@@ -14,14 +15,7 @@ public class Ir_modelFragment extends BaseFragment {
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 

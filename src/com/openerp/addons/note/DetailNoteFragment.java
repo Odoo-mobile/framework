@@ -41,8 +41,8 @@ import com.openerp.addons.messages.MessageComposeActivty;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
 import com.openerp.util.HTMLHelper;
+import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.tags.TagsItems;
 import com.openerp.util.tags.TagsView;
 
@@ -69,7 +69,6 @@ public class DetailNoteFragment extends BaseFragment {
 		note = new Note();
 		rootview = inflater.inflate(R.layout.fragment_detail_note, container,
 				false);
-		handleArguments((Bundle) getArguments());
 		return rootview;
 	}
 
@@ -101,7 +100,6 @@ public class DetailNoteFragment extends BaseFragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-
 		switch (item.getItemId()) {
 		case R.id.menu_note_invite_people:
 
@@ -179,9 +177,9 @@ public class DetailNoteFragment extends BaseFragment {
 		return null;
 	}
 
-	@Override
-	public void handleArguments(Bundle bundle) {
-
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle.containsKey("row_id")) {
 			row_id = bundle.getInt("row_id");
 			row_status = bundle.getString("row_status");
@@ -197,7 +195,7 @@ public class DetailNoteFragment extends BaseFragment {
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 
@@ -264,4 +262,5 @@ public class DetailNoteFragment extends BaseFragment {
 		deleteDialogConfirm.setNegativeButton("Cancel", null);
 		deleteDialogConfirm.show();
 	}
+
 }

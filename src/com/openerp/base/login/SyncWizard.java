@@ -1,6 +1,7 @@
 package com.openerp.base.login;
 
 import java.util.HashMap;
+import java.util.List;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -8,8 +9,6 @@ import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +26,7 @@ import com.openerp.providers.message.MessageProvider;
 import com.openerp.providers.note.NoteProvider;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 public class SyncWizard extends BaseFragment {
 
@@ -55,7 +54,6 @@ public class SyncWizard extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -136,7 +134,6 @@ public class SyncWizard extends BaseFragment {
 	 */
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 		inflater.inflate(R.menu.menu_fragment_sync_wizard, menu);
 	}
 
@@ -149,7 +146,6 @@ public class SyncWizard extends BaseFragment {
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		// handle item selection
 
 		switch (item.getItemId()) {
@@ -172,13 +168,7 @@ public class SyncWizard extends BaseFragment {
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
-
-	}
-
-	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 

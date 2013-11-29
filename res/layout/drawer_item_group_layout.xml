@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/txvDrawerItemTitle"
+        style="?android:attr/textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingBottom="2dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:text="Title"
+        android:textAllCaps="true"
+        android:textColor="#4B4B4D"
+        android:textStyle="bold" />
+
+    <View
+        android:id="@+id/viewDrawerGroupView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#BEBEBE" />
+
+</LinearLayout>

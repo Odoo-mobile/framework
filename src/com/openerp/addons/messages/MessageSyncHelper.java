@@ -33,7 +33,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 
-import com.openerp.MainActivity;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.DataSetChangeReceiver;

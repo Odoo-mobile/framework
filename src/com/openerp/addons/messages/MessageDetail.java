@@ -33,7 +33,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,7 +41,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -62,12 +60,10 @@ import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
-import com.openerp.util.HTMLHelper;
 import com.openerp.util.OEBinaryDownloadHelper;
 import com.openerp.util.OEFileSizeHelper;
+import com.openerp.util.drawer.DrawerItem;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class MessageDetail.
  */
@@ -109,8 +105,6 @@ public class MessageDetail extends BaseFragment {
 				container, false);
 		oea_name = OpenERPAccountManager.currentUser(MainActivity.context)
 				.getAndroidName();
-		handleArguments((Bundle) getArguments());
-
 		return rootView;
 	}
 
@@ -297,18 +291,13 @@ public class MessageDetail extends BaseFragment {
 	 */
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new MessageDBHelper(context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#handleArguments(android.os.Bundle)
-	 */
 	@Override
-	public void handleArguments(Bundle bundle) {
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle != null) {
 			if (bundle.containsKey("message_id")) {
 				message_id = bundle.getInt("message_id");
@@ -317,7 +306,6 @@ public class MessageDetail extends BaseFragment {
 				messageDetails.execute((Void) null);
 			}
 		}
-
 	}
 
 	private boolean setupMessageDetail(int message_id) {
@@ -447,15 +435,8 @@ public class MessageDetail extends BaseFragment {
 		return lists;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#menuHelper(android.content.Context)
-	 */
 	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 
@@ -628,7 +609,6 @@ public class MessageDetail extends BaseFragment {
 						String.valueOf(parent_id) });
 		for (HashMap<String, Object> id : ids) {
 			if (parent_id != Integer.parseInt(id.get("id").toString())) {
-
 				args.addArg(Integer.parseInt(id.get("id").toString()));
 			}
 		}
@@ -647,7 +627,9 @@ public class MessageDetail extends BaseFragment {
 			if (resultCode == Activity.RESULT_OK) {
 				Bundle bundle = new Bundle();
 				bundle.putInt("message_id", message_id);
-				handleArguments(bundle);
+				LoadMessageDetails messageDetails = new LoadMessageDetails(
+						message_id);
+				messageDetails.execute((Void) null);
 			}
 			break;
 		}
@@ -700,9 +682,10 @@ public class MessageDetail extends BaseFragment {
 								.setVisibility(View.VISIBLE);
 					} catch (Exception e) {
 					}
-
-					MarkingAsRead read = new MarkingAsRead(message_id);
-					read.execute((Void) null);
+					if (success) {
+						MarkingAsRead read = new MarkingAsRead(message_id);
+						read.execute((Void) null);
+					}
 				}
 			});
 		}

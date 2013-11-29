@@ -58,9 +58,9 @@ import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
-import com.openerp.support.menu.OEMenu;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.OnBackButtonPressedListener;
+import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.tags.TagsItems;
 import com.openerp.util.tags.TagsView;
 
@@ -97,7 +97,6 @@ public class EditNoteFragment extends BaseFragment implements
 		db = (NoteDBHelper) getModel();
 		rootview = inflater.inflate(R.layout.fragment_edit_note, container,
 				false);
-		handleArguments((Bundle) getArguments());
 		addTags = (ImageView) rootview.findViewById(R.id.imgBtnEditTags);
 		addTags.setOnClickListener(new OnClickListener() {
 			@Override
@@ -265,8 +264,9 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
-
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle.containsKey("row_id")) {
 			noteMemo = (EditText) rootview
 					.findViewById(R.id.txv_editNote_Description);
@@ -300,7 +300,7 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 

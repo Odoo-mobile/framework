@@ -31,18 +31,13 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
-import android.util.Log;
 
-import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.services.ContactSyncService;
 import com.openerp.util.Base64Helper;
 
 public class Res_PartnerSyncHelper {

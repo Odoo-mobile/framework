@@ -36,15 +36,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.openerp.MainActivity;
 import com.openerp.addons.messages.MailFollowerDb;
-import com.openerp.addons.messages.MessageDBHelper;
 import com.openerp.addons.messages.UserGroupsDb;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.SyncFinishReceiver;
-import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OpenERPServerConnection;
 
 // TODO: Auto-generated Javadoc
