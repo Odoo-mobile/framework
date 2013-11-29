@@ -44,7 +44,6 @@ import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.OpenERPServerConnection;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class UserGroupsSyncService.
  */
@@ -123,7 +122,7 @@ public class UserGroupsSyncService extends Service {
 			if (OpenERPServerConnection.isNetworkAvailable(context)) {
 				Log.i(TAG + "::performSync()", "Sync with Server Started");
 				OEHelper oe = usergroups.getOEInstance();
-				if (oe.syncWithServer(usergroups)) {
+				if (oe.syncWithServer(usergroups, null, false, false)) {
 					MailFollowerDb group_follower = new MailFollowerDb(context);
 					OEHelper oe_1 = group_follower.getOEInstance();
 					JSONObject domain = new JSONObject();
