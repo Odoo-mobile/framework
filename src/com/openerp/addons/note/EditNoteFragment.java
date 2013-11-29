@@ -42,11 +42,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
@@ -55,7 +57,9 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
+import com.openerp.support.OEUser;
 import com.openerp.support.menu.OEMenu;
+import com.openerp.util.HTMLHelper;
 import com.openerp.util.OnBackButtonPressedListener;
 import com.openerp.util.tags.TagsItems;
 import com.openerp.util.tags.TagsView;
@@ -66,30 +70,23 @@ public class EditNoteFragment extends BaseFragment implements
 	View rootview;
 	ImageView addTags;
 	Spinner noteStages;
+	EditText noteMemo;
+	TextView descriptionHeader;
+	TagsView noteTags;
+	WebView webViewpad;
+	NoteDBHelper db = null;
 	ArrayAdapter<String> stageAdapter = null;
 	HashMap<String, String> stages = new HashMap<String, String>();;
-	EditText noteName, noteMemo;
+	LinkedHashMap<String, String> note_tags = null;
+	HashMap<String, TagsItems> selectedTags = new HashMap<String, TagsItems>();
+	private static OEHelper oe_obj = null;
 	int row_id = 0;
-	ArrayList<String> stagelist = null;
-	String row_status = null;
 	String stageid = null;
 	String tagid = null;
-	String memo = null;
-	String name = null;
-	NoteDBHelper db = null;
-	ComposeNoteActivity composeNote = null;
-	JSONArray stage_name = null;
 	String originalMemo, originialStage;
-	JSONArray tagID = new JSONArray();
-	ArrayList<String> tagName = new ArrayList<String>();
-	private static OEHelper oe_obj = null;
-	boolean flag = false;
-
-	LinkedHashMap<String, String> note_tags = null;
-	ArrayList<String> keyList = null;
 	String[] stringArray = null;
-	TagsView noteTags;
-	HashMap<String, TagsItems> selectedTags = new HashMap<String, TagsItems>();
+	Boolean padAdded = false;
+	boolean flag = false;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -101,7 +98,6 @@ public class EditNoteFragment extends BaseFragment implements
 		rootview = inflater.inflate(R.layout.fragment_edit_note, container,
 				false);
 		handleArguments((Bundle) getArguments());
-
 		addTags = (ImageView) rootview.findViewById(R.id.imgBtnEditTags);
 		addTags.setOnClickListener(new OnClickListener() {
 			@Override
@@ -112,7 +108,6 @@ public class EditNoteFragment extends BaseFragment implements
 		});
 
 		scope.context().setOnBackPressed(new OnBackButtonPressedListener() {
-
 			@Override
 			public boolean onBackPressed() {
 				if (isContentChanged(noteMemo.getText().toString())) {
@@ -127,6 +122,7 @@ public class EditNoteFragment extends BaseFragment implements
 				return true;
 			}
 		});
+
 		if (oe_obj == null) {
 			oe_obj = getOEInstance();
 		}
@@ -134,9 +130,11 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	public void openTagList() {
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(scope.context());
-		note_tags = getNoteTag();
-		keyList = new ArrayList<String>(note_tags.keySet());
+		note_tags = db.getAllNoteTags();
+		ArrayList<String> keyList = new ArrayList<String>(note_tags.keySet());
+
 		if (keyList.size() > 0) {
 			stringArray = new String[keyList.size() - 1];
 			stringArray = keyList.toArray(stringArray);
@@ -176,6 +174,7 @@ public class EditNoteFragment extends BaseFragment implements
 		} else {
 			builder.setTitle("You don't have any tags \ncreate tag");
 		}
+
 		builder.setNegativeButton("Cancel",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface di, int i) {
@@ -184,13 +183,12 @@ public class EditNoteFragment extends BaseFragment implements
 
 		builder.setNeutralButton("Create",
 				new DialogInterface.OnClickListener() {
-
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
 						createNotetag();
 					}
 				});
+
 		final Dialog dialog = builder.create();
 		dialog.show();
 	}
@@ -206,45 +204,31 @@ public class EditNoteFragment extends BaseFragment implements
 					public void onClick(DialogInterface di, int i) {
 						// do something with onClick
 						if (tag.getText().length() > 0) {
-							writeNoteTags(tag.getText().toString());
+							LinkedHashMap<String, String> newTag = db
+									.writeNoteTags(tag.getText().toString());
+							noteTags.addObject(new TagsItems(Integer
+									.parseInt(newTag.get("newID")), newTag
+									.get("tagName"), ""));
 						} else {
 							Toast.makeText(scope.context(), "Enter Tag First",
 									Toast.LENGTH_LONG).show();
 						}
 					}
 				});
+
 		builder.setNegativeButton("Cancel",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface di, int i) {
 					}
 				});
+
 		builder.create().show();
-	}
-
-	public void writeNoteTags(String tagname) {
-
-		ContentValues values = new ContentValues();
-		values.put("name", tagname);
-		db = new NoteDBHelper(scope.context());
-		NoteDBHelper.NoteTags notetagObj = db.new NoteTags(scope.context());
-		int newId = notetagObj.createRecordOnserver(notetagObj, values);
-		values.put("id", newId);
-		notetagObj.create(notetagObj, values);
-		noteTags.addObject(new TagsItems(newId, tagname, ""));
-	}
-
-	private JSONArray getSelectedTagId() {
-		JSONArray list = new JSONArray();
-		for (String key : selectedTags.keySet()) {
-			list.put(selectedTags.get(key).getId());
-		}
-		return list;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
 
+		switch (item.getItemId()) {
 		case R.id.menu_note_edit_save:
 			updateNote(row_id);
 			flag = true;
@@ -270,11 +254,9 @@ public class EditNoteFragment extends BaseFragment implements
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
 		inflater.inflate(R.menu.menu_fragment_note_detail, menu);
-
 		// disabling the MORE [:] menu
 		MenuItem item_operation = menu.findItem(R.id.menu_note_operation);
 		item_operation.setVisible(false);
-
 	}
 
 	@Override
@@ -288,13 +270,31 @@ public class EditNoteFragment extends BaseFragment implements
 		if (bundle.containsKey("row_id")) {
 			noteMemo = (EditText) rootview
 					.findViewById(R.id.txv_editNote_Description);
+			descriptionHeader = (TextView) rootview
+					.findViewById(R.id.txv_editNote_Description_Heading);
+			webViewpad = (WebView) rootview
+					.findViewById(R.id.txv_editNote_Description_Pad);
+
 			row_id = bundle.getInt("row_id");
 			stageid = bundle.getString("stage_id");
 			tagid = bundle.getString("tag_id");
-
 			setNoteTags(tagid);
-			setNoteStages(scope.context());
+			setCurrentNoteStages(scope.context());
 			originalMemo = bundle.getString("row_details");
+
+			// If Pad Installed
+			if (originalMemo == null) {
+				padAdded = true;
+				noteMemo.setVisibility(View.GONE);
+				descriptionHeader.setVisibility(View.GONE);
+				originalMemo = bundle.getString("padurl");
+				webViewpad.setVisibility(View.VISIBLE);
+				webViewpad.getSettings().setJavaScriptEnabled(true);
+				webViewpad.getSettings()
+						.setJavaScriptCanOpenWindowsAutomatically(true);
+				webViewpad.loadUrl(originalMemo + "?showChat=false&userName="
+						+ OEUser.current(scope.context()).getUsername());
+			}
 			noteMemo.setText(bundle.getString("row_details"));
 		}
 	}
@@ -305,11 +305,11 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	public void setNoteTags(String tagid) {
+
 		noteTags = (TagsView) rootview.findViewById(R.id.txv_editNote_Tag);
 		noteTags.allowDuplicates(false);
 		noteTags.setTokenListener(this);
 		noteTags.showImage(false);
-		// noteTags.allowDuplicates(false);
 		@SuppressWarnings("unused")
 		String[] note_tags_items = getNoteTags(String.valueOf(tagid),
 				scope.context());
@@ -325,6 +325,7 @@ public class EditNoteFragment extends BaseFragment implements
 				.executeSQL(
 						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { note_note_id, oea_name, oea_name });
+
 		if (records.size() > 0) {
 			for (HashMap<String, Object> row : records) {
 				note_tags.add(row.get("name").toString());
@@ -335,16 +336,17 @@ public class EditNoteFragment extends BaseFragment implements
 		return note_tags.toArray(new String[note_tags.size()]);
 	}
 
-	public void setNoteStages(Context context) {
+	// This Method will set the saved stages for selected note
+	public void setCurrentNoteStages(Context context) {
 
 		stages = new HashMap<String, String>();
-		stagelist = new ArrayList<String>();
+		ArrayList<String> stagelist = new ArrayList<String>();
 
 		db = new NoteDBHelper(context);
 		NoteDBHelper.NoteStages stagesobj = db.new NoteStages(context);
 		HashMap<String, Object> data = stagesobj.search(stagesobj);
-
 		int total = Integer.parseInt(data.get("total").toString());
+
 		if (total > 0) {
 			@SuppressWarnings("unchecked")
 			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
@@ -374,7 +376,7 @@ public class EditNoteFragment extends BaseFragment implements
 		try {
 			// Format stage_id = [[6,"Today"]]
 			if (!stageid.equalsIgnoreCase("false")) {
-				stage_name = new JSONArray(stageid);
+				JSONArray stage_name = new JSONArray(stageid);
 				originialStage = stage_name.getJSONArray(0).getString(1)
 						.toString();
 				return stage_name.getJSONArray(0).getString(1).toString();
@@ -382,7 +384,6 @@ public class EditNoteFragment extends BaseFragment implements
 				originialStage = "New";
 				return "New";
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -390,28 +391,49 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	public void updateNote(int row_id) {
+
 		try {
-
-			tagID = getSelectedTagId();
-
-			// For using generateName() of composeNote
-			composeNote = new ComposeNoteActivity();
+			JSONArray tagID = db.getSelectedTagId(selectedTags);
 			long stage_id = Long.parseLong(stages.get(noteStages
 					.getSelectedItem().toString()));
-
 			ContentValues values = new ContentValues();
-			values.put("stage_id", stage_id);
-			values.put("name",
-					composeNote.generateName(noteMemo.getText().toString()));
-			values.put("memo", Html.toHtml(noteMemo.getText()));
-
-			db = new NoteDBHelper(scope.context());
-
 			JSONObject vals = new JSONObject();
-			vals.put("stage_id",
-					Integer.parseInt(values.get("stage_id").toString()));
-			vals.put("memo", values.get("memo").toString());
-			vals.put("name", values.get("name").toString());
+
+			// If Pad Installed Over Server
+			if (padAdded) {
+				JSONArray url = new JSONArray();
+				url.put(originalMemo);
+				JSONObject obj = oe_obj.call_kw("pad.common",
+						"pad_get_content", url);
+
+				// HTMLHelper helper = new HTMLHelper();
+				String link = HTMLHelper.htmlToString(obj.getString("result"));
+				values.put("stage_id", stage_id);
+				vals.put("stage_id",
+						Integer.parseInt(values.get("stage_id").toString()));
+
+				values.put("name", db.generateName(link));
+				vals.put("name", values.get("name").toString());
+
+				values.put("memo", obj.getString("result"));
+				vals.put("memo", values.get("memo").toString());
+
+				values.put("note_pad_url", originalMemo);
+				vals.put("note_pad_url", values.get("note_pad_url").toString());
+			} // If Pad Not Installed Over Server
+			else {
+				values.put("stage_id", stage_id);
+				vals.put("stage_id",
+						Integer.parseInt(values.get("stage_id").toString()));
+
+				values.put("name",
+						db.generateName(noteMemo.getText().toString()));
+				vals.put("name", values.get("name").toString());
+
+				values.put("memo", Html.toHtml(noteMemo.getText()));
+				vals.put("memo", values.get("memo").toString());
+			}
+
 			JSONArray tag_ids = new JSONArray();
 			tag_ids.put(6);
 			tag_ids.put(false);
@@ -419,7 +441,10 @@ public class EditNoteFragment extends BaseFragment implements
 			tag_ids.put(c_ids);
 			vals.put("tag_ids", new JSONArray("[" + tag_ids.toString() + "]"));
 
+			// This will update Notes over Server And Local database
+			db = new NoteDBHelper(scope.context());
 			if (oe_obj.updateValues(db.getModelName(), vals, row_id)) {
+				db.write(db, values, row_id, true);
 				db.executeSQL(
 						"delete from note_note_note_tag_rel where note_note_id = ? and oea_name = ?",
 						new String[] { row_id + "",
@@ -440,6 +465,7 @@ public class EditNoteFragment extends BaseFragment implements
 	}
 
 	public boolean isContentChanged(String memo) {
+
 		if ((originalMemo.length() != memo.length())
 				|| (!originialStage.equalsIgnoreCase(noteStages
 						.getSelectedItem().toString()))) {
@@ -448,13 +474,9 @@ public class EditNoteFragment extends BaseFragment implements
 		return false;
 	}
 
-	@Override
-	public void onPause() {
-		super.onPause();
-	}
-
 	public void openDailogview(String title, String message,
 			String positivebtnText, String negativebtnText) {
+
 		AlertDialog.Builder deleteDialogConfirm = new AlertDialog.Builder(
 				scope.context());
 		deleteDialogConfirm.setTitle(title);
@@ -464,46 +486,29 @@ public class EditNoteFragment extends BaseFragment implements
 		deleteDialogConfirm.setPositiveButton(positivebtnText,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
+						flag = true;
 						getActivity().getSupportFragmentManager()
 								.popBackStack();
 					}
 				});
-		deleteDialogConfirm.setNegativeButton(negativebtnText, null);
-		deleteDialogConfirm.show();
-	}
 
-	public LinkedHashMap<String, String> getNoteTag() {
-		String oea_name = OpenERPAccountManager.currentUser(
-				MainActivity.context).getAndroidName();
-		db = new NoteDBHelper(scope.context());
-		List<HashMap<String, Object>> records = db.executeSQL(
-				"SELECT id,name,oea_name FROM note_tag where oea_name = ?",
-				new String[] { oea_name });
-		LinkedHashMap<String, String> note_tag = new LinkedHashMap<String, String>();
-		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
-				note_tag.put(row.get("name").toString(), row.get("id")
-						.toString());
-			}
-		}
-		return note_tag;
+		deleteDialogConfirm.setNegativeButton(negativebtnText, null);
+
+		deleteDialogConfirm.show();
 	}
 
 	@Override
 	public void onTokenAdded(Object token, View view) {
-		// TODO Auto-generated method stub
 		TagsItems item = (TagsItems) token;
 		selectedTags.put("" + item.getId(), item);
 	}
 
 	@Override
 	public void onTokenSelected(Object token, View view) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onTokenRemoved(Object token) {
-		// TODO Auto-generated method stub
 		TagsItems item = (TagsItems) token;
 		selectedTags.remove("" + item.getId());
 	}

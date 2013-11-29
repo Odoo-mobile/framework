@@ -44,7 +44,6 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.Fields;
@@ -61,21 +60,21 @@ import com.openerp.support.menu.OEMenu;
 public class AddFollowerFragment extends BaseFragment {
 
 	View rootview;
-	Button addFollower, morePartners;
 	ListView partner_list;
-	ArrayList<String> partners;
+	Button addFollower, morePartners;
+	Res_PartnerDBHelper res_partners = null;
 	OEListViewAdapter listAdapters = null;
 	List<OEListViewRows> listRows = null;
+	OEHelper oe = null;
+	ArrayList<String> partners;
 	int record_id = 0;
 	String message = null;
 	Boolean flag = false;
-	Res_PartnerDBHelper res_partners = null;
-	OEHelper oe = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+
 		setHasOptionsMenu(true);
 		scope = new AppScope(this);
 		rootview = inflater.inflate(R.layout.fragment_add_follower, container,
@@ -85,6 +84,7 @@ public class AddFollowerFragment extends BaseFragment {
 				.findViewById(R.id.btn_note_loadpartners);
 		partner_list = (ListView) rootview.findViewById(R.id.lstfollowers);
 		handleArguments((Bundle) getArguments());
+
 		addFollower.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -104,7 +104,6 @@ public class AddFollowerFragment extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new NoteDBHelper(context);
 	}
 
@@ -125,9 +124,8 @@ public class AddFollowerFragment extends BaseFragment {
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
-		inflater.inflate(R.menu.menu_fragment_note, menu);
 
+		inflater.inflate(R.menu.menu_fragment_note, menu);
 		SearchView searchView = (SearchView) menu.findItem(
 				R.id.menu_note_search).getActionView();
 		searchView.setOnQueryTextListener(getQueryListener(listAdapters));
@@ -151,16 +149,16 @@ public class AddFollowerFragment extends BaseFragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		return super.onOptionsItemSelected(item);
 	}
 
 	private List<OEListViewRows> getListRows() {
-		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
 
+		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
 		res_partners = new Res_PartnerDBHelper(scope.context());
 		HashMap<String, Object> partners = res_partners.search(res_partners);
 		int total = Integer.parseInt(partners.get("total").toString());
+
 		if (total > 0) {
 			@SuppressWarnings("unchecked")
 			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) partners
@@ -178,13 +176,16 @@ public class AddFollowerFragment extends BaseFragment {
 	}
 
 	public void getPartnersFromLocal() {
+
 		String[] from = new String[] { "image_small", "name", "email" };
 		int[] to = new int[] { R.id.imgUserPicture, R.id.txvPartner,
 				R.id.txvPartnerEmail };
 		listRows = new ArrayList<OEListViewRows>();
+
 		if (listRows != null && listRows.size() <= 0) {
 			listRows = getListRows();
 		}
+
 		listAdapters = new OEListViewAdapter(scope.context(),
 				R.layout.res_partners, listRows, from, to, db);
 		listAdapters.addImageColumn("image_small");
@@ -198,7 +199,6 @@ public class AddFollowerFragment extends BaseFragment {
 		if (!flag) {
 			res_partners = new Res_PartnerDBHelper(scope.context());
 			oe = res_partners.getOEInstance();
-
 			try {
 				ArrayList<Fields> cols = res_partners.getServerColumns();
 				JSONObject fields = new JSONObject();
@@ -218,22 +218,20 @@ public class AddFollowerFragment extends BaseFragment {
 				for (int i = 0; i < result.getInt("length"); i++) {
 					JSONObject row = result.getJSONArray("records")
 							.getJSONObject(i);
-
 					HashMap<String, Object> rowHash = new HashMap<String, Object>();
 					@SuppressWarnings("unchecked")
 					Iterator<String> keys = row.keys();
+
 					while (keys.hasNext()) {
 						String key = keys.next();
 						rowHash.put(key, row.get(key));
 					}
-
 					final OEListViewRows listRow = new OEListViewRows(
 							row.getInt("id"), rowHash);
 
 					scope.context().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							// TODO Auto-generated method stub
 							listRows.add(listRow);
 							listAdapters.refresh(listRows);
 						}
@@ -247,7 +245,6 @@ public class AddFollowerFragment extends BaseFragment {
 			loaded = false;
 		}
 		return loaded;
-
 	}
 
 	public void getSelecetedPartners() {
@@ -256,13 +253,16 @@ public class AddFollowerFragment extends BaseFragment {
 		for (int i = 0; i < checked.size(); i++) {
 			int key = checked.keyAt(i);
 			boolean value = checked.get(key);
+
 			if (value) {
 				res_partners = new Res_PartnerDBHelper(scope.context());
+
 				if (!res_partners.hasRecord(res_partners, listRows.get(key)
 						.getRow_id())) {
 					ContentValues values = new ContentValues();
 					ArrayList<Fields> cols = new Res_PartnerDBHelper(
 							scope.context()).getServerColumns();
+
 					for (Fields field : cols) {
 						values.put(field.getName(), listRows.get(key)
 								.getRow_data().get(field.getName()).toString());
@@ -281,7 +281,6 @@ public class AddFollowerFragment extends BaseFragment {
 		res_partners = new Res_PartnerDBHelper(scope.context());
 		oe = res_partners.getOEInstance();
 		try {
-
 			JSONObject args = new JSONObject();
 			args.put("res_model", "note.note");
 			args.put("res_id", record_id);
@@ -294,8 +293,6 @@ public class AddFollowerFragment extends BaseFragment {
 			partner_ids.put(c_ids);
 			args.put("partner_ids", new JSONArray("[" + partner_ids.toString()
 					+ "]"));
-
-			// oe.debugMode(true);
 			JSONObject result = oe.createNew("mail.wizard.invite", args);
 			int id = result.getInt("result");
 
@@ -322,7 +319,6 @@ public class AddFollowerFragment extends BaseFragment {
 		OEDialog pdialog = null;
 
 		public LoadPartners() {
-			// TODO Auto-generated constructor stub
 			pdialog = new OEDialog(scope.context(), true, "Loading Partners...");
 		}
 
@@ -333,14 +329,12 @@ public class AddFollowerFragment extends BaseFragment {
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-
 			return getPartnersFromServer();
-
 		}
 
 		@Override
 		protected void onPostExecute(final Boolean success) {
+
 			pdialog.hide();
 			if (!success) {
 				Toast.makeText(scope.context(), "No More Partners...",
@@ -348,5 +342,4 @@ public class AddFollowerFragment extends BaseFragment {
 			}
 		}
 	}
-
 }

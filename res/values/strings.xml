@@ -36,9 +36,12 @@ Your inbox contains private messages or emails sent to you as well as informatio
 
 When you process messages in your inbox, you can mark some as todo. From this menu, you can process all your todo.</string>
     <string name="message_no_group_message">No message in this group.</string>
+
     <!-- Compose Note Fragment Strings -->
-    <string name="compose_note_stages">Stages</string>
+    <string name="compose_note_tags">Tags :</string>
+    <string name="compose_note_stages">Stages :</string>
     <string name="compose_note_description">Description</string>
+    <string name="imgview_note_add_tags">This will open the dailogbox to select tags</string>
 
     <!-- Detail Note Fragment Strings -->
     <string name="detail_note_name">Note Name</string>

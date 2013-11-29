@@ -68,28 +68,26 @@ import com.openerp.util.tags.TagsView;
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
 
+	View rootView = null;
+	TextView noteSyncProcessText, emptyNotesText;
+	ListView lstNotes = null;
+	OEListViewAdapter listAdapter = null;
+	List<OEListViewRows> listRows = null;
+	NoteDBHelper db = null;
+	JSONObject res = null;
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
-	View rootView = null;
-	TextView noteSyncProcessText, emptyNotesText, noteTags;
-	ListView lstNotes = null;
-	List<OEListViewRows> listRows = null;
-	OEListViewAdapter listAdapter = null;
+	SwipeDismissListViewTouchListener touchListener = null;
+	static HashMap<String, Integer> stage_colors = new HashMap<String, Integer>();
+	LinkedHashMap<String, String> stages = null;
+	private static final int NOTE_ID = 0;
+	String[] from = new String[] { "name", "memo", "stage_id" };
+	String stage_id = "-1";
+	static boolean rawStrikeStatus = false;
+	boolean isSynced = false;
 	String tag_colors[] = new String[] { "#9933CC", "#669900", "#FF8800",
 			"#CC0000", "#59A2BE", "#808080", "#192823", "#0099CC", "#218559",
 			"#EBB035" };
-	String[] from = new String[] { "name", "memo", "stage_id" };
-	static HashMap<String, Integer> stage_colors = new HashMap<String, Integer>();
-	LinkedHashMap<String, String> stages = null;
-	static boolean rawStrikeStatus = false;
-	String stage_id = "-1";
-	private static final int NOTE_ID = 0;
-	SwipeDismissListViewTouchListener touchListener = null;
-	NoteDBHelper db = null;
-	JSONObject res = null;
-	String[] note_tags = null;
-	String tags = "";
-	boolean isSynced = false;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -107,7 +105,6 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 
 		// Setting required menu for the action bar
 		inflater.inflate(R.menu.menu_fragment_note, menu);
@@ -124,10 +121,9 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handling menu item selection
+
 		switch (item.getItemId()) {
 		case R.id.menu_note_compose:
-			// Opening activity for composing Note
 			Intent composeNote = new Intent(scope.context(),
 					ComposeNoteActivity.class);
 			startActivityForResult(composeNote, NOTE_ID);
@@ -139,8 +135,8 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
 
+		switch (requestCode) {
 		case NOTE_ID:
 			if (resultCode == Activity.RESULT_OK) {
 				int new_id = data.getExtras().getInt("result");
@@ -165,13 +161,12 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return new NoteDBHelper(context);
 	}
 
 	@Override
 	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
+
 		if (bundle != null) {
 			setNoteStages(scope.context());
 			stage_id = bundle.getString("stage");
@@ -188,7 +183,6 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
 
 		db = (NoteDBHelper) databaseHelper(context);
 		if (db.getOEInstance().isInstalled("note.note")) {
@@ -197,7 +191,7 @@ public class Note extends BaseFragment implements
 			menu.setMenuTitle("Notes");
 			setNoteStages(context);
 
-			// Setting list of stages under Note in Drawable menu
+			// Setting Note Stages In Drawable
 			List<OEMenuItems> items = new ArrayList<OEMenuItems>();
 			items.add(new OEMenuItems(R.drawable.ic_menu_notes, "Notes",
 					getFragBundle("stage", "-1"), getCount("-1", context)));
@@ -229,6 +223,7 @@ public class Note extends BaseFragment implements
 	}
 
 	private Note getFragBundle(String key, String val) {
+
 		Note note = new Note();
 		Bundle bundle = new Bundle();
 		bundle.putString(key, val);
@@ -236,7 +231,7 @@ public class Note extends BaseFragment implements
 		return note;
 	}
 
-	/* Method for counting Notes according stages */
+	/* Method For Calculating Notes According Stages */
 	public int getCount(String stage_id, Context context) {
 
 		int count = 0;
@@ -270,7 +265,6 @@ public class Note extends BaseFragment implements
 	// Allow Activity to pass us it's PullToRefreshAttacher
 	void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
 		mPullAttacher = attacher;
-
 	}
 
 	@Override
@@ -312,20 +306,16 @@ public class Note extends BaseFragment implements
 		int[] to = new int[] { R.id.txvNoteListItem, R.id.txvNoteListDetail,
 				R.id.txvNoteListTags };
 		listRows = new ArrayList<OEListViewRows>();
-
 		if (listRows != null && listRows.size() <= 0) {
 			listRows = getListRows(stage_id);
 		}
-
 		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
 				R.layout.listview_fragment_note_listitem, listRows, from, to,
 				db);
-
 		// Telling adapter to clean HTML text for key value
 		listAdapter.cleanHtmlToTextOn("memo");
 		lstNotes.setAdapter(listAdapter);
-
 		listAdapter.addViewListener(new OEListViewOnCreateListener() {
 
 			@Override
@@ -350,13 +340,13 @@ public class Note extends BaseFragment implements
 					// if (note_tags_items.length <= 0) {
 					noteTags.setVisibility(View.GONE);
 					// }
-
 					// Fetching Note Stage and Setting Background color for that
 					String stageInfo = row_data.getRow_data().get("stage_id")
 							.toString();
 					if (!stageInfo.equals("false")) {
 						JSONArray stage_id = new JSONArray(stageInfo);
 						String stageid = stage_id.getJSONArray(0).getString(0);
+
 						if (stage_colors.containsKey("stage_" + stageid)) {
 							txvTag.setBackgroundColor(Integer
 									.parseInt(stage_colors.get(
@@ -376,7 +366,6 @@ public class Note extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
-				// TODO Auto-generated method stub
 
 				int rowId = listRows.get(position).getRow_id();
 				String rowStatus = listRows.get(position).getRow_data()
@@ -426,10 +415,10 @@ public class Note extends BaseFragment implements
 					public void onDismiss(ListView listView,
 							int[] reverseSortedPositions) {
 						for (int position : reverseSortedPositions) {
-
 							int rowId = listRows.get(position).getRow_id();
 							String raw_status = listRows.get(position)
 									.getRow_data().get("open").toString();
+
 							// Handling functionality to change note status
 							// open --> close OR close --> open
 							if (!rawStrikeStatus) {
@@ -495,11 +484,11 @@ public class Note extends BaseFragment implements
 				Toast.makeText(context, "Moved to Active notes.",
 						Toast.LENGTH_LONG).show();
 			}
+
 			// Refreshing list view after synchronisation
 			// complete
 			scope.context().refreshMenu(scope.context());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -530,7 +519,6 @@ public class Note extends BaseFragment implements
 		// exa.
 		// "You don't have any notes right now. / You don't have any active notes right now."
 		if (total == 0) {
-
 			// Setting text for empty archive list view
 			if (stage_id.equalsIgnoreCase("-2")) {
 				emptyNotesText
@@ -554,6 +542,7 @@ public class Note extends BaseFragment implements
 		} else {
 			if (db.isEmptyTable(db) && !isSynced) {
 				isSynced = true;
+
 				// Hiding text message of empty list view
 				// due to visibility of sync process message
 				emptyNotesText.setVisibility(View.GONE);
@@ -576,6 +565,7 @@ public class Note extends BaseFragment implements
 	public void setNoteStages(Context context) {
 
 		stages = new LinkedHashMap<String, String>();
+
 		try {
 			OEHelper oe = new OEHelper(context,
 					OpenERPAccountManager.currentUser(context));
@@ -592,12 +582,15 @@ public class Note extends BaseFragment implements
 							+ "],[\"id\",\"not in\","
 							+ JSONDataHelper.intArrayToJSONArray(stagesobj
 									.localIds(stagesobj)) + "]]"));
+
 			if (stagesobj.isEmptyTable(stagesobj)) {
 				oe.syncWithServer(stagesobj, domain);
 			}
+
 			HashMap<String, Object> data = stagesobj.search(stagesobj, null,
 					null, null, null, null, "id", "ASC");
 			int total = Integer.parseInt(data.get("total").toString());
+
 			if (total > 0) {
 				@SuppressWarnings("unchecked")
 				List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
@@ -623,6 +616,7 @@ public class Note extends BaseFragment implements
 				.executeSQL(
 						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { note_note_id, oea_name, oea_name });
+
 		if (records.size() > 0) {
 			for (HashMap<String, Object> row : records) {
 				note_tags.add(row.get("name").toString());
@@ -630,5 +624,4 @@ public class Note extends BaseFragment implements
 		}
 		return note_tags.toArray(new String[note_tags.size()]);
 	}
-
 }
