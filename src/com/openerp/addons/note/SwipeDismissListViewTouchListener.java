@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -43,7 +42,7 @@ import com.openerp.PullToRefreshAttacher;
 import com.openerp.providers.note.NoteProvider;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 /**
  * A {@link View.OnTouchListener} that makes the list items in a
@@ -261,7 +260,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 
 			// setting original background color[white] while swapping the rows
 			// COMPLETE.
-			//view.setBackgroundColor(Color.WHITE);
+			// view.setBackgroundColor(Color.WHITE);
 
 			float deltaX = motionEvent.getRawX() - mDownX;
 			mVelocityTracker.addMovement(motionEvent);
@@ -423,7 +422,6 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 
 	@Override
 	public void onRefreshStarted(View arg0) {
-		// TODO Auto-generated method stub
 		mPullAttacher.setRefreshing(true);
 		((MainActivity) context).requestSync(NoteProvider.AUTHORITY);
 	}
@@ -450,26 +448,18 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 			mPullAttacher.setRefreshing(false);
 			// refreshing list view after synchronisation
-			((MainActivity) context).refreshMenu(context);
+			((MainActivity) context).refreshDrawer(Note.TAG, context);
 			mPullAttacher.setRefreshComplete();
 		}
 	};
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 }

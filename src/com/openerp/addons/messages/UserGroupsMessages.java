@@ -17,7 +17,7 @@ import com.openerp.orm.BaseDBHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.listview.OEListViewRows;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 public class UserGroupsMessages extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
@@ -36,7 +36,6 @@ public class UserGroupsMessages extends BaseFragment implements
 		db = (BaseDBHelper) databaseHelper(scope.context());
 		rootView = inflater
 				.inflate(R.layout.fragment_message, container, false);
-		handleArguments(getArguments());
 		return rootView;
 	}
 
@@ -135,7 +134,9 @@ public class UserGroupsMessages extends BaseFragment implements
 	}
 
 	@Override
-	public void handleArguments(Bundle bundle) {
+	public void onStart() {
+		super.onStart();
+		Bundle bundle = getArguments();
 		if (bundle != null) {
 			int group_id = bundle.getInt("group_id");
 			setupView(group_id);
@@ -143,7 +144,7 @@ public class UserGroupsMessages extends BaseFragment implements
 	}
 
 	@Override
-	public OEMenu menuHelper(Context context) {
+	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
 

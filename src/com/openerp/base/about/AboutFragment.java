@@ -1,5 +1,7 @@
 package com.openerp.base.about;
 
+import java.util.List;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
@@ -12,7 +14,7 @@ import android.widget.TextView;
 import com.openerp.R;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.menu.OEMenu;
+import com.openerp.util.drawer.DrawerItem;
 
 public class AboutFragment extends BaseFragment {
 
@@ -26,7 +28,6 @@ public class AboutFragment extends BaseFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		scope = new AppScope(this);
-		// TODO Auto-generated method stub
 		getActivity().getActionBar().setHomeButtonEnabled(true);
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -63,24 +64,11 @@ public class AboutFragment extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void handleArguments(Bundle bundle) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public OEMenu menuHelper(Context context) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			// app icon in action bar clicked; go home
@@ -93,10 +81,14 @@ public class AboutFragment extends BaseFragment {
 
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
 		super.onDestroy();
 		scope.context().getActionBar().setDisplayHomeAsUpEnabled(true);
 		scope.context().getActionBar().setHomeButtonEnabled(true);
+	}
+
+	@Override
+	public List<DrawerItem> drawerMenus(Context context) {
+		return null;
 	}
 
 }

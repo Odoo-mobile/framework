@@ -29,7 +29,6 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.openerp.auth.OpenERPAccountManager;
 
