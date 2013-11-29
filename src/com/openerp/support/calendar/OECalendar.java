@@ -134,7 +134,6 @@ public class OECalendar {
 
 	public OECalendar(Context context) {
 		super();
-		// TODO Auto-generated constructor stub
 		this.context = context;
 	}
 
@@ -169,18 +168,14 @@ public class OECalendar {
 	 *            : databae object.
 	 */
 	public void sync_Event_TOServer(Account account, MeetingDBHelper db) {
-		try {
-			// Fetching all the Meeting which are synced in LOCALDB
-			List<HashMap<String, Object>> local_meetings = getAllMeetings(db);
 
+		try {
+			List<HashMap<String, Object>> local_meetings = getAllMeetings(db);
 			for (int i = 0; i < local_meetings.size(); i++) {
-				// Checking calendar is exists or not. If exists than return ID
-				// or 0
 				cal_id = isCalInDevice(account);
+
 				if (cal_id == 0) {
-					// Creating new Calendar with user account
 					cal_id = createCalendar(account);
-					// Registering EVENT in OpenERP calendar
 					syncEvent(
 							cal_id,
 							Integer.parseInt(local_meetings.get(i).get("id")
@@ -191,13 +186,11 @@ public class OECalendar {
 									.toString(),
 							local_meetings.get(i).get("description").toString());
 				} else {
-					// Calendar exist and Checking whether event is already
-					// exist in OpenERP calendar or not
+
 					if (!isEventInCal(
 							context,
 							isObjectNull(local_meetings.get(i).get(
 									"calendar_event_id")))) {
-						// Registering EVENT in OpenERP calendar
 						syncEvent(
 								cal_id,
 								Integer.parseInt(local_meetings.get(i)
@@ -211,7 +204,6 @@ public class OECalendar {
 					}
 				}
 			}
-			// syncing Manually created events in device to OpenERP Server
 			syncToServer(context);
 		} catch (Exception e1) {
 			e1.printStackTrace();
@@ -227,6 +219,7 @@ public class OECalendar {
 	 * @return boolean : true, if successful
 	 */
 	public boolean syncToServer(Context context) {
+
 		boolean flag = false;
 		get_AllMettings = new HashMap<String, Object>();
 		cursor = context.getContentResolver().query(
@@ -235,10 +228,8 @@ public class OECalendar {
 						"dtstart", "dtend", "eventLocation", "_id", "allDay",
 						"duration" }, null, null, null);
 		calendar_Eventids = new ArrayList<String>();
-
-		// contains all the event_ids which are synced in OpenERP Mobile
-		// Calendar and updated in localdb.
 		calendar_Eventids = get_cal_event_Ids(context);
+
 		if (cursor.moveToFirst()) {
 			do {
 				// retrieve id from Mobile/Device
@@ -278,9 +269,6 @@ public class OECalendar {
 						String description = cursor.getString(cursor
 								.getColumnIndex("description"));
 
-						// retrieve the created record id from OpenERP Server
-						// for
-						// new meeting
 						int newId = writeMeeting(name, date, enddate, duration,
 								allDay, categ_id, location, description);
 
@@ -512,14 +500,8 @@ public class OECalendar {
 			// contain id of newly created event in OpenERP Mobile calendar
 			creted_Event_id = Long.parseLong(uri.getLastPathSegment());
 
-			// update crm.meeting table for meetings which are synced in OpenERP
-			// Mobile calendar
-			// meeting_id : id of the crm.meeting record
-			// calendar_id : OpenERP Mobile calendar id under wich that meeting
-			// synced
 			update_SyncedEvent(meeting_id, String.valueOf(calendar_id),
 					String.valueOf(creted_Event_id), "true");
-
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -534,9 +516,8 @@ public class OECalendar {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<HashMap<String, Object>> getAllMeetings(MeetingDBHelper db) {
-		// retrieve all the meetings from db.
+
 		HashMap<String, Object> res = db.search(db);
-		// checking if records exist?
 		if (Integer.parseInt(res.get("total").toString()) > 0) {
 			return (List<HashMap<String, Object>>) db.search(db).get("records");
 		}
@@ -551,16 +532,15 @@ public class OECalendar {
 	 * @return list: event ids which are synced in OpenERP Mobile Calendar.
 	 */
 	public List<String> get_cal_event_Ids(Context context) {
+
 		db = new MeetingDBHelper(context);
 		List<String> mtnglist = new ArrayList<String>();
 		get_AllMettings = db.search(db);
 
-		// retrieving all the record from db.
 		@SuppressWarnings("unchecked")
 		List<HashMap<String, Object>> idsList = (List<HashMap<String, Object>>) get_AllMettings
 				.get("records");
 		for (int i = 0; i < idsList.size(); i++) {
-			// adding only calendar_event_ids from the records.
 			mtnglist.add(idsList.get(i).get("calendar_event_id").toString());
 		}
 		return mtnglist;
@@ -591,7 +571,9 @@ public class OECalendar {
 	public int writeMeeting(String name, String date, String endDate,
 			String Duration, boolean allDay, String categ_id, String location,
 			String description) {
+
 		String new_generated_id = null;
+
 		try {
 			JSONObject response = new JSONObject();
 			OEHelper openerp = db.getOEInstance();
@@ -601,7 +583,6 @@ public class OECalendar {
 			args.put("date", date);
 			float duration = Float.parseFloat(Duration);
 			args.put("duration", duration);
-
 			JSONArray Ctag_ids = new JSONArray();
 			Ctag_ids.put(6);
 			Ctag_ids.put(false);
@@ -619,10 +600,12 @@ public class OECalendar {
 			args.put("date_deadline", endDate); // IMP Field REQ
 			args.put("location", location);
 			args.put("description", description);
+
 			response = openerp.createNew("crm.meeting", args);
 			new_generated_id = response.getString("result");
 			addMeetings_TOlocaldb(Integer.parseInt(new_generated_id), name,
 					date, endDate, Duration, location, description);
+
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
@@ -645,6 +628,7 @@ public class OECalendar {
 	 * @return String : if yes then "false" else same value.
 	 */
 	public String isNull(String value) {
+
 		if (value != null && !value.isEmpty()) {
 			return value;
 		}
@@ -660,6 +644,7 @@ public class OECalendar {
 	 *         value.
 	 */
 	public String isObjectNull(Object str) {
+
 		if (str != null && !str.toString().isEmpty()) {
 			return str.toString();
 		}
@@ -687,6 +672,7 @@ public class OECalendar {
 	 */
 	public void addMeetings_TOlocaldb(int id, String name, String date,
 			String endDate, String duration, String location, String description) {
+
 		db = new MeetingDBHelper(context);
 		values = new ContentValues();
 
@@ -710,8 +696,7 @@ public class OECalendar {
 	 *            : event id which'll be deleted.
 	 */
 	public void delete_CalendarEvent(int calendar_Event_Id) {
-		// Fetching Event_id from the local DB to delete the event from the
-		// OpenERP Mobile calendar
+
 		long eventID = calendar_Event_Id;
 		Uri deleteUri = null;
 		deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventID);

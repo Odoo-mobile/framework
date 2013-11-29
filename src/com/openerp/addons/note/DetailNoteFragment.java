@@ -138,7 +138,7 @@ public class DetailNoteFragment extends BaseFragment {
 			EditNoteFragment editnote_fragment = new EditNoteFragment();
 			Bundle editNoteID = new Bundle();
 			editNoteID.putInt("row_id", row_id);
-			if (MainActivity.isStateExist.equalsIgnoreCase("true")) {
+			if (Note.isStateExist.equalsIgnoreCase("true")) {
 				if (!padurl.equalsIgnoreCase("false")) {
 					editNoteID.putString("padurl", padurl);
 				} else {

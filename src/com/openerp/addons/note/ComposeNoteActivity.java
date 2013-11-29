@@ -76,7 +76,7 @@ public class ComposeNoteActivity extends Activity implements
 		fillNoteStages();
 		webViewpad = (WebView) findViewById(R.id.txv_composeNote_Description_Pad);
 
-		if (MainActivity.isStateExist.equalsIgnoreCase("true")) {
+		if (Note.isStateExist.equalsIgnoreCase("true")) {
 			oe = dbhelper.getOEInstance();
 			noteDescription.setVisibility(View.GONE);
 			descriptionHeader.setVisibility(View.GONE);
@@ -315,7 +315,7 @@ public class ComposeNoteActivity extends Activity implements
 			JSONObject vals = new JSONObject();
 
 			// If Pad Installed Over Server
-			if (MainActivity.isStateExist.equalsIgnoreCase("true")) {
+			if (Note.isStateExist.equalsIgnoreCase("true")) {
 				OEHelper oe = dbhelper.getOEInstance();
 				JSONArray url = new JSONArray();
 				url.put(padURL);

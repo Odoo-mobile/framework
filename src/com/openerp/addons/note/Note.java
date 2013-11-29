@@ -66,6 +66,8 @@ import com.openerp.util.tags.TagsView;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
+
+	public static String isStateExist = null;
 	public static String TAG = "com.openerp.addons.Note";
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
@@ -98,6 +100,9 @@ public class Note extends BaseFragment implements
 		lstNotes = (ListView) rootView.findViewById(R.id.lstNotes);
 		emptyNotesText = (TextView) rootView
 				.findViewById(R.id.txvNoteAllArchive);
+		if (isStateExist == null) {
+			isStateExist = String.valueOf(db.isPadExist());
+		}
 		return rootView;
 	}
 

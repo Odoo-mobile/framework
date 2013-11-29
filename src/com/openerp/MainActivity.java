@@ -51,7 +51,7 @@ import android.widget.Toast;
 
 import com.openerp.addons.messages.MessageComposeActivty;
 import com.openerp.addons.note.ComposeNoteActivity;
-import com.openerp.addons.note.NoteDBHelper;
+import com.openerp.addons.note.Note;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
@@ -73,7 +73,6 @@ import com.openerp.util.drawer.DrawerItem;
 public class MainActivity extends FragmentActivity implements
 		DrawerItem.DrawerItemClickListener {
 
-	public static String isStateExist = null;
 	public static final int RESULT_SETTINGS = 1;
 	public static boolean set_setting_menu = false;
 	public static Context context = null;
@@ -104,10 +103,6 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		context = this;
-		if (isStateExist == null) {
-			NoteDBHelper db = new NoteDBHelper(context);
-			isStateExist = String.valueOf(db.isPadExist());
-		}
 		if (findViewById(R.id.fragment_container) != null) {
 			initDrawerControls();
 			fragmentHandler = new FragmentHandler(this);
@@ -549,7 +544,7 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		isStateExist = null;
+		Note.isStateExist = null;
 	}
 
 	@Override

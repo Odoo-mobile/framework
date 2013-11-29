@@ -56,6 +56,7 @@ public class Res_PartnerSyncHelper {
 			String number, String mobile, String website, String street,
 			String street2, String city, String zip, String company,
 			String image) {
+
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 		int rawContactInsertIndex = operationList.size();
 
@@ -101,6 +102,7 @@ public class Res_PartnerSyncHelper {
 			builder.withValue(ContactsContract.CommonDataKinds.Email.DATA, mail);
 			operationList.add(builder.build());
 		}
+
 		// Phone number
 		if (!number.equals("false")) {
 			builder = ContentProviderOperation
@@ -114,6 +116,7 @@ public class Res_PartnerSyncHelper {
 					number);
 			operationList.add(builder.build());
 		}
+
 		// Mobile number
 		if (!mobile.equals("false")) {
 			builder = ContentProviderOperation
@@ -129,6 +132,7 @@ public class Res_PartnerSyncHelper {
 					ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
 			operationList.add(builder.build());
 		}
+
 		// Website
 		if (!website.equals("false")) {
 			builder = ContentProviderOperation
@@ -142,6 +146,7 @@ public class Res_PartnerSyncHelper {
 					website);
 			operationList.add(builder.build());
 		}
+
 		// Address street 1
 		if (!street.equals("false")) {
 			builder = ContentProviderOperation
@@ -157,6 +162,7 @@ public class Res_PartnerSyncHelper {
 					street);
 			operationList.add(builder.build());
 		}
+
 		// Address street 2
 		if (!street2.equals("false")) {
 			builder = ContentProviderOperation
@@ -172,6 +178,7 @@ public class Res_PartnerSyncHelper {
 					street2);
 			operationList.add(builder.build());
 		}
+
 		// Address City
 		if (!city.equals("false")) {
 			builder = ContentProviderOperation
@@ -187,6 +194,7 @@ public class Res_PartnerSyncHelper {
 					city);
 			operationList.add(builder.build());
 		}
+
 		// Zip code
 		if (!zip.equals("false")) {
 			builder = ContentProviderOperation
@@ -202,11 +210,13 @@ public class Res_PartnerSyncHelper {
 					zip);
 			operationList.add(builder.build());
 		}
+
 		if (android.os.Build.VERSION.SDK_INT > 9) {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
+
 		// INSERT imAGE
 		if (!image.equals("false")) {
 
@@ -227,6 +237,7 @@ public class Res_PartnerSyncHelper {
 									ContactsContract.CommonDataKinds.Photo.PHOTO,
 									stream.toByteArray()).build());
 		}
+
 		if (!company.equals("false")) {
 			operationList
 					.add(ContentProviderOperation
@@ -316,6 +327,7 @@ public class Res_PartnerSyncHelper {
 	}
 
 	public void SyncContect(Context context, Account account) {
+
 		HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 		mContentResolver = context.getContentResolver();
 		int company_id = Integer.parseInt(OpenERPAccountManager.currentUser(
@@ -334,6 +346,7 @@ public class Res_PartnerSyncHelper {
 		Cursor c1 = mContentResolver.query(rawContactUri, new String[] {
 				BaseColumns._ID, UsernameColumn, PhotoTimestampColumn }, null,
 				null, null);
+
 		while (c1.moveToNext()) {
 			SyncEntry entry = new SyncEntry();
 			entry.raw_id = c1.getLong(c1.getColumnIndex(BaseColumns._ID));
