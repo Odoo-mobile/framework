@@ -38,6 +38,7 @@ import com.openerp.support.OEUser;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.tags.TagsItems;
 import com.openerp.util.tags.TagsView;
+import com.openerp.widget.Mobile_Widget;
 
 public class ComposeNoteActivity extends Activity implements
 		TagsView.TokenListener {
@@ -58,6 +59,7 @@ public class ComposeNoteActivity extends Activity implements
 	String[] stringArray = null;
 	String padURL = null;
 	private static OEHelper oe = null;
+	Intent update_widget = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,9 @@ public class ComposeNoteActivity extends Activity implements
 		fillNoteStages();
 		webViewpad = (WebView) findViewById(R.id.txv_composeNote_Description_Pad);
 
+		if (Note.isStateExist == null) {
+			Note.isStateExist = String.valueOf(dbhelper.isPadExist());
+		}
 		if (Note.isStateExist.equalsIgnoreCase("true")) {
 			oe = dbhelper.getOEInstance();
 			noteDescription.setVisibility(View.GONE);
@@ -88,6 +93,8 @@ public class ComposeNoteActivity extends Activity implements
 			webViewpad.loadUrl(padURL + "?showChat=false&userName="
 					+ OEUser.current(scope.context()).getUsername());
 		}
+		update_widget = new Intent();
+		update_widget.setAction(Mobile_Widget.TAG);
 	}
 
 	// Called when + button pressed for adding tags
@@ -375,6 +382,8 @@ public class ComposeNoteActivity extends Activity implements
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			scope.context().sendBroadcast(update_widget);
 		}
 	}
 

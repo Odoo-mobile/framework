@@ -49,14 +49,14 @@ public class NoteSyncService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
+
 		IBinder ret = null;
 		ret = getSyncAdapter().getSyncAdapterBinder();
 		return ret;
 	}
 
 	public SyncAdapterImpl getSyncAdapter() {
-		// TODO Auto-generated method stub
+
 		if (sSyncAdapter == null) {
 			sSyncAdapter = new SyncAdapterImpl(this);
 		}
@@ -66,7 +66,7 @@ public class NoteSyncService extends Service {
 	public void performSync(Context context, Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
-		// TODO Auto-generated method stub
+
 		try {
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
@@ -99,7 +99,6 @@ public class NoteSyncService extends Service {
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
-			// TODO Auto-generated method stub
 
 			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				account = OpenERPAccountManager.getAccount(mContext,
@@ -121,5 +120,4 @@ public class NoteSyncService extends Service {
 			}
 		}
 	}
-
 }

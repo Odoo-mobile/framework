@@ -49,8 +49,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.openerp.addons.messages.MessageComposeActivty;
-import com.openerp.addons.note.ComposeNoteActivity;
 import com.openerp.addons.note.Note;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
@@ -641,16 +639,28 @@ public class MainActivity extends FragmentActivity implements
 		if (mDrawerItemSelectedPosition >= 0) {
 			position = mDrawerItemSelectedPosition;
 		}
+
 		if (getIntent().getAction() != null
 				&& !getIntent().getAction().toString()
 						.equalsIgnoreCase("android.intent.action.MAIN")) {
-			if (getIntent().getAction().toString()
-					.equalsIgnoreCase("composeMessage")) {
-				startActivity(new Intent(context, MessageComposeActivty.class));
+			if (getIntent().getAction().toString().equalsIgnoreCase("MESSAGE")) {
+				int size = mDrawerListItems.size();
+				for (int i = 0; i < size; i++) {
+					if (mDrawerAdatper.getItem(i).getTitle()
+							.equalsIgnoreCase("Messages")) {
+						loadFragment(mDrawerAdatper.getItem(i + 1));
+					}
+				}
 			}
-			if (getIntent().getAction().toString()
-					.equalsIgnoreCase("composeNote")) {
-				startActivity(new Intent(context, ComposeNoteActivity.class));
+			if (getIntent().getAction().toString().equalsIgnoreCase("NOTES")) {
+				int size = mDrawerListItems.size();
+				for (int i = 0; i < size; i++) {
+					if (mDrawerAdatper.getItem(i).getTitle()
+							.equalsIgnoreCase("Notes")) {
+						loadFragment(mDrawerAdatper.getItem(i + 1));
+						break;
+					}
+				}
 			}
 		} else {
 			if (position > 0) {

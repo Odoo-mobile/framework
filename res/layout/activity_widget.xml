@@ -16,6 +16,7 @@
             android:layout_height="50dp"
             android:layout_gravity="center"
             android:layout_marginLeft="5dp"
+            android:contentDescription="@string/widget_company_logo"
             android:src="@drawable/ic_launcher" />
     </LinearLayout>
 
@@ -40,10 +41,9 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:paddingLeft="10dp"
-            android:text="Messages"
+            android:text="@string/widget_messages_label"
             android:textColor="#f3f3f3"
-            android:textSize="20sp"
-            android:typeface="sans" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/widget_label_notes_layout"
@@ -52,10 +52,9 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:paddingLeft="10dp"
-            android:text="Notes"
+            android:text="@string/widget_notes_label"
             android:textColor="#f3f3f3"
-            android:textSize="20sp"
-            android:typeface="sans" />
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -63,6 +62,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.3"
+        android:baselineAligned="false"
         android:orientation="horizontal" >
 
         <LinearLayout
@@ -81,8 +81,7 @@
                 android:gravity="center"
                 android:text="@string/widget_messages_notification"
                 android:textColor="#f3f3f3"
-                android:textSize="20sp"
-                android:typeface="sans" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/widget_notification_counter_notes"
@@ -93,8 +92,7 @@
                 android:gravity="center"
                 android:text="@string/widget_notes_notification"
                 android:textColor="#f3f3f3"
-                android:textSize="20sp"
-                android:typeface="sans" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -110,6 +108,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
                 android:layout_weight="1"
+                android:contentDescription="@string/widget_compose_messages"
                 android:src="@drawable/ic_action_mail_add"
                 android:tint="#ffffff" />
 
@@ -118,6 +117,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:contentDescription="@string/widget_compose_notes"
                 android:src="@drawable/ic_action_new_note"
                 android:tint="#ffffff" />
         </LinearLayout>
