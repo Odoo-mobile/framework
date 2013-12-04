@@ -24,12 +24,20 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.RemoteViews;
-
-import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.MainActivity;
 import com.openerp.addons.messages.Message;
+import com.openerp.addons.messages.MessageComposeActivty;
+import com.openerp.addons.messages.MessageDBHelper;
+import com.openerp.addons.note.ComposeNoteActivity;
 import com.openerp.addons.note.Note;
+import com.openerp.addons.note.NoteDBHelper;
+import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.orm.OEHelper;
+import com.openerp.util.drawer.DrawerItem;
 
 public class Mobile_Widget extends AppWidgetProvider {
 	public static final String TAG = "android.appwidget.action.APPWIDGET_UPDATE";
@@ -65,9 +73,7 @@ public class Mobile_Widget extends AppWidgetProvider {
 			int[] appWidgetIds) {
 
 		for (int widgetId : allWidgetIds) {
-
 			try {
-
 				// Fetching Notes From Account
 				Note note = new Note();
 				total_Notes = note.getCount("-1", context);
@@ -81,12 +87,12 @@ public class Mobile_Widget extends AppWidgetProvider {
 				Message message = new Message();
 				total_unreadMessges = message.getCount(Message.TYPE.INBOX,
 						context);
+
 				if (String.valueOf(total_unreadMessges) == null
 						&& String.valueOf(total_unreadMessges)
 								.equalsIgnoreCase("false")) {
 					total_unreadMessges = 0;
 				}
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -123,8 +129,14 @@ public class Mobile_Widget extends AppWidgetProvider {
 
 			// Click on Compose Messages
 			// Openening Screen to COMPOSE MESSAGE
-			Intent composeMessage = new Intent(context, MainActivity.class);
-			composeMessage.setAction("composeMessage");
+			MessageDBHelper db = new MessageDBHelper(context);
+			Intent composeMessage = null;
+			if (db.getOEInstance().isInstalled("mail.message")) {
+				composeMessage = new Intent(context,
+						MessageComposeActivty.class);
+			} else {
+				composeMessage = new Intent(context, MainActivity.class);
+			}
 			PendingIntent composeMessagePendingIntent = PendingIntent
 					.getActivity(context, 0, composeMessage, 0);
 			remoteViews.setOnClickPendingIntent(
@@ -133,8 +145,12 @@ public class Mobile_Widget extends AppWidgetProvider {
 
 			// Click on Compose Note
 			// Openening Screen to COMPOSE NOTE
-			Intent composeNote = new Intent(context, MainActivity.class);
-			composeNote.setAction("composeNote");
+			Intent composeNote = null;
+			if (db.getOEInstance().isInstalled("note.note")) {
+				composeNote = new Intent(context, ComposeNoteActivity.class);
+			} else {
+				composeNote = new Intent(context, MainActivity.class);
+			}
 			PendingIntent composeNotePendingIntent = PendingIntent.getActivity(
 					context, 0, composeNote, 0);
 			remoteViews.setOnClickPendingIntent(

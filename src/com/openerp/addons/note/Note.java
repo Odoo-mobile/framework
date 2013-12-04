@@ -63,6 +63,7 @@ import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.tags.TagsView;
+import com.openerp.widget.Mobile_Widget;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
@@ -86,6 +87,7 @@ public class Note extends BaseFragment implements
 	String stage_id = "-1";
 	static boolean rawStrikeStatus = false;
 	boolean isSynced = false;
+	Intent update_widget = null;
 	String tag_colors[] = new String[] { "#9933CC", "#669900", "#FF8800",
 			"#CC0000", "#59A2BE", "#808080", "#192823", "#0099CC", "#218559",
 			"#EBB035" };
@@ -100,6 +102,10 @@ public class Note extends BaseFragment implements
 		lstNotes = (ListView) rootView.findViewById(R.id.lstNotes);
 		emptyNotesText = (TextView) rootView
 				.findViewById(R.id.txvNoteAllArchive);
+
+		update_widget = new Intent();
+		update_widget.setAction(Mobile_Widget.TAG);
+
 		if (isStateExist == null) {
 			isStateExist = String.valueOf(db.isPadExist());
 		}
@@ -270,6 +276,7 @@ public class Note extends BaseFragment implements
 		scope.context().registerReceiver(syncFinishReceiver,
 				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
 		rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
+		scope.context().sendBroadcast(update_widget);
 	}
 
 	@Override
@@ -487,6 +494,8 @@ public class Note extends BaseFragment implements
 			scope.context().refreshDrawer(TAG, scope.context());
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			scope.context().sendBroadcast(update_widget);
 		}
 	}
 
