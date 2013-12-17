@@ -326,8 +326,7 @@ public class Res_PartnerSyncHelper {
 		public Long photo_timestamp = null;
 	}
 
-	public void SyncContect(Context context, Account account) {
-
+	public void SyncContacts(Context context, Account account) {
 		HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 		mContentResolver = context.getContentResolver();
 		int company_id = Integer.parseInt(OpenERPAccountManager.currentUser(
@@ -358,7 +357,10 @@ public class Res_PartnerSyncHelper {
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 		try {
 			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(context);
-			HashMap<String, Object> res = dbHelper.search(dbHelper);
+			HashMap<String, Object> res = dbHelper.search(dbHelper,
+					new String[] { "phone != ? ", "OR", "mobile != ? ", "OR",
+							"email != ?" }, new String[] { "false", "false",
+							"false" });
 			// checking if records exist?
 			int total = Integer.parseInt(res.get("total").toString());
 			// System.out.println("TOTAL PARTNERS ::" + total);

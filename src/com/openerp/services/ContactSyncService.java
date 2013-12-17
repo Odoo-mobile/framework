@@ -27,9 +27,11 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.openerp.auth.OpenERPAccountManager;
@@ -40,7 +42,6 @@ import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.JSONDataHelper;
 
 public class ContactSyncService extends Service {
-	private final static String TAG1 = "In this method: ";
 	int mStartMode; // indicates how to behave if the service is killed
 	IBinder mBinder; // interface for clients that bind
 	boolean mAllowRebind; // indicates whether onRebind should be used
@@ -59,14 +60,12 @@ public class ContactSyncService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		IBinder ret = null;
 		ret = getSyncAdapter().getSyncAdapterBinder();
 		return ret;
 	}
 
 	public SyncAdapterImpl getSyncAdapter() {
-		// TODO Auto-generated method stub
 		if (sSyncAdapter == null) {
 			sSyncAdapter = new SyncAdapterImpl(this);
 		}
@@ -76,7 +75,6 @@ public class ContactSyncService extends Service {
 	public void performSync(Context context, Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
-		// TODO Auto-generated method stub
 		try {
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
@@ -87,32 +85,42 @@ public class ContactSyncService extends Service {
 			OEHelper oe = db.getOEInstance();
 			Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(context);
 
+			SharedPreferences settings = PreferenceManager
+					.getDefaultSharedPreferences(context);
+			boolean syncServerContacts = settings.getBoolean(
+					"server_contact_sync", false);
+
 			if (OpenERPAccountManager.currentUser(context).getHost().toString()
 					.contains(saasURL1)
 					|| OpenERPAccountManager.currentUser(context).getHost()
 							.toString().contains(saasURL2)) {
 				// Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(
 				// context);
-				helper.SyncContect(context, account);
+				helper.SyncContacts(context, account);
 
 			} else {
-				int company_id = Integer.parseInt(OpenERPAccountManager
-						.currentUser(context).getCompany_id());
+				if (syncServerContacts) {
+					int company_id = Integer.parseInt(OpenERPAccountManager
+							.currentUser(context).getCompany_id());
 
-				JSONObject domain = new JSONObject();
-				domain.accumulate(
-						"domain",
-						new JSONArray("[[\"company_id\", \"=\", "
-								+ company_id
-								+ "],[\"id\",\"not in\", "
-								+ JSONDataHelper.intArrayToJSONArray(db
-										.localIds(db)) + "]]"));
+					JSONObject domain = new JSONObject();
+					domain.accumulate(
+							"domain",
+							new JSONArray("[[\"company_id\", \"=\", "
+									+ company_id
+									+ "],[\"id\",\"not in\", "
+									+ JSONDataHelper.intArrayToJSONArray(db
+											.localIds(db)) + "]]"));
 
-				if (oe.syncWithServer(db, domain, false)) {
-					// Sync Done, Next stuff....
-					// Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(
-					// context);
-					helper.SyncContect(context, account);
+					if (oe.syncWithServer(db, domain, false)) {
+						// Sync Done, Next stuff....
+						// Res_PartnerSyncHelper helper = new
+						// Res_PartnerSyncHelper(
+						// context);
+						helper.SyncContacts(context, account);
+					}
+				} else {
+					helper.SyncContacts(context, account);
 				}
 			}
 		} catch (Exception e) {
