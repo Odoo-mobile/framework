@@ -40,6 +40,7 @@ import com.openerp.base.res.Res_PartnerSyncHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.JSONDataHelper;
+import com.openerp.util.logger.OELog;
 
 public class ContactSyncService extends Service {
 	int mStartMode; // indicates how to behave if the service is killed
@@ -94,8 +95,6 @@ public class ContactSyncService extends Service {
 					.contains(saasURL1)
 					|| OpenERPAccountManager.currentUser(context).getHost()
 							.toString().contains(saasURL2)) {
-				// Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(
-				// context);
 				helper.SyncContacts(context, account);
 
 			} else {
@@ -104,19 +103,9 @@ public class ContactSyncService extends Service {
 							.currentUser(context).getCompany_id());
 
 					JSONObject domain = new JSONObject();
-					domain.accumulate(
-							"domain",
-							new JSONArray("[[\"company_id\", \"=\", "
-									+ company_id
-									+ "],[\"id\",\"not in\", "
-									+ JSONDataHelper.intArrayToJSONArray(db
-											.localIds(db)) + "]]"));
-
+					domain.accumulate("domain", new JSONArray(
+							"[[\"company_id\", \"=\", " + company_id + "]]"));
 					if (oe.syncWithServer(db, domain, false)) {
-						// Sync Done, Next stuff....
-						// Res_PartnerSyncHelper helper = new
-						// Res_PartnerSyncHelper(
-						// context);
 						helper.SyncContacts(context, account);
 					}
 				} else {

@@ -28,9 +28,9 @@ public class SyncWizardValues implements SyncWizardHelper {
 		/* Contacts */
 		list.add(new SyncValue("Contacts"));
 		List<SyncValue> radioGroups = new ArrayList<SyncValue>();
-		radioGroups.add(new SyncValue("Local Contacts",
-				ContactsContract.AUTHORITY, SyncValue.Type.RADIO));
 		radioGroups.add(new SyncValue("All Contacts",
+				ContactsContract.AUTHORITY, SyncValue.Type.RADIO));
+		radioGroups.add(new SyncValue("Local Contacts",
 				ContactsContract.AUTHORITY, SyncValue.Type.RADIO));
 		list.add(new SyncValue(radioGroups));
 
