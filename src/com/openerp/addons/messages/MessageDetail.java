@@ -62,6 +62,7 @@ import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.OEBinaryDownloadHelper;
 import com.openerp.util.OEFileSizeHelper;
+import com.openerp.util.contactview.OEContactView;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
@@ -253,6 +254,11 @@ public class MessageDetail extends BaseFragment {
 					row_view.findViewById(R.id.layoutMessageAttachments)
 							.setVisibility(View.GONE);
 				}
+				OEContactView oe_contactView = (OEContactView) row_view
+						.findViewById(R.id.imgUserPicture);
+				int partner_id = Integer.parseInt(row_data.getRow_data()
+						.get("partner_id").toString());
+				oe_contactView.assignPartnerId(partner_id);
 				return row_view;
 			}
 		});
@@ -311,7 +317,7 @@ public class MessageDetail extends BaseFragment {
 	private boolean setupMessageDetail(int message_id) {
 		messages_sorted = new ArrayList<OEListViewRows>();
 
-		String query = "select t1.id as message_id , t1.*, t2.name, t2.image_small as image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.date desc";
+		String query = "select t1.id as message_id , t1.*, t2.id as partner_id, t2.name, t2.image_small as image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.date desc";
 		List<HashMap<String, Object>> records = db.executeSQL(
 				query,
 				new String[] { String.valueOf(message_id),
