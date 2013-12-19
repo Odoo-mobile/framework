@@ -51,7 +51,7 @@ public class Res_PartnerSyncHelper {
 		context = this.context;
 	}
 
-	private static void addContact(Context context, Account account,
+	private void addContact(Context context, Account account,
 			String partner_id, String name, String username, String mail,
 			String number, String mobile, String website, String street,
 			String street2, String city, String zip, String company,
@@ -264,70 +264,12 @@ public class Res_PartnerSyncHelper {
 		}
 	}
 
-	private static void updateContactPhoto(
-			ArrayList<ContentProviderOperation> operationList,
-			long rawContactId, String photo_string, Context context) {
-		if (!photo_string.equals("false")) {
-			Bitmap avatar = Base64Helper.getBitmapImage(context, photo_string);
-			ByteArrayOutputStream convertStream = new ByteArrayOutputStream(
-					avatar.getWidth() * avatar.getHeight() * 4);
-			avatar.compress(Bitmap.CompressFormat.JPEG, 95, convertStream);
-			try {
-				convertStream.flush();
-				convertStream.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// On pre-Honeycomb systems, it's important to call recycle on
-			// bitmaps
-			avatar.recycle();
-			byte[] photo = convertStream.toByteArray();
-			ContentProviderOperation.Builder builder = ContentProviderOperation
-					.newDelete(ContactsContract.Data.CONTENT_URI);
-			builder.withSelection(ContactsContract.Data.RAW_CONTACT_ID + " = '"
-					+ rawContactId + "' AND " + ContactsContract.Data.MIMETYPE
-					+ " = '"
-					+ ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE
-					+ "'", null);
-			operationList.add(builder.build());
-
-			try {
-				if (photo != null) {
-					builder = ContentProviderOperation
-							.newInsert(ContactsContract.Data.CONTENT_URI);
-					builder.withValue(
-							ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID,
-							rawContactId);
-					builder.withValue(
-							ContactsContract.Data.MIMETYPE,
-							ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
-					builder.withValue(
-							ContactsContract.CommonDataKinds.Photo.PHOTO, photo);
-					operationList.add(builder.build());
-
-					builder = ContentProviderOperation
-							.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
-					builder.withSelection(
-							ContactsContract.RawContacts.CONTACT_ID + " = '"
-									+ rawContactId + "'", null);
-					builder.withValue(PhotoTimestampColumn,
-							String.valueOf(System.currentTimeMillis()));
-					operationList.add(builder.build());
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	private static class SyncEntry {
 		public Long raw_id = 0L;
 		public Long photo_timestamp = null;
 	}
 
-	public void SyncContect(Context context, Account account) {
-
+	public void SyncContacts(Context context, Account account) {
 		HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 		mContentResolver = context.getContentResolver();
 		int company_id = Integer.parseInt(OpenERPAccountManager.currentUser(
@@ -355,10 +297,12 @@ public class Res_PartnerSyncHelper {
 			localContacts.put(c1.getString(1), entry);
 		}
 
-		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 		try {
 			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(context);
-			HashMap<String, Object> res = dbHelper.search(dbHelper);
+			HashMap<String, Object> res = dbHelper.search(dbHelper,
+					new String[] { "phone != ? ", "OR", "mobile != ? ", "OR",
+							"email != ?" }, new String[] { "false", "false",
+							"false" });
 			// checking if records exist?
 			int total = Integer.parseInt(res.get("total").toString());
 			// System.out.println("TOTAL PARTNERS ::" + total);
@@ -369,42 +313,35 @@ public class Res_PartnerSyncHelper {
 						.get("records");
 
 				for (HashMap<String, Object> row_data : rows) {
-					if (localContacts.get(row_data.get("id").toString()) == null) {
 
-						if (!(row_data.get("company_id").toString())
-								.equalsIgnoreCase("false")) {
-							JSONArray db_company_id = new JSONArray(row_data
-									.get("company_id").toString());
-							String com_id = db_company_id.getJSONArray(0)
-									.getString(0).toString();
+					if (!(row_data.get("company_id").toString())
+							.equalsIgnoreCase("false")) {
+						JSONArray db_company_id = new JSONArray(row_data.get(
+								"company_id").toString());
+						String com_id = db_company_id.getJSONArray(0)
+								.getString(0).toString();
 
-							if (com_id.equalsIgnoreCase(String
-									.valueOf(company_id))) {
+						if (com_id.equalsIgnoreCase(String.valueOf(company_id))) {
 
-								String partnerID = row_data.get("id")
-										.toString();
-								// Remove everything except characters and
-								// digits
-								String name = (row_data.get("name").toString())
-										.replaceAll("[^\\w\\s]", "");
-								String userName = row_data.get("id").toString();
-								String mail = row_data.get("email").toString();
-								String number = row_data.get("phone")
-										.toString();
-								String mobile = row_data.get("mobile")
-										.toString();
-								String website = row_data.get("website")
-										.toString();
-								String street = row_data.get("street")
-										.toString();
-								String street2 = row_data.get("street2")
-										.toString();
-								String city = row_data.get("city").toString();
-								String zip = row_data.get("zip").toString();
-								String company = "OpenERP";
-								String image = row_data.get("image_small")
-										.toString();
-
+							String partnerID = row_data.get("id").toString();
+							// Remove everything except characters and
+							// digits
+							String name = (row_data.get("name").toString())
+									.replaceAll("[^\\w\\s]", "");
+							String userName = row_data.get("id").toString();
+							String mail = row_data.get("email").toString();
+							String number = row_data.get("phone").toString();
+							String mobile = row_data.get("mobile").toString();
+							String website = row_data.get("website").toString();
+							String street = row_data.get("street").toString();
+							String street2 = row_data.get("street2").toString();
+							String city = row_data.get("city").toString();
+							String zip = row_data.get("zip").toString();
+							String company = "OpenERP";
+							String image = row_data.get("image_small")
+									.toString();
+							if (localContacts
+									.get(row_data.get("id").toString()) == null) {
 								addContact(context, account, partnerID, name,
 										userName, mail, number, mobile,
 										website, street, street2, city, zip,
@@ -412,6 +349,7 @@ public class Res_PartnerSyncHelper {
 							}
 						}
 					}
+
 				}
 			}
 		} catch (Exception e1) {

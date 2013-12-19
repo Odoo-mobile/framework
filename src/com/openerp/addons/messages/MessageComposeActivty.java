@@ -20,6 +20,7 @@ package com.openerp.addons.messages;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -139,6 +140,22 @@ public class MessageComposeActivty extends Activity implements
 
 		} else {
 			getActionBar().setTitle("Compose");
+			if (getIntent().getData() != null) {
+				Cursor cursor = managedQuery(getIntent().getData(), null, null,
+						null, null);
+				if (cursor.moveToNext()) {
+					int partner_id = cursor.getInt(cursor
+							.getColumnIndex("data2"));
+					List<TagsItems> partners = getPartnersByIds(Arrays
+							.asList(new Integer[] { partner_id }));
+					for (TagsItems item : partners) {
+						selectedPartners.put("key_" + item.getId(), item);
+						receipients_view.addObject(item);
+						findViewById(R.id.edtMessageSubject).requestFocus();
+					}
+
+				}
+			}
 		}
 		lstAttachments = (ListView) findViewById(R.id.lstAttachments);
 		String[] from = new String[] { "name" };
@@ -227,6 +244,29 @@ public class MessageComposeActivty extends Activity implements
 		partner_adapter.notifyDataSetChanged();
 		return flag;
 
+	}
+
+	public List<TagsItems> getPartnersByIds(List<Integer> ids) {
+		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(
+				MainActivity.context);
+		List<TagsItems> names = new ArrayList<TagsItems>();
+		String oea_name = OpenERPAccountManager.currentUser(
+				MainActivity.context).getAndroidName();
+		for (Integer partner_id : ids) {
+			List<HashMap<String, Object>> records = partners
+					.executeSQL(
+							"SELECT id,email,name,image_small,oea_name FROM res_partner where id = ?",
+							new String[] { partner_id + "" });
+			if (records.size() > 0) {
+				for (HashMap<String, Object> row : records) {
+					int id = Integer.parseInt(row.get("id").toString());
+					names.add(new TagsItems(id, row.get("name").toString(), row
+							.get("email").toString(), row.get("image_small")
+							.toString()));
+				}
+			}
+		}
+		return names;
 	}
 
 	public List<TagsItems> getPartnersOfMessage(String message_id) {
