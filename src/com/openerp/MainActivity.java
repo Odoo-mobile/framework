@@ -585,28 +585,29 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void initDrawer(List<DrawerItem> drawerItems) {
-
-		Res_PartnerDBHelper partner = new Res_PartnerDBHelper(context);
-		Object obj = partner.search(partner, new String[] { "name" },
-				new String[] { "id = ?" },
-				new String[] { OEUser.current(context).getPartner_id() }).get(
-				"records");
-		String user_name = "";
-		if (obj instanceof Boolean) {
-			user_name = OEUser.current(context).getUsername();
-		} else {
-			user_name = ((List<HashMap<String, Object>>) obj).get(0)
-					.get("name").toString();
-		}
-		mDrawerTitle = user_name;
-		mDrawerSubtitle = OEUser.current(context).getHost();
-		getActionBar().setHomeButtonEnabled(true);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		setDrawerItems(drawerItems);
-		if (mDrawerItemSelectedPosition > 0) {
-			mAppTitle = mDrawerListItems.get(mDrawerItemSelectedPosition)
-					.getTitle();
-			setTitle(mAppTitle);
+		if (OEUser.current(context) != null) {
+			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(context);
+			Object obj = partner.search(partner, new String[] { "name" },
+					new String[] { "id = ?" },
+					new String[] { OEUser.current(context).getPartner_id() })
+					.get("records");
+			String user_name = "";
+			if (obj instanceof Boolean) {
+				user_name = OEUser.current(context).getUsername();
+			} else {
+				user_name = ((List<HashMap<String, Object>>) obj).get(0)
+						.get("name").toString();
+			}
+			mDrawerTitle = user_name;
+			mDrawerSubtitle = OEUser.current(context).getHost();
+			getActionBar().setHomeButtonEnabled(true);
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+			setDrawerItems(drawerItems);
+			if (mDrawerItemSelectedPosition > 0) {
+				mAppTitle = mDrawerListItems.get(mDrawerItemSelectedPosition)
+						.getTitle();
+				setTitle(mAppTitle);
+			}
 		}
 	}
 
