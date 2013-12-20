@@ -95,7 +95,7 @@ public class ContactSyncService extends Service {
 					.contains(saasURL1)
 					|| OpenERPAccountManager.currentUser(context).getHost()
 							.toString().contains(saasURL2)) {
-				helper.SyncContacts(context, account);
+				helper.syncContacts(context, account);
 
 			} else {
 				if (syncServerContacts) {
@@ -106,10 +106,10 @@ public class ContactSyncService extends Service {
 					domain.accumulate("domain", new JSONArray(
 							"[[\"company_id\", \"=\", " + company_id + "]]"));
 					if (oe.syncWithServer(db, domain, false)) {
-						helper.SyncContacts(context, account);
+						helper.syncContacts(context, account);
 					}
 				} else {
-					helper.SyncContacts(context, account);
+					helper.syncContacts(context, account);
 				}
 			}
 		} catch (Exception e) {
@@ -129,7 +129,6 @@ public class ContactSyncService extends Service {
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
 
-			// TODO Auto-generated method stub
 			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				account = OpenERPAccountManager.getAccount(mContext,
 						OpenERPAccountManager.currentUser(mContext)
