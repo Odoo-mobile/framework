@@ -43,27 +43,25 @@ import com.openerp.util.Base64Helper;
 
 public class Res_PartnerSyncHelper {
 
-	Context context = null;
+	Context mContext = null;
 	private static ContentResolver mContentResolver = null;
-	private static String PhotoTimestampColumn = ContactsContract.RawContacts.SYNC2;
-	private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
+	private static String SYNC1_PARTNER_ID = ContactsContract.RawContacts.SYNC1;
 
 	public Res_PartnerSyncHelper(Context context) {
-		this.context = context;
+		mContext = context;
 	}
 
 	public boolean createNewContact(int partner_id) {
-		Account account = OpenERPAccountManager.getAccount(context, OEUser
-				.current(context).getAndroidName());
+		Account account = OpenERPAccountManager.getAccount(mContext, OEUser
+				.current(mContext).getAndroidName());
 		try {
-			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(context);
+			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(mContext);
 			HashMap<String, Object> res = dbHelper.search(dbHelper,
 					new String[] { "(phone != ? ", "OR", "mobile != ? ", "OR",
 							"email != ? ) ", "AND", "id = ? " }, new String[] {
 							"false", "false", "false", partner_id + "" });
 			// checking if records exist?
 			int total = Integer.parseInt(res.get("total").toString());
-			// System.out.println("TOTAL PARTNERS ::" + total);
 
 			if (total > 0) {
 				@SuppressWarnings("unchecked")
@@ -74,17 +72,9 @@ public class Res_PartnerSyncHelper {
 
 					if (!(row_data.get("company_id").toString())
 							.equalsIgnoreCase("false")) {
-						JSONArray db_company_id = new JSONArray(row_data.get(
-								"company_id").toString());
-						String com_id = db_company_id.getJSONArray(0)
-								.getString(0).toString();
-
 						String partnerID = row_data.get("id").toString();
-						// Remove everything except characters and
-						// digits
 						String name = (row_data.get("name").toString())
 								.replaceAll("[^\\w\\s]", "");
-						String userName = row_data.get("id").toString();
 						String mail = row_data.get("email").toString();
 						String number = row_data.get("phone").toString();
 						String mobile = row_data.get("mobile").toString();
@@ -96,37 +86,38 @@ public class Res_PartnerSyncHelper {
 						String company = "OpenERP";
 						String image = row_data.get("image_small").toString();
 
-						addContact(context, account, partnerID, name, userName,
-								mail, number, mobile, website, street, street2,
-								city, zip, company, image);
-
+						// Creating new contact
+						addContact(mContext, account, partnerID, name, mail,
+								number, mobile, website, street, street2, city,
+								zip, company, image);
+						return true;
 					}
-
 				}
 			}
-			return true;
-		} catch (Exception e1) {
+		} catch (Exception e) {
 			return false;
 		}
+		return false;
 	}
 
 	public Uri getPartnerUri(int partner_id) {
-		Account account = OpenERPAccountManager.getAccount(context, OEUser
-				.current(context).getAndroidName());
+		Account account = OpenERPAccountManager.getAccount(mContext, OEUser
+				.current(mContext).getAndroidName());
 		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon()
 				.appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name)
 				.appendQueryParameter(RawContacts.ACCOUNT_TYPE, account.type)
 				.build();
-		mContentResolver = context.getContentResolver();
 
+		mContentResolver = mContext.getContentResolver();
 		Cursor data = mContentResolver.query(rawContactUri, null,
-				UsernameColumn + " = " + partner_id, null, null);
+				SYNC1_PARTNER_ID + " = " + partner_id, null, null);
 		String contact_raw_id = null;
 		while (data.moveToNext()) {
 			contact_raw_id = data.getString(data
 					.getColumnIndex(ContactsContract.Contacts._ID));
 		}
 		data.close();
+
 		Uri contact_uri = null;
 		if (contact_raw_id != null) {
 			contact_uri = Uri.withAppendedPath(
@@ -136,10 +127,9 @@ public class Res_PartnerSyncHelper {
 	}
 
 	private void addContact(Context context, Account account,
-			String partner_id, String name, String username, String mail,
-			String number, String mobile, String website, String street,
-			String street2, String city, String zip, String company,
-			String image) {
+			String partner_id, String name, String mail, String number,
+			String mobile, String website, String street, String street2,
+			String city, String zip, String company, String image) {
 
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 		int rawContactInsertIndex = operationList.size();
@@ -148,9 +138,10 @@ public class Res_PartnerSyncHelper {
 				.newInsert(RawContacts.CONTENT_URI);
 		builder.withValue(RawContacts.ACCOUNT_NAME, account.name);
 		builder.withValue(RawContacts.ACCOUNT_TYPE, account.type);
-		builder.withValue(RawContacts.SYNC1, username);
+		builder.withValue(RawContacts.SYNC1, partner_id);
 		operationList.add(builder.build());
 
+		// Display Name
 		builder = ContentProviderOperation
 				.newInsert(ContactsContract.Data.CONTENT_URI);
 		builder.withValueBackReference(
@@ -164,12 +155,13 @@ public class Res_PartnerSyncHelper {
 				name);
 		operationList.add(builder.build());
 
+		// Connection to send message from contact
 		builder = ContentProviderOperation
 				.newInsert(ContactsContract.Data.CONTENT_URI);
 		builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
 		builder.withValue(ContactsContract.Data.MIMETYPE,
 				"vnd.android.cursor.item/vnd.com.openerp.auth.profile");
-		builder.withValue(ContactsContract.Data.DATA1, username);
+		builder.withValue(ContactsContract.Data.DATA1, name);
 		builder.withValue(ContactsContract.Data.DATA2, partner_id);
 		builder.withValue(ContactsContract.Data.DATA3, "Send Message");
 		operationList.add(builder.build());
@@ -301,7 +293,7 @@ public class Res_PartnerSyncHelper {
 			StrictMode.setThreadPolicy(policy);
 		}
 
-		// INSERT imAGE
+		// Partner Image
 		if (!image.equals("false")) {
 
 			Bitmap bitmapOrg = Base64Helper.getBitmapImage(context, image);
@@ -322,6 +314,7 @@ public class Res_PartnerSyncHelper {
 									stream.toByteArray()).build());
 		}
 
+		// Organization
 		if (!company.equals("false")) {
 			operationList
 					.add(ContentProviderOperation
@@ -349,11 +342,10 @@ public class Res_PartnerSyncHelper {
 	}
 
 	private static class SyncEntry {
-		public Long raw_id = 0L;
-		public Long photo_timestamp = null;
+		public Long partner_id = 0L;
 	}
 
-	public void SyncContacts(Context context, Account account) {
+	public void syncContacts(Context context, Account account) {
 		HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 		mContentResolver = context.getContentResolver();
 		int company_id = Integer.parseInt(OpenERPAccountManager.currentUser(
@@ -369,18 +361,16 @@ public class Res_PartnerSyncHelper {
 				.appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name)
 				.appendQueryParameter(RawContacts.ACCOUNT_TYPE, account.type)
 				.build();
-		Cursor c1 = mContentResolver.query(rawContactUri, new String[] {
-				BaseColumns._ID, UsernameColumn, PhotoTimestampColumn }, null,
-				null, null);
+		Cursor cursor = mContentResolver.query(rawContactUri, new String[] {
+				BaseColumns._ID, SYNC1_PARTNER_ID }, null, null, null);
 
-		while (c1.moveToNext()) {
+		while (cursor.moveToNext()) {
 			SyncEntry entry = new SyncEntry();
-			entry.raw_id = c1.getLong(c1.getColumnIndex(BaseColumns._ID));
-			entry.photo_timestamp = c1.getLong(c1
-					.getColumnIndex(PhotoTimestampColumn));
-			localContacts.put(c1.getString(1), entry);
+			entry.partner_id = cursor.getLong(cursor
+					.getColumnIndex(BaseColumns._ID));
+			localContacts.put(cursor.getString(1), entry);
 		}
-		c1.close();
+		cursor.close();
 
 		try {
 			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(context);
@@ -390,7 +380,6 @@ public class Res_PartnerSyncHelper {
 							"false" });
 			// checking if records exist?
 			int total = Integer.parseInt(res.get("total").toString());
-			// System.out.println("TOTAL PARTNERS ::" + total);
 
 			if (total > 0) {
 				@SuppressWarnings("unchecked")
@@ -407,13 +396,9 @@ public class Res_PartnerSyncHelper {
 								.getString(0).toString();
 
 						if (com_id.equalsIgnoreCase(String.valueOf(company_id))) {
-
 							String partnerID = row_data.get("id").toString();
-							// Remove everything except characters and
-							// digits
 							String name = (row_data.get("name").toString())
 									.replaceAll("[^\\w\\s]", "");
-							String userName = row_data.get("id").toString();
 							String mail = row_data.get("email").toString();
 							String number = row_data.get("phone").toString();
 							String mobile = row_data.get("mobile").toString();
@@ -428,17 +413,16 @@ public class Res_PartnerSyncHelper {
 							if (localContacts
 									.get(row_data.get("id").toString()) == null) {
 								addContact(context, account, partnerID, name,
-										userName, mail, number, mobile,
-										website, street, street2, city, zip,
-										company, image);
+										mail, number, mobile, website, street,
+										street2, city, zip, company, image);
 							}
 						}
 					}
 
 				}
 			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
