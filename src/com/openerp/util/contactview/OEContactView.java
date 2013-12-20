@@ -74,7 +74,7 @@ public class OEContactView extends QuickContactBadge {
 
 		// Set the dialog title
 		builder.setTitle("Add Contact")
-				.setMessage("Create new contact for this user?")
+				.setMessage("Add this partner to your contact.")
 
 				// Set the action buttons
 				.setPositiveButton("Yes",
