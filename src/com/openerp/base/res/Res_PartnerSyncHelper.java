@@ -38,6 +38,7 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.support.OEUser;
 import com.openerp.util.Base64Helper;
 
 public class Res_PartnerSyncHelper {
@@ -48,7 +49,90 @@ public class Res_PartnerSyncHelper {
 	private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
 
 	public Res_PartnerSyncHelper(Context context) {
-		context = this.context;
+		this.context = context;
+	}
+
+	public boolean createNewContact(int partner_id) {
+		Account account = OpenERPAccountManager.getAccount(context, OEUser
+				.current(context).getAndroidName());
+		try {
+			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(context);
+			HashMap<String, Object> res = dbHelper.search(dbHelper,
+					new String[] { "(phone != ? ", "OR", "mobile != ? ", "OR",
+							"email != ? ) ", "AND", "id = ? " }, new String[] {
+							"false", "false", "false", partner_id + "" });
+			// checking if records exist?
+			int total = Integer.parseInt(res.get("total").toString());
+			// System.out.println("TOTAL PARTNERS ::" + total);
+
+			if (total > 0) {
+				@SuppressWarnings("unchecked")
+				List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) res
+						.get("records");
+
+				for (HashMap<String, Object> row_data : rows) {
+
+					if (!(row_data.get("company_id").toString())
+							.equalsIgnoreCase("false")) {
+						JSONArray db_company_id = new JSONArray(row_data.get(
+								"company_id").toString());
+						String com_id = db_company_id.getJSONArray(0)
+								.getString(0).toString();
+
+						String partnerID = row_data.get("id").toString();
+						// Remove everything except characters and
+						// digits
+						String name = (row_data.get("name").toString())
+								.replaceAll("[^\\w\\s]", "");
+						String userName = row_data.get("id").toString();
+						String mail = row_data.get("email").toString();
+						String number = row_data.get("phone").toString();
+						String mobile = row_data.get("mobile").toString();
+						String website = row_data.get("website").toString();
+						String street = row_data.get("street").toString();
+						String street2 = row_data.get("street2").toString();
+						String city = row_data.get("city").toString();
+						String zip = row_data.get("zip").toString();
+						String company = "OpenERP";
+						String image = row_data.get("image_small").toString();
+
+						addContact(context, account, partnerID, name, userName,
+								mail, number, mobile, website, street, street2,
+								city, zip, company, image);
+
+					}
+
+				}
+			}
+			return true;
+		} catch (Exception e1) {
+			return false;
+		}
+	}
+
+	public Uri getPartnerUri(int partner_id) {
+		Account account = OpenERPAccountManager.getAccount(context, OEUser
+				.current(context).getAndroidName());
+		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon()
+				.appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name)
+				.appendQueryParameter(RawContacts.ACCOUNT_TYPE, account.type)
+				.build();
+		mContentResolver = context.getContentResolver();
+
+		Cursor data = mContentResolver.query(rawContactUri, null,
+				UsernameColumn + " = " + partner_id, null, null);
+		String contact_raw_id = null;
+		while (data.moveToNext()) {
+			contact_raw_id = data.getString(data
+					.getColumnIndex(ContactsContract.Contacts._ID));
+		}
+		data.close();
+		Uri contact_uri = null;
+		if (contact_raw_id != null) {
+			contact_uri = Uri.withAppendedPath(
+					ContactsContract.Contacts.CONTENT_URI, contact_raw_id);
+		}
+		return contact_uri;
 	}
 
 	private void addContact(Context context, Account account,
@@ -296,6 +380,7 @@ public class Res_PartnerSyncHelper {
 					.getColumnIndex(PhotoTimestampColumn));
 			localContacts.put(c1.getString(1), entry);
 		}
+		c1.close();
 
 		try {
 			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(context);

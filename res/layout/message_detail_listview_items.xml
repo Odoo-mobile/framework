@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
 
-            <ImageView
+            <com.openerp.util.contactview.OEContactView
                 android:id="@+id/imgUserPicture"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
