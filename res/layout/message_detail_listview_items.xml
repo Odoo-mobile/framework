@@ -161,7 +161,7 @@
                     android:layout_marginTop="10dp"
                     android:background="@drawable/vote_background_selector_gray"
                     android:clickable="true"
-                    android:drawableLeft="@drawable/ic_action_rating_good_white"
+                    android:drawableLeft="@drawable/ic_thumbs_up_unselected_dark_tablet"
                     android:gravity="center"
                     android:paddingBottom="8dp"
                     android:paddingLeft="3dp"
@@ -169,7 +169,7 @@
                     android:paddingTop="5dp"
                     android:text="5"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="#ffffff" />
+                    android:textColor="#838383" />
             </LinearLayout>
         </LinearLayout>
 

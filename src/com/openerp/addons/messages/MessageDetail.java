@@ -152,9 +152,19 @@ public class MessageDetail extends BaseFragment {
 				final boolean hasVoted = Boolean.parseBoolean(row_data
 						.getRow_data().get("has_voted").toString());
 				if (!hasVoted) {
-					txvVote.setBackgroundResource(R.drawable.vote_background_selector_gray);
+					txvVote.setCompoundDrawablesWithIntrinsicBounds(
+							getResources()
+									.getDrawable(
+											R.drawable.ic_thumbs_up_unselected_dark_tablet),
+							null, null, null);
+					// txvVote.setBackgroundResource(R.drawable.vote_background_selector_gray);
 				} else {
-					txvVote.setBackgroundResource(R.drawable.vote_background_selector_blue);
+					// txvVote.setBackgroundResource(R.drawable.vote_background_selector_blue);
+					txvVote.setCompoundDrawablesWithIntrinsicBounds(
+							getResources()
+									.getDrawable(
+											R.drawable.ic_thumbs_up_selected_dark_tablet),
+							null, null, null);
 				}
 				txvVote.setOnClickListener(new OnClickListener() {
 					@Override
@@ -177,9 +187,19 @@ public class MessageDetail extends BaseFragment {
 						voteToggle.execute((Void) null);
 						txvVote.setText(newVote);
 						if (!btnvoted) {
-							txvVote.setBackgroundResource(R.drawable.vote_background_selector_gray);
+							txvVote.setCompoundDrawablesWithIntrinsicBounds(
+									getResources()
+											.getDrawable(
+													R.drawable.ic_thumbs_up_unselected_dark_tablet),
+									null, null, null);
+							// txvVote.setBackgroundResource(R.drawable.vote_background_selector_gray);
 						} else {
-							txvVote.setBackgroundResource(R.drawable.vote_background_selector_blue);
+							// txvVote.setBackgroundResource(R.drawable.vote_background_selector_blue);
+							txvVote.setCompoundDrawablesWithIntrinsicBounds(
+									getResources()
+											.getDrawable(
+													R.drawable.ic_thumbs_up_selected_dark_tablet),
+									null, null, null);
 						}
 					}
 				});
