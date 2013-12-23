@@ -157,20 +157,19 @@
                 <TextView
                     android:id="@+id/txvmessageVotenb"
                     android:layout_width="wrap_content"
-                    android:layout_height="30dp"
+                    android:layout_height="35dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/oe_background_selector"
+                    android:background="@drawable/vote_background_selector_gray"
                     android:clickable="true"
-                    android:drawableLeft="@drawable/ic_action_rating_good"
+                    android:drawableLeft="@drawable/ic_action_rating_good_white"
                     android:gravity="center"
-                    android:paddingBottom="5dp"
-                    android:paddingLeft="0dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="3dp"
                     android:paddingRight="5dp"
                     android:paddingTop="5dp"
                     android:text="5"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#0099CC"
-                    android:textStyle="bold" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#ffffff" />
             </LinearLayout>
         </LinearLayout>
 
