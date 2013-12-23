@@ -50,6 +50,7 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 	/** The m context. */
 	Context mContext = null;
 	private static OEHelper oe = null;
+	OEUser mUser = null;
 
 	/**
 	 * Instantiates a new message sync helper.
@@ -68,6 +69,7 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 			JSONException, IOException, OEVersionException {
 		super(context, OEUser.current(context));
 		mContext = context;
+		mUser = OEUser.current(context);
 	}
 
 	/*
@@ -145,12 +147,60 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 			e.printStackTrace();
 		}
 
+		// Updating Message Votes
+		try {
+			JSONObject vote_fields = new JSONObject();
+			vote_fields.accumulate("fields", "vote_user_ids");
+
+			OEArgsHelper vote_args = new OEArgsHelper();
+			vote_args.addArgCondition("id", "in", localIds);
+
+			OEArgsHelper argsObj = new OEArgsHelper();
+			argsObj.addArg(vote_args.getArgs());
+
+			JSONObject domain_votes = new JSONObject();
+			domain_votes.accumulate("domain", new JSONArray(argsObj.getArgs()
+					.toString()));
+			JSONObject vote_detail = oe.search_read("mail.message",
+					vote_fields, domain_votes, 0, 0, null, null);
+			if (vote_detail.has("records")) {
+				updateMessageVotes(vote_detail, db);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		int total = newCreated.length() + updatedIds.length();
 		messageSyncOutcome.put("total", total);
 		messageSyncOutcome.put("new_ids", newCreated);
 		messageSyncOutcome.put("update_ids", updatedIds);
 
 		return messageSyncOutcome;
+	}
+
+	private void updateMessageVotes(JSONObject vote_detail, BaseDBHelper db) {
+		try {
+			for (int j = 0; j < vote_detail.getJSONArray("records").length(); j++) {
+				JSONObject obj_vote = vote_detail.getJSONArray("records")
+						.getJSONObject(j);
+				JSONArray voted_user_ids = obj_vote
+						.getJSONArray("vote_user_ids");
+				ContentValues values = new ContentValues();
+				for (int i = 0; i < voted_user_ids.length(); i++) {
+					if (voted_user_ids.getString(i).equals(mUser.getUser_id())) {
+						values.put("has_voted", "true");
+						break;
+					} else {
+						values.put("has_voted", "false");
+					}
+				}
+				int total_votes = voted_user_ids.length();
+				int message_id = obj_vote.getInt("id");
+				values.put("vote_nb", total_votes);
+				db.write(db, values, message_id, true);
+			}
+		} catch (Exception e) {
+		}
 	}
 
 	private JSONArray updateMessageStatus(JSONObject msgReplies, BaseDBHelper db) {

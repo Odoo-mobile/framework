@@ -156,7 +156,14 @@ public class MessageDetail extends BaseFragment {
 							scope.context()
 									.getResources()
 									.getDrawable(
-											R.drawable.ic_action_vote_empty_small),
+											R.drawable.ic_action_rating_good),
+							null, null, null);
+				} else {
+					txvVote.setCompoundDrawablesWithIntrinsicBounds(
+							scope.context()
+									.getResources()
+									.getDrawable(
+											R.drawable.ic_action_rating_good_blue),
 							null, null, null);
 				}
 				txvVote.setOnClickListener(new OnClickListener() {
@@ -184,14 +191,14 @@ public class MessageDetail extends BaseFragment {
 									scope.context()
 											.getResources()
 											.getDrawable(
-													R.drawable.ic_action_vote_empty_small),
+													R.drawable.ic_action_rating_good),
 									null, null, null);
 						} else {
 							txvVote.setCompoundDrawablesWithIntrinsicBounds(
 									scope.context()
 											.getResources()
 											.getDrawable(
-													R.drawable.ic_action_rating_filled_small),
+													R.drawable.ic_action_rating_good_blue),
 									null, null, null);
 						}
 					}
