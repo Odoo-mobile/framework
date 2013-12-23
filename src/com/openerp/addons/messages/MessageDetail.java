@@ -153,10 +153,17 @@ public class MessageDetail extends BaseFragment {
 						.getRow_data().get("has_voted").toString());
 				if (!hasVoted) {
 					txvVote.setCompoundDrawablesWithIntrinsicBounds(
-							scope.context()
-									.getResources()
+							getResources()
 									.getDrawable(
-											R.drawable.ic_action_vote_empty_small),
+											R.drawable.ic_thumbs_up_unselected_dark_tablet),
+							null, null, null);
+					// txvVote.setBackgroundResource(R.drawable.vote_background_selector_gray);
+				} else {
+					// txvVote.setBackgroundResource(R.drawable.vote_background_selector_blue);
+					txvVote.setCompoundDrawablesWithIntrinsicBounds(
+							getResources()
+									.getDrawable(
+											R.drawable.ic_thumbs_up_selected_dark_tablet),
 							null, null, null);
 				}
 				txvVote.setOnClickListener(new OnClickListener() {
@@ -181,17 +188,17 @@ public class MessageDetail extends BaseFragment {
 						txvVote.setText(newVote);
 						if (!btnvoted) {
 							txvVote.setCompoundDrawablesWithIntrinsicBounds(
-									scope.context()
-											.getResources()
+									getResources()
 											.getDrawable(
-													R.drawable.ic_action_vote_empty_small),
+													R.drawable.ic_thumbs_up_unselected_dark_tablet),
 									null, null, null);
+							// txvVote.setBackgroundResource(R.drawable.vote_background_selector_gray);
 						} else {
+							// txvVote.setBackgroundResource(R.drawable.vote_background_selector_blue);
 							txvVote.setCompoundDrawablesWithIntrinsicBounds(
-									scope.context()
-											.getResources()
+									getResources()
 											.getDrawable(
-													R.drawable.ic_action_rating_filled_small),
+													R.drawable.ic_thumbs_up_selected_dark_tablet),
 									null, null, null);
 						}
 					}
