@@ -76,7 +76,6 @@ public class UserGroupsSyncService extends Service {
 	 */
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		IBinder ret = null;
 		ret = getSyncAdapter().getSyncAdapterBinder();
 		return ret;
@@ -88,7 +87,6 @@ public class UserGroupsSyncService extends Service {
 	 * @return the sync adapter
 	 */
 	public SyncAdapterImpl getSyncAdapter() {
-		// TODO Auto-generated method stub
 		if (sSyncAdapter == null) {
 			sSyncAdapter = new SyncAdapterImpl(this);
 		}
@@ -114,7 +112,6 @@ public class UserGroupsSyncService extends Service {
 	public void performSync(Context context, Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
-		// TODO Auto-generated method stub
 		try {
 			UserGroupsDb usergroups = new UserGroupsDb(context);
 			Intent intent = new Intent();
@@ -205,7 +202,6 @@ public class UserGroupsSyncService extends Service {
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
-			// TODO Auto-generated method stub
 			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				account = OpenERPAccountManager.getAccount(mContext,
 						OpenERPAccountManager.currentUser(context)

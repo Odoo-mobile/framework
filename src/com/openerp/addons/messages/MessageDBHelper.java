@@ -13,8 +13,11 @@ import com.openerp.orm.Types;
 
 public class MessageDBHelper extends BaseDBHelper {
 
+	Context mContext = null;
+
 	public MessageDBHelper(Context context) {
 		super(context);
+		mContext = context;
 		/* setting model name */
 		name = "mail.message";
 

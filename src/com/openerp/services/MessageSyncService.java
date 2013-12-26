@@ -45,14 +45,12 @@ import com.openerp.addons.messages.MessageDBHelper;
 import com.openerp.addons.messages.MessageSyncHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.receivers.SyncFinishReceiver;
-import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.util.OEDate;
 import com.openerp.util.OENotificationHelper;
 import com.openerp.widget.Mobile_Widget;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class MessageSyncService.
  */
@@ -85,7 +83,6 @@ public class MessageSyncService extends Service {
 	 */
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		IBinder ret = null;
 		ret = getSyncAdapter().getSyncAdapterBinder();
 		return ret;
@@ -97,7 +94,6 @@ public class MessageSyncService extends Service {
 	 * @return the sync adapter
 	 */
 	public SyncAdapterImpl getSyncAdapter() {
-		// TODO Auto-generated method stub
 		if (sSyncAdapter == null) {
 			sSyncAdapter = new SyncAdapterImpl(this);
 		}
@@ -147,9 +143,8 @@ public class MessageSyncService extends Service {
 				// Providing arguments to filter messages from server.
 				// Argument for Check Ids not in local database
 				OEArgsHelper arg1 = new OEArgsHelper();
-				arg1.addArgCondition("id", "not in", JSONDataHelper
-						.intArrayToJSONArray(msgDb.localIds(msgDb)));
-
+				arg1.addArgCondition("id", ">",
+						msgDb.getLastId(msgDb.getModelName(), "id"));
 				// Handling setting argument for sync data limit.
 				OEArgsHelper arg_date = new OEArgsHelper();
 				SharedPreferences pref = PreferenceManager
@@ -309,7 +304,6 @@ public class MessageSyncService extends Service {
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
-			// TODO Auto-generated method stub
 			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				account = OpenERPAccountManager.getAccount(mContext,
 						OpenERPAccountManager.currentUser(context)

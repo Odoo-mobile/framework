@@ -41,7 +41,6 @@ import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OEUser;
 import com.openerp.support.SyncHelper;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class MessageSyncHelper.
  */

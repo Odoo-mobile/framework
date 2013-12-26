@@ -49,20 +49,17 @@ public class MeetingSyncService extends Service {
 
 	public MeetingSyncService() {
 		super();
-		// TODO Auto-generated constructor stub
 		this.context = this;
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		IBinder ret = null;
 		ret = getSyncAdapter().getSyncAdapterBinder();
 		return ret;
 	}
 
 	public SyncAdapterImpl getSyncAdapter() {
-		// TODO Auto-generated method stub
 		if (sSyncAdapter == null) {
 			sSyncAdapter = new SyncAdapterImpl(this);
 		}
@@ -72,7 +69,6 @@ public class MeetingSyncService extends Service {
 	public void performSync(Context context, Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
-		// TODO Auto-generated method stub
 
 		try {
 			// creating a object of MeetingDBHelper to handle database
@@ -82,11 +78,9 @@ public class MeetingSyncService extends Service {
 			JSONObject domain = new JSONObject();
 			domain.accumulate(
 					"domain",
-					new JSONArray("[[\"user_id\", \"=\", "
-							+ user_id
-							+ "],[\"id\",\"not in\", "
-							+ JSONDataHelper.intArrayToJSONArray(db
-									.localIds(db)) + "]]"));
+					new JSONArray("[[\"user_id\", \"=\", " + user_id
+							+ "],[\"id\",\">\", "
+							+ db.getLastId(db.getModelName(), "id") + "]]"));
 
 			// start sync service to fetch new Records from OpenERP Server to
 			// localDB
@@ -157,7 +151,6 @@ public class MeetingSyncService extends Service {
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
-			// TODO Auto-generated method stub
 
 			if (OpenERPAccountManager.isAnyUser(mContext)) {
 				// retriving user account name

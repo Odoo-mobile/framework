@@ -1035,8 +1035,9 @@ public class ORM extends SQLiteDatabaseHelper {
 		sqlQuery.append(TextUtils.join(" ", where));
 
 		List<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
-
 		Cursor cursor = db.rawQuery(sqlQuery.toString(), args);
+		columns = new String[cursor.getColumnCount()];
+		columns = cursor.getColumnNames();
 		if (cursor.moveToFirst()) {
 			do {
 				HashMap<String, Object> row = new HashMap<String, Object>();
@@ -1052,6 +1053,17 @@ public class ORM extends SQLiteDatabaseHelper {
 
 	}
 
+	public int getLastId(String model_name, String column) {
+		List<HashMap<String, Object>> data = executeSQL(model_name,
+				new String[] { "max("+column+") as id" },
+				new String[] { "oea_name = ?" },
+				new String[] { OEUser.current(context).getAndroidName() });
+		Object last_id = data.get(0).get("id");
+		if (last_id == null) {
+			return 0;
+		}
+		return Integer.parseInt(last_id.toString());
+	}
 	/**
 	 * Count.
 	 * 

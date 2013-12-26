@@ -39,8 +39,6 @@ import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.base.res.Res_PartnerSyncHelper;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
-import com.openerp.support.JSONDataHelper;
-import com.openerp.util.logger.OELog;
 
 public class ContactSyncService extends Service {
 	int mStartMode; // indicates how to behave if the service is killed
