@@ -8,8 +8,8 @@ import android.content.Context;
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.BaseDBHelper;
-import com.openerp.orm.Fields;
-import com.openerp.orm.Types;
+import com.openerp.orm.OEColumn;
+import com.openerp.orm.OETypes;
 
 public class MessageDBHelper extends BaseDBHelper {
 
@@ -22,24 +22,24 @@ public class MessageDBHelper extends BaseDBHelper {
 		name = "mail.message";
 
 		/* providing model columns */
-		columns.add(new Fields("partner_ids", "Partners", Types
+		columns.add(new OEColumn("partner_ids", "Partners", OETypes
 				.many2Many(new Res_PartnerDBHelper(context))));
-		columns.add(new Fields("subject", "Subject", Types.text()));
-		columns.add(new Fields("type", "Type", Types.varchar(30)));
-		columns.add(new Fields("body", "Body", Types.text()));
-		columns.add(new Fields("email_from", "Email From", Types.text()));
-		columns.add(new Fields("parent_id", "Parent", Types.integer()));
-		columns.add(new Fields("record_name", "Record Title", Types.text()));
-		columns.add(new Fields("to_read", "To Read", Types.varchar(5)));
-		columns.add(new Fields("author_id", "Author", Types
+		columns.add(new OEColumn("subject", "Subject", OETypes.text()));
+		columns.add(new OEColumn("type", "Type", OETypes.varchar(30)));
+		columns.add(new OEColumn("body", "Body", OETypes.text()));
+		columns.add(new OEColumn("email_from", "Email From", OETypes.text()));
+		columns.add(new OEColumn("parent_id", "Parent", OETypes.integer()));
+		columns.add(new OEColumn("record_name", "Record Title", OETypes.text()));
+		columns.add(new OEColumn("to_read", "To Read", OETypes.varchar(5)));
+		columns.add(new OEColumn("author_id", "Author", OETypes
 				.many2One(new Res_PartnerDBHelper(context))));
-		columns.add(new Fields("model", "Model", Types.varchar(50)));
-		columns.add(new Fields("res_id", "Resouce Reference", Types.text()));
-		columns.add(new Fields("date", "Date", Types.varchar(20)));
-		columns.add(new Fields("has_voted", "Has Voted", Types.varchar(5)));
-		columns.add(new Fields("vote_nb", "vote numbers", Types.integer()));
-		columns.add(new Fields("starred", "Starred", Types.varchar(5)));
-		columns.add(new Fields("attachment_ids", "Attachments", Types
+		columns.add(new OEColumn("model", "Model", OETypes.varchar(50)));
+		columns.add(new OEColumn("res_id", "Resouce Reference", OETypes.text()));
+		columns.add(new OEColumn("date", "Date", OETypes.varchar(20)));
+		columns.add(new OEColumn("has_voted", "Has Voted", OETypes.varchar(5)));
+		columns.add(new OEColumn("vote_nb", "vote numbers", OETypes.integer()));
+		columns.add(new OEColumn("starred", "Starred", OETypes.varchar(5)));
+		columns.add(new OEColumn("attachment_ids", "Attachments", OETypes
 				.many2Many(new Ir_AttachmentDBHelper(context))));
 
 	}

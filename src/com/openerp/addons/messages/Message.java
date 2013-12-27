@@ -71,7 +71,7 @@ import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
-import com.openerp.support.listview.OEListViewRows;
+import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.drawer.DrawerItem;
 
 public class Message extends BaseFragment implements
@@ -83,9 +83,9 @@ public class Message extends BaseFragment implements
 	ActionMode mActionMode;
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 	ListView lstview = null;
-	List<OEListViewRows> list = new ArrayList<OEListViewRows>();
+	List<OEListViewRow> list = new ArrayList<OEListViewRow>();
 	OEListViewAdapter listAdapter = null;
-	List<OEListViewRows> messages_sorted = null;
+	List<OEListViewRow> messages_sorted = null;
 	HashMap<String, Integer> message_row_indexes = new HashMap<String, Integer>();
 	View rootView = null;
 	String[] from = new String[] { "id", "subject", "body", "record_name",
@@ -168,7 +168,7 @@ public class Message extends BaseFragment implements
 	 * 
 	 * Setting up listview for messages to load.
 	 */
-	public void setupListView(List<OEListViewRows> message_list) {
+	public void setupListView(List<OEListViewRow> message_list) {
 		// Destroying pre-loaded instance and going to create new one
 		lstview = null;
 
@@ -206,7 +206,7 @@ public class Message extends BaseFragment implements
 
 			@Override
 			public View listViewOnCreateListener(int position, View row_view,
-					OEListViewRows row_data) {
+					OEListViewRow row_data) {
 				String model_name = row_data.getRow_data().get("model")
 						.toString();
 				String model = model_name;
@@ -290,7 +290,7 @@ public class Message extends BaseFragment implements
 			public boolean onItemLongClick(AdapterView<?> arg0, View view,
 					int index, long arg3) {
 
-				OEListViewRows data = (OEListViewRows) lstview.getAdapter()
+				OEListViewRow data = (OEListViewRow) lstview.getAdapter()
 						.getItem(index);
 
 				Toast.makeText(scope.context(),
@@ -485,7 +485,7 @@ public class Message extends BaseFragment implements
 
 	int message_resource = 0;
 
-	private List<OEListViewRows> getMessages(TYPE type) {
+	private List<OEListViewRow> getMessages(TYPE type) {
 		String[] where = null;
 		String[] whereArgs = null;
 		current_type = type;
@@ -517,8 +517,8 @@ public class Message extends BaseFragment implements
 		// Fetching parent ids from Child row with order by date desc
 		List<OEDataRow> result = db.search(db, from, where, whereArgs, null,
 				null, "date", "DESC");
-		HashMap<String, OEListViewRows> parent_list_details = new HashMap<String, OEListViewRows>();
-		messages_sorted = new ArrayList<OEListViewRows>();
+		HashMap<String, OEListViewRow> parent_list_details = new HashMap<String, OEListViewRow>();
+		messages_sorted = new ArrayList<OEListViewRow>();
 		if (result.size() > 0) {
 			scope.main().runOnUiThread(new Runnable() {
 
@@ -544,7 +544,7 @@ public class Message extends BaseFragment implements
 				if (!parent_list_details.containsKey(key)) {
 					// Fetching row parent message
 					OEDataRow newRow = null;
-					OEListViewRows newRowObj = null;
+					OEListViewRow newRowObj = null;
 
 					if (isParent) {
 						newRow = row;
@@ -556,7 +556,7 @@ public class Message extends BaseFragment implements
 							"subject",
 							updateSubject(newRow.get("subject").toString(),
 									Integer.parseInt(key)));
-					newRowObj = new OEListViewRows(Integer.parseInt(key),
+					newRowObj = new OEListViewRow(Integer.parseInt(key),
 							newRow);
 
 					parent_list_details.put(key, newRowObj);
@@ -841,11 +841,11 @@ public class Message extends BaseFragment implements
 				if (!parent_id.equals("false")) {
 					id = parent_id;
 				}
-				OEListViewRows newRowObj = null;
+				OEListViewRow newRowObj = null;
 				List<OEDataRow> newRow = db.search(db, from,
 						new String[] { "id = ?" }, new String[] { id }, null,
 						null, "date", "DESC");
-				newRowObj = new OEListViewRows(Integer.parseInt(id),
+				newRowObj = new OEListViewRow(Integer.parseInt(id),
 						newRow.get(0));
 				if (message_row_indexes.containsKey(id) && list.size() > 0) {
 					list.remove(Integer.parseInt(message_row_indexes.get(id)
@@ -865,10 +865,10 @@ public class Message extends BaseFragment implements
 		}
 	};
 
-	private OEListViewRows getRowForMessage(int id) {
+	private OEListViewRow getRowForMessage(int id) {
 		List<OEDataRow> newRow = db.search(db, from, new String[] { "id = ?" },
 				new String[] { String.valueOf(id) });
-		OEListViewRows newRowObj = new OEListViewRows(id, newRow.get(0));
+		OEListViewRow newRowObj = new OEListViewRow(id, newRow.get(0));
 
 		return newRowObj;
 	}
@@ -955,7 +955,7 @@ public class Message extends BaseFragment implements
 	BooleanColumnCallback updateStarred = new BooleanColumnCallback() {
 
 		@Override
-		public OEListViewRows updateFlagValues(OEListViewRows row, View view) {
+		public OEListViewRow updateFlagValues(OEListViewRow row, View view) {
 			OEDataRow rowData = row.getRow_data();
 			boolean flag = false;
 			ImageView img = (ImageView) view;
@@ -1034,7 +1034,7 @@ public class Message extends BaseFragment implements
 		String default_model = "false";
 		for (int key : msg_pos.keySet()) {
 			final int pos = msg_pos.get(key);
-			OEListViewRows rowInfo = list.get(pos);
+			OEListViewRow rowInfo = list.get(pos);
 			if (rowInfo.getRow_data().get("parent_id").equals("false")) {
 				parent_id = rowInfo.getRow_id();
 				res_id = Integer.parseInt(rowInfo.getRow_data().get("res_id")
@@ -1136,7 +1136,7 @@ public class Message extends BaseFragment implements
 
 	public class LoadMessages extends AsyncTask<Void, Void, Boolean> {
 
-		List<OEListViewRows> message_list = null;
+		List<OEListViewRow> message_list = null;
 		TYPE message_type = null;
 
 		public LoadMessages(TYPE type) {

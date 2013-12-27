@@ -25,7 +25,7 @@ import com.openerp.orm.OEDataRow;
 /**
  * The Class OEListViewRows.
  */
-public class OEListViewRows {
+public class OEListViewRow {
 
 	/** The row_id. */
 	private int row_id;
@@ -41,7 +41,7 @@ public class OEListViewRows {
 	 * @param row_data
 	 *            the row_data
 	 */
-	public OEListViewRows(int row_id, OEDataRow row_data) {
+	public OEListViewRow(int row_id, OEDataRow row_data) {
 		super();
 		this.row_id = row_id;
 		this.row_data = row_data;

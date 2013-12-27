@@ -52,7 +52,7 @@ import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.base.res.Res_PartnerDBHelper;
-import com.openerp.orm.Fields;
+import com.openerp.orm.OEColumn;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
@@ -60,7 +60,7 @@ import com.openerp.support.AppScope;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
-import com.openerp.support.listview.OEListViewRows;
+import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.OEDate;
@@ -72,9 +72,9 @@ public class MessageComposeActivty extends Activity implements
 	private static final int PICKFILE_RESULT_CODE = 1;
 	List<Uri> file_uris = new ArrayList<Uri>();
 	ListView lstAttachments = null;
-	List<OEListViewRows> attachments = new ArrayList<OEListViewRows>();
+	List<OEListViewRow> attachments = new ArrayList<OEListViewRow>();
 	OEListViewAdapter lstAttachmentAdapter = null;
-	List<OEListViewRows> partners_list = new ArrayList<OEListViewRows>();
+	List<OEListViewRow> partners_list = new ArrayList<OEListViewRow>();
 	HashMap<String, TagsItems> selectedPartners = new HashMap<String, TagsItems>();
 	boolean is_note_body = false;
 	boolean is_reply = false;
@@ -167,8 +167,8 @@ public class MessageComposeActivty extends Activity implements
 				new ControlClickEventListener() {
 
 					@Override
-					public OEListViewRows controlClicked(int position,
-							OEListViewRows row, View view) {
+					public OEListViewRow controlClicked(int position,
+							OEListViewRow row, View view) {
 						file_uris.remove(position);
 						attachments.remove(position);
 						lstAttachmentAdapter.refresh(attachments);
@@ -180,7 +180,7 @@ public class MessageComposeActivty extends Activity implements
 		List<OEDataRow> data = partners.search(partners);
 		if (data.size() > 0) {
 			for (OEDataRow row : data) {
-				OEListViewRows newRow = new OEListViewRows(row.getInt("id"),
+				OEListViewRow newRow = new OEListViewRow(row.getInt("id"),
 						row);
 				partners_list.add(newRow);
 			}
@@ -212,9 +212,9 @@ public class MessageComposeActivty extends Activity implements
 		Res_PartnerDBHelper res_partners = new Res_PartnerDBHelper(this);
 		OEHelper oe = res_partners.getOEInstance();
 		try {
-			ArrayList<Fields> cols = res_partners.getServerColumns();
+			ArrayList<OEColumn> cols = res_partners.getServerColumns();
 			JSONObject fields = new JSONObject();
-			for (Fields field : cols) {
+			for (OEColumn field : cols) {
 				fields.accumulate("fields", field.getName());
 			}
 			JSONObject domain = new JSONObject();
@@ -481,7 +481,7 @@ public class MessageComposeActivty extends Activity implements
 			// File file = new File(uri.getPath());
 			OEDataRow data = new OEDataRow();
 			data.put("name", getFilenameFromUri(uri));
-			OEListViewRows row = new OEListViewRows(row_id, data);
+			OEListViewRow row = new OEListViewRow(row_id, data);
 			attachments.add(row);
 			lstAttachmentAdapter.refresh(attachments);
 			row_id++;
@@ -710,7 +710,7 @@ public class MessageComposeActivty extends Activity implements
 
 						int msg_id = row_detail.getInt("message_id");
 						String key = row_detail.getString("parent_id");
-						OEListViewRows rowObj = null;
+						OEListViewRow rowObj = null;
 						String[] ids = new MessageDetail()
 								.getPartnersOfMessage(row_detail
 										.getString("message_id"));
@@ -720,7 +720,7 @@ public class MessageComposeActivty extends Activity implements
 						}
 						row_detail.put("partners", partners);
 
-						rowObj = new OEListViewRows(msg_id, row_detail);
+						rowObj = new OEListViewRow(msg_id, row_detail);
 
 					}
 				}

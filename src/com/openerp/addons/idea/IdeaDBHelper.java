@@ -22,8 +22,8 @@ package com.openerp.addons.idea;
 import android.content.Context;
 
 import com.openerp.orm.BaseDBHelper;
-import com.openerp.orm.Fields;
-import com.openerp.orm.Types;
+import com.openerp.orm.OEColumn;
+import com.openerp.orm.OETypes;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -42,9 +42,9 @@ public class IdeaDBHelper extends BaseDBHelper {
 		// TODO Auto-generated constructor stub
 		name = "idea.idea";
 
-		columns.add(new Fields("name", "Name", Types.varchar(64)));
-		columns.add(new Fields("description", "Description", Types.text()));
-		columns.add(new Fields("categoriy_ids", "Idea Category", Types
+		columns.add(new OEColumn("name", "Name", OETypes.varchar(64)));
+		columns.add(new OEColumn("description", "Description", OETypes.text()));
+		columns.add(new OEColumn("categoriy_ids", "Idea Category", OETypes
 				.many2Many(new IdeaCategory(context))));
 
 	}
@@ -64,7 +64,7 @@ public class IdeaDBHelper extends BaseDBHelper {
 			super(context);
 			// TODO Auto-generated constructor stub
 			name = "idea.category";
-			columns.add(new Fields("name", "Name", Types.text()));
+			columns.add(new OEColumn("name", "Name", OETypes.text()));
 		}
 
 	}

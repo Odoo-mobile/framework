@@ -61,7 +61,7 @@ import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
-import com.openerp.support.listview.OEListViewRows;
+import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.OEBinaryDownloadHelper;
 import com.openerp.util.OEFileSizeHelper;
 import com.openerp.util.contactview.OEContactView;
@@ -80,7 +80,7 @@ public class MessageDetail extends BaseFragment {
 	OEListViewAdapter listAdapter = null;
 
 	/** The messages_sorted. */
-	List<OEListViewRows> messages_sorted = null;
+	List<OEListViewRow> messages_sorted = null;
 
 	/** The message_id. */
 	int message_id = 0;
@@ -117,7 +117,7 @@ public class MessageDetail extends BaseFragment {
 	 * @param list
 	 *            the new up list view
 	 */
-	private boolean setupListView(final List<OEListViewRows> list) {
+	private boolean setupListView(final List<OEListViewRow> list) {
 		// Handling List View controls and keys
 		String[] from = new String[] { "image", "email_from|name",
 				"email_from|email", "body", "date", "partners", "starred",
@@ -139,7 +139,7 @@ public class MessageDetail extends BaseFragment {
 
 			@Override
 			public View listViewOnCreateListener(final int position,
-					View row_view, OEListViewRows row_data) {
+					View row_view, OEListViewRow row_data) {
 				final int message_id = row_data.getRow_id();
 				final OEDataRow row_values = row_data.getRow_data();
 				/* handling vote control */
@@ -181,7 +181,7 @@ public class MessageDetail extends BaseFragment {
 							row_values.put("has_voted", "true");
 						}
 						row_values.put("vote_nb", newVote);
-						listAdapter.updateRow(position, new OEListViewRows(
+						listAdapter.updateRow(position, new OEListViewRow(
 								message_id, row_values));
 						voteToggle.execute((Void) null);
 						txvVote.setText(newVote);
@@ -204,7 +204,7 @@ public class MessageDetail extends BaseFragment {
 				});
 
 				/* handling attachments */
-				List<OEListViewRows> attachments = getAttachmentsOfMessage(row_data
+				List<OEListViewRow> attachments = getAttachmentsOfMessage(row_data
 						.getRow_id() + "");
 				int index = 0;
 				if (attachments.size() > 0) {
@@ -214,7 +214,7 @@ public class MessageDetail extends BaseFragment {
 					View insertPoint = row_view
 							.findViewById(R.id.gridAttachments);
 					((ViewGroup) insertPoint).removeAllViews();
-					for (OEListViewRows row : attachments) {
+					for (OEListViewRow row : attachments) {
 						View v = vi
 								.inflate(
 										R.layout.fragment_message_detail_attachment_grid_item,
@@ -272,8 +272,8 @@ public class MessageDetail extends BaseFragment {
 				new ControlClickEventListener() {
 
 					@Override
-					public OEListViewRows controlClicked(int position,
-							OEListViewRows row, View view) {
+					public OEListViewRow controlClicked(int position,
+							OEListViewRow row, View view) {
 						Intent composeIntent = new Intent(scope.context(),
 								MessageComposeActivty.class);
 						composeIntent.putExtra("message_id", message_id);
@@ -321,7 +321,7 @@ public class MessageDetail extends BaseFragment {
 	}
 
 	private boolean setupMessageDetail(int message_id) {
-		messages_sorted = new ArrayList<OEListViewRows>();
+		messages_sorted = new ArrayList<OEListViewRow>();
 
 		String query = "select t1.id as message_id , t1.*, t2.id as partner_id, t2.name, t2.image_small as image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.date desc";
 		List<OEDataRow> records = db.executeSQL(
@@ -332,7 +332,7 @@ public class MessageDetail extends BaseFragment {
 			for (OEDataRow row_detail : records) {
 				int msg_id = row_detail.getInt("message_id");
 				String key = row_detail.getString("parent_id");
-				OEListViewRows rowObj = null;
+				OEListViewRow rowObj = null;
 				String[] ids = getPartnersOfMessage(row_detail
 						.getString("message_id"));
 				String partners = "nobody";
@@ -345,7 +345,7 @@ public class MessageDetail extends BaseFragment {
 					if (row_detail.getString("author_id").equals("false")) {
 						row_detail.put("image", "false");
 					}
-					rowObj = new OEListViewRows(msg_id, row_detail);
+					rowObj = new OEListViewRow(msg_id, row_detail);
 					parent_row = row_detail;
 					if (!row_detail.getString("model").equals("false")) {
 						messages_sorted.add(rowObj);
@@ -370,7 +370,7 @@ public class MessageDetail extends BaseFragment {
 						}
 					}
 				} else {
-					rowObj = new OEListViewRows(msg_id, row_detail);
+					rowObj = new OEListViewRow(msg_id, row_detail);
 					messages_sorted.add(rowObj);
 				}
 
@@ -418,8 +418,8 @@ public class MessageDetail extends BaseFragment {
 	 *            the message_id
 	 * @return the partners of message
 	 */
-	public List<OEListViewRows> getAttachmentsOfMessage(String message_id) {
-		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
+	public List<OEListViewRow> getAttachmentsOfMessage(String message_id) {
+		List<OEListViewRow> lists = new ArrayList<OEListViewRow>();
 		Ir_AttachmentDBHelper attachments = new Ir_AttachmentDBHelper(
 				MainActivity.context);
 		oea_name = OpenERPAccountManager.currentUser(MainActivity.context)
@@ -431,7 +431,7 @@ public class MessageDetail extends BaseFragment {
 		if (records.size() > 0) {
 			for (OEDataRow row : records) {
 				int attachment_id = row.getInt("id");
-				OEListViewRows list_row = new OEListViewRows(attachment_id, row);
+				OEListViewRow list_row = new OEListViewRow(attachment_id, row);
 				lists.add(list_row);
 			}
 		}
@@ -447,7 +447,7 @@ public class MessageDetail extends BaseFragment {
 	BooleanColumnCallback updateStarred = new BooleanColumnCallback() {
 
 		@Override
-		public OEListViewRows updateFlagValues(OEListViewRows row, View view) {
+		public OEListViewRow updateFlagValues(OEListViewRow row, View view) {
 			OEDataRow rowData = row.getRow_data();
 			boolean flag = false;
 			ImageView img = (ImageView) view;
@@ -593,7 +593,7 @@ public class MessageDetail extends BaseFragment {
 		String default_model = "false";
 
 		final int pos = 0;
-		OEListViewRows rowInfo = messages_sorted.get(pos);
+		OEListViewRow rowInfo = messages_sorted.get(pos);
 		if (rowInfo.getRow_data().get("parent_id").equals("false")) {
 			parent_id = rowInfo.getRow_id();
 			res_id = Integer.parseInt(rowInfo.getRow_data().get("res_id")

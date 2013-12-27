@@ -45,7 +45,7 @@ import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
 import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
-import com.openerp.support.listview.OEListViewRows;
+import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.OEDate;
 
 /**
@@ -566,10 +566,10 @@ public class OEHelper extends OpenERP {
 	 *            the columns
 	 * @return the sync cols
 	 */
-	private String[] getSyncCols(List<Fields> columns) {
+	private String[] getSyncCols(List<OEColumn> columns) {
 		String[] fields = new String[columns.size()];
 		int i = 0;
-		for (Fields col : columns) {
+		for (OEColumn col : columns) {
 			fields[i] = col.getName();
 			i++;
 		}
@@ -654,9 +654,9 @@ public class OEHelper extends OpenERP {
 	 *            the limit
 	 * @return the list
 	 */
-	public List<OEListViewRows> search_data(BaseDBHelper db, JSONObject domain,
+	public List<OEListViewRow> search_data(BaseDBHelper db, JSONObject domain,
 			int offset, int limit) {
-		List<OEListViewRows> record_lists = new ArrayList<OEListViewRows>();
+		List<OEListViewRow> record_lists = new ArrayList<OEListViewRow>();
 		try {
 			JSONObject fields = fieldsToOEFields(db.getServerColumns());
 			JSONObject result = search_read(db.getModelName(), fields, domain,
@@ -668,7 +668,7 @@ public class OEHelper extends OpenERP {
 					OEDataRow oe_datarow = jsonDataToMap(row);
 					int row_id = row.getInt("id");
 
-					OEListViewRows oe_row = new OEListViewRows(row_id,
+					OEListViewRow oe_row = new OEListViewRow(row_id,
 							oe_datarow);
 					record_lists.add(oe_row);
 				}
@@ -708,10 +708,10 @@ public class OEHelper extends OpenERP {
 	 *            the fields
 	 * @return the jSON object
 	 */
-	public JSONObject fieldsToOEFields(List<Fields> fields) {
+	public JSONObject fieldsToOEFields(List<OEColumn> fields) {
 		JSONObject oeFields = new JSONObject();
 		try {
-			for (Fields field : fields) {
+			for (OEColumn field : fields) {
 				oeFields.accumulate("fields", field.getName());
 			}
 		} catch (Exception e) {

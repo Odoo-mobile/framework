@@ -30,10 +30,10 @@ import android.content.Context;
 
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.BaseDBHelper;
-import com.openerp.orm.Fields;
+import com.openerp.orm.OEColumn;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
-import com.openerp.orm.Types;
+import com.openerp.orm.OETypes;
 import com.openerp.support.OEUser;
 import com.openerp.util.tags.TagsItems;
 
@@ -46,17 +46,17 @@ public class NoteDBHelper extends BaseDBHelper {
 		mContext = context;
 		name = "note.note";
 
-		columns.add(new Fields("name", "Name", Types.varchar(64)));
-		columns.add(new Fields("memo", "Memo", Types.varchar(64)));
-		columns.add(new Fields("open", "Open", Types.varchar(64)));
-		columns.add(new Fields("date_done", "Date_Done", Types.varchar(64)));
-		columns.add(new Fields("stage_id", "NoteStages", Types
+		columns.add(new OEColumn("name", "Name", OETypes.varchar(64)));
+		columns.add(new OEColumn("memo", "Memo", OETypes.varchar(64)));
+		columns.add(new OEColumn("open", "Open", OETypes.varchar(64)));
+		columns.add(new OEColumn("date_done", "Date_Done", OETypes.varchar(64)));
+		columns.add(new OEColumn("stage_id", "NoteStages", OETypes
 				.many2One(new NoteStages(context))));
-		columns.add(new Fields("tag_ids", "NoteTags", Types
+		columns.add(new OEColumn("tag_ids", "NoteTags", OETypes
 				.many2Many(new NoteTags(context))));
-		columns.add(new Fields("current_partner_id", "Res_Partner", Types
+		columns.add(new OEColumn("current_partner_id", "Res_Partner", OETypes
 				.many2One(new Res_PartnerDBHelper(context))));
-		columns.add(new Fields("note_pad_url", "URL", Types.text()));
+		columns.add(new OEColumn("note_pad_url", "URL", OETypes.text()));
 	}
 
 	// This method Will generate Name for the Notes
@@ -177,7 +177,7 @@ public class NoteDBHelper extends BaseDBHelper {
 		public NoteStages(Context context) {
 			super(context);
 			name = "note.stage";
-			columns.add(new Fields("name", "Name", Types.text()));
+			columns.add(new OEColumn("name", "Name", OETypes.text()));
 		}
 
 	}
@@ -187,7 +187,7 @@ public class NoteDBHelper extends BaseDBHelper {
 		public NoteTags(Context context) {
 			super(context);
 			name = "note.tag";
-			columns.add(new Fields("name", "Name", Types.text()));
+			columns.add(new OEColumn("name", "Name", OETypes.text()));
 		}
 	}
 }

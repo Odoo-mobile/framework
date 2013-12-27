@@ -22,7 +22,7 @@ package com.openerp.orm;
 /**
  * The Class Fields.
  */
-public class Fields {
+public class OEColumn {
 
 	/** The name. */
 	private String name;
@@ -49,7 +49,7 @@ public class Fields {
 	 * @param type
 	 *            the type
 	 */
-	public Fields(String name, String title, Object type) {
+	public OEColumn(String name, String title, Object type) {
 		super();
 		this.name = name;
 		this.title = title;
@@ -68,7 +68,7 @@ public class Fields {
 	 * @param canSync
 	 *            the can sync
 	 */
-	public Fields(String name, String title, Object type, boolean canSync) {
+	public OEColumn(String name, String title, Object type, boolean canSync) {
 		super();
 		this.name = name;
 		this.title = title;
@@ -90,7 +90,7 @@ public class Fields {
 	 * @param help
 	 *            the help
 	 */
-	public Fields(String name, String title, Object type, boolean canSync,
+	public OEColumn(String name, String title, Object type, boolean canSync,
 			String help) {
 		super();
 		this.name = name;

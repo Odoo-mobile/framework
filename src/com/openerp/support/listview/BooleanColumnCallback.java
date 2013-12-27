@@ -35,6 +35,6 @@ public interface BooleanColumnCallback {
 	 *            the view
 	 * @return the oE list view rows
 	 */
-	public OEListViewRows updateFlagValues(OEListViewRows row, View view);
+	public OEListViewRow updateFlagValues(OEListViewRow row, View view);
 
 }

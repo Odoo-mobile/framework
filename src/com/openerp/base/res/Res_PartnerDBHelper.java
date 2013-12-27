@@ -22,8 +22,8 @@ package com.openerp.base.res;
 import android.content.Context;
 
 import com.openerp.orm.BaseDBHelper;
-import com.openerp.orm.Fields;
-import com.openerp.orm.Types;
+import com.openerp.orm.OEColumn;
+import com.openerp.orm.OETypes;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -43,18 +43,18 @@ public class Res_PartnerDBHelper extends BaseDBHelper {
 		this.name = "res.partner";
 
 		/* providing model columns */
-		columns.add(new Fields("is_company", "Is Company", Types.text()));
-		columns.add(new Fields("name", "Name", Types.text()));
-		columns.add(new Fields("image_small", "Image", Types.blob()));
-		columns.add(new Fields("street", "Street", Types.text()));
-		columns.add(new Fields("street2", "Street 2", Types.text()));
-		columns.add(new Fields("city", "City", Types.text()));
-		columns.add(new Fields("zip", "Zip", Types.text()));
-		columns.add(new Fields("website", "website", Types.text()));
-		columns.add(new Fields("phone", "Phone", Types.text()));
-		columns.add(new Fields("mobile", "Mobile", Types.text()));
-		columns.add(new Fields("email", "email", Types.text()));
-		columns.add(new Fields("company_id", "company", Types
+		columns.add(new OEColumn("is_company", "Is Company", OETypes.text()));
+		columns.add(new OEColumn("name", "Name", OETypes.text()));
+		columns.add(new OEColumn("image_small", "Image", OETypes.blob()));
+		columns.add(new OEColumn("street", "Street", OETypes.text()));
+		columns.add(new OEColumn("street2", "Street 2", OETypes.text()));
+		columns.add(new OEColumn("city", "City", OETypes.text()));
+		columns.add(new OEColumn("zip", "Zip", OETypes.text()));
+		columns.add(new OEColumn("website", "website", OETypes.text()));
+		columns.add(new OEColumn("phone", "Phone", OETypes.text()));
+		columns.add(new OEColumn("mobile", "Mobile", OETypes.text()));
+		columns.add(new OEColumn("email", "email", OETypes.text()));
+		columns.add(new OEColumn("company_id", "company", OETypes
 				.many2One(new Res_Company(context))));
 
 	}

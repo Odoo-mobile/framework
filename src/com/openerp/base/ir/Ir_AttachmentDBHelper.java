@@ -23,8 +23,8 @@ import android.content.Context;
 
 import com.openerp.base.res.Res_Company;
 import com.openerp.orm.BaseDBHelper;
-import com.openerp.orm.Fields;
-import com.openerp.orm.Types;
+import com.openerp.orm.OEColumn;
+import com.openerp.orm.OETypes;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -44,13 +44,13 @@ public class Ir_AttachmentDBHelper extends BaseDBHelper {
 		this.name = "ir.attachment";
 
 		/* providing model columns */
-		columns.add(new Fields("name", "Name", Types.text()));
-		columns.add(new Fields("datas_fname", "Data File Name", Types.text()));
-		columns.add(new Fields("type", "Type", Types.text()));
-		columns.add(new Fields("file_size", "File Size", Types.integer()));
-		columns.add(new Fields("res_model", "Model", Types.varchar(100)));
-		columns.add(new Fields("company_id", "company id", Types
+		columns.add(new OEColumn("name", "Name", OETypes.text()));
+		columns.add(new OEColumn("datas_fname", "Data File Name", OETypes.text()));
+		columns.add(new OEColumn("type", "Type", OETypes.text()));
+		columns.add(new OEColumn("file_size", "File Size", OETypes.integer()));
+		columns.add(new OEColumn("res_model", "Model", OETypes.varchar(100)));
+		columns.add(new OEColumn("company_id", "company id", OETypes
 				.many2One(new Res_Company(context))));
-		columns.add(new Fields("res_id", "resource id", Types.integer()));
+		columns.add(new OEColumn("res_id", "resource id", OETypes.integer()));
 	}
 }

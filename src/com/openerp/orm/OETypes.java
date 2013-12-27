@@ -23,7 +23,7 @@ package com.openerp.orm;
 /**
  * The Class Types. Handles SQLite Datatypes requied to handle database
  */
-public class Types {
+public class OETypes {
 
 	/**
 	 * Integer.

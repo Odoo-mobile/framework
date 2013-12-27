@@ -37,7 +37,7 @@ import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
-import com.openerp.support.listview.OEListViewRows;
+import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.drawer.DrawerItem;
 
 public class UserGroups extends BaseFragment implements
@@ -85,7 +85,7 @@ public class UserGroups extends BaseFragment implements
 	}
 
 	private Boolean setupView() {
-		List<OEListViewRows> groups = getGroups();
+		List<OEListViewRow> groups = getGroups();
 		String[] from = new String[] { "name", "image_medium", "description" };
 		int[] to = new int[] { R.id.txvGroupName, R.id.imgGroupPic,
 				R.id.txvGroupDescription };
@@ -96,7 +96,7 @@ public class UserGroups extends BaseFragment implements
 
 			@Override
 			public View listViewOnCreateListener(int position, View row_view,
-					OEListViewRows row_data) {
+					OEListViewRow row_data) {
 				final int group_id = row_data.getRow_id();
 				final Button btnJoin = (Button) row_view
 						.findViewById(R.id.btnJoinGroup);
@@ -159,8 +159,8 @@ public class UserGroups extends BaseFragment implements
 
 	}
 
-	private List<OEListViewRows> getGroups() {
-		List<OEListViewRows> groups = new ArrayList<OEListViewRows>();
+	private List<OEListViewRow> getGroups() {
+		List<OEListViewRow> groups = new ArrayList<OEListViewRow>();
 
 		if (!db.isEmptyTable(db)) {
 			scope.main().runOnUiThread(new Runnable() {
@@ -178,7 +178,7 @@ public class UserGroups extends BaseFragment implements
 			if (group_data.size() > 0) {
 				for (OEDataRow row : group_data) {
 					int id = row.getInt("id");
-					OEListViewRows row_data = new OEListViewRows(id, row);
+					OEListViewRow row_data = new OEListViewRow(id, row);
 					groups.add(row_data);
 				}
 			}

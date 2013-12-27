@@ -30,7 +30,7 @@ import android.content.Context;
 public class BaseDBHelper extends ORM {
 
 	/** The columns. */
-	public ArrayList<Fields> columns = null;
+	public ArrayList<OEColumn> columns = null;
 
 	/** The name. */
 	public String name = "";
@@ -44,10 +44,10 @@ public class BaseDBHelper extends ORM {
 	public BaseDBHelper(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
-		this.columns = new ArrayList<Fields>();
-		this.columns.add(new Fields("id", "Id", Types.integer()));
+		this.columns = new ArrayList<OEColumn>();
+		this.columns.add(new OEColumn("id", "Id", OETypes.integer()));
 		this.columns
-				.add(new Fields("oea_name", "OpenERP User", Types.varchar(100),
+				.add(new OEColumn("oea_name", "OpenERP User", OETypes.varchar(100),
 						false,
 						"OpenERP Account manager name used for login and filter multiple accounts."));
 	}
@@ -57,7 +57,7 @@ public class BaseDBHelper extends ORM {
 	 * 
 	 * @return the columns
 	 */
-	public ArrayList<Fields> getColumns() {
+	public ArrayList<OEColumn> getColumns() {
 		return this.columns;
 	}
 
@@ -66,9 +66,9 @@ public class BaseDBHelper extends ORM {
 	 * 
 	 * @return the server columns
 	 */
-	public ArrayList<Fields> getServerColumns() {
-		ArrayList<Fields> serverCols = new ArrayList<Fields>();
-		for (Fields fields : this.columns) {
+	public ArrayList<OEColumn> getServerColumns() {
+		ArrayList<OEColumn> serverCols = new ArrayList<OEColumn>();
+		for (OEColumn fields : this.columns) {
 			if (fields.isCanSync()) {
 				serverCols.add(fields);
 			}
@@ -83,7 +83,7 @@ public class BaseDBHelper extends ORM {
 	 */
 	public HashMap<String, Object> getMany2ManyColumns() {
 		HashMap<String, Object> list = new HashMap<String, Object>();
-		for (Fields field : this.columns) {
+		for (OEColumn field : this.columns) {
 			if (field.getType() instanceof Many2Many) {
 				list.put(field.getName(), field.getType());
 			}
@@ -98,7 +98,7 @@ public class BaseDBHelper extends ORM {
 	 */
 	public HashMap<String, Object> getMany2OneColumns() {
 		HashMap<String, Object> list = new HashMap<String, Object>();
-		for (Fields field : this.columns) {
+		for (OEColumn field : this.columns) {
 			if (field.getType() instanceof Many2One) {
 				list.put(field.getName(), field.getType());
 			}

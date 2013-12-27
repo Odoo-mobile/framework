@@ -49,7 +49,7 @@ import com.openerp.util.OEDate;
 /**
  * The Class OEListViewAdapter.
  */
-public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
+public class OEListViewAdapter extends ArrayAdapter<OEListViewRow> {
 
 	/** The context. */
 	Context context;
@@ -60,10 +60,10 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	OEListViewOnCreateListener viewListener = null;
 
 	/** The rows. */
-	public List<OEListViewRows> rows = null;
+	public List<OEListViewRow> rows = null;
 
 	/** The unfiltered_rows. */
-	public List<OEListViewRows> unfiltered_rows = null;
+	public List<OEListViewRow> unfiltered_rows = null;
 
 	/** The to. */
 	int[] to = null;
@@ -123,7 +123,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	public HashMap<String, String> isFlagged = new HashMap<String, String>();
 
 	/** The row. */
-	OEListViewRows row = null;
+	OEListViewRow row = null;
 
 	/** The datecols. */
 	List<String> datecols = new ArrayList<String>();
@@ -152,14 +152,14 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	 *            the db
 	 */
 	public OEListViewAdapter(Context context, int resource,
-			List<OEListViewRows> objects, String[] from, int[] to,
+			List<OEListViewRow> objects, String[] from, int[] to,
 			BaseDBHelper db) {
 		super(context, resource, objects);
 		this.context = context;
 		this.resource_id = resource;
-		this.rows = new ArrayList<OEListViewRows>(objects);
+		this.rows = new ArrayList<OEListViewRow>(objects);
 		this.to = to;
-		this.unfiltered_rows = new ArrayList<OEListViewRows>(objects);
+		this.unfiltered_rows = new ArrayList<OEListViewRow>(objects);
 		this.from = from;
 		this.dbHelper = db;
 	}
@@ -187,14 +187,14 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	 *            the condition key
 	 */
 	public OEListViewAdapter(Context context, int resource,
-			List<OEListViewRows> objects, String[] from, int[] to,
+			List<OEListViewRow> objects, String[] from, int[] to,
 			BaseDBHelper db, boolean changeBackground, int[] colors,
 			String conditionKey) {
 		super(context, resource, objects);
 		this.context = context;
 		this.resource_id = resource;
-		this.rows = new ArrayList<OEListViewRows>(objects);
-		this.unfiltered_rows = new ArrayList<OEListViewRows>(objects);
+		this.rows = new ArrayList<OEListViewRow>(objects);
+		this.unfiltered_rows = new ArrayList<OEListViewRow>(objects);
 		this.to = to;
 		this.from = from;
 		this.colors = colors;
@@ -482,7 +482,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 			public void onClick(View arg0) {
 				try {
 					if (OpenERPServerConnection.isNetworkAvailable(context)) {
-						OEListViewRows newRow = callbacks.get(key)
+						OEListViewRow newRow = callbacks.get(key)
 								.updateFlagValues(rows.get(position),
 										booleanView);
 						rowdata = newRow.getRow_data();
@@ -514,7 +514,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	 * @param column
 	 *            the column
 	 */
-	public void updateRows(OEListViewRows newRowVal, int position, String column) {
+	public void updateRows(OEListViewRow newRowVal, int position, String column) {
 		rows.get(position).setRow_data(newRowVal.getRow_data());
 		rowdata = newRowVal.getRow_data();
 		isFlagged.put(String.valueOf(position), rowdata.get(column).toString());
@@ -548,9 +548,9 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 			FilterResults result = new FilterResults();
 			if (constraint != null && constraint.toString().length() > 0) {
 				constraint = constraint.toString().toLowerCase();
-				ArrayList<OEListViewRows> filteredItems = new ArrayList<OEListViewRows>();
+				ArrayList<OEListViewRow> filteredItems = new ArrayList<OEListViewRow>();
 				for (int i = 0; i < unfiltered_rows.size(); i++) {
-					OEListViewRows p = unfiltered_rows.get(i);
+					OEListViewRow p = unfiltered_rows.get(i);
 					OEDataRow data = p.getRow_data();
 					if (data.toString().toLowerCase().contains(constraint)) {
 						filteredItems.add(p);
@@ -580,7 +580,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 
 			if (results.count > 0) {
 				clear();
-				rows = (List<OEListViewRows>) results.values;
+				rows = (List<OEListViewRow>) results.values;
 				addAll(rows);
 				notifyDataSetChanged();
 
@@ -598,13 +598,13 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	 * @param items
 	 *            the items
 	 */
-	public void refresh(List<OEListViewRows> items) {
+	public void refresh(List<OEListViewRow> items) {
 		this.rows = items;
 		this.unfiltered_rows = items;
 		notifyDataSetChanged();
 	}
 
-	public void updateRow(int position, OEListViewRows row) {
+	public void updateRow(int position, OEListViewRow row) {
 		rows.remove(position);
 		rows.add(position, row);
 		unfiltered_rows.remove(position);

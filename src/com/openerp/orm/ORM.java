@@ -52,7 +52,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	ArrayList<Module> modules = null;
 
 	/** The fields. */
-	ArrayList<Fields> fields = null;
+	ArrayList<OEColumn> fields = null;
 
 	/** The table name. */
 	String tableName = null;
@@ -127,8 +127,8 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * @param field
 	 *            the field
 	 */
-	public void handleMany2ManyCol(BaseDBHelper db, Fields field) {
-		List<Fields> cols = new ArrayList<Fields>();
+	public void handleMany2ManyCol(BaseDBHelper db, OEColumn field) {
+		List<OEColumn> cols = new ArrayList<OEColumn>();
 
 		// Handle many2many object
 		if (field.getType() instanceof Many2Many) {
@@ -141,8 +141,8 @@ public class ORM extends SQLiteDatabaseHelper {
 				SQLStatement statement = newDb.createStatement(newDb);
 				newDb.createTable(statement);
 
-				Fields dField = new Fields(field.getName(), field.getTitle(),
-						Types.many2Many(newDb.getModelName()));
+				OEColumn dField = new OEColumn(field.getName(), field.getTitle(),
+						OETypes.many2Many(newDb.getModelName()));
 
 				newDb.handleMany2ManyCol(db, dField);
 			} else {
@@ -155,9 +155,9 @@ public class ORM extends SQLiteDatabaseHelper {
 				String tab1_col = tab1 + "_id";
 				String tab2_col = tab2 + "_id";
 				String common_col = "oea_name";
-				cols.add(new Fields(tab1_col, tab1_col, Types.integer()));
-				cols.add(new Fields(tab2_col, tab2_col, Types.integer()));
-				cols.add(new Fields(common_col, "Android Name", Types.text()));
+				cols.add(new OEColumn(tab1_col, tab1_col, OETypes.integer()));
+				cols.add(new OEColumn(tab2_col, tab2_col, OETypes.integer()));
+				cols.add(new OEColumn(common_col, "Android Name", OETypes.text()));
 				SQLStatement many2ManyTable = createStatement(rel_table, cols);
 				this.createTable(many2ManyTable);
 			}
@@ -174,13 +174,13 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the fields
 	 * @return the sQL statement
 	 */
-	private SQLStatement createStatement(String table, List<Fields> fields) {
+	private SQLStatement createStatement(String table, List<OEColumn> fields) {
 		SQLStatement statement = new SQLStatement();
 		StringBuffer sql = new StringBuffer();
 		sql.append("CREATE TABLE IF NOT EXISTS ");
 		sql.append(table);
 		sql.append(" (");
-		for (Fields field : fields) {
+		for (OEColumn field : fields) {
 			try {
 				sql.append(field.getName());
 				sql.append(" ");
@@ -227,7 +227,7 @@ public class ORM extends SQLiteDatabaseHelper {
 		create.append("CREATE TABLE IF NOT EXISTS ");
 		create.append(this.tableName);
 		create.append(" (");
-		for (Fields field : this.fields) {
+		for (OEColumn field : this.fields) {
 
 			Object type = field.getType();
 			if (field.getType() instanceof Many2Many) {
@@ -241,7 +241,7 @@ public class ORM extends SQLiteDatabaseHelper {
 					createMany2OneTable(m2oDb);
 
 				}
-				type = Types.integer();
+				type = OETypes.integer();
 
 			}
 
@@ -447,7 +447,7 @@ public class ORM extends SQLiteDatabaseHelper {
 			data_values.put("id", newId);
 		}
 
-		for (Fields field : dbHelper.getColumns()) {
+		for (OEColumn field : dbHelper.getColumns()) {
 			values.put(field.getName(),
 					data_values.getAsString(field.getName()));
 		}
@@ -953,7 +953,7 @@ public class ORM extends SQLiteDatabaseHelper {
 			cols = new ArrayList<String>();
 			cols = Arrays.asList(fetch_columns);
 		} else {
-			for (Fields col : dbHelper.getColumns()) {
+			for (OEColumn col : dbHelper.getColumns()) {
 				if (!(col.getType() instanceof Many2Many)) {
 					cols.add(col.getName());
 				}
@@ -1265,7 +1265,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	private BaseDBHelper generateM2MHelper(BaseDBHelper db, Many2Many m2m) {
 		BaseDBHelper newdb = new BaseDBHelper(context);
-		newdb.columns = new ArrayList<Fields>();
+		newdb.columns = new ArrayList<OEColumn>();
 		String table1 = modelToTable(db.getModelName());
 		String table2 = "";
 		if (m2m.isM2MObject()) {
@@ -1279,9 +1279,9 @@ public class ORM extends SQLiteDatabaseHelper {
 		String col2 = table2 + "_id";
 		String col3 = "oea_name";
 		newdb.name = rel_table.replaceAll("_", ".");
-		newdb.columns.add(new Fields(col1, col1, Types.integer()));
-		newdb.columns.add(new Fields(col2, col2, Types.integer()));
-		newdb.columns.add(new Fields(col3, col3, Types.text()));
+		newdb.columns.add(new OEColumn(col1, col1, OETypes.integer()));
+		newdb.columns.add(new OEColumn(col2, col2, OETypes.integer()));
+		newdb.columns.add(new OEColumn(col3, col3, OETypes.text()));
 		return newdb;
 	}
 
@@ -1292,10 +1292,10 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the cols
 	 * @return the string[]
 	 */
-	public String[] columnListToStringArray(List<Fields> cols) {
+	public String[] columnListToStringArray(List<OEColumn> cols) {
 		String[] columns = new String[cols.size()];
 		int i = 0;
-		for (Fields col : cols) {
+		for (OEColumn col : cols) {
 			columns[i] = col.getName();
 			i++;
 		}

@@ -21,8 +21,8 @@ package com.openerp.base.res;
 import android.content.Context;
 
 import com.openerp.orm.BaseDBHelper;
-import com.openerp.orm.Fields;
-import com.openerp.orm.Types;
+import com.openerp.orm.OEColumn;
+import com.openerp.orm.OETypes;
 
 /**
  * The Class Res_Company.
@@ -38,7 +38,7 @@ public class Res_Company extends BaseDBHelper {
 	public Res_Company(Context context) {
 		super(context);
 		name = "res.company";
-		columns.add(new Fields("name", "Name", Types.varchar(100)));
+		columns.add(new OEColumn("name", "Name", OETypes.varchar(100)));
 	}
 
 }

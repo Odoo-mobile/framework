@@ -61,7 +61,7 @@ import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEUser;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
-import com.openerp.support.listview.OEListViewRows;
+import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.tags.TagsView;
 import com.openerp.widget.Mobile_Widget;
@@ -77,7 +77,7 @@ public class Note extends BaseFragment implements
 	TextView noteSyncProcessText, emptyNotesText;
 	ListView lstNotes = null;
 	OEListViewAdapter listAdapter = null;
-	List<OEListViewRows> listRows = null;
+	List<OEListViewRow> listRows = null;
 	NoteDBHelper db = null;
 	JSONObject res = null;
 	SwipeDismissListViewTouchListener touchListener = null;
@@ -151,7 +151,7 @@ public class Note extends BaseFragment implements
 				int new_id = data.getExtras().getInt("result");
 				OEDataRow newRow = db.search(db, new String[] { "id = ?" },
 						new String[] { new_id + "" }).get(0);
-				OEListViewRows listRow = new OEListViewRows(new_id, newRow);
+				OEListViewRow listRow = new OEListViewRow(new_id, newRow);
 				listRows.add(listRow);
 				listAdapter.refresh(listRows);
 				lstNotes.setOnTouchListener(touchListener);
@@ -307,7 +307,7 @@ public class Note extends BaseFragment implements
 
 		int[] to = new int[] { R.id.txvNoteListItem, R.id.txvNoteListDetail,
 				R.id.txvNoteListTags };
-		listRows = new ArrayList<OEListViewRows>();
+		listRows = new ArrayList<OEListViewRow>();
 		if (listRows != null && listRows.size() <= 0) {
 			listRows = getListRows(stage_id);
 		}
@@ -322,7 +322,7 @@ public class Note extends BaseFragment implements
 
 			@Override
 			public View listViewOnCreateListener(int position, View row_view,
-					OEListViewRows row_data) {
+					OEListViewRow row_data) {
 
 				View newView = row_view;
 				TextView txvTag = (TextView) newView
@@ -488,9 +488,9 @@ public class Note extends BaseFragment implements
 	}
 
 	/* Method for fetching rows of notes by stage_id */
-	private List<OEListViewRows> getListRows(String stage_id) {
+	private List<OEListViewRow> getListRows(String stage_id) {
 
-		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
+		List<OEListViewRow> lists = new ArrayList<OEListViewRow>();
 		String[] where = null;
 		String[] whereArgs = null;
 
@@ -524,7 +524,7 @@ public class Note extends BaseFragment implements
 
 		if (total > 0) {
 			for (OEDataRow row_data : results) {
-				OEListViewRows row = new OEListViewRows(row_data.getInt("id"),
+				OEListViewRow row = new OEListViewRow(row_data.getInt("id"),
 						row_data);
 				lists.add(row);
 			}

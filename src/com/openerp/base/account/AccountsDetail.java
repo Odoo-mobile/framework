@@ -27,14 +27,14 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
-import com.openerp.support.listview.OEListViewRows;
+import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.drawer.DrawerItem;
 
 public class AccountsDetail extends BaseFragment {
 	View rootView = null;
 	GridView gridAccounts = null;
 	OEListViewAdapter adapter = null;
-	List<OEListViewRows> accounts = new ArrayList<OEListViewRows>();
+	List<OEListViewRow> accounts = new ArrayList<OEListViewRow>();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,7 +60,7 @@ public class AccountsDetail extends BaseFragment {
 
 			@Override
 			public View listViewOnCreateListener(int position, View row_view,
-					final OEListViewRows row_data) {
+					final OEListViewRow row_data) {
 				View newView = row_view;
 				Button btnLogin = (Button) newView.findViewById(R.id.btnLogin);
 				Button btnLogout = (Button) newView
@@ -113,8 +113,8 @@ public class AccountsDetail extends BaseFragment {
 
 	}
 
-	private List<OEListViewRows> getAccounts() {
-		List<OEListViewRows> list = new ArrayList<OEListViewRows>();
+	private List<OEListViewRow> getAccounts() {
+		List<OEListViewRow> list = new ArrayList<OEListViewRow>();
 		for (OEUser account : OpenERPAccountManager.fetchAllAccounts(scope
 				.context())) {
 			OEDataRow row_data = new OEDataRow();
@@ -123,7 +123,7 @@ public class AccountsDetail extends BaseFragment {
 			row_data.put("image", account.getAvatar());
 			row_data.put("host", account.getHost());
 			row_data.put("is_active", account.isIsactive());
-			OEListViewRows row = new OEListViewRows(Integer.parseInt(account
+			OEListViewRow row = new OEListViewRow(Integer.parseInt(account
 					.getUser_id()), row_data);
 			list.add(row);
 		}

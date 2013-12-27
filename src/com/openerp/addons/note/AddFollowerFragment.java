@@ -45,7 +45,7 @@ import android.widget.Toast;
 
 import com.openerp.R;
 import com.openerp.base.res.Res_PartnerDBHelper;
-import com.openerp.orm.Fields;
+import com.openerp.orm.OEColumn;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.note.NoteProvider;
@@ -54,7 +54,7 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.listview.OEListViewAdapter;
-import com.openerp.support.listview.OEListViewRows;
+import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.drawer.DrawerItem;
 
 public class AddFollowerFragment extends BaseFragment {
@@ -64,7 +64,7 @@ public class AddFollowerFragment extends BaseFragment {
 	Button addFollower, morePartners;
 	Res_PartnerDBHelper res_partners = null;
 	OEListViewAdapter listAdapters = null;
-	List<OEListViewRows> listRows = null;
+	List<OEListViewRow> listRows = null;
 	OEHelper oe = null;
 	ArrayList<String> partners;
 	int record_id = 0;
@@ -148,16 +148,16 @@ public class AddFollowerFragment extends BaseFragment {
 		return super.onOptionsItemSelected(item);
 	}
 
-	private List<OEListViewRows> getListRows() {
+	private List<OEListViewRow> getListRows() {
 
-		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
+		List<OEListViewRow> lists = new ArrayList<OEListViewRow>();
 		res_partners = new Res_PartnerDBHelper(scope.context());
 		List<OEDataRow> partners = res_partners.search(res_partners);
 		int total = partners.size();
 
 		if (total > 0) {
 			for (OEDataRow row_data : partners) {
-				OEListViewRows row = new OEListViewRows(row_data.getInt("id"),
+				OEListViewRow row = new OEListViewRow(row_data.getInt("id"),
 						row_data);
 				lists.add(row);
 			}
@@ -172,7 +172,7 @@ public class AddFollowerFragment extends BaseFragment {
 		String[] from = new String[] { "image_small", "name", "email" };
 		int[] to = new int[] { R.id.imgUserPicture, R.id.txvPartner,
 				R.id.txvPartnerEmail };
-		listRows = new ArrayList<OEListViewRows>();
+		listRows = new ArrayList<OEListViewRow>();
 
 		if (listRows != null && listRows.size() <= 0) {
 			listRows = getListRows();
@@ -192,9 +192,9 @@ public class AddFollowerFragment extends BaseFragment {
 			res_partners = new Res_PartnerDBHelper(scope.context());
 			oe = res_partners.getOEInstance();
 			try {
-				ArrayList<Fields> cols = res_partners.getServerColumns();
+				ArrayList<OEColumn> cols = res_partners.getServerColumns();
 				JSONObject fields = new JSONObject();
-				for (Fields field : cols) {
+				for (OEColumn field : cols) {
 					fields.accumulate("fields", field.getName());
 				}
 				JSONObject domain = new JSONObject();
@@ -218,7 +218,7 @@ public class AddFollowerFragment extends BaseFragment {
 						String key = keys.next();
 						rowHash.put(key, row.get(key));
 					}
-					final OEListViewRows listRow = new OEListViewRows(
+					final OEListViewRow listRow = new OEListViewRow(
 							row.getInt("id"), rowHash);
 
 					scope.main().runOnUiThread(new Runnable() {
@@ -252,10 +252,10 @@ public class AddFollowerFragment extends BaseFragment {
 				if (!res_partners.hasRecord(res_partners, listRows.get(key)
 						.getRow_id())) {
 					ContentValues values = new ContentValues();
-					ArrayList<Fields> cols = new Res_PartnerDBHelper(
+					ArrayList<OEColumn> cols = new Res_PartnerDBHelper(
 							scope.context()).getServerColumns();
 
-					for (Fields field : cols) {
+					for (OEColumn field : cols) {
 						values.put(field.getName(), listRows.get(key)
 								.getRow_data().get(field.getName()).toString());
 					}
