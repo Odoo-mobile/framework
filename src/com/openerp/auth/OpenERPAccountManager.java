@@ -23,12 +23,14 @@ import java.util.List;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.openerp.config.SyncWizardValues;
 import com.openerp.support.OEUser;
+import com.openerp.support.SyncValue;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class OpenERPAccountManager.
  */
@@ -211,20 +213,31 @@ public class OpenERPAccountManager {
 	 */
 	public static boolean logoutUser(Context context, String username) {
 		boolean flag = false;
-		OEUser user = OpenERPAccountManager.getAccountDetail(context,
-				username);
+		OEUser user = OpenERPAccountManager.getAccountDetail(context, username);
+		Account account = OpenERPAccountManager.getAccount(context,
+				user.getAndroidName());
 		if (user != null) {
-			AccountManager accMgr = AccountManager.get(context);
-			user.setIsactive(false);
+			if (cancelAllSync(account)) {
+				AccountManager accMgr = AccountManager.get(context);
+				user.setIsactive(false);
 
-			accMgr.setUserData(
-					OpenERPAccountManager.getAccount(context,
-							user.getAndroidName()), "isactive", "0");
-			flag = true;
-			current_user = null;
+				accMgr.setUserData(account, "isactive", "0");
+				flag = true;
+				current_user = null;
+			}
 		}
 		return flag;
 
+	}
+
+	private static boolean cancelAllSync(Account account) {
+		SyncWizardValues syncVals = new SyncWizardValues();
+		boolean flag = false;
+		for (SyncValue sync : syncVals.syncValues()) {
+			ContentResolver.cancelSync(account, sync.getAuthority());
+			flag = true;
+		}
+		return flag;
 	}
 
 	/**

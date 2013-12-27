@@ -66,6 +66,8 @@ public class ORM extends SQLiteDatabaseHelper {
 	/** The oe_obj. */
 	private static OEHelper oe_obj = null;
 
+	OEUser mUser = null;
+
 	/**
 	 * Instantiates a new orm.
 	 * 
@@ -77,9 +79,9 @@ public class ORM extends SQLiteDatabaseHelper {
 		this.context = context;
 		modules = new ModulesConfig().modules();
 		this.statements = new HashMap<String, String>();
-		OEUser obj = OpenERPAccountManager.currentUser(context);
-		if (obj != null) {
-			user_name = obj.getAndroidName();
+		mUser = OpenERPAccountManager.currentUser(context);
+		if (mUser != null) {
+			user_name = mUser.getAndroidName();
 		}
 		if (oe_obj == null) {
 			oe_obj = getOEInstance();
@@ -95,8 +97,7 @@ public class ORM extends SQLiteDatabaseHelper {
 
 		OEHelper openerp = null;
 		try {
-			openerp = new OEHelper(context,
-					OpenERPAccountManager.currentUser(context));
+			openerp = new OEHelper(context, mUser);
 		} catch (Exception e) {
 
 		}
@@ -384,8 +385,7 @@ public class ORM extends SQLiteDatabaseHelper {
 					row_id = values.getInt(i);
 				}
 				ContentValues m2mvals = new ContentValues();
-				String android_name = OpenERPAccountManager
-						.currentUser(context).getAndroidName();
+				String android_name = mUser.getAndroidName();
 				m2mvals.put(col1, id);
 				m2mvals.put(col2, row_id);
 				m2mvals.put(col3, android_name);
@@ -454,8 +454,7 @@ public class ORM extends SQLiteDatabaseHelper {
 					data_values.getAsString(field.getName()));
 		}
 
-		values.put("oea_name", OpenERPAccountManager.currentUser(context)
-				.getAndroidName());
+		values.put("oea_name", mUser.getAndroidName());
 
 		// Handling Many2Many Records
 		HashMap<String, Object> many2manycols = dbHelper.getMany2ManyColumns();
@@ -698,11 +697,9 @@ public class ORM extends SQLiteDatabaseHelper {
 
 		String[] finalWhereArgs = null;
 		if (whereArgs == null) {
-			finalWhereArgs = new String[] { OpenERPAccountManager.currentUser(
-					context).getAndroidName() };
+			finalWhereArgs = new String[] { mUser.getAndroidName() };
 		} else {
-			String[] tmpWhereArg = { OpenERPAccountManager.currentUser(context)
-					.getAndroidName() };
+			String[] tmpWhereArg = { mUser.getAndroidName() };
 			List<String> tmp = new ArrayList<String>();
 			tmp.addAll(Arrays.asList(whereArgs));
 			tmp.addAll(Arrays.asList(tmpWhereArg));
@@ -1074,7 +1071,7 @@ public class ORM extends SQLiteDatabaseHelper {
 		List<HashMap<String, Object>> data = executeSQL(model_name,
 				new String[] { "max(" + column + ") as id" },
 				new String[] { "oea_name = ?" },
-				new String[] { OEUser.current(context).getAndroidName() });
+				new String[] { mUser.getAndroidName() });
 		Object last_id = data.get(0).get("id");
 		if (last_id == null) {
 			return 0;

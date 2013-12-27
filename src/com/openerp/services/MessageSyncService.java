@@ -46,6 +46,7 @@ import com.openerp.addons.messages.MessageSyncHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.OEArgsHelper;
+import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.util.OEDate;
 import com.openerp.util.OENotificationHelper;
@@ -217,7 +218,8 @@ public class MessageSyncService extends Service {
 				// Param 7 : limit
 				mainArgs.addArg(50);
 
-				response = new MessageSyncHelper(context).syncWithServer(msgDb,
+				response = new MessageSyncHelper(context,
+						OEUser.current(context)).syncWithServer(msgDb,
 						mainArgs.getArgs());
 				// Sync status updator
 
