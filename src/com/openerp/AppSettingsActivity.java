@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.MenuItem;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class AppSettingsActivity.
  */
@@ -34,6 +33,7 @@ public class AppSettingsActivity extends PreferenceActivity {
 	 * 
 	 * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

@@ -41,7 +41,6 @@ import com.openerp.support.Module;
 import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ORM.
  */
@@ -74,7 +73,6 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the context
 	 */
 	public ORM(Context context) {
-		// TODO Auto-generated constructor stub
 		super(context);
 		this.context = context;
 		modules = new ModulesConfig().modules();
@@ -288,15 +286,18 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * @return the dB helper from module
 	 */
 	private BaseDBHelper getDBHelperFromModule(Module module) {
+		@SuppressWarnings("rawtypes")
 		Class newClass;
 		try {
 			newClass = Class.forName(module.getModuleInstance().getClass()
 					.getName());
 			if (newClass.isInstance(module.getModuleInstance())) {
 				Object receiver = newClass.newInstance();
+				@SuppressWarnings("rawtypes")
 				Class params[] = new Class[1];
 				params[0] = Context.class;
 
+				@SuppressWarnings("unchecked")
 				Method method = newClass.getDeclaredMethod("databaseHelper",
 						params);
 
@@ -305,7 +306,6 @@ public class ORM extends SQLiteDatabaseHelper {
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -387,12 +387,11 @@ public class ORM extends SQLiteDatabaseHelper {
 				m2mvals.put(col1, id);
 				m2mvals.put(col2, row_id);
 				m2mvals.put(col3, android_name);
-				int res = Integer.parseInt(search(
+				int res = search(
 						newDb,
 						new String[] { col1 + " = ?", "AND", col2 + "= ?",
 								"AND", col3 + " = ?" },
-						new String[] { id, row_id + "", android_name }).get(
-						"total").toString());
+						new String[] { id, row_id + "", android_name }).size();
 				if (res == 0) {
 					SQLiteDatabase db = getWritableDatabase();
 					db.insert(rel_table, null, m2mvals);
@@ -548,7 +547,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the db
 	 * @return the hash map
 	 */
-	public HashMap<String, Object> search(BaseDBHelper db) {
+	public List<OEDataRow> search(BaseDBHelper db) {
 		return search(db, null, null, null, null, null, null, null);
 	}
 
@@ -563,7 +562,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the where args
 	 * @return the hash map
 	 */
-	public HashMap<String, Object> search(BaseDBHelper db, String[] where,
+	public List<OEDataRow> search(BaseDBHelper db, String[] where,
 			String[] whereArgs) {
 		return search(db, null, where, whereArgs, null, null, null, null);
 	}
@@ -577,7 +576,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * @param whereArgs
 	 * @return
 	 */
-	public HashMap<String, Object> search(BaseDBHelper db, String[] columns,
+	public List<OEDataRow> search(BaseDBHelper db, String[] columns,
 			String[] where, String[] whereArgs) {
 		return search(db, columns, where, whereArgs, null, null, null, null);
 	}
@@ -595,7 +594,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the group_by
 	 * @return the hash map
 	 */
-	public HashMap<String, Object> search(BaseDBHelper db, String[] where,
+	public List<OEDataRow> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by) {
 		return search(db, null, where, whereArgs, group_by, null, null, null);
 	}
@@ -615,7 +614,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the having
 	 * @return the hash map
 	 */
-	public HashMap<String, Object> search(BaseDBHelper db, String[] where,
+	public List<OEDataRow> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by, String having) {
 		return search(db, null, where, whereArgs, group_by, having, null, null);
 	}
@@ -639,7 +638,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the ordertype
 	 * @return the hash map
 	 */
-	public HashMap<String, Object> search(BaseDBHelper db, String[] where,
+	public List<OEDataRow> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by, String having, String orderby,
 			String ordertype) {
 		return search(db, null, where, whereArgs, group_by, having, orderby,
@@ -665,11 +664,11 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the ordertype
 	 * @return the hash map
 	 */
-	public HashMap<String, Object> search(BaseDBHelper db, String[] columns,
+	public List<OEDataRow> search(BaseDBHelper db, String[] columns,
 			String[] where, String[] whereArgs, String group_by, String having,
 			String orderby, String ordertype) {
 
-		HashMap<String, Object> returnVals = new HashMap<String, Object>();
+		List<OEDataRow> returnVals = new ArrayList<OEDataRow>();
 
 		String order_by = orderby + " " + ordertype;
 		if (orderby == null) {
@@ -703,16 +702,8 @@ public class ORM extends SQLiteDatabaseHelper {
 			finalWhereArgs = tmp.toArray(new String[whereArgs.length
 					+ tmpWhereArg.length]);
 		}
-
-		List<HashMap<String, Object>> results = executeQuery(db, columns,
-				finalWhere, finalWhereArgs, group_by, having, order_by);
-		if (results != null) {
-			returnVals.put("total", results.size());
-			returnVals.put("records", results);
-		} else {
-			returnVals.put("total", 0);
-			returnVals.put("records", false);
-		}
+		returnVals = executeQuery(db, columns, finalWhere, finalWhereArgs,
+				group_by, having, order_by);
 		return returnVals;
 	}
 
@@ -749,7 +740,6 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	private void updateM2MRecords(String id, JSONArray values, String key,
 			BaseDBHelper dbHelper, Many2Many m2m, ContentValues rootRow) {
-		// TODO Auto-generated method stub
 		String table1 = modelToTable(dbHelper.getModelName());
 		String table2 = "";
 		BaseDBHelper tbl2Obj = null;
@@ -792,8 +782,7 @@ public class ORM extends SQLiteDatabaseHelper {
 						newDb,
 						new String[] { col1 + " = ?", "AND", col2 + "= ?",
 								"AND", col3 + " = ?" },
-						new String[] { id, row_id + "", user_name }).get(
-						"total");
+						new String[] { id, row_id + "", user_name }).size();
 				SQLiteDatabase db = getWritableDatabase();
 				if (res == 0) {
 
@@ -892,12 +881,14 @@ public class ORM extends SQLiteDatabaseHelper {
 
 					}
 					if (fromServer) {
+						@SuppressWarnings("unused")
 						int res = db.update(table, values, "id = " + id, null);
 						flag = true;
 					} else {
 
 						if (oe_obj.updateValues(dbHelper.getModelName(),
 								arguments, id)) {
+							@SuppressWarnings("unused")
 							int res = db.update(table, values, "id = " + id,
 									null);
 							flag = true;
@@ -951,7 +942,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the orderby
 	 * @return the list
 	 */
-	private List<HashMap<String, Object>> executeQuery(BaseDBHelper dbHelper,
+	private List<OEDataRow> executeQuery(BaseDBHelper dbHelper,
 			String[] fetch_columns, String[] where, String[] whereVals,
 			String group_by, String having, String orderby) {
 		SQLiteDatabase db = getWritableDatabase();
@@ -972,23 +963,21 @@ public class ORM extends SQLiteDatabaseHelper {
 		Cursor cursor = db.query(modelToTable(dbHelper.getModelName()),
 				columns, whereStatement(where, dbHelper), whereVals, group_by,
 				having, orderby);
-		List<HashMap<String, Object>> data = getResult(dbHelper, columns,
-				cursor);
+		List<OEDataRow> data = getResult(dbHelper, columns, cursor);
 		db.close();
 		return data;
 	}
 
-	public List<HashMap<String, Object>> executeSQL(String sqlQuery,
-			String[] args) {
+	public List<OEDataRow> executeSQL(String sqlQuery, String[] args) {
 		SQLiteDatabase db = getWritableDatabase();
 
-		List<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
+		List<OEDataRow> data = new ArrayList<OEDataRow>();
 
 		Cursor cursor = db.rawQuery(sqlQuery.toString(), args);
 		String[] columns = cursor.getColumnNames();
 		if (cursor.moveToFirst()) {
 			do {
-				HashMap<String, Object> row = new HashMap<String, Object>();
+				OEDataRow row = new OEDataRow();
 				if (cursor.getColumnIndex("oea_name") > 0) {
 					if (!cursor.getString(cursor.getColumnIndex("oea_name"))
 							.equals(user_name)) {
@@ -1055,7 +1044,7 @@ public class ORM extends SQLiteDatabaseHelper {
 
 	public int getLastId(String model_name, String column) {
 		List<HashMap<String, Object>> data = executeSQL(model_name,
-				new String[] { "max("+column+") as id" },
+				new String[] { "max(" + column + ") as id" },
 				new String[] { "oea_name = ?" },
 				new String[] { OEUser.current(context).getAndroidName() });
 		Object last_id = data.get(0).get("id");
@@ -1064,6 +1053,7 @@ public class ORM extends SQLiteDatabaseHelper {
 		}
 		return Integer.parseInt(last_id.toString());
 	}
+
 	/**
 	 * Count.
 	 * 
@@ -1154,33 +1144,6 @@ public class ORM extends SQLiteDatabaseHelper {
 	}
 
 	/**
-	 * Execute query.
-	 * 
-	 * @param dbHelper
-	 *            the db helper
-	 * @param where
-	 *            the where
-	 * @return the list
-	 */
-	private List<HashMap<String, Object>> executeQuery(BaseDBHelper dbHelper,
-			String where) {
-		List<String> cols = new ArrayList<String>();
-		for (Fields col : dbHelper.getColumns()) {
-			if (!(col.getType() instanceof Many2Many)) {
-				cols.add(col.getName());
-			}
-		}
-		String columns[] = cols.toArray(new String[cols.size()]);
-		SQLiteDatabase db = getWritableDatabase();
-		Cursor cursor = db.query(modelToTable(dbHelper.getModelName()),
-				columns, where, null, null, null, null);
-		List<HashMap<String, Object>> data = getResult(dbHelper, null, cursor);
-		db.close();
-		cursor.close();
-		return data;
-	}
-
-	/**
 	 * Gets the result.
 	 * 
 	 * @param dbHelper
@@ -1190,19 +1153,17 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the result
 	 * @return the result
 	 */
-	@SuppressWarnings("unchecked")
-	private List<HashMap<String, Object>> getResult(BaseDBHelper dbHelper,
+	private List<OEDataRow> getResult(BaseDBHelper dbHelper,
 			String[] fetch_columns, Cursor result) {
 
 		HashMap<String, Object> m2m = dbHelper.getMany2ManyColumns();
 		HashMap<String, Object> m2o = dbHelper.getMany2OneColumns();
-		List<HashMap<String, Object>> results = null;
+		List<OEDataRow> results = new ArrayList<OEDataRow>();
 		String[] columns = result.getColumnNames();
 		if (result.moveToFirst()) {
-			results = new ArrayList<HashMap<String, Object>>();
-			HashMap<String, Object> row;
+			OEDataRow row;
 			do {
-				row = new HashMap<String, Object>();
+				row = new OEDataRow();
 				for (String col : columns) {
 					String value = result.getString(result.getColumnIndex(col));
 					row.put(col, value);
@@ -1223,32 +1184,28 @@ public class ORM extends SQLiteDatabaseHelper {
 							String col1 = newdb.getColumns().get(0).getName();
 							String col2 = newdb.getColumns().get(1).getName();
 							String col3 = newdb.getColumns().get(2).getName();
-							HashMap<String, Object> rel_row = newdb.search(
-									newdb, new String[] { col1 + " = ?", "AND",
+							List<OEDataRow> rel_row = newdb.search(newdb,
+									new String[] { col1 + " = ?", "AND",
 											col3 + " = ?" }, new String[] { id,
 											user_name });
-							int total = Integer.parseInt(rel_row.get("total")
-									.toString());
+							int total = rel_row.size();
 							if (total > 0) {
 								JSONArray ids_list = new JSONArray();
 								for (int i = 0; i < total; i++) {
 									JSONArray ids = new JSONArray();
-									HashMap<String, Object> rowdata = ((List<HashMap<String, Object>>) rel_row
-											.get("records")).get(i);
+									OEDataRow rowdata = rel_row.get(i);
 									BaseDBHelper rel_obj = m2mObj
 											.getM2mObject();
-									HashMap<String, Object> rel_data = rel_obj
-											.search(rel_obj,
-													new String[] { "id = ? " },
-													new String[] { rowdata.get(
-															col2).toString() });
+									List<OEDataRow> rel_data = rel_obj.search(
+											rel_obj,
+											new String[] { "id = ? " },
+											new String[] { rowdata.get(col2)
+													.toString() });
 									ids.put(Integer.parseInt(rowdata.get(col2)
 											.toString()));
-									if (Integer.parseInt(rel_data.get("total")
-											.toString()) > 0) {
-										ids.put(((List<HashMap<String, Object>>) rel_data
-												.get("records")).get(0)
-												.get("name").toString());
+									if (rel_data.size() > 0) {
+										ids.put(rel_data.get(0).get("name")
+												.toString());
 									}
 									ids_list.put(ids);
 								}
@@ -1268,17 +1225,15 @@ public class ORM extends SQLiteDatabaseHelper {
 							if (!ref_id.equals("false")) {
 								Many2One m2oObj = (Many2One) m2o.get(key);
 								JSONArray ids = new JSONArray();
-								HashMap<String, Object> rel_data = m2oObj
+								List<OEDataRow> rel_data = m2oObj
 										.getM2OObject().search(
 												m2oObj.getM2OObject(),
 												new String[] { "id", "name" },
 												new String[] { "id = ? " },
 												new String[] { ref_id });
 								ids.put(ref_id);
-								if (Integer.parseInt(rel_data.get("total")
-										.toString()) > 0) {
-									ids.put(((List<HashMap<String, Object>>) rel_data
-											.get("records")).get(0).get("name")
+								if (rel_data.size() > 0) {
+									ids.put(rel_data.get(0).get("name")
 											.toString());
 								}
 								ids_list.put(ids);
@@ -1381,12 +1336,11 @@ public class ORM extends SQLiteDatabaseHelper {
 		String table = modelToTable(db.getModelName());
 		String sql = "SELECT id, oea_name FROM " + table
 				+ " WHERE oea_name = ?";
-		List<HashMap<String, Object>> records = executeSQL(sql,
-				new String[] { user_name });
+		List<OEDataRow> records = executeSQL(sql, new String[] { user_name });
 		int[] ids = new int[records.size()];
 		int i = 0;
-		for (HashMap<String, Object> row : records) {
-			ids[i] = Integer.parseInt(row.get("id").toString());
+		for (OEDataRow row : records) {
+			ids[i] = row.getInt("id");
 			i++;
 		}
 		return ids;

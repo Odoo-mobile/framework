@@ -23,13 +23,13 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class OpenERPAuthenticateService.
  */
 public class OpenERPAuthenticateService extends Service {
 
 	/** The Constant TAG. */
+	@SuppressWarnings("unused")
 	private static final String TAG = "AccountAuthenticatorService";
 
 	/** The oe account authenticator. */
@@ -51,7 +51,6 @@ public class OpenERPAuthenticateService extends Service {
 	 */
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		IBinder ret = null;
 		if (intent.getAction().equals(
 				android.accounts.AccountManager.ACTION_AUTHENTICATOR_INTENT)) {
@@ -65,6 +64,7 @@ public class OpenERPAuthenticateService extends Service {
 	 * 
 	 * @return the authenticator
 	 */
+	@SuppressWarnings("unused")
 	private OpenERPAuthenticator getAuthenticator() {
 		if (oeAccountAuthenticator == null) {
 			oeAccountAuthenticator = new OpenERPAuthenticator(this);

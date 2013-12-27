@@ -26,6 +26,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -54,6 +55,7 @@ import android.widget.Toast;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
@@ -106,7 +108,7 @@ public class EditNoteFragment extends BaseFragment implements
 			}
 		});
 
-		scope.context().setOnBackPressed(new OnBackButtonPressedListener() {
+		scope.main().setOnBackPressed(new OnBackButtonPressedListener() {
 			@Override
 			public boolean onBackPressed() {
 				if (isContentChanged(noteMemo.getText().toString())) {
@@ -263,6 +265,7 @@ public class EditNoteFragment extends BaseFragment implements
 		return null;
 	}
 
+	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -321,16 +324,16 @@ public class EditNoteFragment extends BaseFragment implements
 				MainActivity.context).getAndroidName();
 		db = new NoteDBHelper(context);
 		List<String> note_tags = new ArrayList<String>();
-		List<HashMap<String, Object>> records = db
+		List<OEDataRow> records = db
 				.executeSQL(
 						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { note_note_id, oea_name, oea_name });
 
 		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
-				note_tags.add(row.get("name").toString());
-				noteTags.addObject(new TagsItems(Integer.parseInt(row.get("id")
-						.toString()), row.get("name").toString(), ""));
+			for (OEDataRow row : records) {
+				note_tags.add(row.getString("name"));
+				noteTags.addObject(new TagsItems(row.getInt("id"), row
+						.getString("name"), ""));
 			}
 		}
 		return note_tags.toArray(new String[note_tags.size()]);
@@ -344,14 +347,11 @@ public class EditNoteFragment extends BaseFragment implements
 
 		db = new NoteDBHelper(context);
 		NoteDBHelper.NoteStages stagesobj = db.new NoteStages(context);
-		HashMap<String, Object> data = stagesobj.search(stagesobj);
-		int total = Integer.parseInt(data.get("total").toString());
+		List<OEDataRow> data = stagesobj.search(stagesobj);
+		int total = data.size();
 
 		if (total > 0) {
-			@SuppressWarnings("unchecked")
-			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
-					.get("records");
-			for (HashMap<String, Object> row_data : rows) {
+			for (OEDataRow row_data : data) {
 				String row_id = row_data.get("id").toString();
 				String name = row_data.get("name").toString();
 				stages.put(name, row_id);

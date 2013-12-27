@@ -50,11 +50,13 @@ import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
+import com.openerp.support.OEUser;
 import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.ControlClickEventListener;
 import com.openerp.support.listview.OEListViewAdapter;
@@ -84,7 +86,7 @@ public class MessageDetail extends BaseFragment {
 	int message_id = 0;
 
 	/** The parent_row. */
-	HashMap<String, Object> parent_row = null;
+	OEDataRow parent_row = null;
 	public static String oea_name = null;
 
 	/*
@@ -139,18 +141,15 @@ public class MessageDetail extends BaseFragment {
 			public View listViewOnCreateListener(final int position,
 					View row_view, OEListViewRows row_data) {
 				final int message_id = row_data.getRow_id();
-				final HashMap<String, Object> row_values = row_data
-						.getRow_data();
+				final OEDataRow row_values = row_data.getRow_data();
 				/* handling vote control */
 				final TextView txvVote = (TextView) row_view
 						.findViewById(R.id.txvmessageVotenb);
-				final int vote_nb = Integer.parseInt(row_data.getRow_data()
-						.get("vote_nb").toString());
+				final int vote_nb = row_values.getInt("vote_nb");
 				if (vote_nb == 0) {
 					txvVote.setText("");
 				}
-				final boolean hasVoted = Boolean.parseBoolean(row_data
-						.getRow_data().get("has_voted").toString());
+				final boolean hasVoted = row_values.getBoolean("has_voted");
 				if (!hasVoted) {
 					txvVote.setCompoundDrawablesWithIntrinsicBounds(
 							getResources()
@@ -325,23 +324,17 @@ public class MessageDetail extends BaseFragment {
 		messages_sorted = new ArrayList<OEListViewRows>();
 
 		String query = "select t1.id as message_id , t1.*, t2.id as partner_id, t2.name, t2.image_small as image, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.date desc";
-		List<HashMap<String, Object>> records = db.executeSQL(
+		List<OEDataRow> records = db.executeSQL(
 				query,
 				new String[] { String.valueOf(message_id),
 						String.valueOf(message_id) });
-		HashMap<String, Object> row = new HashMap<String, Object>();
-		row.put("total", records.size());
-		row.put("records", records);
-		if ((Integer) row.get("total") > 0) {
-			List<HashMap<String, Object>> rows_detail = (List<HashMap<String, Object>>) row
-					.get("records");
-			for (HashMap<String, Object> row_detail : rows_detail) {
-				int msg_id = Integer.parseInt(row_detail.get("message_id")
-						.toString());
-				String key = row_detail.get("parent_id").toString();
+		if (records.size() > 0) {
+			for (OEDataRow row_detail : records) {
+				int msg_id = row_detail.getInt("message_id");
+				String key = row_detail.getString("parent_id");
 				OEListViewRows rowObj = null;
 				String[] ids = getPartnersOfMessage(row_detail
-						.get("message_id").toString());
+						.getString("message_id"));
 				String partners = "nobody";
 				if (ids != null) {
 					partners = TextUtils.join(", ", ids);
@@ -349,32 +342,31 @@ public class MessageDetail extends BaseFragment {
 				row_detail.put("partners", partners);
 				if (key.equals("false")) {
 					// Parent Message
-					if (row_detail.get("author_id").toString().equals("false")) {
+					if (row_detail.getString("author_id").equals("false")) {
 						row_detail.put("image", "false");
 					}
 					rowObj = new OEListViewRows(msg_id, row_detail);
 					parent_row = row_detail;
-					if (!row_detail.get("model").toString().equals("false")) {
+					if (!row_detail.getString("model").equals("false")) {
 						messages_sorted.add(rowObj);
 					} else {
 						messages_sorted.add(0, rowObj);
 					}
-					String sub = rowObj.getRow_data().get("subject").toString();
+					String sub = rowObj.getRow_data().getString("subject");
 					if (sub.equals("false")) {
-						sub = rowObj.getRow_data().get("type").toString();
+						sub = rowObj.getRow_data().getString("type");
 					}
 					TextView txvTitle = (TextView) rootView
 							.findViewById(R.id.txvMessageTitle);
 					txvTitle.setText(sub);
-					if (row_detail.get("model").toString().equals("mail.group")) {
+					if (row_detail.getString("model").equals("mail.group")) {
 						if (UserGroups.menu_color.containsKey("group_"
-								+ row_detail.get("res_id").toString())) {
+								+ row_detail.getString("res_id"))) {
 							View tagColor = rootView
 									.findViewById(R.id.groupColorLine);
 							tagColor.setBackgroundColor(UserGroups.menu_color
 									.get("group_"
-											+ row_detail.get("res_id")
-													.toString()));
+											+ row_detail.getString("res_id")));
 						}
 					}
 				} else {
@@ -399,17 +391,15 @@ public class MessageDetail extends BaseFragment {
 				MainActivity.context);
 		oea_name = OpenERPAccountManager.currentUser(MainActivity.context)
 				.getAndroidName();
-		List<HashMap<String, Object>> records = partners
+		List<OEDataRow> records = partners
 				.executeSQL(
 						"SELECT id,name,oea_name FROM res_partner where id in (select res_partner_id from mail_message_res_partner_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { message_id, oea_name, oea_name });
 		List<String> names = new ArrayList<String>();
 		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
-				if (row.get("name")
-						.toString()
-						.equals(OpenERPAccountManager.currentUser(
-								MainActivity.context).getPartner_id())) {
+			for (OEDataRow row : records) {
+				if (row.getString("name").equals(
+						OEUser.current(scope.context()).getPartner_id())) {
 					names.add("me");
 				} else {
 					names.add(row.get("name").toString());
@@ -434,13 +424,13 @@ public class MessageDetail extends BaseFragment {
 				MainActivity.context);
 		oea_name = OpenERPAccountManager.currentUser(MainActivity.context)
 				.getAndroidName();
-		List<HashMap<String, Object>> records = attachments
+		List<OEDataRow> records = attachments
 				.executeSQL(
 						"SELECT * FROM ir_attachment where id in (select ir_attachment_id from mail_message_ir_attachment_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { message_id, oea_name, oea_name });
 		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
-				int attachment_id = Integer.parseInt(row.get("id").toString());
+			for (OEDataRow row : records) {
+				int attachment_id = row.getInt("id");
 				OEListViewRows list_row = new OEListViewRows(attachment_id, row);
 				lists.add(list_row);
 			}
@@ -458,11 +448,10 @@ public class MessageDetail extends BaseFragment {
 
 		@Override
 		public OEListViewRows updateFlagValues(OEListViewRows row, View view) {
-			HashMap<String, Object> rowData = (HashMap<String, Object>) row
-					.getRow_data();
+			OEDataRow rowData = row.getRow_data();
 			boolean flag = false;
 			ImageView img = (ImageView) view;
-			if (rowData.get("starred").toString().equals("false")) {
+			if (rowData.getString("starred").equals("false")) {
 				flag = true;
 				img.setImageResource(R.drawable.ic_action_starred);
 			} else {
@@ -658,7 +647,7 @@ public class MessageDetail extends BaseFragment {
 
 		@Override
 		protected void onPreExecute() {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -672,7 +661,7 @@ public class MessageDetail extends BaseFragment {
 
 		@Override
 		protected Boolean doInBackground(Void... arg0) {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					flag = setupMessageDetail(message_id);
@@ -684,7 +673,7 @@ public class MessageDetail extends BaseFragment {
 
 		@Override
 		protected void onPostExecute(final Boolean success) {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {

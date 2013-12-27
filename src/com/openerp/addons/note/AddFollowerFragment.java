@@ -19,7 +19,6 @@
 package com.openerp.addons.note;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,6 +46,7 @@ import android.widget.Toast;
 import com.openerp.R;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.Fields;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.note.NoteProvider;
 import com.openerp.support.AppScope;
@@ -152,21 +152,17 @@ public class AddFollowerFragment extends BaseFragment {
 
 		List<OEListViewRows> lists = new ArrayList<OEListViewRows>();
 		res_partners = new Res_PartnerDBHelper(scope.context());
-		HashMap<String, Object> partners = res_partners.search(res_partners);
-		int total = Integer.parseInt(partners.get("total").toString());
+		List<OEDataRow> partners = res_partners.search(res_partners);
+		int total = partners.size();
 
 		if (total > 0) {
-			@SuppressWarnings("unchecked")
-			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) partners
-					.get("records");
-			for (HashMap<String, Object> row_data : rows) {
-				OEListViewRows row = new OEListViewRows(
-						Integer.parseInt(row_data.get("id").toString()),
+			for (OEDataRow row_data : partners) {
+				OEListViewRows row = new OEListViewRows(row_data.getInt("id"),
 						row_data);
 				lists.add(row);
 			}
 		} else {
-			scope.context().requestSync(NoteProvider.AUTHORITY);
+			scope.main().requestSync(NoteProvider.AUTHORITY);
 		}
 		return lists;
 	}
@@ -214,7 +210,7 @@ public class AddFollowerFragment extends BaseFragment {
 				for (int i = 0; i < result.getInt("length"); i++) {
 					JSONObject row = result.getJSONArray("records")
 							.getJSONObject(i);
-					HashMap<String, Object> rowHash = new HashMap<String, Object>();
+					OEDataRow rowHash = new OEDataRow();
 					@SuppressWarnings("unchecked")
 					Iterator<String> keys = row.keys();
 
@@ -225,7 +221,7 @@ public class AddFollowerFragment extends BaseFragment {
 					final OEListViewRows listRow = new OEListViewRows(
 							row.getInt("id"), rowHash);
 
-					scope.context().runOnUiThread(new Runnable() {
+					scope.main().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 							listRows.add(listRow);

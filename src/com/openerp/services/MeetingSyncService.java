@@ -36,6 +36,7 @@ import android.os.IBinder;
 
 import com.openerp.addons.meeting.MeetingDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.calendar.OECalendar;
@@ -99,26 +100,18 @@ public class MeetingSyncService extends Service {
 
 				// contains records which are deleted from OpenERP Server and
 				// local db
-				HashMap<String, List<HashMap<String, Object>>> deleted_ids = oe
+				HashMap<String, List<OEDataRow>> deleted_ids = oe
 						.getDeletedRows();
 
 				// check whether any deleted record foud for crm.meeting
 				if (deleted_ids.containsKey("crm.meeting")) {
 					// contains all the deleted records for crm.meeting module
-					List<HashMap<String, Object>> ids = deleted_ids
-							.get("crm.meeting");
+					List<OEDataRow> ids = deleted_ids.get("crm.meeting");
 
 					// deleting events from OpenERP mobile calendar by id
-					for (int i = 0; i < ids.size(); i++) {
-						// fetching whole row which are deleted
-						@SuppressWarnings("unchecked")
-						HashMap<String, Object> row = ((List<HashMap<String, Object>>) ids
-								.get(i).get("records")).get(0);
-						// fetching calendar_event_id from localdb to and
-						// deleting events by event_id[calendar_event_id]from
-						// OpenERP mobile calendar
-						calendar.delete_CalendarEvent(Integer.parseInt(row.get(
-								"calendar_event_id").toString()));
+					for (OEDataRow id_row : ids) {
+						calendar.delete_CalendarEvent(id_row
+								.getInt("calendar_event_id"));
 					}
 				}
 

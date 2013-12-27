@@ -48,7 +48,6 @@ import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.OEListViewRows;
 import com.openerp.util.OEDate;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class OEHelper.
  */
@@ -60,7 +59,7 @@ public class OEHelper extends OpenERP {
 	/** The m context. */
 	Context mContext = null;
 
-	HashMap<String, List<HashMap<String, Object>>> deleted_rows = new HashMap<String, List<HashMap<String, Object>>>();
+	HashMap<String, List<OEDataRow>> deleted_rows = new HashMap<String, List<OEDataRow>>();
 
 	/**
 	 * Instantiates a new oE helper.
@@ -174,14 +173,7 @@ public class OEHelper extends OpenERP {
 				userObj.setCompany_id(company_id);
 
 			}
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			// e.printStackTrace();
 			Toast.makeText(mContext, "Unable to reach OpenERP 7.0 Server ! ",
 					Toast.LENGTH_LONG).show();
@@ -231,12 +223,10 @@ public class OEHelper extends OpenERP {
 	public List<String> findAllName(BaseDBHelper dbHelper)
 			throws NullPointerException {
 		List<String> names = new ArrayList<String>();
-		HashMap<String, Object> result = dbHelper.search(dbHelper);
+		List<OEDataRow> result = dbHelper.search(dbHelper);
 
-		if (Integer.parseInt(result.get("total").toString()) > 0) {
-			List<HashMap<String, String>> records = (List<HashMap<String, String>>) result
-					.get("records");
-			for (HashMap<String, String> row : records) {
+		if (result.size() > 0) {
+			for (OEDataRow row : result) {
 				names.add(row.get("name").toString());
 			}
 		}
@@ -286,7 +276,7 @@ public class OEHelper extends OpenERP {
 	 * @return true, if successful
 	 */
 	public boolean syncWithServer(BaseDBHelper db) {
-		deleted_rows = new HashMap<String, List<HashMap<String, Object>>>();
+		deleted_rows = new HashMap<String, List<OEDataRow>>();
 		boolean success = false;
 		try {
 			JSONObject result = getDataFromServer(db, null);
@@ -310,7 +300,7 @@ public class OEHelper extends OpenERP {
 	 * @return
 	 */
 	public boolean syncWithServer(BaseDBHelper db, JSONObject domain) {
-		deleted_rows = new HashMap<String, List<HashMap<String, Object>>>();
+		deleted_rows = new HashMap<String, List<OEDataRow>>();
 		boolean success = false;
 		try {
 			JSONObject result = getDataFromServer(db, domain);
@@ -324,7 +314,7 @@ public class OEHelper extends OpenERP {
 
 	public boolean syncWithServer(BaseDBHelper db, JSONObject domain,
 			boolean delete, boolean syncLimitedData) {
-		deleted_rows = new HashMap<String, List<HashMap<String, Object>>>();
+		deleted_rows = new HashMap<String, List<OEDataRow>>();
 		boolean success = false;
 		try {
 			JSONObject result = getDataFromServer(db, domain, syncLimitedData);
@@ -347,7 +337,7 @@ public class OEHelper extends OpenERP {
 	 */
 	public boolean syncWithServer(BaseDBHelper db, JSONObject domain,
 			boolean delete) {
-		deleted_rows = new HashMap<String, List<HashMap<String, Object>>>();
+		deleted_rows = new HashMap<String, List<OEDataRow>>();
 		boolean success = false;
 		try {
 			JSONObject result = getDataFromServer(db, domain);
@@ -428,6 +418,7 @@ public class OEHelper extends OpenERP {
 
 				}
 				if (!db.hasRecord(db, row_id)) {
+					@SuppressWarnings("unused")
 					int newId = db.create(db, values);
 				} else {
 					// Updating data of row
@@ -475,19 +466,19 @@ public class OEHelper extends OpenERP {
 			 * Comparing server Ids with local id. If local id is not present in
 			 * server Ids than deleting local record.
 			 */
-			List<HashMap<String, Object>> del_rows = new ArrayList<HashMap<String, Object>>();
+			List<OEDataRow> del_rows = new ArrayList<OEDataRow>();
 			if (delete) {
 				if (total > 1) {
 					for (int id : db.localIds(db)) {
 						if (serverIds.size() > 0) {
 							if (!serverIds.contains(String.valueOf(id))) {
 								// Delete record with id.
-								HashMap<String, Object> del_row = db.search(db,
+								List<OEDataRow> del_row = db.search(db,
 										new String[] { "id = ?" },
 										new String[] { String.valueOf(id) });
 
 								if (db.delete(db, id, true)) {
-									del_rows.add(del_row);
+									del_rows.add(del_row.get(0));
 								}
 
 							}
@@ -506,8 +497,7 @@ public class OEHelper extends OpenERP {
 		return success;
 	}
 
-	public HashMap<String, List<HashMap<String, Object>>> getDeletedRows() {
-
+	public HashMap<String, List<OEDataRow>> getDeletedRows() {
 		return deleted_rows;
 	}
 
@@ -675,7 +665,7 @@ public class OEHelper extends OpenERP {
 				for (int i = 0; i < result.getJSONArray("records").length(); i++) {
 					JSONObject row = result.getJSONArray("records")
 							.getJSONObject(i);
-					HashMap<String, Object> oe_datarow = jsonDataToMap(row);
+					OEDataRow oe_datarow = jsonDataToMap(row);
 					int row_id = row.getInt("id");
 
 					OEListViewRows oe_row = new OEListViewRows(row_id,
@@ -696,8 +686,9 @@ public class OEHelper extends OpenERP {
 	 *            the data
 	 * @return the hash map
 	 */
-	public HashMap<String, Object> jsonDataToMap(JSONObject data) {
-		HashMap<String, Object> map_data = new HashMap<String, Object>();
+	public OEDataRow jsonDataToMap(JSONObject data) {
+		OEDataRow map_data = new OEDataRow();
+		@SuppressWarnings("unchecked")
 		Iterator<String> keys = data.keys();
 		try {
 			while (keys.hasNext()) {
@@ -728,7 +719,6 @@ public class OEHelper extends OpenERP {
 		return oeFields;
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean isInstalled(String modelname) {
 		String oea_name = OpenERPAccountManager.currentUser(mContext)
 				.getAndroidName();
@@ -750,15 +740,13 @@ public class OEHelper extends OpenERP {
 				flag = false;
 			}
 		} catch (Exception e) {
-			HashMap<String, Object> records = modelObj.search(modelObj,
+			List<OEDataRow> records = modelObj.search(modelObj,
 					new String[] { "is_installed" }, new String[] {
 							"model = ?", " AND ", "oea_name = ?" },
 					new String[] { modelname, oea_name });
-			if (Integer.parseInt(records.get("total").toString()) > 0) {
-				flag = Boolean
-						.parseBoolean(((List<HashMap<String, Object>>) records
-								.get("records")).get(0).get("is_installed")
-								.toString());
+			if (records.size() > 0) {
+				flag = Boolean.parseBoolean(records.get(0).get("is_installed")
+						.toString());
 			} else {
 				flag = false;
 			}

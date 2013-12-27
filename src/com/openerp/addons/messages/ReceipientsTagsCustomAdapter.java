@@ -120,6 +120,7 @@ public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItems>
 			return result;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void publishResults(CharSequence constraint,
 				FilterResults results) {

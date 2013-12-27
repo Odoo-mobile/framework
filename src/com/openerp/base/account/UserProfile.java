@@ -46,7 +46,7 @@ public class UserProfile extends BaseFragment {
 		rootView = inflater.inflate(R.layout.fragment_account_user_profile,
 				container, false);
 		scope = new AppScope(this);
-		scope.context().setTitle("OpenERP User Profile");
+		scope.main().setTitle("OpenERP User Profile");
 
 		setupView();
 		return rootView;

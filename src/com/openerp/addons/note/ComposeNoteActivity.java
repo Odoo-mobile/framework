@@ -8,6 +8,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.OEUser;
@@ -61,6 +63,7 @@ public class ComposeNoteActivity extends Activity implements
 	private static OEHelper oe = null;
 	Intent update_widget = null;
 
+	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -167,14 +170,11 @@ public class ComposeNoteActivity extends Activity implements
 		note_Stages = new HashMap<String, Long>();
 		dbhelper = new NoteDBHelper(scope.context());
 		stagesobj = dbhelper.new NoteStages(scope.context());
-		HashMap<String, Object> data = stagesobj.search(stagesobj);
-		int total = Integer.parseInt(data.get("total").toString());
+		List<OEDataRow> data = stagesobj.search(stagesobj);
+		int total = data.size();
 
 		if (total > 0) {
-			@SuppressWarnings("unchecked")
-			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
-					.get("records");
-			for (HashMap<String, Object> row_data : rows) {
+			for (OEDataRow row_data : data) {
 				stages.add(row_data.get("name").toString());
 				note_Stages.put(row_data.get("name").toString(),
 						Long.parseLong(row_data.get("id").toString()));
@@ -259,7 +259,7 @@ public class ComposeNoteActivity extends Activity implements
 					stages.add(stages.size() - 1, stage.getText().toString());
 					adapter.notifyDataSetChanged();
 					noteStages.setSelection(stages.size() - 2);
-					scope.context().refreshDrawer(Note.TAG, scope.context());
+					scope.main().refreshDrawer(Note.TAG, scope.context());
 				}
 			}
 		});

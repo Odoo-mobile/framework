@@ -19,7 +19,6 @@
 package com.openerp;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import android.accounts.Account;
@@ -56,6 +55,7 @@ import com.openerp.base.account.AccountFragment;
 import com.openerp.base.account.AccountsDetail;
 import com.openerp.base.account.UserProfile;
 import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.orm.OEDataRow;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.Boot;
 import com.openerp.support.FragmentHandler;
@@ -96,6 +96,7 @@ public class MainActivity extends FragmentActivity implements
 	private OnBackButtonPressedListener backPressed = null;
 	private Boot boot = null;
 
+	@SuppressWarnings("unused")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -587,16 +588,14 @@ public class MainActivity extends FragmentActivity implements
 	private void initDrawer(List<DrawerItem> drawerItems) {
 		if (OEUser.current(context) != null) {
 			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(context);
-			Object obj = partner.search(partner, new String[] { "name" },
-					new String[] { "id = ?" },
-					new String[] { OEUser.current(context).getPartner_id() })
-					.get("records");
+			List<OEDataRow> obj = partner.search(partner,
+					new String[] { "name" }, new String[] { "id = ?" },
+					new String[] { OEUser.current(context).getPartner_id() });
 			String user_name = "";
-			if (obj instanceof Boolean) {
+			if (obj.size() <= 0) {
 				user_name = OEUser.current(context).getUsername();
 			} else {
-				user_name = ((List<HashMap<String, Object>>) obj).get(0)
-						.get("name").toString();
+				user_name = obj.get(0).getString("name");
 			}
 			mDrawerTitle = user_name;
 			mDrawerSubtitle = OEUser.current(context).getHost();

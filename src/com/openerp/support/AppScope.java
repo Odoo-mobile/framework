@@ -19,26 +19,25 @@
 
 package com.openerp.support;
 
-import android.support.v4.app.Fragment;
-
 import com.openerp.MainActivity;
 
-// TODO: Auto-generated Javadoc
+import android.content.Context;
+import android.support.v4.app.Fragment;
+
 /**
  * The Class AppScope.
  */
 public class AppScope {
 
 	/** The user. */
-	private OEUser user = new OEUser();
+	private OEUser mUser = new OEUser();
 
 	/** The context. */
-	private MainActivity context = null;
+	private Context mContext = null;
 
 	public AppScope(Fragment fragment) {
-		super();
-		this.context = (MainActivity) fragment.getActivity();
-		this.user = context.getUserContext();
+		mContext = (Context) fragment.getActivity();
+		mUser = OEUser.current(mContext);
 	}
 
 	/**
@@ -49,10 +48,9 @@ public class AppScope {
 	 * @param context
 	 *            the context
 	 */
-	public AppScope(MainActivity context) {
-		super();
-		this.user = context.getUserContext();
-		this.context = context;
+	public AppScope(Context context) {
+		mContext = context;
+		mUser = OEUser.current(mContext);
 	}
 
 	/**
@@ -61,7 +59,7 @@ public class AppScope {
 	 * @return the user object
 	 */
 	public OEUser User() {
-		return user;
+		return mUser;
 	}
 
 	/**
@@ -69,8 +67,11 @@ public class AppScope {
 	 * 
 	 * @return the main activity
 	 */
-	public MainActivity context() {
-		return context;
+	public Context context() {
+		return mContext;
 	}
 
+	public MainActivity main() {
+		return (MainActivity) mContext;
+	}
 }

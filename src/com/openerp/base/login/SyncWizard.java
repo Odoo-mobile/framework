@@ -144,7 +144,7 @@ public class SyncWizard extends BaseFragment {
 		case R.id.menu_start_application:
 			for (CheckBox chkBox : checkbox) {
 				if (chkBox != null) {
-					scope.context().setAutoSync(
+					scope.main().setAutoSync(
 							authorities.get(chkBox.getId() + "").toString(),
 							chkBox.isChecked());
 				}
@@ -167,7 +167,7 @@ public class SyncWizard extends BaseFragment {
 							editor.putBoolean("local_contact_sync", false);
 						}
 						editor.commit();
-						scope.context().setAutoSync(
+						scope.main().setAutoSync(
 								authorities.get(rdoBtn.getId() + ""),
 								rdoBtn.isChecked());
 					}

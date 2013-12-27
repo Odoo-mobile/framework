@@ -50,6 +50,7 @@ import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.note.NoteProvider;
 import com.openerp.receivers.SyncFinishReceiver;
@@ -148,11 +149,8 @@ public class Note extends BaseFragment implements
 		case NOTE_ID:
 			if (resultCode == Activity.RESULT_OK) {
 				int new_id = data.getExtras().getInt("result");
-				@SuppressWarnings("unchecked")
-				HashMap<String, Object> newRow = ((List<HashMap<String, Object>>) db
-						.search(db, new String[] { "id = ?" },
-								new String[] { new_id + "" }).get("records"))
-						.get(0);
+				OEDataRow newRow = db.search(db, new String[] { "id = ?" },
+						new String[] { new_id + "" }).get(0);
 				OEListViewRows listRow = new OEListViewRows(new_id, newRow);
 				listRows.add(listRow);
 				listAdapter.refresh(listRows);
@@ -261,7 +259,7 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public void onRefreshStarted(View view) {
-		scope.context().requestSync(NoteProvider.AUTHORITY);
+		scope.main().requestSync(NoteProvider.AUTHORITY);
 	}
 
 	// PullToRefresh
@@ -299,7 +297,7 @@ public class Note extends BaseFragment implements
 			mPullAttacher.setRefreshComplete();
 
 			// Refreshing Menulist [counter] after synchronisation complete
-			scope.context().refreshDrawer(TAG, context);
+			scope.main().refreshDrawer(TAG, context);
 			setupListView(stage_id);
 		}
 	};
@@ -333,17 +331,7 @@ public class Note extends BaseFragment implements
 						.findViewById(R.id.txv_detailNote_Tags);
 
 				try {
-					// String noteID =
-					// row_data.getRow_data().get("id").toString();
-					// String[] note_tags_items = getNoteTags(
-					// String.valueOf(noteID), scope.context());
-					// noteTags.showImage(false);
-					// for (String tag : note_tags_items) {
-					// noteTags.addObject(new TagsItems(0, tag, ""));
-					// }
-					// if (note_tags_items.length <= 0) {
 					noteTags.setVisibility(View.GONE);
-					// }
 					// Fetching Note Stage and Setting Background color for that
 					String stageInfo = row_data.getRow_data().get("stage_id")
 							.toString();
@@ -398,13 +386,13 @@ public class Note extends BaseFragment implements
 				}
 
 				fragment.setArguments(selectedNoteID);
-				scope.context().fragmentHandler.setBackStack(true, null);
-				scope.context().fragmentHandler.replaceFragmnet(fragment);
+				scope.main().fragmentHandler.setBackStack(true, null);
+				scope.main().fragmentHandler.replaceFragmnet(fragment);
 			}
 		});
 
 		// important to write
-		mPullAttacher = scope.context().getPullToRefreshAttacher();
+		mPullAttacher = scope.main().getPullToRefreshAttacher();
 		mPullAttacher.setRefreshableView(lstNotes, this);
 
 		// Setting touch listner for swapping the list rows.
@@ -491,7 +479,7 @@ public class Note extends BaseFragment implements
 
 			// Refreshing list view after synchronisation
 			// complete
-			scope.context().refreshDrawer(TAG, scope.context());
+			scope.main().refreshDrawer(TAG, scope.context());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -517,9 +505,8 @@ public class Note extends BaseFragment implements
 			whereArgs = new String[] { "true" };
 		}
 
-		HashMap<String, Object> results = getModel().search(db, where,
-				whereArgs);
-		int total = Integer.parseInt(results.get("total").toString());
+		List<OEDataRow> results = getModel().search(db, where, whereArgs);
+		int total = results.size();
 
 		// Handling text message of empty list view
 		// exa.
@@ -536,12 +523,8 @@ public class Note extends BaseFragment implements
 		}
 
 		if (total > 0) {
-			@SuppressWarnings("unchecked")
-			List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) results
-					.get("records");
-			for (HashMap<String, Object> row_data : rows) {
-				OEListViewRows row = new OEListViewRows(
-						Integer.parseInt(row_data.get("id").toString()),
+			for (OEDataRow row_data : results) {
+				OEListViewRows row = new OEListViewRows(row_data.getInt("id"),
 						row_data);
 				lists.add(row);
 			}
@@ -561,7 +544,7 @@ public class Note extends BaseFragment implements
 						View.VISIBLE);
 
 				// requesting to sync..
-				scope.context().requestSync(NoteProvider.AUTHORITY);
+				scope.main().requestSync(NoteProvider.AUTHORITY);
 			}
 		}
 		return lists;
@@ -593,15 +576,12 @@ public class Note extends BaseFragment implements
 				oe.syncWithServer(stagesobj, domain);
 			}
 
-			HashMap<String, Object> data = stagesobj.search(stagesobj, null,
-					null, null, null, null, "id", "ASC");
-			int total = Integer.parseInt(data.get("total").toString());
+			List<OEDataRow> data = stagesobj.search(stagesobj, null, null,
+					null, null, null, "id", "ASC");
+			int total = data.size();
 
 			if (total > 0) {
-				@SuppressWarnings("unchecked")
-				List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) data
-						.get("records");
-				for (HashMap<String, Object> row_data : rows) {
+				for (OEDataRow row_data : data) {
 					String row_id = row_data.get("id").toString();
 					String name = row_data.get("name").toString();
 					stages.put(row_id, name);
@@ -618,13 +598,13 @@ public class Note extends BaseFragment implements
 				MainActivity.context).getAndroidName();
 		db = new NoteDBHelper(context);
 		List<String> note_tags = new ArrayList<String>();
-		List<HashMap<String, Object>> records = db
+		List<OEDataRow> records = db
 				.executeSQL(
 						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { note_note_id, oea_name, oea_name });
 
 		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
+			for (OEDataRow row : records) {
 				note_tags.add(row.get("name").toString());
 			}
 		}
