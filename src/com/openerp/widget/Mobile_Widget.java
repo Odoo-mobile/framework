@@ -24,20 +24,15 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
-import com.openerp.R;
+
 import com.openerp.MainActivity;
+import com.openerp.R;
 import com.openerp.addons.messages.Message;
 import com.openerp.addons.messages.MessageComposeActivty;
 import com.openerp.addons.messages.MessageDBHelper;
 import com.openerp.addons.note.ComposeNoteActivity;
 import com.openerp.addons.note.Note;
-import com.openerp.addons.note.NoteDBHelper;
-import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.base.res.Res_PartnerDBHelper;
-import com.openerp.orm.OEHelper;
-import com.openerp.util.drawer.DrawerItem;
 
 public class Mobile_Widget extends AppWidgetProvider {
 	public static final String TAG = "android.appwidget.action.APPWIDGET_UPDATE";

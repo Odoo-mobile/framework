@@ -38,7 +38,6 @@ import com.openerp.addons.meeting.MeetingDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
-import com.openerp.support.JSONDataHelper;
 import com.openerp.support.calendar.OECalendar;
 
 public class MeetingSyncService extends Service {

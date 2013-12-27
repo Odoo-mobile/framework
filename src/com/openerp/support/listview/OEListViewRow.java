@@ -18,8 +18,6 @@
  */
 package com.openerp.support.listview;
 
-import java.util.HashMap;
-
 import com.openerp.orm.OEDataRow;
 
 /**

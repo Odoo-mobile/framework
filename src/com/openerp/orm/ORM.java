@@ -141,8 +141,9 @@ public class ORM extends SQLiteDatabaseHelper {
 				SQLStatement statement = newDb.createStatement(newDb);
 				newDb.createTable(statement);
 
-				OEColumn dField = new OEColumn(field.getName(), field.getTitle(),
-						OETypes.many2Many(newDb.getModelName()));
+				OEColumn dField = new OEColumn(field.getName(),
+						field.getTitle(), OETypes.many2Many(newDb
+								.getModelName()));
 
 				newDb.handleMany2ManyCol(db, dField);
 			} else {
@@ -157,7 +158,8 @@ public class ORM extends SQLiteDatabaseHelper {
 				String common_col = "oea_name";
 				cols.add(new OEColumn(tab1_col, tab1_col, OETypes.integer()));
 				cols.add(new OEColumn(tab2_col, tab2_col, OETypes.integer()));
-				cols.add(new OEColumn(common_col, "Android Name", OETypes.text()));
+				cols.add(new OEColumn(common_col, "Android Name", OETypes
+						.text()));
 				SQLStatement many2ManyTable = createStatement(rel_table, cols);
 				this.createTable(many2ManyTable);
 			}
@@ -433,8 +435,8 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * 
 	 * @param dbHelper
 	 *            the db helper
-	 * @param values
-	 *            the values
+	 * @param data_values
+	 *            the data_values
 	 * @return the int
 	 */
 	public int create(BaseDBHelper dbHelper, ContentValues data_values) {
@@ -545,7 +547,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * 
 	 * @param db
 	 *            the db
-	 * @return the hash map
+	 * @return the list
 	 */
 	public List<OEDataRow> search(BaseDBHelper db) {
 		return search(db, null, null, null, null, null, null, null);
@@ -560,7 +562,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the where
 	 * @param whereArgs
 	 *            the where args
-	 * @return the hash map
+	 * @return the list
 	 */
 	public List<OEDataRow> search(BaseDBHelper db, String[] where,
 			String[] whereArgs) {
@@ -568,13 +570,17 @@ public class ORM extends SQLiteDatabaseHelper {
 	}
 
 	/**
-	 * Search
+	 * Search.
 	 * 
 	 * @param db
+	 *            the db
 	 * @param columns
+	 *            the columns
 	 * @param where
+	 *            the where
 	 * @param whereArgs
-	 * @return
+	 *            the where args
+	 * @return the list
 	 */
 	public List<OEDataRow> search(BaseDBHelper db, String[] columns,
 			String[] where, String[] whereArgs) {
@@ -592,7 +598,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the where args
 	 * @param group_by
 	 *            the group_by
-	 * @return the hash map
+	 * @return the list
 	 */
 	public List<OEDataRow> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by) {
@@ -612,7 +618,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the group_by
 	 * @param having
 	 *            the having
-	 * @return the hash map
+	 * @return the list
 	 */
 	public List<OEDataRow> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by, String having) {
@@ -636,7 +642,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the orderby
 	 * @param ordertype
 	 *            the ordertype
-	 * @return the hash map
+	 * @return the list
 	 */
 	public List<OEDataRow> search(BaseDBHelper db, String[] where,
 			String[] whereArgs, String group_by, String having, String orderby,
@@ -650,6 +656,8 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * 
 	 * @param db
 	 *            the db
+	 * @param columns
+	 *            the columns
 	 * @param where
 	 *            the where
 	 * @param whereArgs
@@ -662,7 +670,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 *            the orderby
 	 * @param ordertype
 	 *            the ordertype
-	 * @return the hash map
+	 * @return the list
 	 */
 	public List<OEDataRow> search(BaseDBHelper db, String[] columns,
 			String[] where, String[] whereArgs, String group_by, String having,
@@ -930,6 +938,8 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * 
 	 * @param dbHelper
 	 *            the db helper
+	 * @param fetch_columns
+	 *            the fetch_columns
 	 * @param where
 	 *            the where
 	 * @param whereVals
@@ -968,6 +978,15 @@ public class ORM extends SQLiteDatabaseHelper {
 		return data;
 	}
 
+	/**
+	 * Execute sql.
+	 * 
+	 * @param sqlQuery
+	 *            the sql query
+	 * @param args
+	 *            the args
+	 * @return the list
+	 */
 	public List<OEDataRow> executeSQL(String sqlQuery, String[] args) {
 		SQLiteDatabase db = getWritableDatabase();
 
@@ -1042,6 +1061,15 @@ public class ORM extends SQLiteDatabaseHelper {
 
 	}
 
+	/**
+	 * Gets the last id.
+	 * 
+	 * @param model_name
+	 *            the model_name
+	 * @param column
+	 *            the column
+	 * @return the last id
+	 */
 	public int getLastId(String model_name, String column) {
 		List<HashMap<String, Object>> data = executeSQL(model_name,
 				new String[] { "max(" + column + ") as id" },
@@ -1149,6 +1177,7 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * @param dbHelper
 	 *            the db helper
 	 * @param fetch_columns
+	 *            the fetch_columns
 	 * @param result
 	 *            the result
 	 * @return the result
@@ -1347,6 +1376,17 @@ public class ORM extends SQLiteDatabaseHelper {
 
 	}
 
+	/**
+	 * Delete.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param id
+	 *            the id
+	 * @param fromLocal
+	 *            the from local
+	 * @return true, if successful
+	 */
 	public boolean delete(BaseDBHelper db, int id, boolean fromLocal) {
 		try {
 			if (!fromLocal) {
