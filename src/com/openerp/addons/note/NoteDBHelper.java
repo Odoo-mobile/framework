@@ -31,6 +31,7 @@ import android.content.Context;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.Fields;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.orm.Types;
 import com.openerp.support.OEUser;
@@ -76,14 +77,13 @@ public class NoteDBHelper extends BaseDBHelper {
 
 		String oea_name = OEUser.current(mContext).getAndroidName();
 		LinkedHashMap<String, String> note_tag = new LinkedHashMap<String, String>();
-		List<HashMap<String, Object>> records = executeSQL(
+		List<OEDataRow> records = executeSQL(
 				"SELECT id,name,oea_name FROM note_tag where oea_name = ?",
 				new String[] { oea_name });
 
 		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
-				note_tag.put(row.get("name").toString(), row.get("id")
-						.toString());
+			for (OEDataRow row : records) {
+				note_tag.put(row.getString("name"), row.getString("id"));
 			}
 		}
 		return note_tag;

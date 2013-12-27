@@ -40,12 +40,12 @@ import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.orm.BaseDBHelper;
+import com.openerp.orm.OEDataRow;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.OEDate;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class OEListViewAdapter.
  */
@@ -99,7 +99,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 	BaseDBHelper dbHelper = null;
 
 	/** The rowdata. */
-	HashMap<String, Object> rowdata = null;
+	OEDataRow rowdata = null;
 
 	/** The binary_flag. */
 	int[] binary_flag = new int[2];
@@ -155,7 +155,6 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 			List<OEListViewRows> objects, String[] from, int[] to,
 			BaseDBHelper db) {
 		super(context, resource, objects);
-		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.resource_id = resource;
 		this.rows = new ArrayList<OEListViewRows>(objects);
@@ -192,7 +191,6 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 			BaseDBHelper db, boolean changeBackground, int[] colors,
 			String conditionKey) {
 		super(context, resource, objects);
-		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.resource_id = resource;
 		this.rows = new ArrayList<OEListViewRows>(objects);
@@ -547,14 +545,13 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 		 */
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
-			// TODO Auto-generated method stub
 			FilterResults result = new FilterResults();
 			if (constraint != null && constraint.toString().length() > 0) {
 				constraint = constraint.toString().toLowerCase();
 				ArrayList<OEListViewRows> filteredItems = new ArrayList<OEListViewRows>();
 				for (int i = 0; i < unfiltered_rows.size(); i++) {
 					OEListViewRows p = unfiltered_rows.get(i);
-					HashMap<String, Object> data = p.getRow_data();
+					OEDataRow data = p.getRow_data();
 					if (data.toString().toLowerCase().contains(constraint)) {
 						filteredItems.add(p);
 					}
@@ -580,7 +577,6 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRows> {
 		@Override
 		protected void publishResults(CharSequence constraint,
 				FilterResults results) {
-			// TODO Auto-generated method stub
 
 			if (results.count > 0) {
 				clear();

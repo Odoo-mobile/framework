@@ -26,13 +26,14 @@ import android.widget.Toast;
 
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
-import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.BaseDBHelper;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.groups.UserGroupsProvider;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
+import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
@@ -76,7 +77,7 @@ public class UserGroups extends BaseFragment implements
 	public void onStart() {
 		super.onStart();
 		follower = new MailFollowerDb(scope.context());
-		scope.context().setTitle("Join a Group");
+		scope.main().setTitle("Join a Group");
 		lstGroups = (GridView) rootView.findViewById(R.id.listGroups);
 		groups_loader = new LoadGroups();
 		groups_loader.execute((Void) null);
@@ -138,7 +139,7 @@ public class UserGroups extends BaseFragment implements
 			}
 		});
 		adapter.addImageColumn("image_medium");
-		scope.context().runOnUiThread(new Runnable() {
+		scope.main().runOnUiThread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -147,7 +148,7 @@ public class UserGroups extends BaseFragment implements
 		});
 
 		// Getting Pull To Refresh Attacher from Main Activity
-		mPullToRefreshAttacher = scope.context().getPullToRefreshAttacher();
+		mPullToRefreshAttacher = scope.main().getPullToRefreshAttacher();
 
 		// Set the Refreshable View to be the ListView and the refresh listener
 		// to be this.
@@ -162,7 +163,7 @@ public class UserGroups extends BaseFragment implements
 		List<OEListViewRows> groups = new ArrayList<OEListViewRows>();
 
 		if (!db.isEmptyTable(db)) {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -173,19 +174,17 @@ public class UserGroups extends BaseFragment implements
 				}
 			});
 
-			HashMap<String, Object> group_data = db.search(db);
-			if (Integer.parseInt(group_data.get("total").toString()) > 0) {
-				List<HashMap<String, Object>> datas = (List<HashMap<String, Object>>) group_data
-						.get("records");
-				for (HashMap<String, Object> row : datas) {
-					int id = Integer.parseInt(row.get("id").toString());
+			List<OEDataRow> group_data = db.search(db);
+			if (group_data.size() > 0) {
+				for (OEDataRow row : group_data) {
+					int id = row.getInt("id");
 					OEListViewRows row_data = new OEListViewRows(id, row);
 					groups.add(row_data);
 				}
 			}
 
 		} else {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					rootView.findViewById(R.id.groupSyncWaiter).setVisibility(
@@ -196,7 +195,7 @@ public class UserGroups extends BaseFragment implements
 					rootView.findViewById(R.id.listGroups).setVisibility(
 							View.GONE);
 					Log.d(TAG, "Requesting for sync groups");
-					scope.context().requestSync(UserGroupsProvider.AUTHORITY);
+					scope.main().requestSync(UserGroupsProvider.AUTHORITY);
 				}
 			});
 		}
@@ -218,30 +217,23 @@ public class UserGroups extends BaseFragment implements
 
 			// Add dynamic groups
 			MailFollowerDb followers = new MailFollowerDb(context);
-			HashMap<String, Object> user_groups = followers.search(followers,
+			List<OEDataRow> user_groups = followers.search(followers,
 					new String[] { "res_model = ?", "AND", "partner_id = ? " },
-					new String[] {
-							db.getModelName(),
-							OpenERPAccountManager.currentUser(context)
-									.getPartner_id() });
-			int total = Integer.parseInt(user_groups.get("total").toString());
+					new String[] { db.getModelName(),
+							OEUser.current(context).getPartner_id() });
+			int total = user_groups.size();
 			if (total > 0) {
 				int i = 0;
-				List<HashMap<String, Object>> records = (List<HashMap<String, Object>>) user_groups
-						.get("records");
-				for (HashMap<String, Object> row : records) {
+				for (OEDataRow row : user_groups) {
 					if (i > tag_colors.length - 1) {
 						i = 0;
 					}
-
-					List<HashMap<String, Object>> group_rec = (List<HashMap<String, Object>>) db
-							.search(db,
-									new String[] { "id = ?" },
-									new String[] { row.get("res_id").toString() })
-							.get("records");
-					String group_name = group_rec.get(0).get("name").toString();
-					int key = Integer.parseInt(group_rec.get(0).get("id")
-							.toString());
+					OEDataRow group_rec = db.search(db,
+							new String[] { "id = ?" },
+							new String[] { row.get("res_id").toString() }).get(
+							0);
+					String group_name = group_rec.getString("name");
+					int key = group_rec.getInt("id");
 					drawer_items.add(new DrawerItem(TAG, group_name,
 							getGroupCount(context, key), tag_colors[i],
 							getGroupInstance(key)));
@@ -298,7 +290,7 @@ public class UserGroups extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 			mPullToRefreshAttacher.setRefreshComplete();
 			setupView();
-			scope.context().refreshDrawer(TAG, context);
+			scope.main().refreshDrawer(TAG, context);
 		}
 
 	};
@@ -308,7 +300,7 @@ public class UserGroups extends BaseFragment implements
 		try {
 			if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
 				Log.i("UserGroupsFragment", "requesting for sync");
-				scope.context().requestSync(UserGroupsProvider.AUTHORITY);
+				scope.main().requestSync(UserGroupsProvider.AUTHORITY);
 			} else {
 				Toast.makeText(getActivity(), "Unable to connect server !",
 						Toast.LENGTH_LONG).show();
@@ -359,6 +351,7 @@ public class UserGroups extends BaseFragment implements
 					data_vals.put("res_id", this.group_id);
 					data_vals.put("partner_id",
 							Integer.parseInt(scope.User().getPartner_id()));
+					@SuppressWarnings("unused")
 					int newId = follower.create(follower, data_vals);
 					toast_message = "Group joined";
 				} else {
@@ -379,7 +372,7 @@ public class UserGroups extends BaseFragment implements
 					}
 					toast_message = "Unfollowed from group";
 				}
-				scope.context().runOnUiThread(new Runnable() {
+				scope.main().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						try {
@@ -389,7 +382,7 @@ public class UserGroups extends BaseFragment implements
 							}
 						} catch (Exception e) {
 						}
-						scope.context().refreshDrawer(TAG, scope.context());
+						scope.main().refreshDrawer(TAG, scope.context());
 					}
 				});
 				return true;
@@ -404,7 +397,7 @@ public class UserGroups extends BaseFragment implements
 
 		@Override
 		protected void onPreExecute() {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -423,7 +416,7 @@ public class UserGroups extends BaseFragment implements
 
 		@Override
 		protected void onPostExecute(final Boolean success) {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {

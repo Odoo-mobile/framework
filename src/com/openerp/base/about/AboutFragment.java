@@ -82,8 +82,8 @@ public class AboutFragment extends BaseFragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		scope.context().getActionBar().setDisplayHomeAsUpEnabled(true);
-		scope.context().getActionBar().setHomeButtonEnabled(true);
+		scope.main().getActionBar().setDisplayHomeAsUpEnabled(true);
+		scope.main().getActionBar().setHomeButtonEnabled(true);
 	}
 
 	@Override

@@ -288,7 +288,7 @@ public class Login extends BaseFragment {
 					loginUserASync.cancel(true);
 					pdialog.hide();
 					SyncWizard syncWizard = new SyncWizard();
-					scope.context().fragmentHandler.replaceFragmnet(syncWizard);
+					scope.main().fragmentHandler.replaceFragmnet(syncWizard);
 
 				}
 			} else {

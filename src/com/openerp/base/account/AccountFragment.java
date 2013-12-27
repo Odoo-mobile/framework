@@ -249,9 +249,9 @@ public class AccountFragment extends BaseFragment {
 				Login loginFragment = new Login();
 				Bundle bundle = new Bundle();
 				bundle.putString("openERPServerURL", openERPServerURL);
-				scope.context().fragmentHandler.setFragmentArguments(bundle);
-				scope.context().fragmentHandler.setBackStack(true, null);
-				scope.context().fragmentHandler.replaceFragmnet(loginFragment);
+				scope.main().fragmentHandler.setFragmentArguments(bundle);
+				scope.main().fragmentHandler.setBackStack(true, null);
+				scope.main().fragmentHandler.replaceFragmnet(loginFragment);
 
 				serverConnectASync.cancel(true);
 				serverConnectASync = null;
@@ -269,8 +269,8 @@ public class AccountFragment extends BaseFragment {
 	@Override
 	public void onStop() {
 		super.onStop();
-		scope.context().getActionBar().setDisplayHomeAsUpEnabled(true);
-		scope.context().getActionBar().setHomeButtonEnabled(true);
+		scope.main().getActionBar().setDisplayHomeAsUpEnabled(true);
+		scope.main().getActionBar().setHomeButtonEnabled(true);
 
 	}
 

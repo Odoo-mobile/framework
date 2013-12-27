@@ -18,7 +18,6 @@
  */
 package com.openerp.addons.note;
 
-import java.util.HashMap;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -38,6 +37,7 @@ import android.widget.TextView;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.addons.messages.MessageComposeActivty;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
@@ -108,9 +108,8 @@ public class DetailNoteFragment extends BaseFragment {
 			selectedNoteID.putInt("res_id", row_id);
 			selectedNoteID.putString("message", message);
 			addfollower_fragement.setArguments(selectedNoteID);
-			scope.context().fragmentHandler.setBackStack(true, null);
-			scope.context().fragmentHandler
-					.replaceFragmnet(addfollower_fragement);
+			scope.main().fragmentHandler.setBackStack(true, null);
+			scope.main().fragmentHandler.replaceFragmnet(addfollower_fragement);
 			return true;
 
 		case R.id.menu_note_forward_asmail:
@@ -157,8 +156,8 @@ public class DetailNoteFragment extends BaseFragment {
 			editNoteID.putString("stage_id", stageid);
 			editNoteID.putString("tag_id", noteid);
 			editnote_fragment.setArguments(editNoteID);
-			scope.context().fragmentHandler.setBackStack(true, null);
-			scope.context().fragmentHandler.replaceFragmnet(editnote_fragment);
+			scope.main().fragmentHandler.setBackStack(true, null);
+			scope.main().fragmentHandler.replaceFragmnet(editnote_fragment);
 			return true;
 
 		case R.id.menu_note_delete:
@@ -209,18 +208,15 @@ public class DetailNoteFragment extends BaseFragment {
 		noteMemo.setMovementMethod(new ScrollingMovementMethod());
 		db = new NoteDBHelper(scope.context());
 
-		HashMap<String, Object> result = db.search(db, new String[] { "id=?" },
+		List<OEDataRow> result = db.search(db, new String[] { "id=?" },
 				new String[] { String.valueOf(note_id) });
-		int total = Integer.parseInt(result.get("total").toString());
+		int total = result.size();
 		if (total > 0) {
-			@SuppressWarnings("unchecked")
-			HashMap<String, Object> row = ((List<HashMap<String, Object>>) result
-					.get("records")).get(0);
+			OEDataRow row = result.get(0);
 
 			if (row.get("note_pad_url") != null) {
 				padurl = row.get("note_pad_url").toString();
 			}
-
 			// paassing to next followerfragment
 			message = row.get("memo").toString();
 			try {

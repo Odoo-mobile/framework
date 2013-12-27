@@ -1,7 +1,6 @@
 package com.openerp.base.account;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -22,6 +21,7 @@ import android.widget.GridView;
 
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEDataRow;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
@@ -43,7 +43,7 @@ public class AccountsDetail extends BaseFragment {
 		rootView = inflater.inflate(R.layout.fragment_all_accounts_detail,
 				container, false);
 		scope = new AppScope(this);
-		scope.context().setTitle("Accounts");
+		scope.main().setTitle("Accounts");
 		setupGrid();
 		return rootView;
 	}
@@ -99,9 +99,9 @@ public class AccountsDetail extends BaseFragment {
 							OpenERPAccountManager.loginUser(scope.context(),
 									row_data.getRow_data().get("name")
 											.toString());
-							scope.context().finish();
-							scope.context().startActivity(
-									scope.context().getIntent());
+							scope.main().finish();
+							scope.main().startActivity(
+									scope.main().getIntent());
 						}
 					});
 				}
@@ -117,7 +117,7 @@ public class AccountsDetail extends BaseFragment {
 		List<OEListViewRows> list = new ArrayList<OEListViewRows>();
 		for (OEUser account : OpenERPAccountManager.fetchAllAccounts(scope
 				.context())) {
-			HashMap<String, Object> row_data = new HashMap<String, Object>();
+			OEDataRow row_data = new OEDataRow();
 
 			row_data.put("name", account.getAndroidName());
 			row_data.put("image", account.getAvatar());
@@ -145,8 +145,8 @@ public class AccountsDetail extends BaseFragment {
 		switch (item.getItemId()) {
 		case R.id.menu_add_new_account:
 			Fragment fragment = new AccountFragment();
-			scope.context().fragmentHandler.setBackStack(true, null);
-			scope.context().fragmentHandler.replaceFragmnet(fragment);
+			scope.main().fragmentHandler.setBackStack(true, null);
+			scope.main().fragmentHandler.replaceFragmnet(fragment);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -171,11 +171,10 @@ public class AccountsDetail extends BaseFragment {
 								// User clicked OK, so save the result somewhere
 								// or return them to the component that opened
 								// the dialog
-								// TODO Auto-generated method stub
 								OpenERPAccountManager.logoutUser(scope
 										.context(), scope.User()
 										.getAndroidName());
-								scope.context().finish();
+								scope.main().finish();
 							}
 						})
 				.setNegativeButton("Cancel",
@@ -209,9 +208,9 @@ public class AccountsDetail extends BaseFragment {
 								// the dialog
 								OpenERPAccountManager.removeAccount(
 										scope.context(), accountName);
-								scope.context().finish();
-								scope.context().startActivity(
-										scope.context().getIntent());
+								scope.main().finish();
+								scope.main().startActivity(
+										scope.main().getIntent());
 							}
 						})
 				.setNegativeButton("Cancel",

@@ -27,6 +27,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -56,6 +57,7 @@ import android.widget.Toast;
 
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.DataSetChangeReceiver;
@@ -157,7 +159,7 @@ public class Message extends BaseFragment implements
 		 * 
 		 * see method for more information about it.
 		 */
-		scope.context().setAutoSync(MessageProvider.AUTHORITY, true);
+		scope.main().setAutoSync(MessageProvider.AUTHORITY, true);
 		return rootView;
 	}
 
@@ -214,6 +216,7 @@ public class Message extends BaseFragment implements
 							.get("type").toString());
 				} else {
 					String[] model_parts = TextUtils.split(model_name, "\\.");
+					@SuppressWarnings({ "unchecked", "rawtypes" })
 					HashSet unique_parts = new HashSet(Arrays
 							.asList(model_parts));
 					model_name = capitalizeString(TextUtils.join(" ",
@@ -268,7 +271,7 @@ public class Message extends BaseFragment implements
 		// Creating instance for listview control
 		lstview = (ListView) rootView.findViewById(R.id.lstMessages);
 		// Providing adapter to listview
-		scope.context().runOnUiThread(new Runnable() {
+		scope.main().runOnUiThread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -286,7 +289,6 @@ public class Message extends BaseFragment implements
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View view,
 					int index, long arg3) {
-				// TODO Auto-generated method stub
 
 				OEListViewRows data = (OEListViewRows) lstview.getAdapter()
 						.getItem(index);
@@ -299,8 +301,7 @@ public class Message extends BaseFragment implements
 					return false;
 				}
 				// Start the CAB using the ActionMode.Callback defined above
-				mActionMode = scope.context().startActionMode(
-						mActionModeCallback);
+				mActionMode = scope.main().startActionMode(mActionModeCallback);
 				selectedCounter++;
 				view.setBackgroundResource(R.drawable.listitem_pressed);
 				// lstview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -311,6 +312,7 @@ public class Message extends BaseFragment implements
 
 		// Setting multi choice selection listener
 		lstview.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+			@SuppressLint("UseSparseArrays")
 			HashMap<Integer, Boolean> selectedList = new HashMap<Integer, Boolean>();
 
 			@Override
@@ -335,7 +337,6 @@ public class Message extends BaseFragment implements
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 				// Respond to clicks on the actions in the CAB
 				HashMap<Integer, Integer> msg_pos = new HashMap<Integer, Integer>();
-				OEDialog dialog = null;
 				switch (item.getItemId()) {
 				case R.id.menu_message_mark_unread_selected:
 					Log.e("menu_message_context", "Mark as Unread");
@@ -430,14 +431,13 @@ public class Message extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View view, int index,
 					long id) {
-				// TODO Auto-generated method stub
 				MessageDetail messageDetail = new MessageDetail();
 				Bundle bundle = new Bundle();
 				bundle.putInt("message_id", list.get(index).getRow_id());
 				bundle.putInt("position", index);
 				messageDetail.setArguments(bundle);
-				scope.context().fragmentHandler.setBackStack(true, null);
-				scope.context().fragmentHandler.replaceFragmnet(messageDetail);
+				scope.main().fragmentHandler.setBackStack(true, null);
+				scope.main().fragmentHandler.replaceFragmnet(messageDetail);
 				if (!type.equals("archive")) {
 					list.remove(index);
 				}
@@ -446,7 +446,7 @@ public class Message extends BaseFragment implements
 		});
 
 		// Getting Pull To Refresh Attacher from Main Activity
-		mPullToRefreshAttacher = scope.context().getPullToRefreshAttacher();
+		mPullToRefreshAttacher = scope.main().getPullToRefreshAttacher();
 
 		// Set the Refreshable View to be the ListView and the refresh listener
 		// to be this.
@@ -515,12 +515,12 @@ public class Message extends BaseFragment implements
 		}
 
 		// Fetching parent ids from Child row with order by date desc
-		HashMap<String, Object> result = db.search(db, from, where, whereArgs,
-				null, null, "date", "DESC");
+		List<OEDataRow> result = db.search(db, from, where, whereArgs, null,
+				null, "date", "DESC");
 		HashMap<String, OEListViewRows> parent_list_details = new HashMap<String, OEListViewRows>();
 		messages_sorted = new ArrayList<OEListViewRows>();
-		if (Integer.parseInt(result.get("total").toString()) > 0) {
-			scope.context().runOnUiThread(new Runnable() {
+		if (result.size() > 0) {
+			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -533,48 +533,31 @@ public class Message extends BaseFragment implements
 			});
 
 			int i = 0;
-			for (HashMap<String, Object> row : (List<HashMap<String, Object>>) result
-					.get("records")) {
-
+			for (OEDataRow row : result) {
 				boolean isParent = true;
-				String key = row.get("parent_id").toString();
+				String key = row.getString("parent_id");
 				if (key.equals("false")) {
-					key = row.get("id").toString();
+					key = row.getString("id");
 				} else {
 					isParent = false;
 				}
 				if (!parent_list_details.containsKey(key)) {
 					// Fetching row parent message
-					HashMap<String, Object> newRow = null;
+					OEDataRow newRow = null;
 					OEListViewRows newRowObj = null;
 
 					if (isParent) {
-
 						newRow = row;
-						newRow.put(
-								"subject",
-								updateSubject(newRow.get("subject").toString(),
-										Integer.parseInt(key)));
-						newRowObj = new OEListViewRows(Integer.parseInt(key),
-								(HashMap<String, Object>) newRow);
-
 					} else {
 						newRow = db.search(db, from, new String[] { "id = ?" },
-								new String[] { key });
-						HashMap<String, Object> temp_row = new HashMap<String, Object>();
-						try {
-							temp_row = ((List<HashMap<String, Object>>) newRow
-									.get("records")).get(0);
-							temp_row.put(
-									"subject",
-									updateSubject(temp_row.get("subject")
-											.toString(), Integer.parseInt(key)));
-							newRowObj = new OEListViewRows(
-									Integer.parseInt(key), temp_row);
-						} catch (Exception e) {
-						}
-
+								new String[] { key }).get(0);
 					}
+					newRow.put(
+							"subject",
+							updateSubject(newRow.get("subject").toString(),
+									Integer.parseInt(key)));
+					newRowObj = new OEListViewRows(Integer.parseInt(key),
+							newRow);
 
 					parent_list_details.put(key, newRowObj);
 					message_row_indexes.put(key, i);
@@ -587,7 +570,7 @@ public class Message extends BaseFragment implements
 		} else {
 			if (db.isEmptyTable(db) && !isSynced) {
 				isSynced = true;
-				scope.context().runOnUiThread(new Runnable() {
+				scope.main().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						if (rootView.findViewById(R.id.messageSyncWaiter) != null) {
@@ -604,15 +587,15 @@ public class Message extends BaseFragment implements
 						JSONArray ids = new JSONArray();
 						ids.put(group_id);
 						group_bundle.putString("group_ids", ids.toString());
-						scope.context().requestSync(MessageProvider.AUTHORITY,
+						scope.main().requestSync(MessageProvider.AUTHORITY,
 								group_bundle);
 					} else {
-						scope.context().requestSync(MessageProvider.AUTHORITY);
+						scope.main().requestSync(MessageProvider.AUTHORITY);
 					}
 				} catch (Exception e) {
 				}
 			} else {
-				scope.context().runOnUiThread(new Runnable() {
+				scope.main().runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
@@ -792,14 +775,14 @@ public class Message extends BaseFragment implements
 					loadMessage.execute((Void) null);
 
 				}
-				scope.context().setTitle(title);
+				scope.main().setTitle(title);
 			} else {
 				if (bundle.containsKey("group_id")) {
 					group_id = bundle.getString("group_id");
 					loadMessage = new LoadMessages(TYPE.GROUP);
 					loadMessage.execute((Void) null);
 				} else {
-					scope.context().setTitle("Inbox");
+					scope.main().setTitle("Inbox");
 					loadMessage = new LoadMessages(TYPE.INBOX);
 					loadMessage.execute((Void) null);
 				}
@@ -859,14 +842,11 @@ public class Message extends BaseFragment implements
 					id = parent_id;
 				}
 				OEListViewRows newRowObj = null;
-				HashMap<String, Object> newRow = db.search(db, from,
+				List<OEDataRow> newRow = db.search(db, from,
 						new String[] { "id = ?" }, new String[] { id }, null,
 						null, "date", "DESC");
 				newRowObj = new OEListViewRows(Integer.parseInt(id),
-						((List<HashMap<String, Object>>) newRow.get("records"))
-								.get(0));
-
-				HashMap<String, Object> row = newRowObj.getRow_data();
+						newRow.get(0));
 				if (message_row_indexes.containsKey(id) && list.size() > 0) {
 					list.remove(Integer.parseInt(message_row_indexes.get(id)
 							.toString()));
@@ -886,10 +866,9 @@ public class Message extends BaseFragment implements
 	};
 
 	private OEListViewRows getRowForMessage(int id) {
-		HashMap<String, Object> newRow = db.search(db, from,
-				new String[] { "id = ?" }, new String[] { String.valueOf(id) });
-		OEListViewRows newRowObj = new OEListViewRows(id,
-				((List<HashMap<String, Object>>) newRow.get("records")).get(0));
+		List<OEDataRow> newRow = db.search(db, from, new String[] { "id = ?" },
+				new String[] { String.valueOf(id) });
+		OEListViewRows newRowObj = new OEListViewRows(id, newRow.get(0));
 
 		return newRowObj;
 	}
@@ -925,7 +904,7 @@ public class Message extends BaseFragment implements
 
 			} catch (Exception e) {
 			}
-			scope.context().refreshDrawer(TAG, getActivity());
+			scope.main().refreshDrawer(TAG, getActivity());
 			if (mPullToRefreshAttacher == null && listAdapter != null) {
 				listAdapter.clear();
 				list.clear();
@@ -951,10 +930,10 @@ public class Message extends BaseFragment implements
 					JSONArray ids = new JSONArray();
 					ids.put(group_id);
 					group_bundle.putString("group_ids", ids.toString());
-					scope.context().requestSync(MessageProvider.AUTHORITY,
+					scope.main().requestSync(MessageProvider.AUTHORITY,
 							group_bundle);
 				} else {
-					scope.context().requestSync(MessageProvider.AUTHORITY);
+					scope.main().requestSync(MessageProvider.AUTHORITY);
 				}
 			} else {
 				Toast.makeText(getActivity(), "Unable to connect server !",
@@ -977,12 +956,10 @@ public class Message extends BaseFragment implements
 
 		@Override
 		public OEListViewRows updateFlagValues(OEListViewRows row, View view) {
-			// TODO Auto-generated method stub
-			HashMap<String, Object> rowData = (HashMap<String, Object>) row
-					.getRow_data();
+			OEDataRow rowData = row.getRow_data();
 			boolean flag = false;
 			ImageView img = (ImageView) view;
-			if (rowData.get("starred").toString().equals("false")) {
+			if (rowData.getString("starred").equals("false")) {
 				flag = true;
 				img.setImageResource(R.drawable.ic_action_starred);
 			} else {
@@ -1087,7 +1064,7 @@ public class Message extends BaseFragment implements
 				flag)) {
 			for (int key : msg_pos.keySet()) {
 				final int pos = msg_pos.get(key);
-				scope.context().runOnUiThread(new Runnable() {
+				scope.main().runOnUiThread(new Runnable() {
 					public void run() {
 						list.remove(pos);
 						listAdapter.refresh(list);
@@ -1141,7 +1118,7 @@ public class Message extends BaseFragment implements
 			args.addArg(key);
 			if (markAsTodo(args, flag)) {
 				listAdapter.updateRows(getRowForMessage(key), pos, "starred");
-				scope.context().runOnUiThread(new Runnable() {
+				scope.main().runOnUiThread(new Runnable() {
 					public void run() {
 
 						ImageView imgStarred = (ImageView) lstview.getChildAt(
@@ -1168,7 +1145,7 @@ public class Message extends BaseFragment implements
 
 		@Override
 		protected void onPreExecute() {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -1191,7 +1168,7 @@ public class Message extends BaseFragment implements
 
 		@Override
 		protected void onPostExecute(final Boolean success) {
-			scope.context().runOnUiThread(new Runnable() {
+			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -1221,7 +1198,6 @@ public class Message extends BaseFragment implements
 		boolean setFlag = false;
 
 		public PerformOperation(HashMap<Integer, Integer> msg_pos, boolean bool) {
-			// TODO Auto-generated constructor stub
 			this.msg_pos = msg_pos;
 			this.setFlag = bool;
 			pdialog = new OEDialog(scope.context(), true,
@@ -1236,7 +1212,6 @@ public class Message extends BaseFragment implements
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			// TODO Auto-generated method stub
 			return markAsTodo(msg_pos, setFlag);
 		}
 
@@ -1257,7 +1232,6 @@ public class Message extends BaseFragment implements
 
 		public PerformReadUnreadArchiveOperation(
 				HashMap<Integer, Integer> msg_pos, boolean bool) {
-			// TODO Auto-generated constructor stub
 			this.msg_pos = msg_pos;
 			this.setFlag = bool;
 			pdialog = new OEDialog(scope.context(), true,
@@ -1272,7 +1246,6 @@ public class Message extends BaseFragment implements
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			// TODO Auto-generated method stub
 			return markAsReadUnreadArchive(msg_pos, setFlag);
 		}
 

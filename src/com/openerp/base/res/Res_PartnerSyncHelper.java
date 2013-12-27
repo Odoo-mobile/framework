@@ -38,6 +38,7 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEDataRow;
 import com.openerp.support.OEUser;
 import com.openerp.util.Base64Helper;
 
@@ -56,19 +57,15 @@ public class Res_PartnerSyncHelper {
 				.current(mContext).getAndroidName());
 		try {
 			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(mContext);
-			HashMap<String, Object> res = dbHelper.search(dbHelper,
-					new String[] { "(phone != ? ", "OR", "mobile != ? ", "OR",
-							"email != ? ) ", "AND", "id = ? " }, new String[] {
-							"false", "false", "false", partner_id + "" });
+			List<OEDataRow> res = dbHelper.search(dbHelper, new String[] {
+					"(phone != ? ", "OR", "mobile != ? ", "OR",
+					"email != ? ) ", "AND", "id = ? " }, new String[] {
+					"false", "false", "false", partner_id + "" });
 			// checking if records exist?
-			int total = Integer.parseInt(res.get("total").toString());
+			int total = res.size();
 
 			if (total > 0) {
-				@SuppressWarnings("unchecked")
-				List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) res
-						.get("records");
-
-				for (HashMap<String, Object> row_data : rows) {
+				for (OEDataRow row_data : res) {
 
 					if (!(row_data.get("company_id").toString())
 							.equalsIgnoreCase("false")) {
@@ -342,6 +339,7 @@ public class Res_PartnerSyncHelper {
 	}
 
 	private static class SyncEntry {
+		@SuppressWarnings("unused")
 		public Long partner_id = 0L;
 	}
 
@@ -374,19 +372,15 @@ public class Res_PartnerSyncHelper {
 
 		try {
 			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(context);
-			HashMap<String, Object> res = dbHelper.search(dbHelper,
-					new String[] { "phone != ? ", "OR", "mobile != ? ", "OR",
-							"email != ?" }, new String[] { "false", "false",
-							"false" });
+			List<OEDataRow> res = dbHelper.search(dbHelper, new String[] {
+					"phone != ? ", "OR", "mobile != ? ", "OR", "email != ?" },
+					new String[] { "false", "false", "false" });
 			// checking if records exist?
-			int total = Integer.parseInt(res.get("total").toString());
+			int total = res.size();
 
 			if (total > 0) {
-				@SuppressWarnings("unchecked")
-				List<HashMap<String, Object>> rows = (List<HashMap<String, Object>>) res
-						.get("records");
 
-				for (HashMap<String, Object> row_data : rows) {
+				for (OEDataRow row_data : res) {
 
 					if (!(row_data.get("company_id").toString())
 							.equalsIgnoreCase("false")) {

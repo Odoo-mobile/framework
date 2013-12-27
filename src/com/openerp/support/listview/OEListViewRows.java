@@ -20,7 +20,8 @@ package com.openerp.support.listview;
 
 import java.util.HashMap;
 
-// TODO: Auto-generated Javadoc
+import com.openerp.orm.OEDataRow;
+
 /**
  * The Class OEListViewRows.
  */
@@ -30,7 +31,7 @@ public class OEListViewRows {
 	private int row_id;
 
 	/** The row_data. */
-	private HashMap<String, Object> row_data;
+	private OEDataRow row_data;
 
 	/**
 	 * Instantiates a new oE list view rows.
@@ -40,7 +41,7 @@ public class OEListViewRows {
 	 * @param row_data
 	 *            the row_data
 	 */
-	public OEListViewRows(int row_id, HashMap<String, Object> row_data) {
+	public OEListViewRows(int row_id, OEDataRow row_data) {
 		super();
 		this.row_id = row_id;
 		this.row_data = row_data;
@@ -70,7 +71,7 @@ public class OEListViewRows {
 	 * 
 	 * @return the row_data
 	 */
-	public HashMap<String, Object> getRow_data() {
+	public OEDataRow getRow_data() {
 		return row_data;
 	}
 
@@ -80,7 +81,7 @@ public class OEListViewRows {
 	 * @param row_data
 	 *            the row_data
 	 */
-	public void setRow_data(HashMap<String, Object> row_data) {
+	public void setRow_data(OEDataRow row_data) {
 		this.row_data = row_data;
 	}
 

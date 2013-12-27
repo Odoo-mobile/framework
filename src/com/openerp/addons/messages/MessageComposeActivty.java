@@ -53,6 +53,7 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.Fields;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.support.AppScope;
@@ -82,7 +83,7 @@ public class MessageComposeActivty extends Activity implements
 	TagsView receipients_view = null;
 	List<TagsItems> parters = new ArrayList<TagsItems>();
 	/** The parent_row. */
-	HashMap<String, Object> parent_row = null;
+	OEDataRow parent_row = null;
 	ReceipientsTagsCustomAdapter partner_adapter = null;
 
 	enum ATTACHMENT_TYPE {
@@ -96,7 +97,7 @@ public class MessageComposeActivty extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_message_compose);
-		scope = new AppScope((MainActivity) MainActivity.context);
+		scope = new AppScope(this);
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		Intent replyIntent = getIntent();
@@ -116,13 +117,11 @@ public class MessageComposeActivty extends Activity implements
 		if (is_reply) {
 			message_id = replyIntent.getExtras().getInt("message_id");
 			MessageDBHelper msgDb = new MessageDBHelper(this);
-			parent_row = ((List<HashMap<String, Object>>) msgDb.search(msgDb,
-
-			new String[] { "id = ?" }, new String[] { message_id + "" }).get(
-					"records")).get(0);
+			parent_row = msgDb.search(msgDb, new String[] { "id = ?" },
+					new String[] { message_id + "" }).get(0);
 			getActionBar().setTitle("Reply");
 			EditText edtSubject = (EditText) findViewById(R.id.edtMessageSubject);
-			edtSubject.setText("Re: " + parent_row.get("subject").toString());
+			edtSubject.setText("Re: " + parent_row.getString("subject"));
 			JSONArray partner_ids = new JSONArray();
 			try {
 
@@ -162,7 +161,7 @@ public class MessageComposeActivty extends Activity implements
 		int[] to = new int[] { R.id.txvFileName };
 		lstAttachmentAdapter = new OEListViewAdapter(MainActivity.context,
 				R.layout.message_attachment_listview_item, attachments, from,
-				to, null);
+				to, new Ir_AttachmentDBHelper(MainActivity.context));
 		lstAttachments.setAdapter(lstAttachmentAdapter);
 		lstAttachmentAdapter.setItemClickListener(R.id.imgBtnRemoveAttachment,
 				new ControlClickEventListener() {
@@ -178,12 +177,11 @@ public class MessageComposeActivty extends Activity implements
 				});
 
 		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(this);
-		HashMap<String, Object> data = partners.search(partners);
-		if ((Integer) data.get("total") > 0) {
-			for (HashMap<String, Object> row : (List<HashMap<String, Object>>) data
-					.get("records")) {
-				OEListViewRows newRow = new OEListViewRows(Integer.parseInt(row
-						.get("id").toString()), row);
+		List<OEDataRow> data = partners.search(partners);
+		if (data.size() > 0) {
+			for (OEDataRow row : data) {
+				OEListViewRows newRow = new OEListViewRows(row.getInt("id"),
+						row);
 				partners_list.add(newRow);
 			}
 		}
@@ -192,17 +190,15 @@ public class MessageComposeActivty extends Activity implements
 
 	private List<TagsItems> getAllPartners() {
 		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(this);
-		HashMap<String, Object> records = partners.search(partners,
+		List<OEDataRow> records = partners.search(partners,
 				new String[] { "oea_name = ?" },
 				new String[] { OpenERPAccountManager.currentUser(this)
 						.getAndroidName() });
-		if (Integer.parseInt(records.get("total").toString()) > 0) {
+		if (records.size() > 0) {
 			ArrayList<TagsItems> rows = new ArrayList<TagsItems>();
-			for (HashMap<String, Object> row : (List<HashMap<String, Object>>) records
-					.get("records")) {
-				rows.add(new TagsItems(Integer.parseInt(row.get("id")
-						.toString()), row.get("name").toString(), row.get(
-						"email").toString(), row.get("image_small").toString()));
+			for (OEDataRow row : records) {
+				rows.add(new TagsItems(row.getInt("id"), row.getString("name"),
+						row.getString("email"), row.getString("image_small")));
 			}
 			getPartnersFromServer();
 			return rows;
@@ -253,16 +249,15 @@ public class MessageComposeActivty extends Activity implements
 		String oea_name = OpenERPAccountManager.currentUser(
 				MainActivity.context).getAndroidName();
 		for (Integer partner_id : ids) {
-			List<HashMap<String, Object>> records = partners
+			List<OEDataRow> records = partners
 					.executeSQL(
 							"SELECT id,email,name,image_small,oea_name FROM res_partner where id = ?",
 							new String[] { partner_id + "" });
 			if (records.size() > 0) {
-				for (HashMap<String, Object> row : records) {
-					int id = Integer.parseInt(row.get("id").toString());
-					names.add(new TagsItems(id, row.get("name").toString(), row
-							.get("email").toString(), row.get("image_small")
-							.toString()));
+				for (OEDataRow row : records) {
+					int id = row.getInt("id");
+					names.add(new TagsItems(id, row.getString("name"), row
+							.getString("email"), row.getString("image_small")));
 				}
 			}
 		}
@@ -274,17 +269,16 @@ public class MessageComposeActivty extends Activity implements
 				MainActivity.context);
 		String oea_name = OpenERPAccountManager.currentUser(
 				MainActivity.context).getAndroidName();
-		List<HashMap<String, Object>> records = partners
+		List<OEDataRow> records = partners
 				.executeSQL(
 						"SELECT id,email,name,image_small,oea_name FROM res_partner where id in (select res_partner_id from mail_message_res_partner_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { message_id, oea_name, oea_name });
 		List<TagsItems> names = new ArrayList<TagsItems>();
 		if (records.size() > 0) {
-			for (HashMap<String, Object> row : records) {
-				int id = Integer.parseInt(row.get("id").toString());
-				names.add(new TagsItems(id, row.get("name").toString(), row
-						.get("email").toString(), row.get("image_small")
-						.toString()));
+			for (OEDataRow row : records) {
+				int id = row.getInt("id");
+				names.add(new TagsItems(id, row.getString("name"), row
+						.getString("email"), row.getString("image_small")));
 			}
 		}
 		return names;
@@ -485,7 +479,7 @@ public class MessageComposeActivty extends Activity implements
 		int row_id = 1;// Integer.parseInt(uri.getLastPathSegment().toString());
 		for (Uri uri : file_uris) {
 			// File file = new File(uri.getPath());
-			HashMap<String, Object> data = new HashMap<String, Object>();
+			OEDataRow data = new OEDataRow();
 			data.put("name", getFilenameFromUri(uri));
 			OEListViewRows row = new OEListViewRows(row_id, data);
 			attachments.add(row);
@@ -522,15 +516,14 @@ public class MessageComposeActivty extends Activity implements
 			// Getting current user detail (name and email)
 			String partner_id = OpenERPAccountManager.currentUser(
 					getApplicationContext()).getPartner_id();
-			HashMap<String, Object> user_details = partners.search(partners,
+			List<OEDataRow> user_details = partners.search(partners,
 					new String[] { "id = ?" }, new String[] { partner_id });
 			String userFullname = "";
 			String userEmail = "";
-			if ((Integer) user_details.get("total") > 0) {
-				userFullname = ((List<HashMap<String, Object>>) user_details
-						.get("records")).get(0).get("name").toString();
-				userEmail = ((List<HashMap<String, Object>>) user_details
-						.get("records")).get(0).get("email").toString();
+			if (user_details.size() > 0) {
+				OEDataRow user_detail = user_details.get(0);
+				userFullname = user_detail.getString("name");
+				userEmail = user_detail.getString("email");
 			}
 
 			// Preparing arguments for send message
@@ -707,27 +700,20 @@ public class MessageComposeActivty extends Activity implements
 				int newid = message.create(message, values);
 
 				String query = "select t1.id as message_id , t1.*, t2.name, t2.image_small, t2.email from mail_message t1, res_partner t2 where (t1.id = ? or t1.parent_id = ?) and (t2.id = t1.author_id or t1.author_id = 'false') group by t1.id order by t1.id desc";
-				List<HashMap<String, Object>> records = message.executeSQL(
+				List<OEDataRow> records = message.executeSQL(
 						query,
 						new String[] { String.valueOf(newid),
 								String.valueOf(newid) });
 
-				HashMap<String, Object> row = new HashMap<String, Object>();
-				row.put("total", records.size());
-				row.put("records", records);
-				if ((Integer) row.get("total") > 0) {
+				if (records.size() > 0) {
+					for (OEDataRow row_detail : records) {
 
-					List<HashMap<String, Object>> rows_detail = (List<HashMap<String, Object>>) row
-							.get("records");
-					for (HashMap<String, Object> row_detail : rows_detail) {
-
-						int msg_id = Integer.parseInt(row_detail.get(
-								"message_id").toString());
-						String key = row_detail.get("parent_id").toString();
+						int msg_id = row_detail.getInt("message_id");
+						String key = row_detail.getString("parent_id");
 						OEListViewRows rowObj = null;
 						String[] ids = new MessageDetail()
-								.getPartnersOfMessage(row_detail.get(
-										"message_id").toString());
+								.getPartnersOfMessage(row_detail
+										.getString("message_id"));
 						String partners = "nobody";
 						if (ids != null) {
 							partners = TextUtils.join(", ", ids);

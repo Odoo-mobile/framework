@@ -49,10 +49,10 @@ import android.provider.CalendarContract.Events;
 
 import com.openerp.addons.meeting.MeetingDBHelper;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.OEUser;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class OECalendar.
  */
@@ -94,7 +94,7 @@ public class OECalendar {
 	 * get_ AllMettings : contain all the meetings from localdb table
 	 * crm.meeting.
 	 */
-	HashMap<String, Object> get_AllMettings;
+	List<OEDataRow> mAllMettings;
 
 	/**
 	 * startDate : for parsing meeting start time to
@@ -170,7 +170,7 @@ public class OECalendar {
 	public void sync_Event_TOServer(Account account, MeetingDBHelper db) {
 
 		try {
-			List<HashMap<String, Object>> local_meetings = getAllMeetings(db);
+			List<OEDataRow> local_meetings = getAllMeetings(db);
 			for (int i = 0; i < local_meetings.size(); i++) {
 				cal_id = isCalInDevice(account);
 
@@ -221,7 +221,7 @@ public class OECalendar {
 	public boolean syncToServer(Context context) {
 
 		boolean flag = false;
-		get_AllMettings = new HashMap<String, Object>();
+		mAllMettings = new ArrayList<OEDataRow>();
 		cursor = context.getContentResolver().query(
 				Uri.parse("content://com.android.calendar/events"),
 				new String[] { "calendar_id", "title", "description",
@@ -515,11 +515,11 @@ public class OECalendar {
 	 * @return list: of all the records.
 	 */
 	@SuppressWarnings("unchecked")
-	public List<HashMap<String, Object>> getAllMeetings(MeetingDBHelper db) {
+	public List<OEDataRow> getAllMeetings(MeetingDBHelper db) {
 
-		HashMap<String, Object> res = db.search(db);
-		if (Integer.parseInt(res.get("total").toString()) > 0) {
-			return (List<HashMap<String, Object>>) db.search(db).get("records");
+		List<OEDataRow> res = db.search(db);
+		if (res.size() > 0) {
+			return res;
 		}
 		return null;
 	}
@@ -535,13 +535,9 @@ public class OECalendar {
 
 		db = new MeetingDBHelper(context);
 		List<String> mtnglist = new ArrayList<String>();
-		get_AllMettings = db.search(db);
-
-		@SuppressWarnings("unchecked")
-		List<HashMap<String, Object>> idsList = (List<HashMap<String, Object>>) get_AllMettings
-				.get("records");
-		for (int i = 0; i < idsList.size(); i++) {
-			mtnglist.add(idsList.get(i).get("calendar_event_id").toString());
+		mAllMettings = db.search(db);
+		for (OEDataRow row : mAllMettings) {
+			mtnglist.add(row.get("calendar_event_id").toString());
 		}
 		return mtnglist;
 	}
