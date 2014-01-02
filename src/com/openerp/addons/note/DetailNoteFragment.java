@@ -20,6 +20,7 @@ package com.openerp.addons.note;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,7 +33,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
@@ -42,6 +42,7 @@ import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.util.HTMLHelper;
+import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.tags.TagsItems;
 import com.openerp.util.tags.TagsView;
@@ -49,15 +50,16 @@ import com.openerp.util.tags.TagsView;
 public class DetailNoteFragment extends BaseFragment {
 
 	View rootview = null;
-	TextView noteMemo;
+	OETextView mNoteDetailTitle;
+	OETextView mNoteDetailMemo;
 	Note note = null;
 	NoteDBHelper db = null;
-	int row_id = 0;
+	int note_id = 0;
 	String message;
 	String padurl = "false";
 	String row_status = null;
-	String stageid = null;
-	String noteid = null;
+	String stageId;
+	int noteId;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,12 +79,6 @@ public class DetailNoteFragment extends BaseFragment {
 
 		inflater.inflate(R.menu.menu_fragment_note_detail, menu);
 		// disabling the Compose Note option cause you are already in that menu
-		MenuItem item_save = menu.findItem(R.id.menu_note_edit_save);
-		MenuItem item_cancel = menu.findItem(R.id.menu_note_edit_cancel);
-		item_save.setVisible(false);
-		item_cancel.setVisible(false);
-
-		// handling Menubutton[Marks As Done or Open] depending upon note status
 		if (getArguments() != null) {
 			row_status = getArguments().getString("row_status");
 
@@ -105,7 +101,7 @@ public class DetailNoteFragment extends BaseFragment {
 
 			AddFollowerFragment addfollower_fragement = new AddFollowerFragment();
 			Bundle selectedNoteID = new Bundle();
-			selectedNoteID.putInt("res_id", row_id);
+			selectedNoteID.putInt("res_id", note_id);
 			selectedNoteID.putString("message", message);
 			addfollower_fragement.setArguments(selectedNoteID);
 			scope.main().fragmentHandler.setBackStack(true, null);
@@ -122,48 +118,48 @@ public class DetailNoteFragment extends BaseFragment {
 
 		case R.id.menu_note_mark_asdone:
 
-			note.strikeNote(row_id, row_status, scope.context());
+			note.strikeNote(note_id, row_status, scope);
 			getActivity().getSupportFragmentManager().popBackStack();
 			return true;
 
 		case R.id.menu_note_mark_asopen:
 
-			note.strikeNote(row_id, row_status, scope.context());
+			note.strikeNote(note_id, row_status, scope);
 			getActivity().getSupportFragmentManager().popBackStack();
 			return true;
 
 		case R.id.menu_note_edit:
-
-			EditNoteFragment editnote_fragment = new EditNoteFragment();
+			NoteDBHelper noteDb = new NoteDBHelper(scope.context());
 			Bundle editNoteID = new Bundle();
-			editNoteID.putInt("row_id", row_id);
-			if (Note.isStateExist.equalsIgnoreCase("true")) {
+			editNoteID.putInt("note_id", note_id);
+			if (noteDb.isPadExist()) {
 				if (!padurl.equalsIgnoreCase("false")) {
 					editNoteID.putString("padurl", padurl);
 				} else {
 					// If Pad Installed And Notes is without pad then will
 					// converted into Pad.
 					OEHelper oe = getOEInstance();
-					padurl = db.getURL(oe, row_id);
+					padurl = db.getURL(oe, note_id);
 					editNoteID.putString("padurl", padurl);
 				}
 			} else {
 				editNoteID.putString("padurl", padurl);
-				editNoteID.putString("row_details", noteMemo.getText()
+				editNoteID.putString("row_details", mNoteDetailMemo.getText()
 						.toString());
 			}
 
-			editNoteID.putString("stage_id", stageid);
-			editNoteID.putString("tag_id", noteid);
-			editnote_fragment.setArguments(editNoteID);
-			scope.main().fragmentHandler.setBackStack(true, null);
-			scope.main().fragmentHandler.replaceFragmnet(editnote_fragment);
+			editNoteID.putString("stage_id", stageId);
+			editNoteID.putInt("tag_id", noteId);
+			Intent editNote = new Intent(scope.context(),
+					ComposeNoteActivity.class);
+			editNote.putExtras(editNoteID);
+			startActivityForResult(editNote, 123);
 			return true;
 
 		case R.id.menu_note_delete:
 
 			// Opening dailogbox for confirmation to delete
-			openDailogview(row_id);
+			openDailogview(note_id);
 			return true;
 
 		default:
@@ -179,17 +175,17 @@ public class DetailNoteFragment extends BaseFragment {
 	public void onStart() {
 		super.onStart();
 		Bundle bundle = getArguments();
-		if (bundle.containsKey("row_id")) {
-			row_id = bundle.getInt("row_id");
+		if (bundle.containsKey("note_id")) {
+			note_id = bundle.getInt("note_id");
 			row_status = bundle.getString("row_status");
-			stageid = bundle.getString("stage_id");
+			stageId = bundle.getString("stage_id");
 
 			if (bundle.containsKey("stage_color")) {
 				View vStageColor = (View) rootview
 						.findViewById(R.id.viewNoteStageColor);
 				vStageColor.setBackgroundColor(bundle.getInt("stage_color"));
 			}
-			showNoteDetails(bundle.getInt("row_id"));
+			showNoteDetails(bundle.getInt("note_id"));
 		}
 	}
 
@@ -199,13 +195,15 @@ public class DetailNoteFragment extends BaseFragment {
 	}
 
 	private void showNoteDetails(int note_id) {
-
-		noteMemo = (TextView) rootview.findViewById(R.id.txv_detailNote_Memo);
+		mNoteDetailTitle = (OETextView) rootview
+				.findViewById(R.id.txvNoteDetailTitle);
+		mNoteDetailMemo = (OETextView) rootview
+				.findViewById(R.id.txvNoteDetailMemo);
 		TagsView noteTags = (TagsView) rootview
 				.findViewById(R.id.txv_detailNote_Tags);
 
 		noteTags.allowDuplicates(false);
-		noteMemo.setMovementMethod(new ScrollingMovementMethod());
+		mNoteDetailMemo.setMovementMethod(new ScrollingMovementMethod());
 		db = new NoteDBHelper(scope.context());
 
 		List<OEDataRow> result = db.search(db, new String[] { "id=?" },
@@ -220,9 +218,9 @@ public class DetailNoteFragment extends BaseFragment {
 			// paassing to next followerfragment
 			message = row.get("memo").toString();
 			try {
-				noteid = String.valueOf(note_id);
+				noteId = note_id;
 				String[] note_tags_items = note.getNoteTags(
-						String.valueOf(noteid), scope.context());
+						String.valueOf(noteId), scope.context());
 				noteTags.showImage(false);
 				for (String tag : note_tags_items) {
 					noteTags.addObject(new TagsItems(0, tag, ""));
@@ -230,8 +228,10 @@ public class DetailNoteFragment extends BaseFragment {
 				if (note_tags_items.length <= 0) {
 					noteTags.setVisibility(View.GONE);
 				}
-				noteMemo.setText(HTMLHelper.stringToHtml(row.get("memo")
-						.toString()));
+				mNoteDetailTitle.setText(HTMLHelper.htmlToString(db
+						.generateName(row.getString("memo"))));
+				mNoteDetailMemo.setText(HTMLHelper.stringToHtml(row
+						.getString("memo")));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -257,6 +257,24 @@ public class DetailNoteFragment extends BaseFragment {
 
 		deleteDialogConfirm.setNegativeButton("Cancel", null);
 		deleteDialogConfirm.show();
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == Activity.RESULT_OK) {
+			switch (requestCode) {
+			case 123:
+				if (data.hasExtra("updated")) {
+					Bundle notedata = data.getExtras();
+					String memo = notedata.getString("memo");
+					mNoteDetailTitle.setText(HTMLHelper.htmlToString(db
+							.generateName(memo)));
+					mNoteDetailMemo.setText(HTMLHelper.stringToHtml(memo));
+				}
+				break;
+			}
+		}
 	}
 
 }

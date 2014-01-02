@@ -38,10 +38,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,24 +61,22 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.FragmentHandler;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEUser;
-import com.openerp.support.listview.OEListViewAdapter;
-import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRow;
+import com.openerp.util.HTMLHelper;
+import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.tags.TagsView;
 import com.openerp.widget.Mobile_Widget;
 
 public class Note extends BaseFragment implements
 		PullToRefreshAttacher.OnRefreshListener {
 
-	public static String isStateExist = null;
 	public static String TAG = "com.openerp.addons.Note";
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
 	View rootView = null;
 	TextView noteSyncProcessText, emptyNotesText;
-	ListView lstNotes = null;
-	OEListViewAdapter listAdapter = null;
+	GridView notesGrid = null;
+	// OEListViewAdapter listAdapter = null;
 	List<OEListViewRow> listRows = null;
 	NoteDBHelper db = null;
 	JSONObject res = null;
@@ -100,16 +100,12 @@ public class Note extends BaseFragment implements
 		db = (NoteDBHelper) getModel();
 		setHasOptionsMenu(true);
 		rootView = inflater.inflate(R.layout.fragment_note, container, false);
-		lstNotes = (ListView) rootView.findViewById(R.id.lstNotes);
+		notesGrid = (GridView) rootView.findViewById(R.id.noteGridView);
 		emptyNotesText = (TextView) rootView
 				.findViewById(R.id.txvNoteAllArchive);
 
 		update_widget = new Intent();
 		update_widget.setAction(Mobile_Widget.TAG);
-
-		if (isStateExist == null) {
-			isStateExist = String.valueOf(db.isPadExist());
-		}
 		return rootView;
 	}
 
@@ -119,24 +115,13 @@ public class Note extends BaseFragment implements
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 		SearchView searchView = (SearchView) menu.findItem(
 				R.id.menu_note_search).getActionView();
-		searchView.setOnQueryTextListener(getQueryListener(listAdapter));
-
-		// Hiding unnecesary Menu from action bar
-		MenuItem item_write = menu.findItem(R.id.menu_note_write);
-		item_write.setVisible(false);
-		MenuItem item_cancel = menu.findItem(R.id.menu_note_cancel);
-		item_cancel.setVisible(false);
+		// searchView.setOnQueryTextListener(getQueryListener(listAdapter));
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		switch (item.getItemId()) {
-		case R.id.menu_note_compose:
-			Intent composeNote = new Intent(scope.context(),
-					ComposeNoteActivity.class);
-			startActivityForResult(composeNote, NOTE_ID);
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -153,9 +138,10 @@ public class Note extends BaseFragment implements
 						new String[] { new_id + "" }).get(0);
 				OEListViewRow listRow = new OEListViewRow(new_id, newRow);
 				listRows.add(listRow);
-				listAdapter.refresh(listRows);
-				lstNotes.setOnTouchListener(touchListener);
-				lstNotes.setOnScrollListener(touchListener.makeScrollListener());
+				// listAdapter.refresh(listRows);
+				notesGrid.setOnTouchListener(touchListener);
+				notesGrid.setOnScrollListener(touchListener
+						.makeScrollListener());
 
 				// checking if list view is empty ? if not then
 				// Hiding text message of empty list view
@@ -186,6 +172,22 @@ public class Note extends BaseFragment implements
 			setNoteStages(scope.context());
 			setupListView("-1");
 		}
+		rootView.findViewById(R.id.imgBtnCreateQuickNote).setOnClickListener(
+				new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						Intent composeNote = new Intent(scope.context(),
+								ComposeNoteActivity.class);
+						OEEditText edtTitle = (OEEditText) rootView
+								.findViewById(R.id.edtNoteQuickTitle);
+						composeNote.putExtra("note_title", edtTitle.getText()
+								.toString());
+						startActivityForResult(composeNote, NOTE_ID);
+						edtTitle.setText(null);
+					}
+				});
+
 	}
 
 	@Override
@@ -273,7 +275,8 @@ public class Note extends BaseFragment implements
 		super.onResume();
 		scope.context().registerReceiver(syncFinishReceiver,
 				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
-		rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
+		// TODO
+		// :rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
 		scope.context().sendBroadcast(update_widget);
 	}
 
@@ -293,7 +296,8 @@ public class Note extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 
 			// Hiding the NoteSyncWaiter view
-			rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
+			// TODO:
+			// rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
 			mPullAttacher.setRefreshComplete();
 
 			// Refreshing Menulist [counter] after synchronisation complete
@@ -311,50 +315,87 @@ public class Note extends BaseFragment implements
 		if (listRows != null && listRows.size() <= 0) {
 			listRows = getListRows(stage_id);
 		}
+		// TODO: udate adapter to custome....
 		// Creating instance for listAdapter
-		listAdapter = new OEListViewAdapter(scope.context(),
-				R.layout.listview_fragment_note_listitem, listRows, from, to,
-				db);
-		// Telling adapter to clean HTML text for key value
-		listAdapter.cleanHtmlToTextOn("memo");
-		lstNotes.setAdapter(listAdapter);
-		listAdapter.addViewListener(new OEListViewOnCreateListener() {
+		/*
+		 * listAdapter = new OEListViewAdapter(scope.context(),
+		 * R.layout.listview_fragment_note_listitem, listRows, from, to, db); //
+		 * Telling adapter to clean HTML text for key value
+		 * listAdapter.cleanHtmlToTextOn("memo");
+		 * notesGrid.setAdapter(listAdapter); listAdapter.addViewListener(new
+		 * OEListViewOnCreateListener() {
+		 * 
+		 * @Override public View listViewOnCreateListener(int position, View
+		 * row_view, OEListViewRow row_data) {
+		 * 
+		 * View newView = row_view; TextView txvTag = (TextView) newView
+		 * .findViewById(R.id.txvNoteListTags); TagsView noteTags = (TagsView)
+		 * newView .findViewById(R.id.txv_detailNote_Tags);
+		 * 
+		 * try { noteTags.setVisibility(View.GONE); // Fetching Note Stage and
+		 * Setting Background color for that String stageInfo =
+		 * row_data.getRow_data().get("stage_id") .toString(); if
+		 * (!stageInfo.equals("false")) { JSONArray stage_id = new
+		 * JSONArray(stageInfo); String stageid =
+		 * stage_id.getJSONArray(0).getString(0);
+		 * 
+		 * if (stage_colors.containsKey("stage_" + stageid)) {
+		 * txvTag.setBackgroundColor(Integer .parseInt(stage_colors.get(
+		 * "stage_" + stageid).toString())); } } else {
+		 * txvTag.setBackgroundColor(Color.parseColor("#ffffff")); } } catch
+		 * (Exception e) { } return newView; } });
+		 */
+
+		notesGrid.setAdapter(new ArrayAdapter<OEListViewRow>(scope.context(),
+				R.layout.note_grid_custom_layout, listRows) {
+			View mView = null;
 
 			@Override
-			public View listViewOnCreateListener(int position, View row_view,
-					OEListViewRow row_data) {
+			public View getView(int position, View convertView, ViewGroup parent) {
+				mView = convertView;
+				if (convertView == null) {
+					LayoutInflater inflater = getActivity().getLayoutInflater();
+					mView = inflater.inflate(R.layout.note_grid_custom_layout,
+							parent, false);
+				}
 
-				View newView = row_view;
-				TextView txvTag = (TextView) newView
-						.findViewById(R.id.txvNoteListTags);
-				TagsView noteTags = (TagsView) newView
-						.findViewById(R.id.txv_detailNote_Tags);
-
-				try {
-					noteTags.setVisibility(View.GONE);
-					// Fetching Note Stage and Setting Background color for that
-					String stageInfo = row_data.getRow_data().get("stage_id")
-							.toString();
-					if (!stageInfo.equals("false")) {
+				TextView txvTitle = (TextView) mView
+						.findViewById(R.id.txvNoteTitle);
+				TextView txvDesc = (TextView) mView
+						.findViewById(R.id.txvNoteDescription);
+				TextView txvStage = (TextView) mView
+						.findViewById(R.id.txvNoteStage);
+				OEListViewRow note = listRows.get(position);
+				txvTitle.setText(note.getRow_data().getString("name"));
+				txvDesc.setText(HTMLHelper.htmlToString(note.getRow_data()
+						.getString("memo")));
+				String stageInfo = note.getRow_data().getString("stage_id")
+						.toString();
+				int color = Color.parseColor("#ffffff");
+				String stage_name = "New";
+				if (!stageInfo.equals("false")) {
+					try {
 						JSONArray stage_id = new JSONArray(stageInfo);
 						String stageid = stage_id.getJSONArray(0).getString(0);
-
+						stage_name = stage_id.getJSONArray(0).getString(1);
 						if (stage_colors.containsKey("stage_" + stageid)) {
-							txvTag.setBackgroundColor(Integer
-									.parseInt(stage_colors.get(
-											"stage_" + stageid).toString()));
+							color = Integer.parseInt(stage_colors.get(
+									"stage_" + stageid).toString());
 						}
-					} else {
-						txvTag.setBackgroundColor(Color.parseColor("#ffffff"));
+					} catch (Exception e) {
 					}
-				} catch (Exception e) {
 				}
-				return newView;
-			}
-		});
+				mView.findViewById(R.id.noteGridClildView).setBackgroundColor(
+						color);
+				txvStage.setText(stage_name);
+				txvStage.setTextColor(color);
 
+				return mView;
+			}
+
+		});
 		// Setting item click listner for Detail view of selected Note.
-		lstNotes.setOnItemClickListener(new OnItemClickListener() {
+		notesGrid.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
@@ -368,7 +409,7 @@ public class Note extends BaseFragment implements
 				// Creating an instance of DetailNoteFragment
 				DetailNoteFragment fragment = new DetailNoteFragment();
 				Bundle selectedNoteID = new Bundle();
-				selectedNoteID.putInt("row_id", rowId);
+				selectedNoteID.putInt("note_id", rowId);
 				selectedNoteID.putString("row_status", rowStatus);
 				selectedNoteID.putString("stage_id", stageIds);
 
@@ -393,10 +434,10 @@ public class Note extends BaseFragment implements
 
 		// important to write
 		mPullAttacher = scope.main().getPullToRefreshAttacher();
-		mPullAttacher.setRefreshableView(lstNotes, this);
+		mPullAttacher.setRefreshableView(notesGrid, this);
 
 		// Setting touch listner for swapping the list rows.
-		touchListener = new SwipeDismissListViewTouchListener(lstNotes,
+		touchListener = new SwipeDismissListViewTouchListener(notesGrid,
 				new SwipeDismissListViewTouchListener.DismissCallbacks() {
 					@Override
 					public boolean canDismiss(int position) {
@@ -404,7 +445,7 @@ public class Note extends BaseFragment implements
 					}
 
 					@Override
-					public void onDismiss(ListView listView,
+					public void onDismiss(GridView listView,
 							int[] reverseSortedPositions) {
 						for (int position : reverseSortedPositions) {
 							int rowId = listRows.get(position).getRow_id();
@@ -414,50 +455,51 @@ public class Note extends BaseFragment implements
 							// Handling functionality to change note status
 							// open --> close OR close --> open
 							if (!rawStrikeStatus) {
-								strikeNote(rowId, raw_status, scope.context());
+								strikeNote(rowId, raw_status, scope);
 								rawStrikeStatus = true;
 							} else {
-								strikeNote(rowId, raw_status, scope.context());
+								strikeNote(rowId, raw_status, scope);
 								rawStrikeStatus = false;
 							}
 
 							listRows.remove(position);
-							listAdapter.refresh(listRows);
+							// ::TODO: update this
+							// listAdapter.refresh(listRows);
 
 							// Checking whether list view is empty !
-							if (listAdapter.isEmpty()) {
-								// Setting text for empty archive list view
-								if (stage_id.equalsIgnoreCase("-2")) {
-									emptyNotesText
-											.setText("You don't have any archived notes right now.");
-								}
-								// Displaying text message of empty list view
-								emptyNotesText.setVisibility(View.VISIBLE);
-							} else {
-								// Hiding text message of empty list view
-								emptyNotesText.setVisibility(View.GONE);
-							}
+							/*
+							 * if (listAdapter.isEmpty()) { // Setting text for
+							 * empty archive list view if
+							 * (stage_id.equalsIgnoreCase("-2")) {
+							 * emptyNotesText .setText(
+							 * "You don't have any archived notes right now.");
+							 * } // Displaying text message of empty list view
+							 * emptyNotesText.setVisibility(View.VISIBLE); }
+							 * else { // Hiding text message of empty list view
+							 * emptyNotesText.setVisibility(View.GONE); }
+							 */
 						}
 					}
 				});
 
-		lstNotes.setOnTouchListener(touchListener);
+		notesGrid.setOnTouchListener(touchListener);
 		// Setting this scroll listener is required to ensure that during
 		// ListView scrolling,
 		// we don't look for swipes.
-		lstNotes.setOnScrollListener(touchListener.makeScrollListener());
+		notesGrid.setOnScrollListener(touchListener.makeScrollListener());
 
 	}
 
 	/* Method for handling STRIKE/UNSTRIKE functionality of notes */
-	public void strikeNote(int note_id, String open, Context context) {
+	public void strikeNote(int note_id, String open, AppScope scope) {
 		try {
 			JSONArray args = new JSONArray();
 			JSONArray id = new JSONArray();
 			id.put(note_id);
 			args.put(id);
-			OEHelper oe = new OEHelper(context, OEUser.current(context));
-			db = new NoteDBHelper(context);
+			OEHelper oe = new OEHelper(scope.context(), OEUser.current(scope
+					.context()));
+			db = new NoteDBHelper(scope.context());
 			ContentValues values = new ContentValues();
 
 			// Update--> Open[true]-->To-->Close[false]
@@ -465,15 +507,15 @@ public class Note extends BaseFragment implements
 				res = oe.call_kw("note.note", "onclick_note_is_done", args);
 				values.put("open", "false");
 				db.write(db, values, note_id);
-				Toast.makeText(context, "Moved to Archive.", Toast.LENGTH_LONG)
-						.show();
+				Toast.makeText(scope.context(), "Moved to Archive.",
+						Toast.LENGTH_LONG).show();
 			}
 			// Update--> Close[false]-->To-->Open[true]
 			else {
 				res = oe.call_kw("note.note", "onclick_note_not_done", args);
 				values.put("open", "true");
 				db.write(db, values, note_id);
-				Toast.makeText(context, "Moved to Active notes.",
+				Toast.makeText(scope.context(), "Moved to Active notes.",
 						Toast.LENGTH_LONG).show();
 			}
 
@@ -483,6 +525,8 @@ public class Note extends BaseFragment implements
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			update_widget = new Intent();
+			update_widget.setAction(Mobile_Widget.TAG);
 			scope.context().sendBroadcast(update_widget);
 		}
 	}
@@ -537,11 +581,14 @@ public class Note extends BaseFragment implements
 				emptyNotesText.setVisibility(View.GONE);
 
 				// Handling text message for sync process on startup
-				noteSyncProcessText = (TextView) rootView
-						.findViewById(R.id.txvMessageHeaderSubtitle);
-				noteSyncProcessText.setText("Your notes will appear shortly");
-				rootView.findViewById(R.id.noteSyncWaiter).setVisibility(
-						View.VISIBLE);
+				// TODO:
+				/*
+				 * noteSyncProcessText = (TextView) rootView
+				 * .findViewById(R.id.txvMessageHeaderSubtitle);
+				 * noteSyncProcessText
+				 * .setText("Your notes will appear shortly");
+				 */
+				// rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.VISIBLE);
 
 				// requesting to sync..
 				scope.main().requestSync(NoteProvider.AUTHORITY);

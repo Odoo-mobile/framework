@@ -24,6 +24,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +47,7 @@ public class TagsView extends MultiTagsTextView implements
 		super(context, attrs);
 		setTokenListener(this);
 		mContext = context;
+		setTypeFace(getTextStyle(attrs));
 	}
 
 	@Override
@@ -59,6 +61,43 @@ public class TagsView extends MultiTagsTextView implements
 			return new TagsItems(0, completionText.substring(0, index),
 					completionText);
 		}
+	}
+
+	private void setTypeFace(String textStyle) {
+
+		Typeface typeFace = null;
+		if (textStyle.equals("light")) {
+			typeFace = Typeface.createFromAsset(getResources().getAssets(),
+					"fonts/RobotoSlab-Light.ttf");
+		}
+		if (textStyle.equals("bold")) {
+			typeFace = Typeface.createFromAsset(getResources().getAssets(),
+					"fonts/RobotoSlab-Bold.ttf");
+		}
+
+		if (textStyle.equals("italic")) {
+			typeFace = Typeface.createFromAsset(getResources().getAssets(),
+					"fonts/RobotoSlab-Regular.ttf");
+		}
+
+		setTypeface(typeFace);
+	}
+
+	private String getTextStyle(AttributeSet attrs) {
+		String textStyle = "light";
+		for (int i = 0; i < attrs.getAttributeCount(); i++) {
+			String attr = attrs.getAttributeName(i);
+			if (attr.equals("textStyle")) {
+				textStyle = attrs.getAttributeValue(i);
+				if (textStyle.equals("0x1")) {
+					textStyle = "bold";
+				}
+				if (textStyle.equals("0x2")) {
+					textStyle = "italic";
+				}
+			}
+		}
+		return textStyle;
 	}
 
 	@Override

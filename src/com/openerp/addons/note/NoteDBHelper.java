@@ -63,7 +63,9 @@ public class NoteDBHelper extends BaseDBHelper {
 	public String generateName(String longName) {
 
 		String[] splitName = (longName).split("\\n");
-
+		if (splitName.length == 1) {
+			splitName = (longName).split("\\<br/>");
+		}
 		if (splitName.length == 1) {
 			name = longName;
 		} else {

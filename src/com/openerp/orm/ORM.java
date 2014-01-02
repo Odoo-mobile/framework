@@ -40,6 +40,7 @@ import com.openerp.config.ModulesConfig;
 import com.openerp.support.Module;
 import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
+import com.openerp.util.logger.OELog;
 
 /**
  * The Class ORM.

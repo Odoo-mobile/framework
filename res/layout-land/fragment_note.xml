@@ -33,8 +33,7 @@
             android:background="@drawable/oe_background_selector"
             android:clickable="true"
             android:padding="3dp"
-            android:src="@drawable/ic_menu_new_plus"
-            android:tint="#414141" />
+            android:src="@drawable/ic_menu_new_plus" />
     </LinearLayout>
 
     <com.openerp.util.controls.OETextView
@@ -57,7 +56,7 @@
         android:drawSelectorOnTop="true"
         android:gravity="center"
         android:horizontalSpacing="10dp"
-        android:numColumns="auto_fit"
+        android:numColumns="3"
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp" >
 
