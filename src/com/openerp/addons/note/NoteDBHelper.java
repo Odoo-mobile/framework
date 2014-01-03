@@ -35,7 +35,7 @@ import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.orm.OETypes;
 import com.openerp.support.OEUser;
-import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.TagsItem;
 
 public class NoteDBHelper extends BaseDBHelper {
 
@@ -75,17 +75,17 @@ public class NoteDBHelper extends BaseDBHelper {
 	}
 
 	// This method will retrieve all the Tags from database
-	public LinkedHashMap<String, String> getAllNoteTags() {
+	public LinkedHashMap<Integer, String> getAllNoteTags() {
 
 		String oea_name = OEUser.current(mContext).getAndroidName();
-		LinkedHashMap<String, String> note_tag = new LinkedHashMap<String, String>();
+		LinkedHashMap<Integer, String> note_tag = new LinkedHashMap<Integer, String>();
 		List<OEDataRow> records = executeSQL(
 				"SELECT id,name,oea_name FROM note_tag where oea_name = ?",
 				new String[] { oea_name });
 
 		if (records.size() > 0) {
 			for (OEDataRow row : records) {
-				note_tag.put(row.getString("name"), row.getString("id"));
+				note_tag.put(row.getInt("id"), row.getString("name"));
 			}
 		}
 		return note_tag;
@@ -93,7 +93,7 @@ public class NoteDBHelper extends BaseDBHelper {
 
 	// This method will retrieve IDS of selected Tags from EditNotes or
 	// Compose Notes
-	public JSONArray getSelectedTagId(HashMap<String, TagsItems> selectedTags) {
+	public JSONArray getSelectedTagId(HashMap<String, TagsItem> selectedTags) {
 
 		JSONArray list = new JSONArray();
 

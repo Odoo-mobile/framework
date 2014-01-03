@@ -44,10 +44,12 @@ import com.openerp.support.BaseFragment;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.MultiTagsTextView;
+import com.openerp.util.tags.TagsItem;
 import com.openerp.util.tags.TagsView;
 
-public class DetailNoteFragment extends BaseFragment {
+public class DetailNoteFragment extends BaseFragment implements
+		MultiTagsTextView.TokenListener {
 
 	View rootview = null;
 	OETextView mNoteDetailTitle;
@@ -60,11 +62,12 @@ public class DetailNoteFragment extends BaseFragment {
 	String row_status = null;
 	String stageId;
 	int noteId;
+	int stageColor;
+	TagsView noteTags = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
 		setHasOptionsMenu(true);
 		scope = new AppScope(this);
 		db = (NoteDBHelper) getModel();
@@ -184,6 +187,7 @@ public class DetailNoteFragment extends BaseFragment {
 				View vStageColor = (View) rootview
 						.findViewById(R.id.viewNoteStageColor);
 				vStageColor.setBackgroundColor(bundle.getInt("stage_color"));
+				stageColor = bundle.getInt("stage_color");
 			}
 			showNoteDetails(bundle.getInt("note_id"));
 		}
@@ -199,9 +203,27 @@ public class DetailNoteFragment extends BaseFragment {
 				.findViewById(R.id.txvNoteDetailTitle);
 		mNoteDetailMemo = (OETextView) rootview
 				.findViewById(R.id.txvNoteDetailMemo);
-		TagsView noteTags = (TagsView) rootview
-				.findViewById(R.id.txv_detailNote_Tags);
+		noteTags = (TagsView) rootview.findViewById(R.id.edtNoteTagsView);
+		noteTags.setTokenListener(this);
+		noteTags.setCustomTagView(new TagsView.CustomTagViewListener() {
 
+			@Override
+			public View getViewForTags(LayoutInflater layoutInflater,
+					Object object, ViewGroup tagsViewGroup) {
+				View view = (View) layoutInflater.inflate(
+						R.layout.custom_note_tagsview_item, tagsViewGroup,
+						false);
+				TagsItem item = (TagsItem) object;
+				OETextView txvTitle = (OETextView) view
+						.findViewById(R.id.txvCustomNoteTagsViewItem);
+				txvTitle.setText(item.getSubject());
+				txvTitle.setBackgroundColor(stageColor);
+				return view;
+			}
+		});
+		for (Object tag : noteTags.getObjects()) {
+			noteTags.removeObject(tag);
+		}
 		noteTags.allowDuplicates(false);
 		mNoteDetailMemo.setMovementMethod(new ScrollingMovementMethod());
 		db = new NoteDBHelper(scope.context());
@@ -215,17 +237,17 @@ public class DetailNoteFragment extends BaseFragment {
 			if (row.get("note_pad_url") != null) {
 				padurl = row.get("note_pad_url").toString();
 			}
-			// paassing to next followerfragment
 			message = row.get("memo").toString();
 			try {
 				noteId = note_id;
-				String[] note_tags_items = note.getNoteTags(
+				List<TagsItem> note_tags_items = note.getNoteTags(
 						String.valueOf(noteId), scope.context());
 				noteTags.showImage(false);
-				for (String tag : note_tags_items) {
-					noteTags.addObject(new TagsItems(0, tag, ""));
+				for (TagsItem tag : note_tags_items) {
+					noteTags.addObject(new TagsItem(tag.getId(), tag
+							.getSubject(), null));
 				}
-				if (note_tags_items.length <= 0) {
+				if (note_tags_items.size() <= 0) {
 					noteTags.setVisibility(View.GONE);
 				}
 				mNoteDetailTitle.setText(HTMLHelper.htmlToString(db
@@ -277,4 +299,18 @@ public class DetailNoteFragment extends BaseFragment {
 		}
 	}
 
+	@Override
+	public void onTokenAdded(Object token, View view) {
+
+	}
+
+	@Override
+	public void onTokenSelected(Object token, View view) {
+
+	}
+
+	@Override
+	public void onTokenRemoved(Object token) {
+		noteTags.addObject(token);
+	}
 }

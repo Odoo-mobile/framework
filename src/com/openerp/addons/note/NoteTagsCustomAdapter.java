@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.openerp.addons.messages;
+package com.openerp.addons.note;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,15 +29,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.openerp.R;
-import com.openerp.util.Base64Helper;
+import com.openerp.util.controls.OETextView;
 import com.openerp.util.tags.TagsItem;
 
-public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItem>
-		implements Filterable {
+public class NoteTagsCustomAdapter extends ArrayAdapter<TagsItem> implements
+		Filterable {
 	private final Object mLock = new Object();
 	List<TagsItem> lists = null;
 	List<TagsItem> listsArray = null;
@@ -46,7 +44,7 @@ public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItem>
 	int resource_id = 0;
 	ItemFilter filter = null;
 
-	public ReceipientsTagsCustomAdapter(Context context, int resource,
+	public NoteTagsCustomAdapter(Context context, int resource,
 			List<TagsItem> objects) {
 		super(context, resource, objects);
 		this.lists = objects;
@@ -56,28 +54,15 @@ public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItem>
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		// return super.getView(position, convertView, parent);
 		rootView = convertView;
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
 		if (rootView == null) {
 			rootView = inflater.inflate(this.resource_id, parent, false);
 		}
 		TagsItem item = lists.get(position);
-		TextView txvSubject = (TextView) rootView.findViewById(R.id.txvSubject);
-		TextView txvSubSubject = (TextView) rootView
-				.findViewById(R.id.txvSubSubject);
-		ImageView imgPic = (ImageView) rootView
-				.findViewById(R.id.imgReceipientPic);
-		txvSubject.setText(item.getSubject());
-		if (!item.getSub_subject().equals("false")) {
-			txvSubSubject.setText(item.getSub_subject());
-		} else {
-			txvSubSubject.setText("No email");
-		}
-		if (item.getImage() != null && !item.getImage().equals("false")) {
-			imgPic.setImageBitmap(Base64Helper.getBitmapImage(context,
-					item.getImage()));
-		}
+		OETextView txvTagTitle = (OETextView) rootView
+				.findViewById(R.id.txvCustomNoteTagsAdapterViewItem);
+		txvTagTitle.setText(item.getSubject());
 
 		return rootView;
 	}

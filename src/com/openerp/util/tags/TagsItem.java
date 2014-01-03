@@ -20,21 +20,21 @@ package com.openerp.util.tags;
 
 import java.io.Serializable;
 
-public class TagsItems implements Serializable {
+public class TagsItem implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int id = 0;
 	private String subject = null;
 	private String sub_subject = null;
 	private String image = null;
 
-	public TagsItems(int id, String subject, String sub_subject) {
+	public TagsItem(int id, String subject, String sub_subject) {
 		super();
 		this.id = id;
 		this.subject = subject;
 		this.sub_subject = sub_subject;
 	}
 
-	public TagsItems(int id, String subject, String sub_subject, String image) {
+	public TagsItem(int id, String subject, String sub_subject, String image) {
 		super();
 		this.id = id;
 		this.subject = subject;
@@ -78,4 +78,5 @@ public class TagsItems implements Serializable {
 	public void setImage(String image) {
 		this.image = image;
 	}
+	
 }

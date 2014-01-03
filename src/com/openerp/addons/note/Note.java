@@ -42,7 +42,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -61,10 +60,14 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.FragmentHandler;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEUser;
+import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.controls.OEEditText;
+import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
+import com.openerp.util.logger.OELog;
+import com.openerp.util.tags.TagsItem;
 import com.openerp.widget.Mobile_Widget;
 
 public class Note extends BaseFragment implements
@@ -74,9 +77,9 @@ public class Note extends BaseFragment implements
 	public FragmentHandler fragmentHandler;
 	private PullToRefreshAttacher mPullAttacher;
 	View rootView = null;
-	TextView noteSyncProcessText, emptyNotesText;
+	OETextView emptyNotesText;
 	GridView notesGrid = null;
-	// OEListViewAdapter listAdapter = null;
+	OEListViewAdapter listAdapter = null;
 	List<OEListViewRow> listRows = null;
 	NoteDBHelper db = null;
 	JSONObject res = null;
@@ -101,7 +104,7 @@ public class Note extends BaseFragment implements
 		setHasOptionsMenu(true);
 		rootView = inflater.inflate(R.layout.fragment_note, container, false);
 		notesGrid = (GridView) rootView.findViewById(R.id.noteGridView);
-		emptyNotesText = (TextView) rootView
+		emptyNotesText = (OETextView) rootView
 				.findViewById(R.id.txvNoteAllArchive);
 
 		update_widget = new Intent();
@@ -115,7 +118,7 @@ public class Note extends BaseFragment implements
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 		SearchView searchView = (SearchView) menu.findItem(
 				R.id.menu_note_search).getActionView();
-		// searchView.setOnQueryTextListener(getQueryListener(listAdapter));
+		searchView.setOnQueryTextListener(getQueryListener(listAdapter));
 	}
 
 	@Override
@@ -138,7 +141,6 @@ public class Note extends BaseFragment implements
 						new String[] { new_id + "" }).get(0);
 				OEListViewRow listRow = new OEListViewRow(new_id, newRow);
 				listRows.add(listRow);
-				// listAdapter.refresh(listRows);
 				notesGrid.setOnTouchListener(touchListener);
 				notesGrid.setOnScrollListener(touchListener
 						.makeScrollListener());
@@ -275,8 +277,6 @@ public class Note extends BaseFragment implements
 		super.onResume();
 		scope.context().registerReceiver(syncFinishReceiver,
 				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
-		// TODO
-		// :rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
 		scope.context().sendBroadcast(update_widget);
 	}
 
@@ -296,10 +296,7 @@ public class Note extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 
 			// Hiding the NoteSyncWaiter view
-			// TODO:
-			// rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.GONE);
 			mPullAttacher.setRefreshComplete();
-
 			// Refreshing Menulist [counter] after synchronisation complete
 			scope.main().refreshDrawer(TAG, context);
 			setupListView(stage_id);
@@ -309,45 +306,12 @@ public class Note extends BaseFragment implements
 	/* Method for setting list view for Notes according stages */
 	private void setupListView(final String stage_id) {
 
-		int[] to = new int[] { R.id.txvNoteListItem, R.id.txvNoteListDetail,
-				R.id.txvNoteListTags };
 		listRows = new ArrayList<OEListViewRow>();
 		if (listRows != null && listRows.size() <= 0) {
 			listRows = getListRows(stage_id);
 		}
-		// TODO: udate adapter to custome....
-		// Creating instance for listAdapter
-		/*
-		 * listAdapter = new OEListViewAdapter(scope.context(),
-		 * R.layout.listview_fragment_note_listitem, listRows, from, to, db); //
-		 * Telling adapter to clean HTML text for key value
-		 * listAdapter.cleanHtmlToTextOn("memo");
-		 * notesGrid.setAdapter(listAdapter); listAdapter.addViewListener(new
-		 * OEListViewOnCreateListener() {
-		 * 
-		 * @Override public View listViewOnCreateListener(int position, View
-		 * row_view, OEListViewRow row_data) {
-		 * 
-		 * View newView = row_view; TextView txvTag = (TextView) newView
-		 * .findViewById(R.id.txvNoteListTags); TagsView noteTags = (TagsView)
-		 * newView .findViewById(R.id.txv_detailNote_Tags);
-		 * 
-		 * try { noteTags.setVisibility(View.GONE); // Fetching Note Stage and
-		 * Setting Background color for that String stageInfo =
-		 * row_data.getRow_data().get("stage_id") .toString(); if
-		 * (!stageInfo.equals("false")) { JSONArray stage_id = new
-		 * JSONArray(stageInfo); String stageid =
-		 * stage_id.getJSONArray(0).getString(0);
-		 * 
-		 * if (stage_colors.containsKey("stage_" + stageid)) {
-		 * txvTag.setBackgroundColor(Integer .parseInt(stage_colors.get(
-		 * "stage_" + stageid).toString())); } } else {
-		 * txvTag.setBackgroundColor(Color.parseColor("#ffffff")); } } catch
-		 * (Exception e) { } return newView; } });
-		 */
-
-		notesGrid.setAdapter(new ArrayAdapter<OEListViewRow>(scope.context(),
-				R.layout.note_grid_custom_layout, listRows) {
+		listAdapter = new OEListViewAdapter(scope.context(),
+				R.layout.note_grid_custom_layout, listRows, null, null, db) {
 			View mView = null;
 
 			@Override
@@ -358,7 +322,6 @@ public class Note extends BaseFragment implements
 					mView = inflater.inflate(R.layout.note_grid_custom_layout,
 							parent, false);
 				}
-
 				TextView txvTitle = (TextView) mView
 						.findViewById(R.id.txvNoteTitle);
 				TextView txvDesc = (TextView) mView
@@ -392,8 +355,8 @@ public class Note extends BaseFragment implements
 
 				return mView;
 			}
-
-		});
+		};
+		notesGrid.setAdapter(listAdapter);
 		// Setting item click listner for Detail view of selected Note.
 		notesGrid.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -463,21 +426,20 @@ public class Note extends BaseFragment implements
 							}
 
 							listRows.remove(position);
-							// ::TODO: update this
-							// listAdapter.refresh(listRows);
 
 							// Checking whether list view is empty !
-							/*
-							 * if (listAdapter.isEmpty()) { // Setting text for
-							 * empty archive list view if
-							 * (stage_id.equalsIgnoreCase("-2")) {
-							 * emptyNotesText .setText(
-							 * "You don't have any archived notes right now.");
-							 * } // Displaying text message of empty list view
-							 * emptyNotesText.setVisibility(View.VISIBLE); }
-							 * else { // Hiding text message of empty list view
-							 * emptyNotesText.setVisibility(View.GONE); }
-							 */
+
+							if (listAdapter.isEmpty()) {
+								// Setting text for empty archive list view
+								if (stage_id.equalsIgnoreCase("-2")) {
+									emptyNotesText
+											.setText("You don't have any archived notes right now.");
+								} // Displaying text message of empty list view
+								emptyNotesText.setVisibility(View.VISIBLE);
+							} else { // Hiding text message of empty list view
+								emptyNotesText.setVisibility(View.GONE);
+							}
+
 						}
 					}
 				});
@@ -575,20 +537,9 @@ public class Note extends BaseFragment implements
 		} else {
 			if (db.isEmptyTable(db) && !isSynced) {
 				isSynced = true;
-
 				// Hiding text message of empty list view
 				// due to visibility of sync process message
 				emptyNotesText.setVisibility(View.GONE);
-
-				// Handling text message for sync process on startup
-				// TODO:
-				/*
-				 * noteSyncProcessText = (TextView) rootView
-				 * .findViewById(R.id.txvMessageHeaderSubtitle);
-				 * noteSyncProcessText
-				 * .setText("Your notes will appear shortly");
-				 */
-				// rootView.findViewById(R.id.noteSyncWaiter).setVisibility(View.VISIBLE);
 
 				// requesting to sync..
 				scope.main().requestSync(NoteProvider.AUTHORITY);
@@ -639,12 +590,12 @@ public class Note extends BaseFragment implements
 		}
 	}
 
-	public String[] getNoteTags(String note_note_id, Context context) {
+	public List<TagsItem> getNoteTags(String note_note_id, Context context) {
 
 		String oea_name = OpenERPAccountManager.currentUser(
 				MainActivity.context).getAndroidName();
 		db = new NoteDBHelper(context);
-		List<String> note_tags = new ArrayList<String>();
+		List<TagsItem> note_tags = new ArrayList<TagsItem>();
 		List<OEDataRow> records = db
 				.executeSQL(
 						"SELECT id,name,oea_name FROM note_tag where id in (select note_tag_id from note_note_note_tag_rel where note_note_id = ? and oea_name = ?) and oea_name = ?",
@@ -652,9 +603,10 @@ public class Note extends BaseFragment implements
 
 		if (records.size() > 0) {
 			for (OEDataRow row : records) {
-				note_tags.add(row.get("name").toString());
+				note_tags.add(new TagsItem(row.getInt("id"), row
+						.getString("name"), null));
 			}
 		}
-		return note_tags.toArray(new String[note_tags.size()]);
+		return note_tags;
 	}
 }

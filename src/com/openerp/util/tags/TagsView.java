@@ -30,7 +30,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.openerp.R;
@@ -39,9 +38,11 @@ import com.openerp.util.Base64Helper;
 public class TagsView extends MultiTagsTextView implements
 		MultiTagsTextView.TokenListener {
 
-	HashMap<String, TagsItems> selectedTags = new HashMap<String, TagsItems>();
+	HashMap<String, TagsItem> selectedTags = new HashMap<String, TagsItem>();
 	Context mContext = null;
 	private boolean showImage = true;
+	CustomTagViewListener mCustomTagView = null;
+	NewTokenCreateListener mNewTokenListener = null;
 
 	public TagsView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -52,15 +53,11 @@ public class TagsView extends MultiTagsTextView implements
 
 	@Override
 	protected Object defaultObject(String completionText) {
-		// Stupid simple example of guessing if we have an email or not
-		int index = completionText.indexOf('@');
-		if (index == -1) {
-			return new TagsItems(0, completionText, completionText.replace(" ",
-					"") + "@example.com");
-		} else {
-			return new TagsItems(0, completionText.substring(0, index),
-					completionText);
+		if (mNewTokenListener != null) {
+			return (TagsItem) mNewTokenListener
+					.newTokenAddListener(completionText);
 		}
+		return null;
 	}
 
 	private void setTypeFace(String textStyle) {
@@ -102,42 +99,56 @@ public class TagsView extends MultiTagsTextView implements
 
 	@Override
 	protected View getViewForObject(Object object) {
-		TagsItems item = (TagsItems) object;
+		TagsItem item = (TagsItem) object;
+		View view = null;
+		ViewGroup tagsParentView = (ViewGroup) TagsView.this.getParent();
 		LayoutInflater l = (LayoutInflater) getContext().getSystemService(
 				Activity.LAYOUT_INFLATER_SERVICE);
-		LinearLayout view = (LinearLayout) l.inflate(
-				R.layout.message_receipient_tag_layout,
-				(ViewGroup) TagsView.this.getParent(), false);
-		((TextView) view.findViewById(R.id.txvTagSubject)).setText(item
-				.getSubject());
-		if (!this.showImage) {
-			view.findViewById(R.id.imgTagImage).setVisibility(View.GONE);
-		}
-		if (this.showImage && item.getImage() != null
-				&& !item.getImage().equals("false")) {
-			((ImageView) view.findViewById(R.id.imgTagImage))
-					.setImageBitmap(Base64Helper.getBitmapImage(mContext,
-							item.getImage()));
+		if (mCustomTagView == null) {
+			view = l.inflate(R.layout.message_receipient_tag_layout,
+					tagsParentView, false);
+			((TextView) view.findViewById(R.id.txvTagSubject)).setText(item
+					.getSubject());
+			if (!this.showImage) {
+				view.findViewById(R.id.imgTagImage).setVisibility(View.GONE);
+			}
+			if (this.showImage && item.getImage() != null
+					&& !item.getImage().equals("false")) {
+				((ImageView) view.findViewById(R.id.imgTagImage))
+						.setImageBitmap(Base64Helper.getBitmapImage(mContext,
+								item.getImage()));
+			}
+		} else {
+			view = mCustomTagView.getViewForTags(l, object, tagsParentView);
 		}
 		return view;
 	}
 
+	public void setCustomTagView(CustomTagViewListener customTagView) {
+		mCustomTagView = customTagView;
+	}
+
+	public void setNewTokenCreateListener(
+			NewTokenCreateListener newTokenListener) {
+		mNewTokenListener = newTokenListener;
+	}
+
 	@Override
 	public void onTokenAdded(Object obj, View view) {
-		final TagsItems item = (TagsItems) obj;
+		final TagsItem item = (TagsItem) obj;
 		selectedTags.put("id_" + item.getId(), item);
 	}
 
 	@Override
 	public void onTokenRemoved(Object arg0) {
-		TagsItems item = (TagsItems) arg0;
+		TagsItem item = (TagsItem) arg0;
 		if (selectedTags.containsKey("id_" + item.getId())) {
 			selectedTags.remove("id_" + item.getId());
 		}
 	}
 
-	public List<TagsItems> getSelectedTags() {
-		List<TagsItems> items = new ArrayList<TagsItems>();
+	public List<TagsItem> getSelectedTags() {
+		List<TagsItem> items = new ArrayList<TagsItem>();
 		for (String key : selectedTags.keySet()) {
 			items.add(selectedTags.get(key));
 		}
@@ -150,5 +161,14 @@ public class TagsView extends MultiTagsTextView implements
 
 	@Override
 	public void onTokenSelected(Object token, View view) {
+	}
+
+	public interface CustomTagViewListener {
+		public View getViewForTags(LayoutInflater layoutInflater,
+				Object object, ViewGroup tagsViewGroup);
+	}
+
+	public interface NewTokenCreateListener {
+		public TagsItem newTokenAddListener(String token);
 	}
 }

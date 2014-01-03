@@ -64,7 +64,7 @@ import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.OEDate;
-import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.TagsItem;
 import com.openerp.util.tags.TagsView;
 
 public class MessageComposeActivty extends Activity implements
@@ -75,13 +75,13 @@ public class MessageComposeActivty extends Activity implements
 	List<OEListViewRow> attachments = new ArrayList<OEListViewRow>();
 	OEListViewAdapter lstAttachmentAdapter = null;
 	List<OEListViewRow> partners_list = new ArrayList<OEListViewRow>();
-	HashMap<String, TagsItems> selectedPartners = new HashMap<String, TagsItems>();
+	HashMap<String, TagsItem> selectedPartners = new HashMap<String, TagsItem>();
 	boolean is_note_body = false;
 	boolean is_reply = false;
 	int message_id = 0;
 	AppScope scope = null;
 	TagsView receipients_view = null;
-	List<TagsItems> parters = new ArrayList<TagsItems>();
+	List<TagsItem> parters = new ArrayList<TagsItem>();
 	/** The parent_row. */
 	OEDataRow parent_row = null;
 	ReceipientsTagsCustomAdapter partner_adapter = null;
@@ -125,8 +125,8 @@ public class MessageComposeActivty extends Activity implements
 			JSONArray partner_ids = new JSONArray();
 			try {
 
-				List<TagsItems> partners = getPartnersOfMessage(message_id + "");
-				for (TagsItems item : partners) {
+				List<TagsItem> partners = getPartnersOfMessage(message_id + "");
+				for (TagsItem item : partners) {
 					selectedPartners.put("key_" + item.getId(), item);
 					partner_ids.put(item.getId());
 					receipients_view.addObject(item);
@@ -145,9 +145,9 @@ public class MessageComposeActivty extends Activity implements
 				if (cursor.moveToNext()) {
 					int partner_id = cursor.getInt(cursor
 							.getColumnIndex("data2"));
-					List<TagsItems> partners = getPartnersByIds(Arrays
+					List<TagsItem> partners = getPartnersByIds(Arrays
 							.asList(new Integer[] { partner_id }));
-					for (TagsItems item : partners) {
+					for (TagsItem item : partners) {
 						selectedPartners.put("key_" + item.getId(), item);
 						receipients_view.addObject(item);
 						findViewById(R.id.edtMessageSubject).requestFocus();
@@ -188,22 +188,22 @@ public class MessageComposeActivty extends Activity implements
 		handleIntentFilter(getIntent());
 	}
 
-	private List<TagsItems> getAllPartners() {
+	private List<TagsItem> getAllPartners() {
 		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(this);
 		List<OEDataRow> records = partners.search(partners,
 				new String[] { "oea_name = ?" },
 				new String[] { OpenERPAccountManager.currentUser(this)
 						.getAndroidName() });
 		if (records.size() > 0) {
-			ArrayList<TagsItems> rows = new ArrayList<TagsItems>();
+			ArrayList<TagsItem> rows = new ArrayList<TagsItem>();
 			for (OEDataRow row : records) {
-				rows.add(new TagsItems(row.getInt("id"), row.getString("name"),
+				rows.add(new TagsItem(row.getInt("id"), row.getString("name"),
 						row.getString("email"), row.getString("image_small")));
 			}
 			getPartnersFromServer();
 			return rows;
 		} else {
-			return new ArrayList<TagsItems>();
+			return new ArrayList<TagsItem>();
 		}
 	}
 
@@ -229,7 +229,7 @@ public class MessageComposeActivty extends Activity implements
 				JSONObject row = result.getJSONArray("records")
 						.getJSONObject(i);
 				int id = row.getInt("id");
-				parters.add(new TagsItems(id, row.getString("name").toString(),
+				parters.add(new TagsItem(id, row.getString("name").toString(),
 						row.getString("email").toString(), row
 								.getString("image_small")));
 			}
@@ -242,10 +242,10 @@ public class MessageComposeActivty extends Activity implements
 
 	}
 
-	public List<TagsItems> getPartnersByIds(List<Integer> ids) {
+	public List<TagsItem> getPartnersByIds(List<Integer> ids) {
 		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(
 				MainActivity.context);
-		List<TagsItems> names = new ArrayList<TagsItems>();
+		List<TagsItem> names = new ArrayList<TagsItem>();
 		String oea_name = OpenERPAccountManager.currentUser(
 				MainActivity.context).getAndroidName();
 		for (Integer partner_id : ids) {
@@ -256,7 +256,7 @@ public class MessageComposeActivty extends Activity implements
 			if (records.size() > 0) {
 				for (OEDataRow row : records) {
 					int id = row.getInt("id");
-					names.add(new TagsItems(id, row.getString("name"), row
+					names.add(new TagsItem(id, row.getString("name"), row
 							.getString("email"), row.getString("image_small")));
 				}
 			}
@@ -264,7 +264,7 @@ public class MessageComposeActivty extends Activity implements
 		return names;
 	}
 
-	public List<TagsItems> getPartnersOfMessage(String message_id) {
+	public List<TagsItem> getPartnersOfMessage(String message_id) {
 		Res_PartnerDBHelper partners = new Res_PartnerDBHelper(
 				MainActivity.context);
 		String oea_name = OpenERPAccountManager.currentUser(
@@ -273,11 +273,11 @@ public class MessageComposeActivty extends Activity implements
 				.executeSQL(
 						"SELECT id,email,name,image_small,oea_name FROM res_partner where id in (select res_partner_id from mail_message_res_partner_rel where mail_message_id = ? and oea_name = ?) and oea_name = ?",
 						new String[] { message_id, oea_name, oea_name });
-		List<TagsItems> names = new ArrayList<TagsItems>();
+		List<TagsItem> names = new ArrayList<TagsItem>();
 		if (records.size() > 0) {
 			for (OEDataRow row : records) {
 				int id = row.getInt("id");
-				names.add(new TagsItems(id, row.getString("name"), row
+				names.add(new TagsItem(id, row.getString("name"), row
 						.getString("email"), row.getString("image_small")));
 			}
 		}
@@ -612,7 +612,7 @@ public class MessageComposeActivty extends Activity implements
 			if (success) {
 				Toast.makeText(getApplicationContext(),
 						"Message sent succussfull.", Toast.LENGTH_LONG).show();
-				selectedPartners = new HashMap<String, TagsItems>();
+				selectedPartners = new HashMap<String, TagsItem>();
 				finish();
 			} else {
 				Toast.makeText(getApplicationContext(),
@@ -736,7 +736,7 @@ public class MessageComposeActivty extends Activity implements
 			if (success) {
 				Toast.makeText(getApplicationContext(),
 						"Message sent succussfull.", Toast.LENGTH_LONG).show();
-				selectedPartners = new HashMap<String, TagsItems>();
+				selectedPartners = new HashMap<String, TagsItem>();
 				setResult(RESULT_OK);
 				finish();
 			} else {
@@ -749,7 +749,7 @@ public class MessageComposeActivty extends Activity implements
 
 	@Override
 	public void onTokenAdded(Object token, View view) {
-		TagsItems item = (TagsItems) token;
+		TagsItem item = (TagsItem) token;
 		selectedPartners.put("key_" + item.getId(), item);
 	}
 
@@ -760,7 +760,7 @@ public class MessageComposeActivty extends Activity implements
 
 	@Override
 	public void onTokenRemoved(Object token) {
-		TagsItems item = (TagsItems) token;
+		TagsItem item = (TagsItem) token;
 		if (!is_reply) {
 			selectedPartners.remove("key_" + item.getId());
 		} else {

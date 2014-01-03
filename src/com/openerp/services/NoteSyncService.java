@@ -30,6 +30,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.openerp.addons.note.NoteDBHelper;
+import com.openerp.addons.note.NoteDBHelper.NoteTags;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
@@ -79,8 +80,11 @@ public class NoteSyncService extends Service {
 
 			if (oe.syncWithServer(db)) {
 				// Sync Done, Next stuff....
-				context.sendBroadcast(intent);
-				context.sendBroadcast(update_widget);
+				NoteTags noteTags = db.new NoteTags(context);
+				if (oe.syncWithServer(noteTags)) {
+					context.sendBroadcast(intent);
+					context.sendBroadcast(update_widget);
+				}
 			}
 
 		} catch (Exception e) {

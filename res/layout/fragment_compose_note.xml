@@ -23,33 +23,15 @@
             android:textColor="#414141"
             android:textStyle="bold" />
 
-        <LinearLayout
+        <com.openerp.util.tags.TagsView
+            android:id="@+id/edtComposeNoteTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:orientation="horizontal"
-            android:weightSum="3" >
-
-            <com.openerp.util.tags.TagsView
-                android:id="@+id/txv_composeNote_Tag"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_weight="3"
-                android:background="#f5f5f5"
-                android:hint="Tags"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ImageView
-                android:id="@+id/imgBtnAddTags"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/oe_listview_background_selector"
-                android:contentDescription="@string/imgview_note_add_tags"
-                android:onClick="addTags"
-                android:src="@drawable/ic_action_content_new" />
-        </LinearLayout>
+            android:layout_marginTop="2dp"
+            android:background="#f5f5f5"
+            android:hint="Tags"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <com.openerp.util.controls.OEEditText
             android:id="@+id/edtNoteComposeDescription"
@@ -60,7 +42,7 @@
             android:hint="@string/compose_note_description" />
 
         <WebView
-            android:id="@+id/txv_composeNote_Description_Pad"
+            android:id="@+id/webNoteComposeWebViewPad"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible" />

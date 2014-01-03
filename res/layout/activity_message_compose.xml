@@ -13,6 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:orientation="horizontal"
             android:weightSum="3" >
 
@@ -25,19 +26,19 @@
                 android:textColor="#828182" />
         </LinearLayout>
 
-        <EditText
+        <com.openerp.util.controls.OEEditText
             android:id="@+id/edtMessageSubject"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="20dp"
             android:hint="Subject"
             android:singleLine="true" />
 
-        <EditText
+        <com.openerp.util.controls.OEEditText
             android:id="@+id/edtMessageBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="20dp"
             android:hint="Body"
             android:inputType="textMultiLine" />
 
