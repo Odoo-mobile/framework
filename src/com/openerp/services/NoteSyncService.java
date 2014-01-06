@@ -18,6 +18,9 @@
  */
 package com.openerp.services;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
@@ -30,10 +33,13 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.openerp.addons.note.NoteDBHelper;
+import com.openerp.addons.note.NoteDBHelper.NoteFollowers;
 import com.openerp.addons.note.NoteDBHelper.NoteTags;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
+import com.openerp.support.JSONDataHelper;
+import com.openerp.util.logger.OELog;
 import com.openerp.widget.Mobile_Widget;
 
 public class NoteSyncService extends Service {
@@ -82,8 +88,22 @@ public class NoteSyncService extends Service {
 				// Sync Done, Next stuff....
 				NoteTags noteTags = db.new NoteTags(context);
 				if (oe.syncWithServer(noteTags)) {
-					context.sendBroadcast(intent);
-					context.sendBroadcast(update_widget);
+					// Syncing note followers
+					NoteFollowers noteFollowers = db.new NoteFollowers(context);
+					JSONObject noteFollowersDomain = new JSONObject();
+					noteFollowersDomain
+							.accumulate(
+									"domain",
+									new JSONArray("[[\"res_id\", \"in\", "
+											+ JSONDataHelper
+													.intArrayToJSONArray(
+															db.localIds(db))
+													.toString() + "]]"));
+					if (oe.syncWithServer(noteFollowers, noteFollowersDomain,
+							false, false)) {
+						context.sendBroadcast(intent);
+						context.sendBroadcast(update_widget);
+					}
 				}
 			}
 

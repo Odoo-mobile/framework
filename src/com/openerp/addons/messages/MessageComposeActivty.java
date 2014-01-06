@@ -103,7 +103,7 @@ public class MessageComposeActivty extends Activity implements
 		Intent replyIntent = getIntent();
 		receipients_view = (TagsView) findViewById(R.id.receipients_view);
 		partner_adapter = new ReceipientsTagsCustomAdapter(this,
-				R.layout.message_receipient_item_layout, parters);
+				R.layout.tags_view_partner_item_layout, parters);
 		receipients_view.setAdapter(partner_adapter);
 		/* tags component */
 		if (replyIntent.hasExtra("send_reply")) {

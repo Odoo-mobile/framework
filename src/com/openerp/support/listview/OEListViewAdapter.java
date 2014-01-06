@@ -631,4 +631,8 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRow> {
 	public void addViewListener(OEListViewOnCreateListener viewListener) {
 		this.viewListener = viewListener;
 	}
+
+	public int getResource() {
+		return this.resource_id;
+	}
 }

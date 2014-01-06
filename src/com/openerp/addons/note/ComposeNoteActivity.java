@@ -97,7 +97,7 @@ public class ComposeNoteActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.fragment_compose_note);
+		setContentView(R.layout.fragment_note_compose);
 		scope = new AppScope((MainActivity) MainActivity.context);
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);

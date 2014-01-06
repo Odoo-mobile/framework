@@ -59,6 +59,9 @@ public class OEHelper extends OpenERP {
 	/** The m context. */
 	Context mContext = null;
 
+	/** The list of columns with domain */
+	List<OEColumn> domainCols = new ArrayList<OEColumn>();
+
 	HashMap<String, List<OEDataRow>> deleted_rows = new HashMap<String, List<OEDataRow>>();
 
 	/**
@@ -521,6 +524,24 @@ public class OEHelper extends OpenERP {
 						+ OEDate.getDateBefore(data_limit) + "\"]"));
 				domain.put("domain", domainArgs);
 			}
+
+			List<OEColumn> domainCols = getColumnsWithDomain();
+			if (domainCols.size() > 0) {
+				for (OEColumn col : domainCols) {
+					JSONArray domainArgs = new JSONArray();
+					if (domain == null) {
+						domain = new JSONObject();
+					} else {
+						domainArgs = domain.getJSONArray("domain");
+					}
+					JSONArray domainColsVals = new JSONArray();
+					domainColsVals.put(col.getName());
+					domainColsVals.put(col.getColumnDomain().getOperator());
+					domainColsVals.put(col.getColumnDomain().getValue());
+					domainArgs.put(new JSONArray(domainColsVals.toString()));
+					domain.put("domain", domainArgs);
+				}
+			}
 			return search_read(model, fields, domain, 0, 50, null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -567,13 +588,21 @@ public class OEHelper extends OpenERP {
 	 * @return the sync cols
 	 */
 	private String[] getSyncCols(List<OEColumn> columns) {
+		domainCols = new ArrayList<OEColumn>();
 		String[] fields = new String[columns.size()];
 		int i = 0;
 		for (OEColumn col : columns) {
 			fields[i] = col.getName();
 			i++;
+			if (col.getColumnDomain() != null) {
+				domainCols.add(col);
+			}
 		}
 		return fields;
+	}
+
+	private List<OEColumn> getColumnsWithDomain() {
+		return domainCols;
 	}
 
 	/**
@@ -668,8 +697,7 @@ public class OEHelper extends OpenERP {
 					OEDataRow oe_datarow = jsonDataToMap(row);
 					int row_id = row.getInt("id");
 
-					OEListViewRow oe_row = new OEListViewRow(row_id,
-							oe_datarow);
+					OEListViewRow oe_row = new OEListViewRow(row_id, oe_datarow);
 					record_lists.add(oe_row);
 				}
 			}

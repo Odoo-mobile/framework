@@ -32,9 +32,9 @@
                 android:title="Forward as mail">
             </item>
             <item
-                android:id="@+id/menu_note_invite_people"
+                android:id="@+id/menu_note_followers"
                 android:icon="@drawable/ic_menu_add_group"
-                android:title="Invite people">
+                android:title="Followers">
             </item>
         </menu>
     </item>
