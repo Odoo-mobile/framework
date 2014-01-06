@@ -764,7 +764,6 @@ public class ORM extends SQLiteDatabaseHelper {
 
 		// Temp dummy helper
 		BaseDBHelper newDb = generateM2MHelper(dbHelper, m2m);
-
 		for (int i = 0; i < values.length(); i++) {
 			try {
 				int row_id = 0;
@@ -793,9 +792,7 @@ public class ORM extends SQLiteDatabaseHelper {
 						new String[] { id, row_id + "", user_name }).size();
 				SQLiteDatabase db = getWritableDatabase();
 				if (res == 0) {
-
 					db.insert(rel_table, null, m2mvals);
-
 					if (tbl2Obj != null) {
 						List<Integer> list = new ArrayList<Integer>();
 						list.add(row_id);
@@ -830,7 +827,8 @@ public class ORM extends SQLiteDatabaseHelper {
 	 */
 	public boolean write(BaseDBHelper dbHelper, ContentValues values, int id,
 			boolean fromServer) {
-
+		// for update server side data.
+		JSONObject arguments = new JSONObject();
 		// Handling many2one records
 		HashMap<String, Object> many2onecols = dbHelper.getMany2OneColumns();
 		// Handling Many2Many Records
@@ -840,11 +838,18 @@ public class ORM extends SQLiteDatabaseHelper {
 
 				JSONArray m2mArray = new JSONArray(values.getAsString(key));
 				Many2Many m2m = (Many2Many) many2manycols.get(key);
-				updateM2MRecords(values.getAsString("id"), m2mArray, key,
-						dbHelper, m2m, values);
+				updateM2MRecords(id + "", m2mArray, key, dbHelper, m2m, values);
+
+				JSONArray m2m_ids = new JSONArray();
+				m2m_ids.put(6);
+				m2m_ids.put(false);
+				m2m_ids.put(m2mArray);
+				arguments.put(key,
+						new JSONArray("[" + m2m_ids.toString() + "]"));
 			} catch (Exception e) {
 
 			}
+
 			values.remove(key);
 		}
 		// Handling many2one records. [id, "name"] to id
@@ -861,7 +866,6 @@ public class ORM extends SQLiteDatabaseHelper {
 			} catch (Exception e) {
 			}
 		}
-
 		boolean flag = false;
 		SQLiteDatabase db = getWritableDatabase();
 		try {
@@ -869,7 +873,6 @@ public class ORM extends SQLiteDatabaseHelper {
 				String table = modelToTable(dbHelper.getModelName());
 				try {
 
-					JSONObject arguments = new JSONObject();
 					for (String key : values.keySet()) {
 						try {
 							int keyid = Integer.parseInt(values
@@ -881,19 +884,15 @@ public class ORM extends SQLiteDatabaseHelper {
 								arguments.put(key,
 										((temp.equals("true")) ? true : false));
 							} else {
-
 								arguments.put(key, values.get(key).toString());
-
 							}
 						}
-
 					}
 					if (fromServer) {
 						@SuppressWarnings("unused")
 						int res = db.update(table, values, "id = " + id, null);
 						flag = true;
 					} else {
-
 						if (oe_obj.updateValues(dbHelper.getModelName(),
 								arguments, id)) {
 							@SuppressWarnings("unused")
@@ -1388,19 +1387,24 @@ public class ORM extends SQLiteDatabaseHelper {
 	 * @return true, if successful
 	 */
 	public boolean delete(BaseDBHelper db, int id, boolean fromLocal) {
+		return delete(db, "id", id, fromLocal);
+	}
+
+	public boolean delete(BaseDBHelper db, String column, int id,
+			boolean fromLocal) {
 		try {
 			if (!fromLocal) {
 
 				if (oe_obj.unlink(db.getModelName(), id)) {
 					SQLiteDatabase sdb = getWritableDatabase();
-					String where = "id = " + id;
+					String where = column + " = " + id;
 					sdb.delete(modelToTable(db.getModelName()), where, null);
 					sdb.close();
 					return true;
 				}
 			} else {
 				SQLiteDatabase sdb = getWritableDatabase();
-				String where = "id = " + id;
+				String where = column + " = " + id;
 				sdb.delete(modelToTable(db.getModelName()), where, null);
 				sdb.close();
 				return true;

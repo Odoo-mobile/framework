@@ -1,14 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_note_edit_save"
+        android:id="@+id/menu_note_edit"
+        android:icon="@drawable/ic_menu_edit"
         android:showAsAction="always"
-        android:title="Save">
+        android:title="Edit note">
     </item>
     <item
-        android:id="@+id/menu_note_edit_cancel"
+        android:id="@+id/menu_note_delete"
+        android:icon="@drawable/ic_menu__discard"
         android:showAsAction="always"
-        android:title="Cancel">
+        android:title="Delete note">
     </item>
     <item
         android:id="@+id/menu_note_operation"
@@ -17,26 +19,22 @@
         android:title="More">
         <menu>
             <item
-                android:id="@+id/menu_note_invite_people"
-                android:title="Invite People">
-            </item>
-            <item
-                android:id="@+id/menu_note_forward_asmail"
-                android:title="Forward as Email">
-            </item>
-            <item
                 android:id="@+id/menu_note_mark_asdone"
-                android:title="Mark As Done"/>
+                android:icon="@drawable/ic_action_done"
+                android:title="Mark as done"/>
             <item
                 android:id="@+id/menu_note_mark_asopen"
-                android:title="Mark As Open"/>
+                android:icon="@drawable/ic_menu_navigation_back"
+                android:title="Mark as open"/>
             <item
-                android:id="@+id/menu_note_edit"
-                android:title="Edit Note">
+                android:id="@+id/menu_note_forward_asmail"
+                android:icon="@drawable/ic_menu_forward"
+                android:title="Forward as mail">
             </item>
             <item
-                android:id="@+id/menu_note_delete"
-                android:title="Delete Note">
+                android:id="@+id/menu_note_invite_people"
+                android:icon="@drawable/ic_menu_add_group"
+                android:title="Invite people">
             </item>
         </menu>
     </item>

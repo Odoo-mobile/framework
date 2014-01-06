@@ -302,16 +302,19 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 
 	@Override
 	public void performCompletion() {
-		if (getListSelection() == ListView.INVALID_POSITION) {
-			Object bestGuess;
-			if (getAdapter().getCount() > 0) {
-				bestGuess = getAdapter().getItem(0);
+		try {
+			if (getListSelection() == ListView.INVALID_POSITION) {
+				Object bestGuess;
+				if (getAdapter().getCount() > 0) {
+					bestGuess = getAdapter().getItem(0);
+				} else {
+					bestGuess = defaultObject(currentCompletionText());
+				}
+				replaceText(convertSelectionToString(bestGuess));
 			} else {
-				bestGuess = defaultObject(currentCompletionText());
+				super.performCompletion();
 			}
-			replaceText(convertSelectionToString(bestGuess));
-		} else {
-			super.performCompletion();
+		} catch (NullPointerException e) {
 		}
 	}
 
@@ -945,6 +948,7 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 		public void onTokenSelected(Object token, View view);
 
 		public void onTokenRemoved(Object token);
+
 	}
 
 	private class TokenSpanWatcher implements SpanWatcher {

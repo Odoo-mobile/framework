@@ -25,7 +25,6 @@ import android.support.v4.app.FragmentTransaction;
 import com.openerp.MainActivity;
 import com.openerp.R;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class FragmentHandler.
  */

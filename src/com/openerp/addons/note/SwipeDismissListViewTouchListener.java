@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ListView;
+import android.widget.GridView;
 
 import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
@@ -43,7 +43,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 	private long mAnimationTime;
 
 	// Fixed properties
-	private ListView mListView;
+	private GridView mListView;
 	private DismissCallbacks mCallbacks;
 	private int mViewWidth = 1; // 1 and not 0 to prevent dividing by zero
 
@@ -81,7 +81,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 		 *            An array of positions to dismiss, sorted in descending
 		 *            order for convenience.
 		 */
-		void onDismiss(ListView listView, int[] reverseSortedPositions);
+		void onDismiss(GridView listView, int[] reverseSortedPositions);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 	 *            The callback to trigger when the user has indicated that she
 	 *            would like to dismiss one or more list items.
 	 */
-	public SwipeDismissListViewTouchListener(ListView listView,
+	public SwipeDismissListViewTouchListener(GridView listView,
 			DismissCallbacks callbacks) {
 		ViewConfiguration vc = ViewConfiguration.get(listView.getContext());
 		mSlop = vc.getScaledTouchSlop();
@@ -246,7 +246,7 @@ public class SwipeDismissListViewTouchListener extends BaseFragment implements
 			mVelocityTracker = null;
 			mDownX = 0;
 			mDownView = null;
-			mDownPosition = ListView.INVALID_POSITION;
+			mDownPosition = GridView.INVALID_POSITION;
 			mSwiping = false;
 			break;
 		}

@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_note_write"
+        android:icon="@drawable/ic_menu_save"
+        android:showAsAction="always"
+        android:title="Create">
+    </item>
+    <item
+        android:id="@+id/menu_note_cancel"
+        android:showAsAction="always"
+        android:title="Cancel">
+    </item>
+
+</menu>

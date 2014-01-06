@@ -2,90 +2,50 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
-    android:fillViewport="true" >
+    android:background="#f5f5f5"
+    android:fillViewport="true"
+    android:padding="10dp" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp" >
+        android:padding="15dp" >
 
-        <LinearLayout
+        <com.openerp.util.controls.OEEditText
+            android:id="@+id/edtNoteTitleInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3" >
+            android:layout_marginBottom="20dp"
+            android:background="#f5f5f5"
+            android:hint="Title"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#414141"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/txv_composeNote_Tag_Heading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:text="@string/compose_note_tags"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <com.openerp.util.tags.TagsView
-                android:id="@+id/txv_composeNote_Tag"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_weight="3"
-                android:padding="3dp" />
-
-            <ImageView
-                android:id="@+id/imgBtnAddTags"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/oe_listview_background_selector"
-                android:contentDescription="@string/imgview_note_add_tags"
-                android:onClick="addTags"
-                android:padding="5dp"
-                android:src="@drawable/ic_action_content_new" />
-        </LinearLayout>
-
-        <LinearLayout
+        <com.openerp.util.tags.TagsView
+            android:id="@+id/edtComposeNoteTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3" >
-
-            <TextView
-                android:id="@+id/txv_composeNote_StageHeading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:text="@string/compose_note_stages"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <Spinner
-                android:id="@+id/txv_composeNote_Stage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/txv_composeNote_Description_Heading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:text="@string/compose_note_description"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="2dp"
+            android:background="#f5f5f5"
+            android:hint="Tags"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <EditText
-            android:id="@+id/txv_composeNote_Description"
+        <com.openerp.util.controls.OEEditText
+            android:id="@+id/edtNoteComposeDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/compose_note_description"
-            android:paddingTop="10dp" />
+            android:layout_marginBottom="20dp"
+            android:background="#f5f5f5"
+            android:hint="@string/compose_note_description" />
 
         <WebView
-            android:id="@+id/txv_composeNote_Description_Pad"
+            android:id="@+id/webNoteComposeWebViewPad"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible" />
     </LinearLayout>
-/
 
 </ScrollView>
