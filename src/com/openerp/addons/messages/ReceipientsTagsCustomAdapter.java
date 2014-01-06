@@ -34,20 +34,20 @@ import android.widget.TextView;
 
 import com.openerp.R;
 import com.openerp.util.Base64Helper;
-import com.openerp.util.tags.TagsItems;
+import com.openerp.util.tags.TagsItem;
 
-public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItems>
+public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItem>
 		implements Filterable {
 	private final Object mLock = new Object();
-	List<TagsItems> lists = null;
-	List<TagsItems> listsArray = null;
+	List<TagsItem> lists = null;
+	List<TagsItem> listsArray = null;
 	View rootView = null;
 	Context context = null;
 	int resource_id = 0;
 	ItemFilter filter = null;
 
 	public ReceipientsTagsCustomAdapter(Context context, int resource,
-			List<TagsItems> objects) {
+			List<TagsItem> objects) {
 		super(context, resource, objects);
 		this.lists = objects;
 		this.context = context;
@@ -62,7 +62,7 @@ public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItems>
 		if (rootView == null) {
 			rootView = inflater.inflate(this.resource_id, parent, false);
 		}
-		TagsItems item = lists.get(position);
+		TagsItem item = lists.get(position);
 		TextView txvSubject = (TextView) rootView.findViewById(R.id.txvSubject);
 		TextView txvSubSubject = (TextView) rootView
 				.findViewById(R.id.txvSubSubject);
@@ -105,7 +105,7 @@ public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItems>
 			// use it
 			if (listsArray == null) {
 				synchronized (mLock) { // Notice the declaration above
-					listsArray = new ArrayList<TagsItems>(lists);
+					listsArray = new ArrayList<TagsItem>(lists);
 				}
 			}
 			// No prefix is sent to filter by so we're going to send back the
@@ -119,11 +119,11 @@ public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItems>
 				// Compare lower case strings
 				String prefixString = prefix.toString().toLowerCase();
 				// Local to here so we're not changing actual array
-				final List<TagsItems> items = lists;
+				final List<TagsItem> items = lists;
 				final int count = items.size();
-				final List<TagsItems> newItems = new ArrayList<TagsItems>(count);
+				final List<TagsItem> newItems = new ArrayList<TagsItem>(count);
 				for (int i = 0; i < count; i++) {
-					final TagsItems item = items.get(i);
+					final TagsItem item = items.get(i);
 					final String itemName = item.getSubject().toLowerCase();
 					// First match against the whole, non-splitted value
 					if (itemName.toLowerCase().contains(prefixString)) {
@@ -144,7 +144,7 @@ public class ReceipientsTagsCustomAdapter extends ArrayAdapter<TagsItems>
 				FilterResults results) {
 			if (results.count > 0) {
 				clear();
-				lists = (List<TagsItems>) results.values;
+				lists = (List<TagsItem>) results.values;
 				addAll(lists);
 				notifyDataSetChanged();
 			} else {

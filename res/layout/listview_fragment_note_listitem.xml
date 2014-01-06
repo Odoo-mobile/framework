@@ -25,7 +25,7 @@
         android:orientation="horizontal" >
 
         <com.openerp.util.tags.TagsView
-            android:id="@+id/txv_detailNote_Tags"
+            android:id="@+id/edtNoteTagsViewListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"

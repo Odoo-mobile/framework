@@ -133,14 +133,6 @@ public class AddFollowerFragment extends BaseFragment {
 				return false;
 			}
 		});
-
-		// disabling the COMPOSE NOTE,WRITE,CANCEL options
-		MenuItem item_compose = menu.findItem(R.id.menu_note_compose);
-		item_compose.setVisible(false);
-		MenuItem item_write = menu.findItem(R.id.menu_note_write);
-		item_write.setVisible(false);
-		MenuItem item_cancel = menu.findItem(R.id.menu_note_cancel);
-		item_cancel.setVisible(false);
 	}
 
 	@Override

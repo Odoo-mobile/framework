@@ -30,17 +30,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-public class CustomAdapter extends ArrayAdapter<TagsItems> implements
+public class CustomAdapter extends ArrayAdapter<TagsItem> implements
 		Filterable {
 	private final Object mLock = new Object();
-	List<TagsItems> lists = null;
-	List<TagsItems> listsArray = null;
+	List<TagsItem> lists = null;
+	List<TagsItem> listsArray = null;
 	View rootView = null;
 	Context context = null;
 	int resource_id = 0;
 	ItemFilter filter = null;
 
-	public CustomAdapter(Context context, int resource, List<TagsItems> objects) {
+	public CustomAdapter(Context context, int resource, List<TagsItem> objects) {
 		super(context, resource, objects);
 		this.lists = objects;
 		this.context = context;
@@ -88,7 +88,7 @@ public class CustomAdapter extends ArrayAdapter<TagsItems> implements
 			// use it
 			if (listsArray == null) {
 				synchronized (mLock) { // Notice the declaration above
-					listsArray = new ArrayList<TagsItems>(lists);
+					listsArray = new ArrayList<TagsItem>(lists);
 				}
 			}
 			// No prefix is sent to filter by so we're going to send back the
@@ -102,11 +102,11 @@ public class CustomAdapter extends ArrayAdapter<TagsItems> implements
 				// Compare lower case strings
 				String prefixString = prefix.toString().toLowerCase();
 				// Local to here so we're not changing actual array
-				final List<TagsItems> items = lists;
+				final List<TagsItem> items = lists;
 				final int count = items.size();
-				final List<TagsItems> newItems = new ArrayList<TagsItems>(count);
+				final List<TagsItem> newItems = new ArrayList<TagsItem>(count);
 				for (int i = 0; i < count; i++) {
-					final TagsItems item = items.get(i);
+					final TagsItem item = items.get(i);
 					final String itemName = item.getSubject().toLowerCase();
 					// First match against the whole, non-splitted value
 					if (itemName.toLowerCase().contains(prefixString)) {
@@ -126,7 +126,7 @@ public class CustomAdapter extends ArrayAdapter<TagsItems> implements
 				FilterResults results) {
 			if (results.count > 0) {
 				clear();
-				lists = (List<TagsItems>) results.values;
+				lists = (List<TagsItem>) results.values;
 				addAll(lists);
 				notifyDataSetChanged();
 			} else {

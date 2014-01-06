@@ -27,26 +27,26 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
@@ -56,182 +56,233 @@ import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.OEUser;
 import com.openerp.util.HTMLHelper;
-import com.openerp.util.tags.TagsItems;
+import com.openerp.util.controls.OEEditText;
+import com.openerp.util.controls.OETextView;
+import com.openerp.util.tags.TagsItem;
 import com.openerp.util.tags.TagsView;
 import com.openerp.widget.Mobile_Widget;
 
 public class ComposeNoteActivity extends Activity implements
-		TagsView.TokenListener {
+		TagsView.TokenListener, OnNavigationListener {
 
-	Spinner noteStages = null;
-	EditText noteDescription;
-	TextView descriptionHeader;
+	OEEditText noteDescription;
 	WebView webViewpad;
 	TagsView noteTags;
 	AppScope scope = null;
-	NoteDBHelper.NoteStages stagesobj;
+	NoteDBHelper.NoteStages mNoteStagesDB;
 	NoteDBHelper dbhelper = null;
-	ArrayAdapter<String> adapter;
-	HashMap<String, Long> note_Stages = null;
-	ArrayList<String> stages = new ArrayList<String>();
-	HashMap<String, TagsItems> selectedTags = new HashMap<String, TagsItems>();
-	LinkedHashMap<String, String> note_tags = null;
+
+	/* actionbar navigation */
+	ActionBar mActionbar;
+	ArrayAdapter<SpinnerNavItem> mActionbarAdapter;
+	List<SpinnerNavItem> mSpinnerItems = new ArrayList<SpinnerNavItem>();
+	HashMap<String, Integer> mSpinnerItemsPositions = new HashMap<String, Integer>();
+	Integer mStageId = null;
+
+	HashMap<String, TagsItem> selectedTags = new HashMap<String, TagsItem>();
 	String[] stringArray = null;
 	String padURL = null;
 	private static OEHelper oe = null;
 	Intent update_widget = null;
+
+	boolean inEditMode = false;
+	int mEditNoteId = 0;
+	String mEditNoteMemo = null;
+	int mEditNoteStageId;
+
+	List<TagsItem> mNoteTagsList = new ArrayList<TagsItem>();
+	ArrayAdapter<TagsItem> mNoteTagAdapter = null;
 
 	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_compose_note);
-
 		scope = new AppScope((MainActivity) MainActivity.context);
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		noteTags = (TagsView) findViewById(R.id.txv_composeNote_Tag);
-		noteDescription = (EditText) findViewById(R.id.txv_composeNote_Description);
-		descriptionHeader = (TextView) findViewById(R.id.txv_composeNote_Description_Heading);
-		noteTags.allowDuplicates(false);
-		noteTags.setTokenListener(this);
-		noteTags.showImage(false);
+		noteDescription = (OEEditText) findViewById(R.id.edtNoteComposeDescription);
+		dbhelper = new NoteDBHelper(scope.context());
+		mActionbar = getActionBar();
+		mActionbar.setDisplayShowTitleEnabled(false);
+		mActionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		fillNoteStages();
-		webViewpad = (WebView) findViewById(R.id.txv_composeNote_Description_Pad);
-
-		if (Note.isStateExist == null) {
-			Note.isStateExist = String.valueOf(dbhelper.isPadExist());
+		Intent intent = getIntent();
+		if (intent.hasExtra("note_title")) {
+			OEEditText edtNoteTitleInput = (OEEditText) findViewById(R.id.edtNoteTitleInput);
+			edtNoteTitleInput.setText(intent.getStringExtra("note_title")
+					.toString());
 		}
-		if (Note.isStateExist.equalsIgnoreCase("true")) {
+		webViewpad = (WebView) findViewById(R.id.webNoteComposeWebViewPad);
+		noteTags = (TagsView) findViewById(R.id.edtComposeNoteTags);
+		noteTags.setCustomTagView(new TagsView.CustomTagViewListener() {
+
+			@Override
+			public View getViewForTags(LayoutInflater layoutInflater,
+					Object object, ViewGroup tagsViewGroup) {
+				View view = (View) layoutInflater.inflate(
+						R.layout.custom_note_tagsview_item, tagsViewGroup,
+						false);
+				TagsItem item = (TagsItem) object;
+				OETextView txvTitle = (OETextView) view
+						.findViewById(R.id.txvCustomNoteTagsViewItem);
+				txvTitle.setText(item.getSubject());
+				txvTitle.setBackgroundColor(Color.parseColor("#cccccc"));
+				txvTitle.setTextColor(Color.parseColor("#414141"));
+				return view;
+			}
+		});
+		Bundle editModeBundle = intent.getExtras();
+		boolean padExists = dbhelper.isPadExist();
+		if (editModeBundle != null) {
+			if (editModeBundle.containsKey("note_id")) {
+				inEditMode = true;
+				mEditNoteId = editModeBundle.getInt("note_id");
+				String row_details = editModeBundle.getString("row_details");
+				mEditNoteMemo = row_details;
+				findViewById(R.id.edtNoteTitleInput).setVisibility(View.GONE);
+				Note note = new Note();
+				List<TagsItem> tags = note.getNoteTags(mEditNoteId + "", this);
+				for (TagsItem item : tags) {
+					noteTags.addObject(item);
+					selectedTags.put(item.getId() + "", item);
+				}
+				if (padExists) {
+					padURL = editModeBundle.getString("padurl");
+				} else {
+					((OEEditText) findViewById(R.id.edtNoteComposeDescription))
+							.setText(row_details);
+				}
+				try {
+					JSONArray stage_id = new JSONArray(
+							editModeBundle.getString("stage_id"));
+					mEditNoteStageId = stage_id.getJSONArray(0).getInt(0);
+					mStageId = mEditNoteStageId;
+					mActionbar.setSelectedNavigationItem(mSpinnerItemsPositions
+							.get("key_" + mStageId));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		if (padExists) {
 			oe = dbhelper.getOEInstance();
 			noteDescription.setVisibility(View.GONE);
-			descriptionHeader.setVisibility(View.GONE);
 			webViewpad.setVisibility(View.VISIBLE);
 			webViewpad.getSettings().setJavaScriptEnabled(true);
 			webViewpad.getSettings().setJavaScriptCanOpenWindowsAutomatically(
 					true);
-			padURL = dbhelper.getURL(oe);
+			if (padURL == null) {
+				padURL = dbhelper.getURL(oe);
+			}
 			webViewpad.loadUrl(padURL + "?showChat=false&userName="
 					+ OEUser.current(scope.context()).getUsername());
 		}
 		update_widget = new Intent();
 		update_widget.setAction(Mobile_Widget.TAG);
+
 	}
 
-	// Called when + button pressed for adding tags
-	public void addTags(View v) {
+	@Override
+	public void onStart() {
+		super.onStart();
+		noteTags.allowDuplicates(false);
+		noteTags.setTokenListener(this);
+		mNoteTagsList = getTags();
+		mNoteTagAdapter = new ArrayAdapter<TagsItem>(this,
+				R.layout.custom_note_tags_adapter_view_item, mNoteTagsList);
+		noteTags.setNewTokenCreateListener(new TagsView.NewTokenCreateListener() {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		note_tags = dbhelper.getAllNoteTags();
-		ArrayList<String> keyList = new ArrayList<String>(note_tags.keySet());
+			@Override
+			public TagsItem newTokenAddListener(String token) {
+				TagsItem item = null;
+				LinkedHashMap<String, String> newTag = dbhelper
+						.writeNoteTags(token);
+				item = new TagsItem(Integer.parseInt(newTag.get("newID")),
+						newTag.get("tagName"), null);
+				noteTags.addObject(item);
+				mNoteTagsList.add(item);
+				return item;
+			}
+		});
+		noteTags.setAdapter(mNoteTagAdapter);
+	}
 
-		if (keyList.size() > 0) {
-			stringArray = new String[keyList.size() - 1];
-			stringArray = keyList.toArray(stringArray);
-
-			builder.setTitle("Select Tags");
-			builder.setMultiChoiceItems(stringArray, null,
-					new DialogInterface.OnMultiChoiceClickListener() {
-						public void onClick(DialogInterface dialog, int item,
-								boolean isChecked) {
-						}
-					});
-
-			builder.setPositiveButton("Select",
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							AlertDialog d = (AlertDialog) dialog;
-							ListView v = d.getListView();
-							int i = 0;
-							while (i < stringArray.length) {
-								if (v.isItemChecked(i)) {
-									Integer id = Integer.parseInt(note_tags
-											.get(v.getItemAtPosition(i)
-													.toString()).toString());
-									if (!selectedTags.containsKey(note_tags
-											.get(v.getItemAtPosition(i)
-													.toString()))) {
-										noteTags.addObject(new TagsItems(id,
-												stringArray[i], ""));
-									}
-								}
-								i++;
-							}
-						}
-					});
-		} else {
-			builder.setTitle("You don't have any tags \ncreate tag");
+	public List<TagsItem> getTags() {
+		List<TagsItem> items = new ArrayList<TagsItem>();
+		LinkedHashMap<Integer, String> noteTags = dbhelper.getAllNoteTags();
+		for (Integer key : noteTags.keySet()) {
+			items.add(new TagsItem(key, noteTags.get(key).toString(), null));
 		}
-
-		builder.setNegativeButton("Cancel",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface di, int i) {
-					}
-				});
-
-		builder.setNeutralButton("Create",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						createNotetag();
-					}
-				});
-
-		final Dialog dialog = builder.create();
-		dialog.show();
+		return items;
 	}
 
 	public void fillNoteStages() {
 
-		noteStages = (Spinner) findViewById(R.id.txv_composeNote_Stage);
-		note_Stages = new HashMap<String, Long>();
-		dbhelper = new NoteDBHelper(scope.context());
-		stagesobj = dbhelper.new NoteStages(scope.context());
-		List<OEDataRow> data = stagesobj.search(stagesobj);
+		mNoteStagesDB = dbhelper.new NoteStages(scope.context());
+		List<OEDataRow> data = mNoteStagesDB.search(mNoteStagesDB);
 		int total = data.size();
 
 		if (total > 0) {
+			mSpinnerItems.add(new SpinnerNavItem(0, "Stages"));
+			int i = 1;
 			for (OEDataRow row_data : data) {
-				stages.add(row_data.get("name").toString());
-				note_Stages.put(row_data.get("name").toString(),
-						Long.parseLong(row_data.get("id").toString()));
+				mSpinnerItems.add(new SpinnerNavItem(row_data.getInt("id"),
+						row_data.getString("name")));
+				mSpinnerItemsPositions.put("key_" + row_data.getInt("id"), i);
+				i++;
 			}
-			stages.add("Add New");
+			mSpinnerItems.add(new SpinnerNavItem(-1, "Add New"));
 		} else {
-			stages.add("Add New");
+			mSpinnerItems.add(new SpinnerNavItem(-1, "Add New"));
 		}
 
-		adapter = new ArrayAdapter<String>(scope.context(),
-				android.R.layout.simple_spinner_dropdown_item, stages);
-		noteStages.setAdapter(adapter);
+		mActionbarAdapter = new ArrayAdapter<SpinnerNavItem>(this,
+				R.layout.spinner_custom_layout, mSpinnerItems) {
 
-		noteStages.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1,
-					int position, long arg3) {
-				String selectedStageName = noteStages.getItemAtPosition(
-						position).toString();
-				if (selectedStageName.equalsIgnoreCase("Add New")) {
-					createNoteStage();
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View mView = convertView;
+				if (mView == null) {
+					LayoutInflater inflater = getLayoutInflater();
+					mView = inflater.inflate(R.layout.spinner_custom_layout,
+							parent, false);
 				}
+				OETextView txvTitle = (OETextView) mView
+						.findViewById(R.id.txvCustomSpinnerItemText);
+				SpinnerNavItem item = mSpinnerItems.get(position);
+				txvTitle.setText(item.get_title());
+				return mView;
 			}
 
 			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
+			public View getDropDownView(int position, View convertView,
+					ViewGroup parent) {
+				View mView = convertView;
+				if (mView == null) {
+					LayoutInflater inflater = getLayoutInflater();
+					mView = inflater.inflate(R.layout.spinner_custom_layout,
+							parent, false);
+				}
+				OETextView txvTitle = (OETextView) mView
+						.findViewById(R.id.txvCustomSpinnerItemText);
+				SpinnerNavItem item = mSpinnerItems.get(position);
+				txvTitle.setText(item.get_title());
+				return mView;
 			}
-		});
+
+		};
+		mActionbar.setListNavigationCallbacks(mActionbarAdapter, this);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
-		getMenuInflater().inflate(R.menu.menu_fragment_note, menu);
-		// disabling the Compose Note option cause you are already in that menu
-		MenuItem item = menu.findItem(R.id.menu_note_compose);
-		MenuItem item1 = menu.findItem(R.id.menu_note_search);
-		item1.setVisible(false);
-		item.setVisible(false);
+		getMenuInflater().inflate(R.menu.menu_fragment_note_new_edit, menu);
+		MenuItem note_write = menu.findItem(R.id.menu_note_write);
+		if (inEditMode) {
+			note_write.setTitle("Update");
+		}
 		return true;
 	}
 
@@ -240,21 +291,68 @@ public class ComposeNoteActivity extends Activity implements
 
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			// app icon in action bar clicked; go home
 			finish();
 			return true;
 
 		case R.id.menu_note_write:
-			writeNote();
+			if (inEditMode) {
+				Toast.makeText(this, "Updating...", Toast.LENGTH_LONG).show();
+				writeNote(mEditNoteId);
+			} else {
+				writeNote(null);
+			}
 			return true;
 
 		case R.id.menu_note_cancel:
-			finish();
+			if (inEditMode) {
+				if (isContentChanged()) {
+					openConfirmDiscard("Discard ?",
+							"Your changes will be discarded. Are you sure?",
+							"Discard", "Cancel");
+				} else {
+					finish();
+				}
+			} else {
+				finish();
+			}
 			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	public void openConfirmDiscard(String title, String message,
+			String positivebtnText, String negativebtnText) {
+
+		AlertDialog.Builder deleteDialogConfirm = new AlertDialog.Builder(
+				scope.context());
+		deleteDialogConfirm.setTitle(title);
+		deleteDialogConfirm.setMessage(message);
+		deleteDialogConfirm.setCancelable(true);
+
+		deleteDialogConfirm.setPositiveButton(positivebtnText,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				});
+
+		deleteDialogConfirm.setNegativeButton(negativebtnText, null);
+
+		deleteDialogConfirm.show();
+	}
+
+	public boolean isContentChanged() {
+		String memo = ((OEEditText) findViewById(R.id.edtNoteComposeDescription))
+				.getText().toString();
+
+		if ((mEditNoteMemo.length() != memo.length())
+				|| (mEditNoteStageId != mStageId)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public void createNoteStage() {
@@ -273,10 +371,12 @@ public class ComposeNoteActivity extends Activity implements
 					Toast.makeText(scope.context(), "CHOOSE ANOTHER NAME",
 							Toast.LENGTH_SHORT).show();
 				} else {
-					writeNoteStages(stage.getText().toString());
-					stages.add(stages.size() - 1, stage.getText().toString());
-					adapter.notifyDataSetChanged();
-					noteStages.setSelection(stages.size() - 2);
+					int newId = writeNoteStages(stage.getText().toString());
+					mSpinnerItems.add(mSpinnerItems.size() - 1,
+							new SpinnerNavItem(newId, stage.getText()
+									.toString()));
+					mActionbarAdapter.notifyDataSetChanged();
+					mStageId = newId;
 					scope.main().refreshDrawer(Note.TAG, scope.context());
 				}
 			}
@@ -290,49 +390,19 @@ public class ComposeNoteActivity extends Activity implements
 		builder.create().show();
 	}
 
-	public void createNotetag() {
-
-		AlertDialog.Builder builder = new Builder(this);
-		final EditText tag = new EditText(this);
-		builder.setTitle("Tag Name").setMessage("Enter new Tag").setView(tag);
-		builder.setPositiveButton("Create", new OnClickListener() {
-			public void onClick(DialogInterface di, int i) {
-				// do something with onClick
-				if (tag.getText().length() > 0) {
-					LinkedHashMap<String, String> newTag = dbhelper
-							.writeNoteTags(tag.getText().toString());
-					noteTags.addObject(new TagsItems(Integer.parseInt(newTag
-							.get("newID")), newTag.get("tagName"), ""));
-				} else {
-					Toast.makeText(scope.context(), "Enter Tag First",
-							Toast.LENGTH_LONG).show();
-				}
-			}
-		});
-
-		builder.setNegativeButton("Cancel", new OnClickListener() {
-			public void onClick(DialogInterface di, int i) {
-			}
-		});
-
-		builder.create().show();
-	}
-
-	public void writeNoteStages(String stagename) {
+	public int writeNoteStages(String stageName) {
 
 		ContentValues values = new ContentValues();
-		values.put("name", stagename);
+		values.put("name", stageName);
 		dbhelper = new NoteDBHelper(scope.context());
 		NoteDBHelper.NoteStages notestageObj = dbhelper.new NoteStages(
 				scope.context());
 		int newId = notestageObj.createRecordOnserver(notestageObj, values);
-
-		note_Stages.put(stagename, Long.parseLong(String.valueOf(newId)));
 		values.put("id", newId);
-		notestageObj.create(notestageObj, values);
+		return notestageObj.create(notestageObj, values);
 	}
 
-	private void writeNote() {
+	private void writeNote(Integer note_id) {
 
 		JSONArray tagID = dbhelper.getSelectedTagId(selectedTags);
 		try {
@@ -340,35 +410,44 @@ public class ComposeNoteActivity extends Activity implements
 			JSONObject vals = new JSONObject();
 
 			// If Pad Installed Over Server
-			if (Note.isStateExist.equalsIgnoreCase("true")) {
+			if (dbhelper.isPadExist()) {
 				OEHelper oe = dbhelper.getOEInstance();
 				JSONArray url = new JSONArray();
 				url.put(padURL);
 				JSONObject obj = oe.call_kw("pad.common", "pad_get_content",
 						url);
 				String link = HTMLHelper.htmlToString(obj.getString("result"));
-
 				values.put("name", dbhelper.generateName(link));
 				values.put("memo", link);
 				values.put("note_pad_url", padURL);
 				vals.put("note_pad_url", values.get("note_pad_url").toString());
 			} // If Pad Not Installed Over Server
 			else {
-				values.put("name", dbhelper.generateName(noteDescription
-						.getText().toString()));
+				String name = dbhelper.generateName(noteDescription.getText()
+						.toString());
+				if (!inEditMode) {
+					EditText edtTitle = (EditText) findViewById(R.id.edtNoteTitleInput);
+					if (!TextUtils.isEmpty(edtTitle.getText())) {
+						name = edtTitle.getText().toString();
+					}
+				}
+				values.put("name", name);
 				vals.put("name", values.get("name").toString());
-				values.put("memo", noteDescription.getText().toString());
+				if (!inEditMode) {
+					values.put("memo", name + "<br/><br/>"
+							+ noteDescription.getText().toString());
+				} else {
+					values.put("memo", noteDescription.getText().toString());
+				}
+
 				vals.put("memo", values.get("memo").toString());
 			}
 
 			values.put("open", "true");
 			vals.put("open", true);
-			Long stageid = note_Stages.get(noteStages.getSelectedItem()
-					.toString());
 
-			if (stageid != null) {
-				values.put("stage_id", note_Stages.get(noteStages
-						.getSelectedItem().toString()));
+			if (mStageId != null) {
+				values.put("stage_id", mStageId + "");
 				vals.put("stage_id",
 						Integer.parseInt(values.get("stage_id").toString()));
 				JSONArray tag_ids = new JSONArray();
@@ -383,20 +462,34 @@ public class ComposeNoteActivity extends Activity implements
 				vals.put("tag_ids", new JSONArray("[" + tag_ids.toString()
 						+ "]"));
 				dbhelper = new NoteDBHelper(scope.context());
-				int newId = dbhelper.createRecordOnserver(dbhelper, vals);
-				values.put("id", newId);
+
 				values.put("date_done", "false");
 				values.put("tag_ids", tagID.toString());
-
-				int new_id = dbhelper.create(dbhelper, values);
+				int write_id = 0;
 				Intent resultIntent = new Intent();
-				resultIntent.putExtra("result", new_id);
+				String toast_msg = "Note created";
+				if (note_id == null) {
+					int newId = dbhelper.createRecordOnserver(dbhelper, vals);
+					values.put("id", newId);
+					write_id = dbhelper.create(dbhelper, values);
+				} else {
+					deleteLocalEntriesForTags(note_id);
+					dbhelper.write(dbhelper, values, note_id);
+					resultIntent.putExtra("updated", true);
+					Bundle editNoteValues = new Bundle();
+					editNoteValues.putString("memo", noteDescription.getText()
+							.toString());
+					editNoteValues.putInt("stage_id", mStageId);
+					resultIntent.putExtras(editNoteValues);
+					toast_msg = "Note updated";
+				}
+				Toast.makeText(this, toast_msg, Toast.LENGTH_LONG).show();
+				resultIntent.putExtra("result", write_id);
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 			} else {
-				Toast.makeText(scope.context(),
-						"You can't keep Stage empty..!", Toast.LENGTH_SHORT)
-						.show();
+				Toast.makeText(scope.context(), "Please select stage",
+						Toast.LENGTH_SHORT).show();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -405,9 +498,17 @@ public class ComposeNoteActivity extends Activity implements
 		}
 	}
 
+	private void deleteLocalEntriesForTags(int note_id) {
+		// Removing all many to many records for note for tags.
+		dbhelper.executeSQL(
+				"delete from note_note_note_tag_rel where note_note_id = ? and oea_name = ?",
+				new String[] { note_id + "",
+						OEUser.current(this).getAndroidName() });
+	}
+
 	@Override
 	public void onTokenAdded(Object token, View view) {
-		TagsItems item = (TagsItems) token;
+		TagsItem item = (TagsItem) token;
 		selectedTags.put("" + item.getId(), item);
 	}
 
@@ -417,7 +518,79 @@ public class ComposeNoteActivity extends Activity implements
 
 	@Override
 	public void onTokenRemoved(Object token) {
-		TagsItems item = (TagsItems) token;
+		TagsItem item = (TagsItem) token;
 		selectedTags.remove("" + item.getId());
+	}
+
+	class SpinnerNavItem {
+		int _id;
+		String _title;
+
+		public SpinnerNavItem(int _id, String _title) {
+			this._id = _id;
+			this._title = _title;
+		}
+
+		public int get_id() {
+			return _id;
+		}
+
+		public void set_id(int _id) {
+			this._id = _id;
+		}
+
+		public String get_title() {
+			return _title;
+		}
+
+		public void set_title(String _title) {
+			this._title = _title;
+		}
+
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		SpinnerNavItem item = mSpinnerItems.get(itemPosition);
+		if (item.get_id() == 0) {
+			return false;
+		}
+		if (item.get_id() == -1) {
+			createNoteStage();
+		}
+		mStageId = item.get_id();
+		return true;
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		Bundle bundle = new Bundle();
+		for (String key : selectedTags.keySet()) {
+			TagsItem item = selectedTags.get(key);
+			Bundle item_bundle = new Bundle();
+			item_bundle.putString("name", item.getSubject());
+			item_bundle.putInt("id", item.getId());
+			bundle.putBundle(key, item_bundle);
+		}
+		savedInstanceState.putBundle("selected_tags", bundle);
+		savedInstanceState.putString("padURL", padURL);
+		savedInstanceState.putInt("stage_id", mStageId);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		Bundle bundle = savedInstanceState.getBundle("selected_tags");
+		selectedTags = new HashMap<String, TagsItem>();
+		for (String key : bundle.keySet()) {
+			Bundle item_bundle = bundle.getBundle(key);
+			TagsItem item = new TagsItem(item_bundle.getInt("id"),
+					item_bundle.getString("name"), null);
+			selectedTags.put(key, item);
+			noteTags.addObject(item);
+		}
+		padURL = savedInstanceState.getString("padURL");
+		mStageId = savedInstanceState.getInt("stage_id");
 	}
 }

@@ -48,7 +48,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.openerp.addons.note.Note;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
@@ -541,12 +540,6 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Note.isStateExist = null;
-	}
-
-	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position,
 			long id) {
 		DrawerItem item = mDrawerListItems.get(position);
@@ -759,5 +752,4 @@ public class MainActivity extends FragmentActivity implements
 		outState.putInt("current_drawer_item", mDrawerItemSelectedPosition);
 		super.onSaveInstanceState(outState);
 	}
-
 }
