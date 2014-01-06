@@ -31,6 +31,7 @@ import android.content.Context;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEColumn;
+import com.openerp.orm.OEColumnDomain;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.orm.OETypes;
@@ -191,5 +192,19 @@ public class NoteDBHelper extends BaseDBHelper {
 			name = "note.tag";
 			columns.add(new OEColumn("name", "Name", OETypes.text()));
 		}
+	}
+
+	public class NoteFollowers extends BaseDBHelper {
+
+		public NoteFollowers(Context context) {
+			super(context);
+			name = "mail.followers";
+			columns.add(new OEColumn("res_model", "Model", OETypes.text(),
+					new OEColumnDomain("=", "note.note")));
+			columns.add(new OEColumn("res_id", "Note ID", OETypes.integer()));
+			columns.add(new OEColumn("partner_id", "Partner ID", OETypes
+					.many2One(new Res_PartnerDBHelper(context))));
+		}
+
 	}
 }

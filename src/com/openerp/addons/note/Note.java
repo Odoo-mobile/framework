@@ -50,6 +50,7 @@ import android.widget.Toast;
 import com.openerp.MainActivity;
 import com.openerp.PullToRefreshAttacher;
 import com.openerp.R;
+import com.openerp.addons.note.NoteDBHelper.NoteFollowers;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
@@ -66,7 +67,6 @@ import com.openerp.util.HTMLHelper;
 import com.openerp.util.controls.OEEditText;
 import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.logger.OELog;
 import com.openerp.util.tags.TagsItem;
 import com.openerp.widget.Mobile_Widget;
 
@@ -155,7 +155,11 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new NoteDBHelper(context);
+		NoteDBHelper noteDb = new NoteDBHelper(context);
+		NoteFollowers noteFollowerDb = noteDb.new NoteFollowers(context);
+		noteFollowerDb.createTable(noteFollowerDb
+				.createStatement(noteFollowerDb));
+		return noteDb;
 	}
 
 	@Override
@@ -311,7 +315,7 @@ public class Note extends BaseFragment implements
 			listRows = getListRows(stage_id);
 		}
 		listAdapter = new OEListViewAdapter(scope.context(),
-				R.layout.note_grid_custom_layout, listRows, null, null, db) {
+				R.layout.fragment_note_grid_custom_layout, listRows, null, null, db) {
 			View mView = null;
 
 			@Override
@@ -319,7 +323,7 @@ public class Note extends BaseFragment implements
 				mView = convertView;
 				if (convertView == null) {
 					LayoutInflater inflater = getActivity().getLayoutInflater();
-					mView = inflater.inflate(R.layout.note_grid_custom_layout,
+					mView = inflater.inflate(R.layout.fragment_note_grid_custom_layout,
 							parent, false);
 				}
 				TextView txvTitle = (TextView) mView

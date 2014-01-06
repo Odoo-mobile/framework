@@ -58,6 +58,7 @@ public class DetailNoteFragment extends BaseFragment implements
 	NoteDBHelper db = null;
 	int note_id = 0;
 	String message;
+	String mNoteName = "";
 	String padurl = "false";
 	String row_status = null;
 	String stageId;
@@ -100,15 +101,15 @@ public class DetailNoteFragment extends BaseFragment implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_note_invite_people:
+		case R.id.menu_note_followers:
 
-			AddFollowerFragment addfollower_fragement = new AddFollowerFragment();
+			NoteFollower fragNoteFollower = new NoteFollower();
 			Bundle selectedNoteID = new Bundle();
-			selectedNoteID.putInt("res_id", note_id);
-			selectedNoteID.putString("message", message);
-			addfollower_fragement.setArguments(selectedNoteID);
+			selectedNoteID.putInt("note_id", note_id);
+			selectedNoteID.putString("note_name", mNoteName);
+			fragNoteFollower.setArguments(selectedNoteID);
 			scope.main().fragmentHandler.setBackStack(true, null);
-			scope.main().fragmentHandler.replaceFragmnet(addfollower_fragement);
+			scope.main().fragmentHandler.replaceFragmnet(fragNoteFollower);
 			return true;
 
 		case R.id.menu_note_forward_asmail:
@@ -252,6 +253,7 @@ public class DetailNoteFragment extends BaseFragment implements
 				}
 				mNoteDetailTitle.setText(HTMLHelper.htmlToString(db
 						.generateName(row.getString("memo"))));
+				mNoteName = mNoteDetailTitle.getText().toString();
 				mNoteDetailMemo.setText(HTMLHelper.stringToHtml(row
 						.getString("memo")));
 			} catch (Exception e) {

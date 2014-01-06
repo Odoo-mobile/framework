@@ -40,6 +40,7 @@ import com.openerp.config.ModulesConfig;
 import com.openerp.support.Module;
 import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
+import com.openerp.util.logger.OELog;
 
 /**
  * The Class ORM.
@@ -962,6 +963,20 @@ public class ORM extends SQLiteDatabaseHelper {
 			for (OEColumn col : dbHelper.getColumns()) {
 				if (!(col.getType() instanceof Many2Many)) {
 					cols.add(col.getName());
+				}
+				if (col.getColumnDomain() != null) {
+					// Adding custom domain for model
+					List<String> newWhere = new ArrayList<String>(
+							Arrays.asList(where));
+					List<String> newWhereVals = new ArrayList<String>(
+							Arrays.asList(whereVals));
+					newWhere.add("AND");
+					newWhere.add(col.getName()
+							+ col.getColumnDomain().getOperator() + " ?");
+					newWhereVals.add(col.getColumnDomain().getValue());
+					where = newWhere.toArray(new String[newWhere.size()]);
+					whereVals = newWhereVals.toArray(new String[newWhereVals
+							.size()]);
 				}
 			}
 		}

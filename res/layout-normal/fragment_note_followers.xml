@@ -1,0 +1,66 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#DCE1E3"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/note_quick_text_background"
+        android:orientation="horizontal"
+        android:paddingBottom="1dp"
+        android:weightSum="1" >
+
+        <com.openerp.util.tags.TagsView
+            android:id="@+id/edtNoteFollowers"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#fff"
+            android:hint="Add Followers"
+            android:inputType="text"
+            android:paddingLeft="10dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ImageView
+            android:id="@+id/imgBtnAddFollower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/oe_background_selector"
+            android:clickable="true"
+            android:padding="3dp"
+            android:src="@drawable/ic_action_done"
+            android:tint="#414141" />
+    </LinearLayout>
+
+    <com.openerp.util.controls.OETextView
+        android:id="@+id/txvNoteFollowerStatus"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:gravity="top|center_horizontal"
+        android:text="No Followers found for note"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#77778f"
+        android:visibility="gone" />
+
+    <GridView
+        android:id="@+id/noteFollowersGridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:drawSelectorOnTop="true"
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:numColumns="1"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp" >
+
+        <requestFocus />
+    </GridView>
+
+</LinearLayout>

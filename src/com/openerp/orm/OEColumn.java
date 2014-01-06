@@ -18,7 +18,6 @@
  */
 package com.openerp.orm;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Fields.
  */
@@ -38,6 +37,9 @@ public class OEColumn {
 
 	/** The can sync. */
 	private boolean canSync = true;
+
+	/** The column domain */
+	OEColumnDomain columnDomain = null;
 
 	/**
 	 * Instantiates a new fields.
@@ -74,6 +76,14 @@ public class OEColumn {
 		this.title = title;
 		this.type = type;
 		this.canSync = canSync;
+	}
+
+	public OEColumn(String name, String title, Object type,
+			OEColumnDomain columnDomain) {
+		this.name = name;
+		this.title = title;
+		this.type = type;
+		this.columnDomain = columnDomain;
 	}
 
 	/**
@@ -195,4 +205,11 @@ public class OEColumn {
 		this.help = help;
 	}
 
+	public OEColumnDomain getColumnDomain() {
+		return columnDomain;
+	}
+
+	public void setColumnDomain(OEColumnDomain columnDomain) {
+		this.columnDomain = columnDomain;
+	}
 }
