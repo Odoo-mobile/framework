@@ -64,11 +64,12 @@ public class MessageSyncHelper extends OEHelper implements SyncHelper {
 	 *             Signals that an I/O exception has occurred.
 	 * @throws OEVersionException
 	 */
-	public MessageSyncHelper(Context context) throws ClientProtocolException,
-			JSONException, IOException, OEVersionException {
-		super(context, OEUser.current(context));
+	public MessageSyncHelper(Context context, OEUser user)
+			throws ClientProtocolException, JSONException, IOException,
+			OEVersionException {
+		super(context, user);
 		mContext = context;
-		mUser = OEUser.current(context);
+		mUser = user;
 	}
 
 	/*

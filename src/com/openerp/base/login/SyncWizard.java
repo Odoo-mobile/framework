@@ -162,9 +162,10 @@ public class SyncWizard extends BaseFragment {
 		case R.id.menu_start_application:
 			for (CheckBox chkBox : checkbox) {
 				if (chkBox != null) {
-					scope.main().setAutoSync(
-							authorities.get(chkBox.getId() + "").toString(),
-							chkBox.isChecked());
+					String authority = authorities.get(chkBox.getId() + "")
+							.toString();
+					scope.main().setAutoSync(authority, chkBox.isChecked());
+					scope.main().cancelSync(authority);
 				}
 			}
 			for (RadioGroup rdoGrp : rdoGroups) {
@@ -185,9 +186,9 @@ public class SyncWizard extends BaseFragment {
 							editor.putBoolean("local_contact_sync", false);
 						}
 						editor.commit();
-						scope.main().setAutoSync(
-								authorities.get(rdoBtn.getId() + ""),
-								rdoBtn.isChecked());
+						String authority = authorities.get(rdoBtn.getId() + "");
+						scope.main().setAutoSync(authority, rdoBtn.isChecked());
+						scope.main().cancelSync(authority);
 					}
 				}
 			}
