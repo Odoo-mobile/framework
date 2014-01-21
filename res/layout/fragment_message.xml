@@ -4,7 +4,7 @@
 
     <include
         android:id="@+id/messageSyncWaiter"
-        layout="@layout/message_listview_header"
+        layout="@layout/fragment_message_listview_header"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
         android:visibility="gone" />
@@ -16,7 +16,7 @@
         android:paddingTop="5dp"
         android:visibility="gone" />
 
-    <TextView
+    <com.openerp.util.controls.OETextView
         android:id="@+id/txvMessageAllReadMessage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

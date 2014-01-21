@@ -12,14 +12,14 @@
         android:orientation="vertical"
         android:padding="2dp" >
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvSubject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Subject"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvSubSubject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -43,7 +43,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
@@ -65,6 +64,7 @@ import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.OEBinaryDownloadHelper;
 import com.openerp.util.OEFileSizeHelper;
 import com.openerp.util.contactview.OEContactView;
+import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
@@ -128,7 +128,7 @@ public class MessageDetail extends BaseFragment {
 
 		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
-				R.layout.message_detail_listview_items, list, from, to, db);
+				R.layout.fragment_message_detail_listview_items, list, from, to, db);
 		listAdapter.toHTML("body", true);
 		listAdapter.addImageColumn("image");
 		// listAdapter.layoutBackgroundColor("parent_id",
@@ -143,7 +143,7 @@ public class MessageDetail extends BaseFragment {
 				final int message_id = row_data.getRow_id();
 				final OEDataRow row_values = row_data.getRow_data();
 				/* handling vote control */
-				final TextView txvVote = (TextView) row_view
+				final OETextView txvVote = (OETextView) row_view
 						.findViewById(R.id.txvmessageVotenb);
 				final int vote_nb = row_values.getInt("vote_nb");
 				if (vote_nb == 0) {
@@ -219,12 +219,12 @@ public class MessageDetail extends BaseFragment {
 								.inflate(
 										R.layout.fragment_message_detail_attachment_grid_item,
 										null, true);
-						TextView txvAttachmentName = (TextView) v
+						OETextView txvAttachmentName = (OETextView) v
 								.findViewById(R.id.txvFileName);
 
 						txvAttachmentName.setText(row.getRow_data().get("name")
 								.toString());
-						TextView txvAttachmentSize = (TextView) v
+						OETextView txvAttachmentSize = (OETextView) v
 								.findViewById(R.id.txvFileSize);
 						long fileSize = Long.parseLong(row.getRow_data()
 								.get("file_size").toString());
@@ -233,7 +233,7 @@ public class MessageDetail extends BaseFragment {
 						txvAttachmentSize.setText((file_size.equals("0")) ? " "
 								: file_size);
 
-						TextView txvAttachmentId = (TextView) v
+						OETextView txvAttachmentId = (OETextView) v
 								.findViewById(R.id.txvAttachmentId);
 						txvAttachmentId.setText(String.valueOf(row.getRow_id()));
 						((ViewGroup) insertPoint).addView(v, index,
@@ -244,7 +244,7 @@ public class MessageDetail extends BaseFragment {
 
 							@Override
 							public void onClick(View v) {
-								int attachment_id = Integer.parseInt(((TextView) v
+								int attachment_id = Integer.parseInt(((OETextView) v
 										.findViewById(R.id.txvAttachmentId))
 										.getText().toString());
 								OEBinaryDownloadHelper binaryDownload = new OEBinaryDownloadHelper();
@@ -356,7 +356,7 @@ public class MessageDetail extends BaseFragment {
 					if (sub.equals("false")) {
 						sub = rowObj.getRow_data().getString("type");
 					}
-					TextView txvTitle = (TextView) rootView
+					OETextView txvTitle = (OETextView) rootView
 							.findViewById(R.id.txvMessageTitle);
 					txvTitle.setText(sub);
 					if (row_detail.getString("model").equals("mail.group")) {
@@ -399,7 +399,7 @@ public class MessageDetail extends BaseFragment {
 		if (records.size() > 0) {
 			for (OEDataRow row : records) {
 				if (row.getString("name").equals(
-						OEUser.current(scope.context()).getPartner_id())) {
+						OEUser.current(getActivity()).getPartner_id())) {
 					names.add("me");
 				} else {
 					names.add(row.get("name").toString());

@@ -105,7 +105,7 @@ public class TagsView extends MultiTagsTextView implements
 		LayoutInflater l = (LayoutInflater) getContext().getSystemService(
 				Activity.LAYOUT_INFLATER_SERVICE);
 		if (mCustomTagView == null) {
-			view = l.inflate(R.layout.message_receipient_tag_layout,
+			view = l.inflate(R.layout.fragment_message_receipient_tag_layout,
 					tagsParentView, false);
 			((TextView) view.findViewById(R.id.txvTagSubject)).setText(item
 					.getSubject());

@@ -24,7 +24,7 @@
             android:layout_height="5dp"
             android:background="#ffffff" />
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvMessageTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
