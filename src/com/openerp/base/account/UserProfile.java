@@ -36,7 +36,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.R;
@@ -46,12 +45,13 @@ import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
 import com.openerp.util.Base64Helper;
+import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 
 public class UserProfile extends BaseFragment {
 	View rootView = null;
 	EditText password = null;
-	TextView txvUserLoginName, txvUsername, txvServerUrl, txvTimeZone,
+	OETextView txvUserLoginName, txvUsername, txvServerUrl, txvTimeZone,
 			txvDatabase;
 	ImageView imgUserPic;
 	AlertDialog.Builder builder = null;
@@ -76,20 +76,20 @@ public class UserProfile extends BaseFragment {
 		imgUserPic = (ImageView) rootView.findViewById(R.id.imgUserProfilePic);
 		imgUserPic.setImageBitmap(Base64Helper.getBitmapImage(scope.context(),
 				scope.User().getAvatar()));
-		txvUserLoginName = (TextView) rootView
+		txvUserLoginName = (OETextView) rootView
 				.findViewById(R.id.txvUserLoginName);
 		txvUserLoginName.setText(scope.User().getAndroidName());
 
-		txvUsername = (TextView) rootView.findViewById(R.id.txvUserName);
+		txvUsername = (OETextView) rootView.findViewById(R.id.txvUserName);
 		txvUsername.setText(scope.User().getUsername());
 
-		txvServerUrl = (TextView) rootView.findViewById(R.id.txvServerUrl);
+		txvServerUrl = (OETextView) rootView.findViewById(R.id.txvServerUrl);
 		txvServerUrl.setText(scope.User().getHost());
 
-		txvDatabase = (TextView) rootView.findViewById(R.id.txvDatabase);
+		txvDatabase = (OETextView) rootView.findViewById(R.id.txvDatabase);
 		txvDatabase.setText(scope.User().getDatabase());
 
-		txvTimeZone = (TextView) rootView.findViewById(R.id.txvTimeZone);
+		txvTimeZone = (OETextView) rootView.findViewById(R.id.txvTimeZone);
 		String timezone = scope.User().getTimezone();
 		txvTimeZone.setText((timezone.equals("false")) ? "GMT" : timezone);
 

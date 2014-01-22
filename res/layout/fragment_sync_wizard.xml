@@ -25,7 +25,7 @@
                 android:src="@drawable/openerp_logo" />
         </RelativeLayout>
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             android:text="@string/syncwizard_title"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvsubTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

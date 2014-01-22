@@ -4,7 +4,7 @@
     android:background="#ffffff"
     android:orientation="vertical" >
 
-    <TextView
+    <com.openerp.util.controls.OETextView
         android:id="@+id/txvDrawerItemTitle"
         style="?android:attr/textAppearanceSmall"
         android:layout_width="match_parent"

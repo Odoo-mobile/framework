@@ -25,7 +25,7 @@
                 android:src="@drawable/openerp_logo" />
         </RelativeLayout>
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             android:text="@string/login_title"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvsubTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
                 android:layout_marginBottom="20dp"
                 android:prompt="@string/login_select_database" />
 
-            <EditText
+            <com.openerp.util.controls.OEEditText
                 android:id="@+id/edtUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                 android:inputType="textUri"
                 android:singleLine="true" />
 
-            <EditText
+            <com.openerp.util.controls.OEEditText
                 android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

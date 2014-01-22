@@ -4,30 +4,30 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.TextView;
+import android.widget.CheckBox;
 
-public class OETextView extends TextView {
+public class OECheckBox extends CheckBox {
 	Context mContext = null;
 
-	public OETextView(Context context) {
+	public OECheckBox(Context context) {
 		super(context);
 		mContext = context;
 		setTypeFace("light");
 	}
 
-	public OETextView(Context context, AttributeSet attrs) {
+	public OECheckBox(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		mContext = context;
 		setTypeFace(getTextStyle(attrs));
 	}
 
-	public OETextView(Context context, AttributeSet attrs, int defStyle) {
+	public OECheckBox(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		mContext = context;
 		setTypeFace(getTextStyle(attrs));
 	}
 
-	public void setTypeFace(String textStyle) {
+	private void setTypeFace(String textStyle) {
 
 		Typeface typeFace = null;
 		if (textStyle.equals("light")) {

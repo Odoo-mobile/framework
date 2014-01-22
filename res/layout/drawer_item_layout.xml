@@ -25,7 +25,7 @@
         android:background="#ffffff"
         android:visibility="gone" />
 
-    <TextView
+    <com.openerp.util.controls.OETextView
         android:id="@+id/txvDrawerItemTitle"
         style="?android:attr/textAppearanceMedium"
         android:layout_width="0dp"
@@ -35,7 +35,7 @@
         android:padding="10dp"
         android:textColor="@color/drawer_textview_color_selector" />
 
-    <TextView
+    <com.openerp.util.controls.OETextView
         android:id="@+id/txvDrawerItemCounter"
         style="?android:attr/textAppearanceSmall"
         android:layout_width="50dp"

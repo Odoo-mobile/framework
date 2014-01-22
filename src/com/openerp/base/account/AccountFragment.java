@@ -34,7 +34,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.openerp.R;
@@ -43,6 +42,7 @@ import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OpenERPServerConnection;
+import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
@@ -63,7 +63,7 @@ public class AccountFragment extends BaseFragment {
 	String openERPServerURL = "";
 
 	/** The edt server url. */
-	EditText edtServerUrl = null;
+	OEEditText edtServerUrl = null;
 
 	/** The server connect a sync. */
 	ConnectToServer serverConnectASync = null;
@@ -96,7 +96,7 @@ public class AccountFragment extends BaseFragment {
 		getActivity().setTitle("Setup Account");
 		chkSecureConnection = (CheckBox) rootView
 				.findViewById(R.id.chkIsSecureConnection);
-		final EditText edtUrl = (EditText) rootView
+		final OEEditText edtUrl = (OEEditText) rootView
 				.findViewById(R.id.edtServerURL);
 		chkSecureConnection.setOnClickListener(new OnClickListener() {
 			@Override
@@ -153,7 +153,8 @@ public class AccountFragment extends BaseFragment {
 		switch (item.getItemId()) {
 		case R.id.menu_account_next:
 			StringBuffer serverURL = new StringBuffer();
-			edtServerUrl = (EditText) rootView.findViewById(R.id.edtServerURL);
+			edtServerUrl = (OEEditText) rootView
+					.findViewById(R.id.edtServerURL);
 			edtServerUrl.setError(null);
 			if (TextUtils.isEmpty(edtServerUrl.getText())) {
 				edtServerUrl.setError("Provide Server URL");
