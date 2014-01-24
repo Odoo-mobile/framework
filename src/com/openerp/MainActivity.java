@@ -91,7 +91,7 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private CharSequence mTitle;
-	private PullToRefreshAttacher mPullToRefreshAttacher;
+	private OETouchListener mTouchAttacher;
 	private OnBackButtonPressedListener backPressed = null;
 	private Boot boot = null;
 
@@ -108,7 +108,7 @@ public class MainActivity extends FragmentActivity implements
 			if (savedInstanceState != null) {
 				mDrawerItemSelectedPosition = savedInstanceState
 						.getInt("current_drawer_item");
-				mPullToRefreshAttacher = new PullToRefreshAttacher(this);
+				mTouchAttacher = new OETouchListener(this);
 				initDrawer(boot.getDrawerItems());
 				return;
 			}
@@ -142,7 +142,7 @@ public class MainActivity extends FragmentActivity implements
 					// The attacher should always be created in the Activity's
 					// onCreate
 					initDrawer(boot.getDrawerItems());
-					mPullToRefreshAttacher = new PullToRefreshAttacher(this);
+					mTouchAttacher = new OETouchListener(this);
 					if (savedInstanceState != null) {
 						return;
 					}
@@ -401,8 +401,8 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	// PullToRefresh
-	public PullToRefreshAttacher getPullToRefreshAttacher() {
-		return mPullToRefreshAttacher;
+	public OETouchListener getTouchAttacher() {
+		return mTouchAttacher;
 	}
 
 	/**
