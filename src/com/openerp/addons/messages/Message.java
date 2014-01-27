@@ -52,7 +52,6 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.OETouchListener;
@@ -72,6 +71,7 @@ import com.openerp.support.listview.BooleanColumnCallback;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRow;
+import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 
 public class Message extends BaseFragment implements
@@ -191,7 +191,7 @@ public class Message extends BaseFragment implements
 
 		// Creating instance for listAdapter
 		listAdapter = new OEListViewAdapter(scope.context(),
-				R.layout.message_listview_items, list, from, to, db, true,
+				R.layout.fragment_message_listview_items, list, from, to, db, true,
 				new int[] { R.drawable.message_listview_bg_toread_selector,
 						R.drawable.message_listview_bg_tonotread_selector },
 				"to_read");
@@ -223,7 +223,7 @@ public class Message extends BaseFragment implements
 							unique_parts.toArray()));
 
 				}
-				TextView msgTag = (TextView) row_view
+				OETextView msgTag = (OETextView) row_view
 						.findViewById(R.id.txvMessageTag);
 				int tag_color = 0;
 				if (message_model_colors.containsKey(model_name)) {
@@ -246,21 +246,16 @@ public class Message extends BaseFragment implements
 				}
 				msgTag.setBackgroundColor(tag_color);
 				msgTag.setText(model_name);
-				TextView txvSubject = (TextView) row_view
+				OETextView txvSubject = (OETextView) row_view
 						.findViewById(R.id.txvMessageSubject);
-				TextView txvAuthor = (TextView) row_view
+				OETextView txvAuthor = (OETextView) row_view
 						.findViewById(R.id.txvMessageFrom);
 				if (row_data.getRow_data().get("to_read").toString()
 						.equals("false")) {
-					txvSubject.setTypeface(null, Typeface.NORMAL);
 					txvSubject.setTextColor(Color.BLACK);
-
-					txvAuthor.setTypeface(null, Typeface.NORMAL);
 					txvAuthor.setTextColor(Color.BLACK);
 				} else {
-					txvSubject.setTypeface(null, Typeface.BOLD);
 					txvSubject.setTextColor(Color.parseColor("#414141"));
-					txvAuthor.setTypeface(null, Typeface.BOLD);
 					txvAuthor.setTextColor(Color.parseColor("#414141"));
 				}
 
@@ -602,7 +597,7 @@ public class Message extends BaseFragment implements
 								.setVisibility(View.GONE);
 						rootView.findViewById(R.id.lstMessages).setVisibility(
 								View.GONE);
-						TextView txvMsg = (TextView) rootView
+						OETextView txvMsg = (OETextView) rootView
 								.findViewById(R.id.txvMessageAllReadMessage);
 						txvMsg.setVisibility(View.VISIBLE);
 						txvMsg.setText(message_resource);

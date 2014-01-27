@@ -33,6 +33,7 @@ import android.content.SharedPreferences;
 import android.content.SyncAdapterType;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -61,6 +62,7 @@ import com.openerp.support.FragmentHandler;
 import com.openerp.support.OEUser;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.OnBackButtonPressedListener;
+import com.openerp.util.actionbar.ActionbarHandler;
 import com.openerp.util.drawer.DrawerAdatper;
 import com.openerp.util.drawer.DrawerItem;
 
@@ -618,6 +620,12 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onStart() {
 		super.onStart();
+
+		ActionbarHandler actionbarHandler = new ActionbarHandler(this,
+				getActionBar());
+		actionbarHandler.applyCustomFonts(Typeface.createFromAsset(
+				getResources().getAssets(), "fonts/RobotoSlab-Regular.ttf"));
+
 		mDrawerListView.setOnItemClickListener(this);
 		int position = -1;
 		if (mDrawerListItems.size() > 0) {

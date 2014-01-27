@@ -35,7 +35,6 @@ import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
@@ -45,6 +44,7 @@ import com.openerp.support.OpenERPServerConnection;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.OEDate;
+import com.openerp.util.controls.OETextView;
 
 /**
  * The Class OEListViewAdapter.
@@ -254,17 +254,17 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRow> {
 							data));
 				}
 			} else {
-				TextView txvObj = null;
+				OETextView txvObj = null;
 				WebView webview = null;
 				if (!webViewControls.containsKey(this.from[i])) {
-					txvObj = (TextView) viewRow.findViewById(this.to[i]);
+					txvObj = (OETextView) viewRow.findViewById(this.to[i]);
 				} else {
 					if (webViewControls.get(this.from[i])) {
 						webview = (WebView) viewRow.findViewById(this.to[i]);
 						webview.getSettings().setJavaScriptEnabled(true);
 						webview.getSettings().setBuiltInZoomControls(true);
 					} else {
-						txvObj = (TextView) viewRow.findViewById(this.to[i]);
+						txvObj = (OETextView) viewRow.findViewById(this.to[i]);
 					}
 				}
 

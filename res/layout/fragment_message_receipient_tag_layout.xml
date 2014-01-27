@@ -15,7 +15,7 @@
         android:background="#e3e3e3"
         android:orientation="horizontal" >
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvTagSubject"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -35,4 +35,5 @@
             android:background="#cccccc"
             android:src="@drawable/ic_action_user" />
     </LinearLayout>
+
 </LinearLayout>

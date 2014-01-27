@@ -27,7 +27,7 @@
                 android:contentDescription="@string/imgcontentDescription"
                 android:src="@drawable/openerp_logo" />
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/txvVersionName"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -47,18 +47,17 @@
             android:background="@drawable/aboutus_background"
             android:padding="20dp" >
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/line1"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/abtus_imgLogo"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line1"
                 android:textColor="@android:color/white" />
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/line2"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -69,7 +68,7 @@
                 android:text="@string/about_Company_line2"
                 android:textColor="@android:color/white" />
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/line3"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -80,7 +79,7 @@
                 android:text="@string/about_Company_line3"
                 android:textColor="@android:color/white" />
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/line4"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

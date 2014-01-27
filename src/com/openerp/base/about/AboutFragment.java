@@ -27,20 +27,18 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.openerp.R;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
+import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 
 public class AboutFragment extends BaseFragment {
 
 	View rootView = null;
-	TextView versionName = null;
-	TextView aboutLine2 = null;
-	TextView aboutLine3 = null;
-	TextView aboutLine4 = null;
+	OETextView versionName = null, aboutLine2 = null, aboutLine3 = null,
+			aboutLine4 = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,7 +49,7 @@ public class AboutFragment extends BaseFragment {
 
 		rootView = inflater.inflate(R.layout.fragment_about_company, container,
 				false);
-		versionName = (TextView) rootView.findViewById(R.id.txvVersionName);
+		versionName = (OETextView) rootView.findViewById(R.id.txvVersionName);
 
 		try {
 			// setting version name from manifest file
@@ -60,15 +58,15 @@ public class AboutFragment extends BaseFragment {
 			versionName.setText("Version " + version);
 
 			// setting link in textview
-			aboutLine2 = (TextView) rootView.findViewById(R.id.line2);
+			aboutLine2 = (OETextView) rootView.findViewById(R.id.line2);
 			if (aboutLine2 != null) {
 				aboutLine2.setMovementMethod(LinkMovementMethod.getInstance());
 			}
-			aboutLine3 = (TextView) rootView.findViewById(R.id.line3);
+			aboutLine3 = (OETextView) rootView.findViewById(R.id.line3);
 			if (aboutLine3 != null) {
 				aboutLine3.setMovementMethod(LinkMovementMethod.getInstance());
 			}
-			aboutLine4 = (TextView) rootView.findViewById(R.id.line4);
+			aboutLine4 = (OETextView) rootView.findViewById(R.id.line4);
 			if (aboutLine4 != null) {
 				aboutLine4.setMovementMethod(LinkMovementMethod.getInstance());
 			}

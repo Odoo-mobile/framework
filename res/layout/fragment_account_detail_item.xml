@@ -20,7 +20,7 @@
         android:orientation="vertical"
         android:paddingLeft="10dp" >
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvAccountName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
             android:text="Dummy Name"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvAccountHost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
             android:gravity="right"
             android:orientation="horizontal" >
 
-            <Button
+            <com.openerp.util.controls.OEButton
                 android:id="@+id/btnDelete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#ffffff" />
 
-            <Button
+            <com.openerp.util.controls.OEButton
                 android:id="@+id/btnLogout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#ffffff" />
 
-            <Button
+            <com.openerp.util.controls.OEButton
                 android:id="@+id/btnLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

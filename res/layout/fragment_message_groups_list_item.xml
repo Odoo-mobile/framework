@@ -27,7 +27,7 @@
             android:orientation="vertical"
             android:padding="5dp" >
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/txvGroupName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#414141" />
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/txvGroupDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
