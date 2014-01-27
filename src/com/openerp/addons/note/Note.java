@@ -48,7 +48,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
-import com.openerp.PullToRefreshAttacher;
+import com.openerp.OESwipeListener.DismissCallbacks;
+import com.openerp.OETouchListener;
 import com.openerp.R;
 import com.openerp.addons.note.NoteDBHelper.NoteFollowers;
 import com.openerp.auth.OpenERPAccountManager;
@@ -67,15 +68,16 @@ import com.openerp.util.HTMLHelper;
 import com.openerp.util.controls.OEEditText;
 import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
+import com.openerp.util.logger.OELog;
 import com.openerp.util.tags.TagsItem;
 import com.openerp.widget.Mobile_Widget;
 
 public class Note extends BaseFragment implements
-		PullToRefreshAttacher.OnRefreshListener {
+		OETouchListener.OnPullListener, DismissCallbacks {
 
 	public static String TAG = "com.openerp.addons.Note";
 	public FragmentHandler fragmentHandler;
-	private PullToRefreshAttacher mPullAttacher;
+	private OETouchListener mPullAttacher;
 	View rootView = null;
 	OETextView emptyNotesText;
 	GridView notesGrid = null;
@@ -83,7 +85,6 @@ public class Note extends BaseFragment implements
 	List<OEListViewRow> listRows = null;
 	NoteDBHelper db = null;
 	JSONObject res = null;
-	SwipeDismissListViewTouchListener touchListener = null;
 	static HashMap<String, Integer> stage_colors = new HashMap<String, Integer>();
 	LinkedHashMap<String, String> stages = null;
 	private static final int NOTE_ID = 0;
@@ -141,10 +142,6 @@ public class Note extends BaseFragment implements
 						new String[] { new_id + "" }).get(0);
 				OEListViewRow listRow = new OEListViewRow(new_id, newRow);
 				listRows.add(listRow);
-				notesGrid.setOnTouchListener(touchListener);
-				notesGrid.setOnScrollListener(touchListener
-						.makeScrollListener());
-
 				// checking if list view is empty ? if not then
 				// Hiding text message of empty list view
 				emptyNotesText.setVisibility(View.GONE);
@@ -265,14 +262,9 @@ public class Note extends BaseFragment implements
 		rootView = null; // now cleaning up!
 	}
 
-	@Override
-	public void onRefreshStarted(View view) {
-		scope.main().requestSync(NoteProvider.AUTHORITY);
-	}
-
-	// PullToRefresh
-	// Allow Activity to pass us it's PullToRefreshAttacher
-	void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
+	// Pull To sync
+	// Allow Activity to pass us it's OETouchListener
+	void setPullToRefreshAttacher(OETouchListener attacher) {
 		mPullAttacher = attacher;
 	}
 
@@ -300,7 +292,7 @@ public class Note extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 
 			// Hiding the NoteSyncWaiter view
-			mPullAttacher.setRefreshComplete();
+			mPullAttacher.setPullComplete();
 			// Refreshing Menulist [counter] after synchronisation complete
 			scope.main().refreshDrawer(TAG, context);
 			setupListView(stage_id);
@@ -402,59 +394,10 @@ public class Note extends BaseFragment implements
 		});
 
 		// important to write
-		mPullAttacher = scope.main().getPullToRefreshAttacher();
-		mPullAttacher.setRefreshableView(notesGrid, this);
-
-		// Setting touch listner for swapping the list rows.
-		touchListener = new SwipeDismissListViewTouchListener(notesGrid,
-				new SwipeDismissListViewTouchListener.DismissCallbacks() {
-					@Override
-					public boolean canDismiss(int position) {
-						return true;
-					}
-
-					@Override
-					public void onDismiss(GridView listView,
-							int[] reverseSortedPositions) {
-						for (int position : reverseSortedPositions) {
-							int rowId = listRows.get(position).getRow_id();
-							String raw_status = listRows.get(position)
-									.getRow_data().get("open").toString();
-
-							// Handling functionality to change note status
-							// open --> close OR close --> open
-							if (!rawStrikeStatus) {
-								strikeNote(rowId, raw_status, scope);
-								rawStrikeStatus = true;
-							} else {
-								strikeNote(rowId, raw_status, scope);
-								rawStrikeStatus = false;
-							}
-
-							listRows.remove(position);
-
-							// Checking whether list view is empty !
-
-							if (listAdapter.isEmpty()) {
-								// Setting text for empty archive list view
-								if (stage_id.equalsIgnoreCase("-2")) {
-									emptyNotesText
-											.setText("You don't have any archived notes right now.");
-								} // Displaying text message of empty list view
-								emptyNotesText.setVisibility(View.VISIBLE);
-							} else { // Hiding text message of empty list view
-								emptyNotesText.setVisibility(View.GONE);
-							}
-
-						}
-					}
-				});
-
-		notesGrid.setOnTouchListener(touchListener);
-		// Setting this scroll listener is required to ensure that during
-		// ListView scrolling,
-		// we don't look for swipes.
-		notesGrid.setOnScrollListener(touchListener.makeScrollListener());
+		mPullAttacher = scope.main().getTouchAttacher();
+		mPullAttacher.setPullableView(notesGrid, this);
+		mPullAttacher.setSwipeableView(notesGrid, this);
+		notesGrid.setOnScrollListener(mPullAttacher.makeScrollListener());
 
 	}
 
@@ -614,5 +557,49 @@ public class Note extends BaseFragment implements
 			}
 		}
 		return note_tags;
+	}
+
+	@Override
+	public void onPullStarted(View arg0) {
+		scope.main().requestSync(NoteProvider.AUTHORITY);
+	}
+
+	@Override
+	public boolean canDismiss(int arg0) {
+		return true;
+	}
+
+	@Override
+	public void onDismiss(View view, int[] reverseSortedPositions) {
+		for (int position : reverseSortedPositions) {
+			int rowId = listRows.get(position).getRow_id();
+			String raw_status = listRows.get(position).getRow_data()
+					.get("open").toString();
+
+			// Handling functionality to change note status
+			// open --> close OR close --> open
+			if (!rawStrikeStatus) {
+				strikeNote(rowId, raw_status, scope);
+				rawStrikeStatus = true;
+			} else {
+				strikeNote(rowId, raw_status, scope);
+				rawStrikeStatus = false;
+			}
+			listRows.remove(position);
+
+			// Checking whether list view is empty !
+
+			if (listAdapter.isEmpty()) {
+				// Setting text for empty archive list view
+				if (stage_id.equalsIgnoreCase("-2")) {
+					emptyNotesText
+							.setText("You don't have any archived notes right now.");
+				} // Displaying text message of empty list view
+				emptyNotesText.setVisibility(View.VISIBLE);
+			} else { // Hiding text message of empty list view
+				emptyNotesText.setVisibility(View.GONE);
+			}
+			listAdapter.refresh(listRows);
+		}
 	}
 }

@@ -54,7 +54,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.openerp.PullToRefreshAttacher;
+import com.openerp.OETouchListener;
 import com.openerp.R;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
@@ -75,13 +75,13 @@ import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 
 public class Message extends BaseFragment implements
-		PullToRefreshAttacher.OnRefreshListener {
+		OETouchListener.OnPullListener {
 	public static String TAG = "com.openerp.addons.Message";
 	PerformOperation markasTodoTask = null;
 	String type = "inbox";
 	PerformReadUnreadArchiveOperation readunreadoperation = null;
 	ActionMode mActionMode;
-	private PullToRefreshAttacher mPullToRefreshAttacher;
+	private OETouchListener mTouchAttacher;
 	ListView lstview = null;
 	List<OEListViewRow> list = new ArrayList<OEListViewRow>();
 	OEListViewAdapter listAdapter = null;
@@ -441,12 +441,12 @@ public class Message extends BaseFragment implements
 		});
 
 		// Getting Pull To Refresh Attacher from Main Activity
-		mPullToRefreshAttacher = scope.main().getPullToRefreshAttacher();
+		mTouchAttacher = scope.main().getTouchAttacher();
 
 		// Set the Refreshable View to be the ListView and the refresh listener
 		// to be this.
-		if (mPullToRefreshAttacher != null & lstview != null) {
-			mPullToRefreshAttacher.setRefreshableView(lstview, this);
+		if (mTouchAttacher != null & lstview != null) {
+			mTouchAttacher.setPullableView(lstview, this);
 		}
 	}
 
@@ -877,7 +877,7 @@ public class Message extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 			// Extract data included in the Intent
 			try {
-				mPullToRefreshAttacher.setRefreshComplete();
+				mTouchAttacher.setPullComplete();
 				String data_new = intent.getExtras().get("data_new").toString();
 				String data_update = intent.getExtras()
 						.getString("data_update");
@@ -899,7 +899,7 @@ public class Message extends BaseFragment implements
 			} catch (Exception e) {
 			}
 			scope.main().refreshDrawer(TAG, getActivity());
-			if (mPullToRefreshAttacher == null && listAdapter != null) {
+			if (mTouchAttacher == null && listAdapter != null) {
 				listAdapter.clear();
 				list.clear();
 				listAdapter.refresh(list);
@@ -914,35 +914,10 @@ public class Message extends BaseFragment implements
 		}
 	};
 
-	@Override
-	public void onRefreshStarted(View view) {
-		try {
-			if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
-				Log.d("MessageFragment", "requesting for sync");
-				if (group_id != null) {
-					Bundle group_bundle = new Bundle();
-					JSONArray ids = new JSONArray();
-					ids.put(group_id);
-					group_bundle.putString("group_ids", ids.toString());
-					scope.main().requestSync(MessageProvider.AUTHORITY,
-							group_bundle);
-				} else {
-					scope.main().requestSync(MessageProvider.AUTHORITY);
-				}
-			} else {
-				Toast.makeText(getActivity(), "Unable to connect server !",
-						Toast.LENGTH_LONG).show();
-				mPullToRefreshAttacher.setRefreshComplete();
-			}
-		} catch (Exception e) {
-
-		}
-	}
-
-	// PullToRefresh
-	// Allow Activity to pass us it's PullToRefreshAttacher
-	void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
-		mPullToRefreshAttacher = attacher;
+	// Pull listview
+	// Allow Activity to pass us it's OETouchListener
+	void setTouchAttacher(OETouchListener attacher) {
+		mTouchAttacher = attacher;
 	}
 
 	// Callback when user press on starred button from listview row
@@ -1256,4 +1231,28 @@ public class Message extends BaseFragment implements
 		rootView = null; // now cleaning up!
 	}
 
+	@Override
+	public void onPullStarted(View arg0) {
+		try {
+			if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
+				Log.d("MessageFragment", "requesting for sync");
+				if (group_id != null) {
+					Bundle group_bundle = new Bundle();
+					JSONArray ids = new JSONArray();
+					ids.put(group_id);
+					group_bundle.putString("group_ids", ids.toString());
+					scope.main().requestSync(MessageProvider.AUTHORITY,
+							group_bundle);
+				} else {
+					scope.main().requestSync(MessageProvider.AUTHORITY);
+				}
+			} else {
+				Toast.makeText(getActivity(), "Unable to connect server !",
+						Toast.LENGTH_LONG).show();
+				mTouchAttacher.setPullComplete();
+			}
+		} catch (Exception e) {
+
+		}
+	}
 }

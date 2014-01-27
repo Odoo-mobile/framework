@@ -42,7 +42,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.openerp.PullToRefreshAttacher;
+import com.openerp.OETouchListener;
 import com.openerp.R;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEDataRow;
@@ -59,9 +59,9 @@ import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.drawer.DrawerItem;
 
 public class UserGroups extends BaseFragment implements
-		PullToRefreshAttacher.OnRefreshListener {
+		OETouchListener.OnPullListener {
 	public static final String TAG = "com.openerp.addons.UserGroups";
-	private PullToRefreshAttacher mPullToRefreshAttacher;
+	private OETouchListener mTouchAttacher;
 	View rootView = null;
 	GridView lstGroups = null;
 	String tag_colors[] = new String[] { "#218559", "#192823", "#FF8800",
@@ -166,12 +166,12 @@ public class UserGroups extends BaseFragment implements
 		});
 
 		// Getting Pull To Refresh Attacher from Main Activity
-		mPullToRefreshAttacher = scope.main().getPullToRefreshAttacher();
+		mTouchAttacher = scope.main().getTouchAttacher();
 
 		// Set the Refreshable View to be the ListView and the refresh listener
 		// to be this.
-		if (mPullToRefreshAttacher != null & lstGroups != null) {
-			mPullToRefreshAttacher.setRefreshableView(lstGroups, this);
+		if (mTouchAttacher != null & lstGroups != null) {
+			mTouchAttacher.setPullableView(lstGroups, this);
 		}
 		return true;
 
@@ -296,37 +296,22 @@ public class UserGroups extends BaseFragment implements
 				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
 	}
 
-	// PullToRefresh
-	// Allow Activity to pass us it's PullToRefreshAttacher
-	void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
-		mPullToRefreshAttacher = attacher;
+	// sync Pull
+	// Allow Activity to pass us it's OETouchListener
+	void setTouchAttacher(OETouchListener attacher) {
+		mTouchAttacher = attacher;
 	}
 
 	private SyncFinishReceiver syncFinishReceiver = new SyncFinishReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			mPullToRefreshAttacher.setRefreshComplete();
+			mTouchAttacher.setPullComplete();
 			setupView();
 			scope.main().refreshDrawer(TAG, context);
 		}
 
 	};
-
-	@Override
-	public void onRefreshStarted(View arg0) {
-		try {
-			if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
-				Log.i("UserGroupsFragment", "requesting for sync");
-				scope.main().requestSync(UserGroupsProvider.AUTHORITY);
-			} else {
-				Toast.makeText(getActivity(), "Unable to connect server !",
-						Toast.LENGTH_LONG).show();
-				mPullToRefreshAttacher.setRefreshComplete();
-			}
-		} catch (Exception e) {
-		}
-	}
 
 	public class JoinUnfollowGroup extends AsyncTask<Void, Void, Boolean> {
 		int group_id = 0;
@@ -450,5 +435,20 @@ public class UserGroups extends BaseFragment implements
 			});
 		}
 
+	}
+
+	@Override
+	public void onPullStarted(View arg0) {
+		try {
+			if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
+				Log.i("UserGroupsFragment", "requesting for sync");
+				scope.main().requestSync(UserGroupsProvider.AUTHORITY);
+			} else {
+				Toast.makeText(getActivity(), "Unable to connect server !",
+						Toast.LENGTH_LONG).show();
+				mTouchAttacher.setPullComplete();
+			}
+		} catch (Exception e) {
+		}
 	}
 }

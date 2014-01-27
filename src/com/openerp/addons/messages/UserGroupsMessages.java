@@ -28,7 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.openerp.PullToRefreshAttacher;
+import com.openerp.OETouchListener;
 import com.openerp.R;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.support.AppScope;
@@ -36,13 +36,13 @@ import com.openerp.support.BaseFragment;
 import com.openerp.util.drawer.DrawerItem;
 
 public class UserGroupsMessages extends BaseFragment implements
-		PullToRefreshAttacher.OnRefreshListener {
+		OETouchListener.OnPullListener {
 	View rootView = null;
 	ListView lstview = null;
 	String[] from = new String[] { "id", "subject", "body", "record_name",
 			"type", "to_read", "starred", "author_id" };
 	HashMap<String, Object> message_row_indexes = new HashMap<String, Object>();
-	private PullToRefreshAttacher mPullToRefreshAttacher;
+	private OETouchListener mTouchAttacher;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,12 +60,12 @@ public class UserGroupsMessages extends BaseFragment implements
 		lstview = (ListView) rootView.findViewById(R.id.lstMessages);
 
 		// Getting Pull To Refresh Attacher from Main Activity
-		mPullToRefreshAttacher = scope.main().getPullToRefreshAttacher();
+		mTouchAttacher = scope.main().getTouchAttacher();
 
 		// Set the Refreshable View to be the ListView and the refresh listener
 		// to be this.
-		if (mPullToRefreshAttacher != null & lstview != null) {
-			mPullToRefreshAttacher.setRefreshableView(lstview, this);
+		if (mTouchAttacher != null & lstview != null) {
+			mTouchAttacher.setPullableView(lstview, this);
 		}
 	}
 
@@ -89,15 +89,15 @@ public class UserGroupsMessages extends BaseFragment implements
 		return null;
 	}
 
-	@Override
-	public void onRefreshStarted(View arg0) {
-
+	// pull to sync
+	// Allow Activity to pass us it's OETouchListener
+	void setPullToRefreshAttacher(OETouchListener attacher) {
+		mTouchAttacher = attacher;
 	}
 
-	// PullToRefresh
-	// Allow Activity to pass us it's PullToRefreshAttacher
-	void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
-		mPullToRefreshAttacher = attacher;
+	@Override
+	public void onPullStarted(View arg0) {
+
 	}
 
 }
