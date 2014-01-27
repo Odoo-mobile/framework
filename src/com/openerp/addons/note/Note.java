@@ -315,7 +315,8 @@ public class Note extends BaseFragment implements
 			listRows = getListRows(stage_id);
 		}
 		listAdapter = new OEListViewAdapter(scope.context(),
-				R.layout.fragment_note_grid_custom_layout, listRows, null, null, db) {
+				R.layout.fragment_note_grid_custom_layout, listRows, null,
+				null, db) {
 			View mView = null;
 
 			@Override
@@ -323,8 +324,9 @@ public class Note extends BaseFragment implements
 				mView = convertView;
 				if (convertView == null) {
 					LayoutInflater inflater = getActivity().getLayoutInflater();
-					mView = inflater.inflate(R.layout.fragment_note_grid_custom_layout,
-							parent, false);
+					mView = inflater.inflate(
+							R.layout.fragment_note_grid_custom_layout, parent,
+							false);
 				}
 				TextView txvTitle = (TextView) mView
 						.findViewById(R.id.txvNoteTitle);

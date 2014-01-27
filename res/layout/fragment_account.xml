@@ -25,7 +25,7 @@
                 android:src="@drawable/openerp_logo" />
         </RelativeLayout>
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             android:text="@string/account_title"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/txvsubTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
             android:layout_below="@id/txvsubTitle"
             android:padding="20dp" >
 
-            <EditText
+            <com.openerp.util.controls.OEEditText
                 android:id="@+id/edtServerURL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
                 android:inputType="textUri"
                 android:singleLine="true" />
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/txvDesc"
                 style="?android:attr/textAppearanceSmall"
                 android:layout_width="match_parent"
@@ -76,7 +76,7 @@
                 android:text="Provide your port number with URL if any."
                 android:textColor="#aaa" />
 
-            <CheckBox
+            <com.openerp.util.controls.OECheckBox
                 android:id="@+id/chkIsSecureConnection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
