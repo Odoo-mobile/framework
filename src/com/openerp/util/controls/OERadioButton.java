@@ -4,24 +4,24 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.TextView;
+import android.widget.RadioButton;
 
-public class OETextView extends TextView {
+public class OERadioButton extends RadioButton {
 	Context mContext = null;
 
-	public OETextView(Context context) {
+	public OERadioButton(Context context) {
 		super(context);
 		mContext = context;
 		setTypeFace("light");
 	}
 
-	public OETextView(Context context, AttributeSet attrs) {
+	public OERadioButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		mContext = context;
 		setTypeFace(getTextStyle(attrs));
 	}
 
-	public OETextView(Context context, AttributeSet attrs, int defStyle) {
+	public OERadioButton(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		mContext = context;
 		setTypeFace(getTextStyle(attrs));

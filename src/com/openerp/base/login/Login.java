@@ -33,7 +33,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -45,6 +44,7 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OEUser;
+import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
@@ -65,7 +65,7 @@ public class Login extends BaseFragment {
 	String openERPServerURL = "";
 
 	/** The edt server url. */
-	EditText edtServerUrl = null;
+	OEEditText edtServerUrl = null;
 
 	/** The arguments. */
 	Bundle arguments = null;
@@ -80,10 +80,10 @@ public class Login extends BaseFragment {
 	LoginUser loginUserASync = null;
 
 	/** The edt username. */
-	EditText edtUsername = null;
+	OEEditText edtUsername = null;
 
 	/** The edt password. */
-	EditText edtPassword = null;
+	OEEditText edtPassword = null;
 
 	/** The OpenERP Object */
 	OEHelper openerp = null;
@@ -138,9 +138,8 @@ public class Login extends BaseFragment {
 			dbList.add(0,
 					getActivity().getString(R.string.login_select_database));
 			ArrayAdapter<String> dbAdapter = new ArrayAdapter<String>(
-					getActivity(), android.R.layout.simple_spinner_item, dbList);
-			dbAdapter
-					.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+					getActivity(), R.layout.spinner_custom_layout, dbList);
+			dbAdapter.setDropDownViewResource(R.layout.spinner_custom_layout);
 			dbListSpinner.setAdapter(dbAdapter);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -186,8 +185,8 @@ public class Login extends BaseFragment {
 		switch (item.getItemId()) {
 		case R.id.menu_login_account:
 			Log.d("LoginFragment()->ActionBarMenuClicked", "menu_login_account");
-			edtUsername = (EditText) rootView.findViewById(R.id.edtUsername);
-			edtPassword = (EditText) rootView.findViewById(R.id.edtPassword);
+			edtUsername = (OEEditText) rootView.findViewById(R.id.edtUsername);
+			edtPassword = (OEEditText) rootView.findViewById(R.id.edtPassword);
 			edtUsername.setError(null);
 			edtPassword.setError(null);
 			if (TextUtils.isEmpty(edtUsername.getText())) {
