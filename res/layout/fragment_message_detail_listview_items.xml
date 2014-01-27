@@ -44,7 +44,7 @@
                     android:gravity="left|top"
                     android:orientation="vertical" >
 
-                    <TextView
+                    <com.openerp.util.controls.OETextView
                         android:id="@+id/txvMessageAuthor"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
                         android:textColor="#414141"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <com.openerp.util.controls.OETextView
                         android:id="@+id/txvAuthorEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -115,7 +115,7 @@
                     android:background="#ffffff"
                     android:orientation="horizontal" >
 
-                    <TextView
+                    <com.openerp.util.controls.OETextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:singleLine="true"
@@ -123,7 +123,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="#414141" />
 
-                    <TextView
+                    <com.openerp.util.controls.OETextView
                         android:id="@+id/txvTo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -133,7 +133,7 @@
                         android:textColor="#414141" />
                 </LinearLayout>
 
-                <TextView
+                <com.openerp.util.controls.OETextView
                     android:id="@+id/txvTime"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -154,7 +154,7 @@
                 android:orientation="horizontal"
                 android:paddingRight="5dp" >
 
-                <TextView
+                <com.openerp.util.controls.OETextView
                     android:id="@+id/txvmessageVotenb"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
@@ -199,7 +199,7 @@
             android:orientation="vertical"
             android:padding="8dp" >
 
-            <TextView
+            <com.openerp.util.controls.OETextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="left"

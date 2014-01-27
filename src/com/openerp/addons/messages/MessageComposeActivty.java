@@ -160,7 +160,7 @@ public class MessageComposeActivty extends Activity implements
 		String[] from = new String[] { "name" };
 		int[] to = new int[] { R.id.txvFileName };
 		lstAttachmentAdapter = new OEListViewAdapter(MainActivity.context,
-				R.layout.message_attachment_listview_item, attachments, from,
+				R.layout.fragment_message_attachment_listview_item, attachments, from,
 				to, new Ir_AttachmentDBHelper(MainActivity.context));
 		lstAttachments.setAdapter(lstAttachmentAdapter);
 		lstAttachmentAdapter.setItemClickListener(R.id.imgBtnRemoveAttachment,

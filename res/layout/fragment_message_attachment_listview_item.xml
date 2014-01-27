@@ -7,7 +7,7 @@
     android:padding="5dp"
     android:weightSum="3" >
 
-    <TextView
+    <com.openerp.util.controls.OETextView
         android:id="@+id/txvFileName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
