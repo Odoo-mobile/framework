@@ -48,7 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
-import com.openerp.OESwipeListener.DismissCallbacks;
+import com.openerp.OESwipeListener.SwipeCallbacks;
 import com.openerp.OETouchListener;
 import com.openerp.R;
 import com.openerp.addons.note.NoteDBHelper.NoteFollowers;
@@ -68,12 +68,11 @@ import com.openerp.util.HTMLHelper;
 import com.openerp.util.controls.OEEditText;
 import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.logger.OELog;
 import com.openerp.util.tags.TagsItem;
 import com.openerp.widget.Mobile_Widget;
 
 public class Note extends BaseFragment implements
-		OETouchListener.OnPullListener, DismissCallbacks {
+		OETouchListener.OnPullListener, SwipeCallbacks {
 
 	public static String TAG = "com.openerp.addons.Note";
 	public FragmentHandler fragmentHandler;
@@ -565,12 +564,12 @@ public class Note extends BaseFragment implements
 	}
 
 	@Override
-	public boolean canDismiss(int arg0) {
+	public boolean canSwipe(int arg0) {
 		return true;
 	}
 
 	@Override
-	public void onDismiss(View view, int[] reverseSortedPositions) {
+	public void onSwipe(View view, int[] reverseSortedPositions) {
 		for (int position : reverseSortedPositions) {
 			int rowId = listRows.get(position).getRow_id();
 			String raw_status = listRows.get(position).getRow_data()
