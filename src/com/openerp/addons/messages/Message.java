@@ -23,17 +23,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -52,6 +53,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.OETouchListener;
@@ -65,29 +67,49 @@ import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEArgsHelper;
-import com.openerp.support.OEDialog;
 import com.openerp.support.OpenERPServerConnection;
-import com.openerp.support.listview.BooleanColumnCallback;
+import com.openerp.support.listview.OEListAdapter;
 import com.openerp.support.listview.OEListViewAdapter;
-import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRow;
+import com.openerp.util.HTMLHelper;
+import com.openerp.util.OEDate;
 import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 
 public class Message extends BaseFragment implements
-		OETouchListener.OnPullListener {
+		OETouchListener.OnPullListener, OnItemLongClickListener,
+		OnItemClickListener {
+
 	public static String TAG = "com.openerp.addons.Message";
-	PerformOperation markasTodoTask = null;
-	String type = "inbox";
-	PerformReadUnreadArchiveOperation readunreadoperation = null;
-	ActionMode mActionMode;
+
 	private OETouchListener mTouchAttacher;
-	ListView lstview = null;
-	List<OEListViewRow> list = new ArrayList<OEListViewRow>();
-	OEListViewAdapter listAdapter = null;
-	List<OEListViewRow> messages_sorted = null;
-	HashMap<String, Integer> message_row_indexes = new HashMap<String, Integer>();
+	ActionMode mActionMode;
 	View rootView = null;
+	SearchView searchView = null;
+
+	String type = "inbox";
+	MessagesLoader mMessageLoader = null;
+	StarredOperation mStarredOperation = null;
+	@SuppressLint("UseSparseArrays")
+	HashMap<Integer, Boolean> mMultiSelectedRows = new HashMap<Integer, Boolean>();
+	ReadUnreadOperation mReadUnreadOperation = null;
+
+	OEListAdapter mListViewAdapter = null;
+
+	ListView lstMessagesView = null;
+	OEListViewAdapter listAdapter = null;
+	List<Object> mMessageObjects = new ArrayList<Object>();
+
+	HashMap<String, Integer> message_row_indexes = new HashMap<String, Integer>();
+	HashMap<String, Integer> message_model_colors = new HashMap<String, Integer>();
+
+	int[] background_res = new int[] {
+			R.drawable.message_listview_bg_toread_selector,
+			R.drawable.message_listview_bg_tonotread_selector };
+
+	int[] starred_drawables = new int[] { R.drawable.ic_action_starred,
+			R.drawable.ic_action_unstarred };
+
 	String[] from = new String[] { "id", "subject", "body", "record_name",
 			"type", "to_read", "starred", "author_id", "res_id", "email_from",
 			"parent_id", "model", "date" };
@@ -95,19 +117,18 @@ public class Message extends BaseFragment implements
 	String tag_colors[] = new String[] { "#A4C400", "#00ABA9", "#1BA1E2",
 			"#AA00FF", "#D80073", "#A20025", "#FA6800", "#6D8764", "#76608A",
 			"#EBB035" };
-	HashMap<String, Integer> message_model_colors = new HashMap<String, Integer>();
+
 	int tag_color_count = 0;
 	boolean isSynced = false;
 
-	public enum TYPE {
+	public enum Type {
 		INBOX, TODO, TOME, ARCHIVE, GROUP
 	}
 
-	private String group_id = null;
-	SearchView searchView = null;
-	TYPE current_type = TYPE.INBOX;
+	private String mGroupId = null;
+
+	Type mType = Type.INBOX;
 	public int selectedCounter = 0;
-	LoadMessages loadMessage = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,294 +181,128 @@ public class Message extends BaseFragment implements
 		 * see method for more information about it.
 		 */
 		scope.main().setAutoSync(MessageProvider.AUTHORITY, true);
+		initView();
+
 		return rootView;
 	}
 
-	/*
-	 * setupListView()
-	 * 
-	 * Setting up listview for messages to load.
-	 */
-	public void setupListView(List<OEListViewRow> message_list) {
-		// Destroying pre-loaded instance and going to create new one
-		lstview = null;
-
-		// Fetching required messages for listview by filtering of requrement
-		if (list != null && list.size() <= 0) {
-			list = message_list;// getMessages(message_list);
-		} else {
-			rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
-					View.GONE);
-			rootView.findViewById(R.id.txvMessageAllReadMessage).setVisibility(
-					View.GONE);
-		}
-
-		// Handling List View controls and keys
-		String[] from = new String[] { "subject|type", "body", "starred",
-				"author_id|email_from", "date", "model|type" };
-		int[] to = new int[] { R.id.txvMessageSubject, R.id.txvMessageBody,
-				R.id.imgMessageStarred, R.id.txvMessageFrom,
-				R.id.txvMessageDate, R.id.txvMessageTag };
-
-		// Creating instance for listAdapter
-		listAdapter = new OEListViewAdapter(scope.context(),
-				R.layout.fragment_message_listview_items, list, from, to, db, true,
-				new int[] { R.drawable.message_listview_bg_toread_selector,
-						R.drawable.message_listview_bg_tonotread_selector },
-				"to_read");
-		// Telling adapter to clean HTML text for key value
-		listAdapter.cleanHtmlToTextOn("body");
-		listAdapter.cleanDate("date", scope.User().getTimezone());
-		// Setting callback handler for boolean field value change.
-		listAdapter.setBooleanEventOperation("starred",
-				R.drawable.ic_action_starred, R.drawable.ic_action_unstarred,
-				updateStarred);
-		listAdapter.addViewListener(new OEListViewOnCreateListener() {
-
+	private void initView() {
+		lstMessagesView = (ListView) rootView.findViewById(R.id.lstMessages);
+		lstMessagesView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		lstMessagesView.setOnItemLongClickListener(this);
+		lstMessagesView.setOnItemClickListener(this);
+		lstMessagesView
+				.setMultiChoiceModeListener(mMessageViewMultiChoiceListener);
+		mListViewAdapter = new OEListAdapter(getActivity(),
+				R.layout.fragment_message_listview_items, mMessageObjects) {
 			@Override
-			public View listViewOnCreateListener(int position, View row_view,
-					OEListViewRow row_data) {
-				String model_name = row_data.getRow_data().get("model")
-						.toString();
-				String model = model_name;
-				String res_id = row_data.getRow_data().get("res_id").toString();
-				if (model_name.equals("false")) {
-					model_name = capitalizeString(row_data.getRow_data()
-							.get("type").toString());
-				} else {
-					String[] model_parts = TextUtils.split(model_name, "\\.");
-					@SuppressWarnings({ "unchecked", "rawtypes" })
-					HashSet unique_parts = new HashSet(Arrays
-							.asList(model_parts));
-					model_name = capitalizeString(TextUtils.join(" ",
-							unique_parts.toArray()));
-
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View mView = convertView;
+				if (mView == null) {
+					mView = getActivity().getLayoutInflater().inflate(
+							getResource(), parent, false);
 				}
-				OETextView msgTag = (OETextView) row_view
-						.findViewById(R.id.txvMessageTag);
-				int tag_color = 0;
-				if (message_model_colors.containsKey(model_name)) {
-					tag_color = message_model_colors.get(model_name);
-				} else {
-					tag_color = Color.parseColor(tag_colors[tag_color_count]);
-					message_model_colors.put(model_name, tag_color);
-					tag_color_count++;
-					if (tag_color_count > tag_colors.length) {
-						tag_color_count = 0;
-					}
-				}
-				if (model.equals("mail.group")) {
-					if (UserGroups.group_names.containsKey("group_" + res_id)) {
-						model_name = UserGroups.group_names.get("group_"
-								+ res_id);
-						tag_color = UserGroups.menu_color
-								.get("group_" + res_id);
-					}
-				}
-				msgTag.setBackgroundColor(tag_color);
-				msgTag.setText(model_name);
-				OETextView txvSubject = (OETextView) row_view
-						.findViewById(R.id.txvMessageSubject);
-				OETextView txvAuthor = (OETextView) row_view
-						.findViewById(R.id.txvMessageFrom);
-				if (row_data.getRow_data().get("to_read").toString()
-						.equals("false")) {
-					txvSubject.setTextColor(Color.BLACK);
-					txvAuthor.setTextColor(Color.BLACK);
-				} else {
-					txvSubject.setTextColor(Color.parseColor("#414141"));
-					txvAuthor.setTextColor(Color.parseColor("#414141"));
-				}
-
-				return row_view;
+				mView = handleRowView(mView, position);
+				return mView;
 			}
-		});
+		};
 
-		// Creating instance for listview control
-		lstview = (ListView) rootView.findViewById(R.id.lstMessages);
-		// Providing adapter to listview
-		scope.main().runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				lstview.setAdapter(listAdapter);
-
-			}
-		});
-
-		// Setting listview choice mode to multiple model
-		lstview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
-		// Seeting item long click listern to activate action mode.
-		lstview.setOnItemLongClickListener(new OnItemLongClickListener() {
-
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View view,
-					int index, long arg3) {
-
-				OEListViewRow data = (OEListViewRow) lstview.getAdapter()
-						.getItem(index);
-
-				Toast.makeText(scope.context(),
-						data.getRow_id() + " id clicked", Toast.LENGTH_LONG)
-						.show();
-				view.setSelected(true);
-				if (mActionMode != null) {
-					return false;
-				}
-				// Start the CAB using the ActionMode.Callback defined above
-				mActionMode = scope.main().startActionMode(mActionModeCallback);
-				selectedCounter++;
-				view.setBackgroundResource(R.drawable.listitem_pressed);
-				// lstview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-				return true;
-
-			}
-		});
-
-		// Setting multi choice selection listener
-		lstview.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-			@SuppressLint("UseSparseArrays")
-			HashMap<Integer, Boolean> selectedList = new HashMap<Integer, Boolean>();
-
-			@Override
-			public void onItemCheckedStateChanged(ActionMode mode,
-					int position, long id, boolean checked) {
-				// Here you can do something when items are
-				// selected/de-selected,
-				// such as update the title in the CAB
-				selectedList.put(position, checked);
-				if (checked) {
-					selectedCounter++;
-				} else {
-					selectedCounter--;
-				}
-				if (selectedCounter != 0) {
-					mode.setTitle(selectedCounter + "");
-				}
-
-			}
-
-			@Override
-			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-				// Respond to clicks on the actions in the CAB
-				HashMap<Integer, Integer> msg_pos = new HashMap<Integer, Integer>();
-				switch (item.getItemId()) {
-				case R.id.menu_message_mark_unread_selected:
-					Log.e("menu_message_context", "Mark as Unread");
-					for (int pos : selectedList.keySet()) {
-						msg_pos.put(list.get(pos).getRow_id(), pos);
-					}
-					readunreadoperation = new PerformReadUnreadArchiveOperation(
-							msg_pos, false);
-					readunreadoperation.execute((Void) null);
-					mode.finish();
-					return true;
-				case R.id.menu_message_mark_read_selected:
-					Log.e("menu_message_context", "Mark as Read");
-					for (int pos : selectedList.keySet()) {
-						msg_pos.put(list.get(pos).getRow_id(), pos);
-					}
-					readunreadoperation = new PerformReadUnreadArchiveOperation(
-							msg_pos, true);
-					readunreadoperation.execute((Void) null);
-					mode.finish();
-					return true;
-				case R.id.menu_message_more_move_to_archive_selected:
-					Log.e("menu_message_context", "Archive");
-					for (int pos : selectedList.keySet()) {
-						msg_pos.put(list.get(pos).getRow_id(), pos);
-					}
-					readunreadoperation = new PerformReadUnreadArchiveOperation(
-							msg_pos, false);
-					readunreadoperation.execute((Void) null);
-					mode.finish();
-					return true;
-				case R.id.menu_message_more_add_star_selected:
-					for (int pos : selectedList.keySet()) {
-						msg_pos.put(list.get(pos).getRow_id(), pos);
-					}
-
-					markasTodoTask = new PerformOperation(msg_pos, true);
-					markasTodoTask.execute((Void) null);
-
-					mode.finish();
-
-					return true;
-				case R.id.menu_message_more_remove_star_selected:
-					for (int pos : selectedList.keySet()) {
-						msg_pos.put(list.get(pos).getRow_id(), pos);
-					}
-
-					markasTodoTask = new PerformOperation(msg_pos, false);
-					markasTodoTask.execute((Void) null);
-					mode.finish();
-					return true;
-				default:
-					return false;
-				}
-			}
-
-			@Override
-			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-				// Inflate the menu for the CAB
-				MenuInflater inflater = mode.getMenuInflater();
-				inflater.inflate(R.menu.menu_fragment_message_context, menu);
-				return true;
-			}
-
-			@Override
-			public void onDestroyActionMode(ActionMode mode) {
-				// Here you can make any necessary updates to the activity when
-				// the CAB is removed. By default, selected items are
-				// deselected/unchecked.
-
-				/*
-				 * Perform Operation on Selected Ids.
-				 * 
-				 * row_ids are list of selected message Ids.
-				 */
-
-				selectedList.clear();
-				selectedCounter = 0;
-				lstview.clearChoices();
-
-			}
-
-			@Override
-			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-				// Here you can perform updates to the CAB due to
-				// an invalidate() request
-				return false;
-			}
-		});
-		lstview.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View view, int index,
-					long id) {
-				MessageDetail messageDetail = new MessageDetail();
-				Bundle bundle = new Bundle();
-				bundle.putInt("message_id", list.get(index).getRow_id());
-				bundle.putInt("position", index);
-				messageDetail.setArguments(bundle);
-				scope.main().fragmentHandler.setBackStack(true, null);
-				scope.main().fragmentHandler.replaceFragmnet(messageDetail);
-				if (!type.equals("archive")) {
-					list.remove(index);
-				}
-				listAdapter.refresh(list);
-			}
-		});
-
+		lstMessagesView.setAdapter(mListViewAdapter);
 		// Getting Pull To Refresh Attacher from Main Activity
 		mTouchAttacher = scope.main().getTouchAttacher();
 
 		// Set the Refreshable View to be the ListView and the refresh listener
 		// to be this.
-		if (mTouchAttacher != null & lstview != null) {
-			mTouchAttacher.setPullableView(lstview, this);
+		if (mTouchAttacher != null) {
+			mTouchAttacher.setPullableView(lstMessagesView, this);
 		}
+	}
+
+	// Handling each row view
+	private View handleRowView(View mView, final int position) {
+		final OEListViewRow row = (OEListViewRow) mMessageObjects.get(position);
+
+		boolean to_read = row.getRow_data().getBoolean("to_read");
+		mView.setBackgroundResource((to_read) ? background_res[1]
+				: background_res[0]);
+
+		TextView txvSubject, txvBody, txvFrom, txvDate, txvTag;
+		final ImageView imgStarred = (ImageView) mView
+				.findViewById(R.id.imgMessageStarred);
+
+		final boolean starred = row.getRow_data().getBoolean("starred");
+		imgStarred.setImageResource((starred) ? starred_drawables[0]
+				: starred_drawables[1]);
+		imgStarred.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// Handling Starred click event
+				mMultiSelectedRows.put(position, true);
+				mStarredOperation = new StarredOperation((starred) ? false
+						: true);
+				mStarredOperation.execute();
+			}
+		});
+
+		txvSubject = (TextView) mView.findViewById(R.id.txvMessageSubject);
+		txvBody = (TextView) mView.findViewById(R.id.txvMessageBody);
+		txvFrom = (TextView) mView.findViewById(R.id.txvMessageFrom);
+		txvDate = (TextView) mView.findViewById(R.id.txvMessageDate);
+		txvTag = (TextView) mView.findViewById(R.id.txvMessageTag);
+
+		if (!to_read) {
+			txvSubject.setTextColor(Color.BLACK);
+			txvFrom.setTextColor(Color.BLACK);
+		} else {
+			txvSubject.setTextColor(Color.parseColor("#414141"));
+			txvFrom.setTextColor(Color.parseColor("#414141"));
+		}
+
+		txvSubject.setText(row.getRow_data().getString("subject"));
+		txvBody.setText(HTMLHelper.htmlToString(row.getRow_data().getString(
+				"body")));
+		String date = row.getRow_data().getString("date");
+		txvDate.setText(OEDate.getDate(date, TimeZone.getDefault().getID()));
+
+		String from = row.getRow_data().getString("email_from");
+		if (from.equals("false")) {
+			from = row.getRow_data().getIdName("author_id").getName();
+		}
+		txvFrom.setText(from);
+
+		String model_name = row.getRow_data().getString("model");
+		if (model_name.equals("false")) {
+			model_name = capitalizeString(row.getRow_data().getString("type"));
+		} else {
+			String[] model_parts = TextUtils.split(model_name, "\\.");
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			HashSet unique_parts = new HashSet(Arrays.asList(model_parts));
+			model_name = capitalizeString(TextUtils.join(" ",
+					unique_parts.toArray()));
+		}
+		int tag_color = 0;
+		if (message_model_colors.containsKey(model_name)) {
+			tag_color = message_model_colors.get(model_name);
+		} else {
+			tag_color = Color.parseColor(tag_colors[tag_color_count]);
+			message_model_colors.put(model_name, tag_color);
+			tag_color_count++;
+			if (tag_color_count > tag_colors.length) {
+				tag_color_count = 0;
+			}
+		}
+		if (model_name.equals("mail.group")) {
+			String res_id = row.getRow_data().getString("res_id");
+			if (UserGroups.group_names.containsKey("group_" + res_id)) {
+				model_name = UserGroups.group_names.get("group_" + res_id);
+				tag_color = UserGroups.menu_color.get("group_" + res_id);
+			}
+		}
+		txvTag.setBackgroundColor(tag_color);
+		txvTag.setText(model_name);
+
+		return mView;
 	}
 
 	public static String capitalizeString(String string) {
@@ -480,95 +335,17 @@ public class Message extends BaseFragment implements
 
 	int message_resource = 0;
 
-	private List<OEListViewRow> getMessages(TYPE type) {
-		String[] where = null;
-		String[] whereArgs = null;
-		current_type = type;
-		switch (type) {
-		case INBOX:
-			where = new String[] { "to_read = ?", "AND", "starred  = ?" };
-			whereArgs = new String[] { "true", "false" };
-			message_resource = R.string.message_inbox_all_read;
-			break;
-		case TOME:
-			where = new String[] { "res_id = ? ", "AND", "to_read= ?", };
-			whereArgs = new String[] { "0", "true" };
-			message_resource = R.string.message_tome_all_read;
-			break;
-		case TODO:
-			where = new String[] { "starred  = ? ", "AND", "to_read = ?" };
-			whereArgs = new String[] { "true", "true" };
-			message_resource = R.string.message_todo_all_read;
-			break;
-		case GROUP:
-			where = new String[] { "res_id  = ? ", "AND", "model = ?" };
-			whereArgs = new String[] { group_id, "mail.group" };
-			message_resource = R.string.message_no_group_message;
-			break;
-		default:
-			break;
-		}
+	private void checkMessageStatus() {
 
 		// Fetching parent ids from Child row with order by date desc
-		List<OEDataRow> result = db.search(db, from, where, whereArgs, null,
-				null, "date", "DESC");
-		HashMap<String, OEListViewRow> parent_list_details = new HashMap<String, OEListViewRow>();
-		messages_sorted = new ArrayList<OEListViewRow>();
-		if (result.size() > 0) {
-			scope.main().runOnUiThread(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						rootView.findViewById(R.id.messageSyncWaiter)
-								.setVisibility(View.GONE);
-					} catch (Exception e) {
-					}
-				}
-			});
-
-			int i = 0;
-			for (OEDataRow row : result) {
-				boolean isParent = true;
-				String key = row.getString("parent_id");
-				if (key.equals("false")) {
-					key = row.getString("id");
-				} else {
-					isParent = false;
-				}
-				if (!parent_list_details.containsKey(key)) {
-					// Fetching row parent message
-					OEDataRow newRow = null;
-					OEListViewRow newRowObj = null;
-
-					if (isParent) {
-						newRow = row;
-					} else {
-						newRow = db.search(db, from, new String[] { "id = ?" },
-								new String[] { key }).get(0);
-					}
-					newRow.put(
-							"subject",
-							updateSubject(newRow.get("subject").toString(),
-									Integer.parseInt(key)));
-					newRowObj = new OEListViewRow(Integer.parseInt(key), newRow);
-
-					parent_list_details.put(key, newRowObj);
-					message_row_indexes.put(key, i);
-					i++;
-					messages_sorted.add(newRowObj);
-
-				}
-			}
-
-		} else {
+		if (mMessageObjects.size() == 0) {
 			if (db.isEmptyTable(db) && !isSynced) {
 				isSynced = true;
 				scope.main().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (rootView.findViewById(R.id.messageSyncWaiter) != null) {
-							rootView.findViewById(R.id.messageSyncWaiter)
+						if (rootView.findViewById(R.id.waitingForSyncToStart) != null) {
+							rootView.findViewById(R.id.waitingForSyncToStart)
 									.setVisibility(View.VISIBLE);
 						}
 					}
@@ -576,10 +353,10 @@ public class Message extends BaseFragment implements
 
 				try {
 					Thread.sleep(2000);
-					if (group_id != null) {
+					if (mGroupId != null) {
 						Bundle group_bundle = new Bundle();
 						JSONArray ids = new JSONArray();
-						ids.put(group_id);
+						ids.put(mGroupId);
 						group_bundle.putString("group_ids", ids.toString());
 						scope.main().requestSync(MessageProvider.AUTHORITY,
 								group_bundle);
@@ -593,10 +370,8 @@ public class Message extends BaseFragment implements
 
 					@Override
 					public void run() {
-						rootView.findViewById(R.id.messageSyncWaiter)
+						rootView.findViewById(R.id.waitingForSyncToStart)
 								.setVisibility(View.GONE);
-						rootView.findViewById(R.id.lstMessages).setVisibility(
-								View.GONE);
 						OETextView txvMsg = (OETextView) rootView
 								.findViewById(R.id.txvMessageAllReadMessage);
 						txvMsg.setVisibility(View.VISIBLE);
@@ -607,7 +382,6 @@ public class Message extends BaseFragment implements
 			}
 
 		}
-		return messages_sorted;
 	}
 
 	@Override
@@ -680,19 +454,47 @@ public class Message extends BaseFragment implements
 		}
 	};
 
+	private String[] getWhereClause(Type type) {
+		String where[] = null;
+		switch (type) {
+		case INBOX:
+			where = new String[] { "to_read = 'true'", "AND",
+					"starred  = 'false'" };
+			message_resource = R.string.message_inbox_all_read;
+			break;
+		case TOME:
+			where = new String[] { "res_id = '0' ", "AND", "to_read= 'true'", };
+			message_resource = R.string.message_tome_all_read;
+			break;
+		case TODO:
+			where = new String[] { "starred  = 'true' ", "AND",
+					"to_read = 'true'" };
+			message_resource = R.string.message_todo_all_read;
+			break;
+		case GROUP:
+			where = new String[] { "res_id  =  " + mGroupId, "AND",
+					"model = 'mail.group'" };
+			message_resource = R.string.message_no_group_message;
+			break;
+		default:
+			break;
+		}
+		return where;
+	}
+
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> drawerItems = new ArrayList<DrawerItem>();
 		db = (MessageDBHelper) databaseHelper(context);
 		if (db.getOEInstance().isInstalled("mail.message")) {
 			drawerItems.add(new DrawerItem(TAG, "Messages", true));
-			drawerItems.add(new DrawerItem(TAG, "Inbox", getCount(TYPE.INBOX,
+			drawerItems.add(new DrawerItem(TAG, "Inbox", getCount(Type.INBOX,
 					context), R.drawable.ic_action_inbox, getObjectOFClass(
 					"type", "inbox")));
-			drawerItems.add(new DrawerItem(TAG, "To: me", getCount(TYPE.TOME,
+			drawerItems.add(new DrawerItem(TAG, "To: me", getCount(Type.TOME,
 					context), R.drawable.ic_action_user, getObjectOFClass(
 					"type", "to-me")));
-			drawerItems.add(new DrawerItem(TAG, "To-do", getCount(TYPE.TODO,
+			drawerItems.add(new DrawerItem(TAG, "To-do", getCount(Type.TODO,
 					context), R.drawable.ic_action_todo, getObjectOFClass(
 					"type", "to-do")));
 			drawerItems.add(new DrawerItem(TAG, "Archives", 0,
@@ -704,30 +506,12 @@ public class Message extends BaseFragment implements
 		}
 	}
 
-	public int getCount(TYPE type, Context context) {
+	public int getCount(Type type, Context context) {
 		db = new MessageDBHelper(context);
 		int count = 0;
-		String[] where = null;
-		String[] whereArgs = null;
-		switch (type) {
-		case INBOX:
-			where = new String[] { "to_read = ?", "AND", "starred = ?" };
-			whereArgs = new String[] { "true", "false" };
-			break;
-		case TOME:
-			where = new String[] { "to_read = ?", "AND", "res_id = ?" };
-			whereArgs = new String[] { "true", "0" };
-			break;
-		case TODO:
-			where = new String[] { "starred = ?", "AND", "to_read = ? " };
-			whereArgs = new String[] { "true", "true" };
-			break;
-		default:
-			break;
-		}
+		String[] where = getWhereClause(type);
 		if (where != null) {
-			count = db.count(db, where, whereArgs);
-
+			count = db.count(db, where, null);
 		}
 		return count;
 	}
@@ -749,36 +533,36 @@ public class Message extends BaseFragment implements
 				type = bundle.getString("type");
 				String title = "Archive";
 				if (type.equals("inbox")) {
-					// setupListView(TYPE.INBOX);
-					loadMessage = new LoadMessages(TYPE.INBOX);
-					loadMessage.execute((Void) null);
+					// setupListView(Type.INBOX);
+					mMessageLoader = new MessagesLoader(Type.INBOX);
+					mMessageLoader.execute((Void) null);
 					title = "Inbox";
 				} else if (type.equals("to-me")) {
 					title = "To-Me";
-					// setupListView(TYPE.TOME);
-					loadMessage = new LoadMessages(TYPE.TOME);
-					loadMessage.execute((Void) null);
+					// setupListView(Type.TOME);
+					mMessageLoader = new MessagesLoader(Type.TOME);
+					mMessageLoader.execute((Void) null);
 				} else if (type.equals("to-do")) {
-					// setupListView(TYPE.TODO);
+					// setupListView(Type.TODO);
 					title = "To-DO";
-					loadMessage = new LoadMessages(TYPE.TODO);
-					loadMessage.execute((Void) null);
+					mMessageLoader = new MessagesLoader(Type.TODO);
+					mMessageLoader.execute((Void) null);
 				} else if (type.equals("archive")) {
-					// setupListView(TYPE.ARCHIVE);
-					loadMessage = new LoadMessages(TYPE.ARCHIVE);
-					loadMessage.execute((Void) null);
+					// setupListView(Type.ARCHIVE);
+					mMessageLoader = new MessagesLoader(Type.ARCHIVE);
+					mMessageLoader.execute((Void) null);
 
 				}
 				scope.main().setTitle(title);
 			} else {
 				if (bundle.containsKey("group_id")) {
-					group_id = bundle.getString("group_id");
-					loadMessage = new LoadMessages(TYPE.GROUP);
-					loadMessage.execute((Void) null);
+					mGroupId = bundle.getString("group_id");
+					mMessageLoader = new MessagesLoader(Type.GROUP);
+					mMessageLoader.execute((Void) null);
 				} else {
 					scope.main().setTitle("Inbox");
-					loadMessage = new LoadMessages(TYPE.INBOX);
-					loadMessage.execute((Void) null);
+					mMessageLoader = new MessagesLoader(Type.INBOX);
+					mMessageLoader.execute((Void) null);
 				}
 
 			}
@@ -797,8 +581,8 @@ public class Message extends BaseFragment implements
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (loadMessage != null) {
-			loadMessage.cancel(true);
+		if (mMessageLoader != null) {
+			mMessageLoader.cancel(true);
 		}
 		scope.context().unregisterReceiver(messageSyncFinish);
 		scope.context().unregisterReceiver(datasetChangeReceiver);
@@ -807,16 +591,16 @@ public class Message extends BaseFragment implements
 	@Override
 	public void onStop() {
 		super.onStop();
-		if (loadMessage != null) {
-			loadMessage.cancel(true);
+		if (mMessageLoader != null) {
+			mMessageLoader.cancel(true);
 		}
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (loadMessage != null) {
-			loadMessage.cancel(true);
+		if (mMessageLoader != null) {
+			mMessageLoader.cancel(true);
 		}
 	}
 
@@ -827,8 +611,8 @@ public class Message extends BaseFragment implements
 		public void onReceive(Context context, Intent intent) {
 
 			try {
-				rootView.findViewById(R.id.messageSyncWaiter).setVisibility(
-						View.GONE);
+				rootView.findViewById(R.id.waitingForSyncToStart)
+						.setVisibility(View.GONE);
 
 				String id = intent.getExtras().getString("id");
 				String parent_id = intent.getExtras().getString("parent_id");
@@ -841,16 +625,17 @@ public class Message extends BaseFragment implements
 						null, "date", "DESC");
 				newRowObj = new OEListViewRow(Integer.parseInt(id),
 						newRow.get(0));
-				if (message_row_indexes.containsKey(id) && list.size() > 0) {
-					list.remove(Integer.parseInt(message_row_indexes.get(id)
-							.toString()));
+				if (message_row_indexes.containsKey(id)
+						&& mMessageObjects.size() > 0) {
+					mMessageObjects.remove(Integer.parseInt(message_row_indexes
+							.get(id).toString()));
 					datasetReg.remove(id);
 				}
 				if (!datasetReg.containsKey(String.valueOf(newRowObj
 						.getRow_id()))) {
 					datasetReg.put(String.valueOf(newRowObj.getRow_id()), true);
-					list.add(0, newRowObj);
-					listAdapter.refresh(list);
+					mMessageObjects.add(0, newRowObj);
+					mListViewAdapter.notifiyDataChange(mMessageObjects);
 				}
 
 			} catch (Exception e) {
@@ -858,14 +643,6 @@ public class Message extends BaseFragment implements
 
 		}
 	};
-
-	private OEListViewRow getRowForMessage(int id) {
-		List<OEDataRow> newRow = db.search(db, from, new String[] { "id = ?" },
-				new String[] { String.valueOf(id) });
-		OEListViewRow newRowObj = new OEListViewRow(id, newRow.get(0));
-
-		return newRowObj;
-	}
 
 	/*
 	 * Used for Synchronization : Register receiver and unregister receiver
@@ -887,28 +664,20 @@ public class Message extends BaseFragment implements
 				if (!data_update.equals("false")) {
 
 				}
-				listAdapter.clear();
-				list.clear();
-				listAdapter.refresh(list);
-				if (group_id != null) {
-					setupListView(getMessages(TYPE.GROUP));
-				} else {
-					setupListView(getMessages(TYPE.INBOX));
-				}
+				mListViewAdapter.clear();
+				mMessageObjects.clear();
+				mListViewAdapter.notifiyDataChange(mMessageObjects);
+
+				new MessagesLoader(mType).execute();
 
 			} catch (Exception e) {
 			}
 			scope.main().refreshDrawer(TAG, getActivity());
 			if (mTouchAttacher == null && listAdapter != null) {
-				listAdapter.clear();
-				list.clear();
-				listAdapter.refresh(list);
-				if (group_id != null) {
-					setupListView(getMessages(TYPE.GROUP));
-				} else {
-					setupListView(getMessages(TYPE.INBOX));
-				}
-
+				mListViewAdapter.clear();
+				mMessageObjects.clear();
+				mListViewAdapter.notifiyDataChange(mMessageObjects);
+				new MessagesLoader(mType).execute();
 			}
 
 		}
@@ -920,219 +689,72 @@ public class Message extends BaseFragment implements
 		mTouchAttacher = attacher;
 	}
 
-	// Callback when user press on starred button from listview row
-	BooleanColumnCallback updateStarred = new BooleanColumnCallback() {
+	public class MessagesLoader extends AsyncTask<Void, Void, Boolean> {
 
-		@Override
-		public OEListViewRow updateFlagValues(OEListViewRow row, View view) {
-			OEDataRow rowData = row.getRow_data();
-			boolean flag = false;
-			ImageView img = (ImageView) view;
-			if (rowData.getString("starred").equals("false")) {
-				flag = true;
-				img.setImageResource(R.drawable.ic_action_starred);
-			} else {
-				img.setImageResource(R.drawable.ic_action_unstarred);
-			}
-			OEArgsHelper messageIds = new OEArgsHelper();
-			messageIds.addArg(row.getRow_id());
-			if (markAsTodo(messageIds, flag)) {
-				rowData.put("starred", flag);
-			} else {
-				Log.e("Unable to mark as todo", "Operation Fail");
-			}
+		Type messageType = null;
 
-			return row;
-		}
-	};
-
-	/* Method for Make Message as Read,Unread and Archive */
-	private boolean markAsReadUnreadArchive(OEArgsHelper messageIds,
-			String default_model, int res_id, int parent_id, boolean markFlag) {
-		boolean flag = false;
-		OEHelper openerp = getOEInstance();
-		JSONObject newContext = new JSONObject();
-		try {
-			if (default_model.equals("false")) {
-				newContext.put("default_model", false);
-			} else {
-				newContext.put("default_model", default_model);
-			}
-			newContext.put("default_res_id", res_id);
-			newContext.put("default_parent_id", parent_id);
-			OEArgsHelper args = new OEArgsHelper();
-
-			// Param 1 : message_ids list
-			args.addArg(messageIds.getArgs());
-
-			// Param 2 : starred - boolean value
-			args.addArg(markFlag);
-
-			// Param 3 : create_missing - If table does not contain any value
-			// for
-			// this row than create new one
-			args.addArg(true);
-
-			// Param 4 : context
-			args.addArg(newContext);
-
-			// Creating Local Database Requirement Values
-			ContentValues values = new ContentValues();
-			String value = (markFlag) ? "false" : "true";
-			values.put("starred", "false");
-			values.put("to_read", value);
-			flag = openerp.callServerMethod(getModel(), "set_message_read",
-					args.getArgs(), values,
-					JSONDataHelper.jsonArrayTointArray(messageIds.getArgs()));
-			for (int uId : JSONDataHelper.jsonArrayTointArray(messageIds
-					.getArgs())) {
-				db.write(db, values, uId, true);
-			}
-		} catch (Exception e) {
-		}
-		return flag;
-	}
-
-	/* Method for mark multiple message as Read, Unread, Archive */
-	private boolean markAsReadUnreadArchive(HashMap<Integer, Integer> msg_pos,
-			final boolean flag) {
-		boolean res = false;
-		OEArgsHelper args = new OEArgsHelper();
-		int parent_id = 0;
-		int res_id = 0;
-		String default_model = "false";
-		for (int key : msg_pos.keySet()) {
-			final int pos = msg_pos.get(key);
-			OEListViewRow rowInfo = list.get(pos);
-			if (rowInfo.getRow_data().get("parent_id").equals("false")) {
-				parent_id = rowInfo.getRow_id();
-				res_id = Integer.parseInt(rowInfo.getRow_data().get("res_id")
-						.toString());
-				default_model = rowInfo.getRow_data().get("model").toString();
-			} else {
-				parent_id = Integer.parseInt(rowInfo.getRow_data()
-						.get("parent_id").toString());
-			}
-			List<HashMap<String, Object>> ids = db.executeSQL(
-					db.getModelName(),
-					new String[] { "id" },
-					new String[] { "id = ?", "OR", "parent_id = ?" },
-					new String[] { String.valueOf(parent_id),
-							String.valueOf(parent_id) });
-			for (HashMap<String, Object> id : ids) {
-				if (parent_id != Integer.parseInt(id.get("id").toString())) {
-
-					args.addArg(Integer.parseInt(id.get("id").toString()));
-				}
-			}
-			args.addArg(key);
-
-		}
-
-		if (markAsReadUnreadArchive(args, default_model, res_id, parent_id,
-				flag)) {
-			for (int key : msg_pos.keySet()) {
-				final int pos = msg_pos.get(key);
-				scope.main().runOnUiThread(new Runnable() {
-					public void run() {
-						list.remove(pos);
-						listAdapter.refresh(list);
-					}
-				});
-			}
-		}
-		return res;
-	}
-
-	/* Method for Make Message as TODO */
-	public boolean markAsTodo(OEArgsHelper messageIds, boolean markFlag) {
-		boolean flag = false;
-		OEHelper openerp = getOEInstance();
-
-		OEArgsHelper args = new OEArgsHelper();
-
-		// Param 1 : message_ids list
-		args.addArg(messageIds.getArgs());
-
-		// Param 2 : starred - boolean value
-		args.addArg(markFlag);
-
-		// Param 3 : create_missing - If table does not contain any value for
-		// this row than create new one
-		args.addArg(true);
-
-		// Creating Local Database Requirement Values
-		ContentValues values = new ContentValues();
-		String value = (markFlag) ? "true" : "false";
-		values.put("starred", value);
-
-		flag = openerp.callServerMethod(getModel(), "set_message_starred",
-				args.getArgs(), values,
-				JSONDataHelper.jsonArrayTointArray(messageIds.getArgs()));
-		Log.d("Marking as TODO", messageIds.getArgs().toString());
-		return flag;
-	}
-
-	/* Method for mark multiple message as TODO */
-	private boolean markAsTodo(HashMap<Integer, Integer> msg_pos,
-			final boolean flag) {
-		boolean res = false;
-		final int img[] = new int[] { R.drawable.ic_action_unstarred,
-				R.drawable.ic_action_starred };
-		for (int key : msg_pos.keySet()) {
-
-			final int pos = msg_pos.get(key);
-
-			OEArgsHelper args = new OEArgsHelper();
-			args.addArg(key);
-			if (markAsTodo(args, flag)) {
-				listAdapter.updateRows(getRowForMessage(key), pos, "starred");
-				scope.main().runOnUiThread(new Runnable() {
-					public void run() {
-
-						ImageView imgStarred = (ImageView) lstview.getChildAt(
-								pos).findViewById(R.id.imgMessageStarred);
-						imgStarred.setImageResource((flag) ? img[1] : img[0]);
-						imgStarred.invalidate();
-
-					}
-				});
-			}
-		}
-
-		return res;
-	}
-
-	public class LoadMessages extends AsyncTask<Void, Void, Boolean> {
-
-		List<OEListViewRow> message_list = null;
-		TYPE message_type = null;
-
-		public LoadMessages(TYPE type) {
-			this.message_type = type;
+		public MessagesLoader(Type type) {
+			messageType = type;
 		}
 
 		@Override
 		protected void onPreExecute() {
 			scope.main().runOnUiThread(new Runnable() {
-
 				@Override
 				public void run() {
-					rootView.findViewById(R.id.loadingHeader).setVisibility(
+					rootView.findViewById(R.id.loadingProgress).setVisibility(
 							View.VISIBLE);
-					rootView.findViewById(R.id.lstMessages).setVisibility(
-							View.GONE);
 				}
 			});
 		}
 
 		@Override
 		protected Boolean doInBackground(Void... arg0) {
-			if (list != null && list.size() <= 0) {
-				message_list = getMessages(message_type);
-				return true;
+			String[] where = getWhereClause(messageType);
+			mType = messageType;
+			List<OEDataRow> result = db.search(db, from, where, null, null,
+					null, "date", "DESC");
+			HashMap<String, OEListViewRow> parent_list_details = new HashMap<String, OEListViewRow>();
+			mMessageObjects.clear();
+			if (result.size() > 0) {
+				int i = 0;
+				for (OEDataRow row : result) {
+					boolean isParent = true;
+					String key = row.getString("parent_id");
+					if (key.equals("false")) {
+						key = row.getString("id");
+					} else {
+						isParent = false;
+					}
+					if (!parent_list_details.containsKey(key)) {
+						// Fetching row parent message
+						OEDataRow newRow = null;
+						OEListViewRow newRowObj = null;
+
+						if (isParent) {
+							newRow = row;
+						} else {
+							List<OEDataRow> data_row = db.search(db, from,
+									new String[] { "id = ?" },
+									new String[] { key });
+							newRow = data_row.get(0);
+						}
+						newRow.put(
+								"subject",
+								updateSubject(newRow.get("subject").toString(),
+										Integer.parseInt(key)));
+						newRowObj = new OEListViewRow(Integer.parseInt(key),
+								newRow);
+
+						parent_list_details.put(key, newRowObj);
+						message_row_indexes.put(key, i);
+						i++;
+						mMessageObjects.add(newRowObj);
+
+					}
+				}
 			}
-			return false;
+			return true;
 		}
 
 		@Override
@@ -1142,85 +764,19 @@ public class Message extends BaseFragment implements
 				@Override
 				public void run() {
 					try {
-						rootView.findViewById(R.id.loadingHeader)
+						rootView.findViewById(R.id.loadingProgress)
 								.setVisibility(View.GONE);
-						rootView.findViewById(R.id.lstMessages).setVisibility(
-								View.VISIBLE);
-						setupListView(message_list);
+						mListViewAdapter.notifiyDataChange(mMessageObjects);
 						searchView
-								.setOnQueryTextListener(getQueryListener(listAdapter));
-						loadMessage = null;
+								.setOnQueryTextListener(getQueryListener(mListViewAdapter));
+						mMessageLoader = null;
+						checkMessageStatus();
+
 					} catch (Exception e) {
 					}
 				}
 			});
 
-		}
-
-	}
-
-	public class PerformOperation extends AsyncTask<Void, Void, Boolean> {
-
-		OEDialog pdialog = null;
-		String errorMsg = "";
-		HashMap<Integer, Integer> msg_pos;
-		boolean setFlag = false;
-
-		public PerformOperation(HashMap<Integer, Integer> msg_pos, boolean bool) {
-			this.msg_pos = msg_pos;
-			this.setFlag = bool;
-			pdialog = new OEDialog(scope.context(), true,
-					"Performing Operation...");
-		}
-
-		@Override
-		protected void onPreExecute() {
-
-			pdialog.show();
-		}
-
-		@Override
-		protected Boolean doInBackground(Void... params) {
-			return markAsTodo(msg_pos, setFlag);
-		}
-
-		@Override
-		protected void onPostExecute(final Boolean success) {
-			pdialog.hide();
-		}
-
-	}
-
-	public class PerformReadUnreadArchiveOperation extends
-			AsyncTask<Void, Void, Boolean> {
-
-		OEDialog pdialog = null;
-		String errorMsg = "";
-		HashMap<Integer, Integer> msg_pos;
-		boolean setFlag = false;
-
-		public PerformReadUnreadArchiveOperation(
-				HashMap<Integer, Integer> msg_pos, boolean bool) {
-			this.msg_pos = msg_pos;
-			this.setFlag = bool;
-			pdialog = new OEDialog(scope.context(), true,
-					"Performing Operation...");
-		}
-
-		@Override
-		protected void onPreExecute() {
-
-			pdialog.show();
-		}
-
-		@Override
-		protected Boolean doInBackground(Void... params) {
-			return markAsReadUnreadArchive(msg_pos, setFlag);
-		}
-
-		@Override
-		protected void onPostExecute(final Boolean success) {
-			pdialog.hide();
 		}
 
 	}
@@ -1236,10 +792,10 @@ public class Message extends BaseFragment implements
 		try {
 			if (OpenERPServerConnection.isNetworkAvailable(getActivity())) {
 				Log.d("MessageFragment", "requesting for sync");
-				if (group_id != null) {
+				if (mGroupId != null) {
 					Bundle group_bundle = new Bundle();
 					JSONArray ids = new JSONArray();
-					ids.put(group_id);
+					ids.put(mGroupId);
 					group_bundle.putString("group_ids", ids.toString());
 					scope.main().requestSync(MessageProvider.AUTHORITY,
 							group_bundle);
@@ -1254,5 +810,342 @@ public class Message extends BaseFragment implements
 		} catch (Exception e) {
 
 		}
+	}
+
+	// On ListView item Long click listener
+	@Override
+	public boolean onItemLongClick(AdapterView<?> adapter, View view,
+			int position, long id) {
+		view.setSelected(true);
+		if (mActionMode != null) {
+			return false;
+		}
+		// Start the CAB using the ActionMode.Callback defined above
+		mActionMode = scope.main().startActionMode(mActionModeCallback);
+		selectedCounter++;
+		view.setBackgroundResource(R.drawable.listitem_pressed);
+		return true;
+	}
+
+	// Message ListView multiChoiceListener
+	MultiChoiceModeListener mMessageViewMultiChoiceListener = new MultiChoiceModeListener() {
+
+		@Override
+		public void onItemCheckedStateChanged(ActionMode mode, int position,
+				long id, boolean checked) {
+			mMultiSelectedRows.put(position, checked);
+			if (checked) {
+				selectedCounter++;
+			} else {
+				selectedCounter--;
+			}
+			if (selectedCounter != 0) {
+				mode.setTitle(selectedCounter + "");
+			}
+		}
+
+		@SuppressLint("UseSparseArrays")
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			// Respond to clicks on the actions in the CAB
+			switch (item.getItemId()) {
+			case R.id.menu_message_mark_unread_selected:
+				mReadUnreadOperation = new ReadUnreadOperation(true);
+				mReadUnreadOperation.execute();
+				mode.finish();
+				return true;
+			case R.id.menu_message_mark_read_selected:
+				mReadUnreadOperation = new ReadUnreadOperation(false);
+				mReadUnreadOperation.execute();
+				mode.finish();
+				return true;
+			case R.id.menu_message_more_move_to_archive_selected:
+				mReadUnreadOperation = new ReadUnreadOperation(false);
+				mReadUnreadOperation.execute();
+				mode.finish();
+				return true;
+			case R.id.menu_message_more_add_star_selected:
+				mStarredOperation = new StarredOperation(true);
+				mStarredOperation.execute();
+				mode.finish();
+				return true;
+			case R.id.menu_message_more_remove_star_selected:
+				mStarredOperation = new StarredOperation(false);
+				mStarredOperation.execute();
+				mode.finish();
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			// Inflate the menu for the CAB
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.menu_fragment_message_context, menu);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			// Here you can make any necessary updates to the activity when
+			// the CAB is removed. By default, selected items are
+			// deselected/unchecked.
+
+			selectedCounter = 0;
+			lstMessagesView.clearChoices();
+
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			// Here you can perform updates to the CAB due to
+			// an invalidate() request
+			return false;
+		}
+	};
+
+	// On item click listener
+	@Override
+	public void onItemClick(AdapterView<?> adapter, View view, int position,
+			long id) {
+		MessageDetail messageDetail = new MessageDetail();
+		Bundle bundle = new Bundle();
+		OEListViewRow row = (OEListViewRow) mMessageObjects.get(position);
+		bundle.putInt("message_id", row.getRow_id());
+		bundle.putInt("position", position);
+		messageDetail.setArguments(bundle);
+
+		scope.main().fragmentHandler.setBackStack(true, null);
+		scope.main().fragmentHandler.replaceFragmnet(messageDetail);
+	}
+
+	/**
+	 * Marking each row starred/unstarred in background
+	 */
+	public class StarredOperation extends AsyncTask<Void, Void, Boolean> {
+
+		boolean mStarred = false;
+		ProgressDialog mProgressDialog = null;
+		boolean isConnection = true;
+
+		public StarredOperation(boolean starred) {
+			mStarred = starred;
+			try {
+				if (!OpenERPServerConnection.isNetworkAvailable(getActivity())) {
+					isConnection = false;
+				}
+			} catch (Exception e) {
+				isConnection = false;
+			}
+			mProgressDialog = new ProgressDialog(getActivity());
+			mProgressDialog.setMessage("Working...");
+			if (isConnection) {
+				mProgressDialog.show();
+			}
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			if (!isConnection) {
+				return false;
+			}
+			OEArgsHelper messageIds = new OEArgsHelper();
+			for (int position : mMultiSelectedRows.keySet()) {
+				if (mMultiSelectedRows.get(position)) {
+					OEListViewRow row = (OEListViewRow) mMessageObjects
+							.get(position);
+					messageIds.addArg(row.getRow_id());
+				}
+			}
+			OEHelper openerp = getOEInstance();
+
+			OEArgsHelper args = new OEArgsHelper();
+
+			// Param 1 : message_ids list
+			args.addArg(messageIds.getArgs());
+
+			// Param 2 : starred - boolean value
+			args.addArg(mStarred);
+
+			// Param 3 : create_missing - If table does not contain any value
+			// for
+			// this row than create new one
+			args.addArg(true);
+
+			// Creating Local Database Requirement Values
+			ContentValues values = new ContentValues();
+			String value = (mStarred) ? "true" : "false";
+			values.put("starred", value);
+
+			boolean response = openerp.callServerMethod(getModel(),
+					"set_message_starred", args.getArgs(), values,
+					JSONDataHelper.jsonArrayTointArray(messageIds.getArgs()));
+			return response;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if (result) {
+				for (int position : mMultiSelectedRows.keySet()) {
+					OEListViewRow row = (OEListViewRow) mMessageObjects
+							.get(position);
+					row.getRow_data().put("starred", mStarred);
+				}
+				mListViewAdapter.notifiyDataChange(mMessageObjects);
+				scope.main().refreshDrawer(TAG, getActivity());
+			} else {
+				Toast.makeText(getActivity(), "No connection",
+						Toast.LENGTH_LONG).show();
+			}
+			mMultiSelectedRows.clear();
+			mProgressDialog.dismiss();
+		}
+
+	}
+
+	/**
+	 * Making message read or unread or Archive
+	 */
+	public class ReadUnreadOperation extends AsyncTask<Void, Void, Boolean> {
+
+		ProgressDialog mProgressDialog = null;
+		boolean mToRead = false;
+		boolean isConnection = true;
+
+		public ReadUnreadOperation(boolean toRead) {
+			mToRead = toRead;
+			try {
+				if (!OpenERPServerConnection.isNetworkAvailable(getActivity())) {
+					isConnection = false;
+				}
+			} catch (Exception e) {
+				isConnection = false;
+			}
+			mProgressDialog = new ProgressDialog(getActivity());
+			mProgressDialog.setMessage("Working...");
+			if (isConnection) {
+				mProgressDialog.show();
+			}
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			if (!isConnection) {
+				return false;
+			}
+			boolean flag = false;
+			OEArgsHelper args = new OEArgsHelper();
+			for (int position : mMultiSelectedRows.keySet()) {
+				if (mMultiSelectedRows.get(position)) {
+					args = new OEArgsHelper();
+					OEListViewRow row = (OEListViewRow) mMessageObjects
+							.get(position);
+
+					String default_model = "false";
+					int parent_id = 0, res_id = 0;
+					if (row.getRow_data().getString("parent_id")
+							.equals("false")) {
+						parent_id = row.getRow_id();
+						res_id = row.getRow_data().getInt("res_id");
+						default_model = row.getRow_data().getString("model");
+					} else {
+						parent_id = row.getRow_data().getInt("parent_id");
+					}
+					List<HashMap<String, Object>> ids = db.executeSQL(
+							db.getModelName(),
+							new String[] { "id" },
+							new String[] { "id = ?", "OR", "parent_id = ?" },
+							new String[] { String.valueOf(parent_id),
+									String.valueOf(parent_id) });
+					for (HashMap<String, Object> id : ids) {
+						if (parent_id != Integer.parseInt(id.get("id")
+								.toString())) {
+							args.addArg(Integer.parseInt(id.get("id")
+									.toString()));
+						}
+					}
+					args.addArg(row.getRow_id());
+					if (toggleReadUnread(args, default_model, res_id,
+							parent_id, mToRead)) {
+						flag = true;
+					}
+
+				}
+			}
+			return flag;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if (result) {
+				for (int position : mMultiSelectedRows.keySet()) {
+					if (!mToRead && !mType.equals(Type.ARCHIVE)) {
+						mMessageObjects.remove(position);
+					}
+				}
+				mListViewAdapter.notifiyDataChange(mMessageObjects);
+				if (mMessageObjects.size() == 0) {
+					OETextView txvMsg = (OETextView) rootView
+							.findViewById(R.id.txvMessageAllReadMessage);
+					txvMsg.setVisibility(View.VISIBLE);
+					txvMsg.setText(message_resource);
+				}
+				scope.main().refreshDrawer(TAG, getActivity());
+			} else {
+				Toast.makeText(getActivity(), "No connection",
+						Toast.LENGTH_LONG).show();
+			}
+			mMultiSelectedRows.clear();
+			mProgressDialog.dismiss();
+		}
+
+	}
+
+	/* Method for Make Message as Read,Unread and Archive */
+	private boolean toggleReadUnread(OEArgsHelper idsArg, String default_model,
+			int res_id, int parent_id, boolean to_read) {
+		boolean flag = false;
+		OEHelper openerp = getOEInstance();
+		JSONObject newContext = new JSONObject();
+		try {
+			if (default_model.equals("false")) {
+				newContext.put("default_model", false);
+			} else {
+				newContext.put("default_model", default_model);
+			}
+			newContext.put("default_res_id", res_id);
+			newContext.put("default_parent_id", parent_id);
+			OEArgsHelper args = new OEArgsHelper();
+
+			// Param 1 : message_ids list
+			args.addArg(idsArg.getArgs());
+
+			// Param 2 : to_read - boolean value
+			args.addArg((to_read) ? false : true);
+
+			// Param 3 : create_missing - If table does not contain any value
+			// for
+			// this row than create new one
+			args.addArg(true);
+
+			// Param 4 : context
+			args.addArg(newContext);
+
+			// Creating Local Database Requirement Values
+			ContentValues values = new ContentValues();
+			String value = (to_read) ? "true" : "false";
+			values.put("starred", "false");
+			values.put("to_read", value);
+			flag = openerp.callServerMethod(getModel(), "set_message_read",
+					args.getArgs(), values,
+					JSONDataHelper.jsonArrayTointArray(idsArg.getArgs()));
+			for (int uId : JSONDataHelper.jsonArrayTointArray(idsArg.getArgs())) {
+				db.write(db, values, uId, true);
+			}
+		} catch (Exception e) {
+		}
+		return flag;
 	}
 }

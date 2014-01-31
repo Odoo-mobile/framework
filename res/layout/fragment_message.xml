@@ -1,16 +1,17 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
     <include
-        android:id="@+id/messageSyncWaiter"
+        android:id="@+id/waitingForSyncToStart"
         layout="@layout/fragment_message_listview_header"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
         android:visibility="gone" />
 
     <include
-        android:id="@+id/loadingHeader"
+        android:id="@+id/loadingProgress"
         layout="@layout/listview_data_loading_progress"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
@@ -20,11 +21,8 @@
         android:id="@+id/txvMessageAllReadMessage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/messageSyncWaiter"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="15dp"
         android:gravity="top|center_horizontal"
+        android:padding="10dp"
         android:text="Woohoo! You&apos;ve read all the messages in your inbox."
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#77778f"
@@ -33,9 +31,8 @@
     <ListView
         android:id="@+id/lstMessages"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txvMessageAllReadMessage"
+        android:layout_height="match_parent"
         android:animateLayoutChanges="true" >
     </ListView>
 
-</RelativeLayout>
+</LinearLayout>

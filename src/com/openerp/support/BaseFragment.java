@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.SearchView.OnQueryTextListener;
 
 import com.openerp.auth.OpenERPAccountManager;
@@ -49,7 +50,7 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 	public BaseDBHelper db;
 
 	/** The list search adapter. */
-	private OEListViewAdapter listSearchAdapter;
+	private ArrayAdapter listSearchAdapter;
 
 	/**
 	 * Gets the oE instance.
@@ -84,7 +85,7 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 	 *            the list adapter
 	 * @return the query listener
 	 */
-	public OnQueryTextListener getQueryListener(OEListViewAdapter listAdapter) {
+	public OnQueryTextListener getQueryListener(ArrayAdapter listAdapter) {
 		listSearchAdapter = listAdapter;
 		return queryListener;
 	}

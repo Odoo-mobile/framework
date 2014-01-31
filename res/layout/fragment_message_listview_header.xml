@@ -1,26 +1,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/messageHeaderView"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical|center_horizontal"
-    android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical"
     android:paddingBottom="10dp"
     android:paddingTop="10dp" >
 
     <com.openerp.util.controls.OETextView
         android:id="@+id/txvMessageHeaderTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:paddingBottom="5dp"
-        android:text="Waiting for Sync to Start"
-        android:textSize="20dp" />
+        android:text="@string/message_waiting_for_sync_to_start"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <com.openerp.util.controls.OETextView
         android:id="@+id/txvMessageHeaderSubtitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Your messages will appear shortly"
-        android:textSize="14dp" />
+        android:gravity="center_horizontal"
+        android:text="@string/message_your_message_will_appear_shortly"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>

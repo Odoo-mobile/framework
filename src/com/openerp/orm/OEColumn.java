@@ -18,6 +18,7 @@
  */
 package com.openerp.orm;
 
+
 /**
  * The Class Fields.
  */

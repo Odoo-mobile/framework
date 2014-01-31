@@ -27,7 +27,8 @@
     <string name="syncwizard_title">Enable/Disable your Sync Settings</string>
     <string name="syncwizard_description">Select your auto sync option so application will get up to-date automatically.</string>
     <string name="account_sync_wizard_button">Continue</string>
-    <!-- Message Fragment all read messages -->
+
+    <!-- Message Fragment -->
     <string name="message_inbox_all_read"><b>Good Job!</b> Your inbox is empty.\n \n
 
 Your inbox contains private messages or emails sent to you as well as information related to documents or people you follow.</string>
@@ -36,6 +37,8 @@ Your inbox contains private messages or emails sent to you as well as informatio
 
 When you process messages in your inbox, you can mark some as todo. From this menu, you can process all your todo.</string>
     <string name="message_no_group_message">No message in this group.</string>
+    <string name="message_waiting_for_sync_to_start">Waiting for Sync to Start</string>
+    <string name="message_your_message_will_appear_shortly">Your messages will appear shortly</string>
 
     <!-- Compose Note Fragment Strings -->
     <string name="compose_note_tags">Tags</string>
