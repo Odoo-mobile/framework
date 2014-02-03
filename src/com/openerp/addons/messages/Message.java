@@ -99,6 +99,7 @@ public class Message extends BaseFragment implements
 	ListView lstMessagesView = null;
 	OEListViewAdapter listAdapter = null;
 	List<Object> mMessageObjects = new ArrayList<Object>();
+	int mSelectedItemPosition = -1;
 
 	HashMap<String, Integer> message_row_indexes = new HashMap<String, Integer>();
 	HashMap<String, Integer> message_model_colors = new HashMap<String, Integer>();
@@ -133,6 +134,10 @@ public class Message extends BaseFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			mSelectedItemPosition = savedInstanceState.getInt(
+					"mSelectedItemPosition", -1);
+		}
 		/*
 		 * setHasOptionsMenu()
 		 * 
@@ -333,8 +338,6 @@ public class Message extends BaseFragment implements
 		return newSubject;
 	}
 
-	int message_resource = 0;
-
 	private void checkMessageStatus() {
 
 		// Fetching parent ids from Child row with order by date desc
@@ -375,7 +378,7 @@ public class Message extends BaseFragment implements
 						OETextView txvMsg = (OETextView) rootView
 								.findViewById(R.id.txvMessageAllReadMessage);
 						txvMsg.setVisibility(View.VISIBLE);
-						txvMsg.setText(message_resource);
+						txvMsg.setText(getStatusMessage(mType));
 					}
 				});
 
@@ -454,27 +457,39 @@ public class Message extends BaseFragment implements
 		}
 	};
 
+	private int getStatusMessage(Type type) {
+		switch (type) {
+		case INBOX:
+			return R.string.message_inbox_all_read;
+		case TOME:
+			return R.string.message_tome_all_read;
+		case TODO:
+			return R.string.message_todo_all_read;
+		case GROUP:
+			return R.string.message_no_group_message;
+		default:
+			break;
+		}
+		return 0;
+	}
+
 	private String[] getWhereClause(Type type) {
 		String where[] = null;
 		switch (type) {
 		case INBOX:
 			where = new String[] { "to_read = 'true'", "AND",
 					"starred  = 'false'" };
-			message_resource = R.string.message_inbox_all_read;
 			break;
 		case TOME:
 			where = new String[] { "res_id = '0' ", "AND", "to_read= 'true'", };
-			message_resource = R.string.message_tome_all_read;
 			break;
 		case TODO:
 			where = new String[] { "starred  = 'true' ", "AND",
 					"to_read = 'true'" };
-			message_resource = R.string.message_todo_all_read;
 			break;
 		case GROUP:
 			where = new String[] { "res_id  =  " + mGroupId, "AND",
 					"model = 'mail.group'" };
-			message_resource = R.string.message_no_group_message;
 			break;
 		default:
 			break;
@@ -527,6 +542,9 @@ public class Message extends BaseFragment implements
 	@Override
 	public void onStart() {
 		super.onStart();
+		if (mSelectedItemPosition > -1) {
+			return;
+		}
 		Bundle bundle = getArguments();
 		if (bundle != null) {
 			if (bundle.containsKey("type")) {
@@ -586,6 +604,9 @@ public class Message extends BaseFragment implements
 		}
 		scope.context().unregisterReceiver(messageSyncFinish);
 		scope.context().unregisterReceiver(datasetChangeReceiver);
+		Bundle outState = new Bundle();
+		outState.putInt("mSelectedItemPosition", mSelectedItemPosition);
+		onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -667,7 +688,6 @@ public class Message extends BaseFragment implements
 				mListViewAdapter.clear();
 				mMessageObjects.clear();
 				mListViewAdapter.notifiyDataChange(mMessageObjects);
-
 				new MessagesLoader(mType).execute();
 
 			} catch (Exception e) {
@@ -910,13 +930,13 @@ public class Message extends BaseFragment implements
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position,
 			long id) {
+		mSelectedItemPosition = position;
 		MessageDetail messageDetail = new MessageDetail();
 		Bundle bundle = new Bundle();
 		OEListViewRow row = (OEListViewRow) mMessageObjects.get(position);
 		bundle.putInt("message_id", row.getRow_id());
 		bundle.putInt("position", position);
 		messageDetail.setArguments(bundle);
-
 		scope.main().fragmentHandler.setBackStack(true, null);
 		scope.main().fragmentHandler.replaceFragmnet(messageDetail);
 	}
@@ -1090,7 +1110,7 @@ public class Message extends BaseFragment implements
 					OETextView txvMsg = (OETextView) rootView
 							.findViewById(R.id.txvMessageAllReadMessage);
 					txvMsg.setVisibility(View.VISIBLE);
-					txvMsg.setText(message_resource);
+					txvMsg.setText(getStatusMessage(mType));
 				}
 				scope.main().refreshDrawer(TAG, getActivity());
 			} else {

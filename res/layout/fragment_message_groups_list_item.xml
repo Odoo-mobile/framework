@@ -15,8 +15,7 @@
         <ImageView
             android:id="@+id/imgGroupPic"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="#f3f3f3"
+            android:layout_height="80dp"
             android:scaleType="centerCrop" />
 
         <LinearLayout
@@ -34,8 +33,9 @@
                 android:gravity="center_horizontal"
                 android:singleLine="true"
                 android:text="Group Name"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#414141" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#414141"
+                android:textStyle="bold" />
 
             <com.openerp.util.controls.OETextView
                 android:id="@+id/txvGroupDescription"
@@ -46,17 +46,17 @@
                 android:gravity="center_horizontal"
                 android:lines="2"
                 android:text="Group Name"
-                android:textColor="#414141"
-                android:textSize="11sp" />
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#414141" />
         </LinearLayout>
 
         <Button
             android:id="@+id/btnJoinGroup"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/button_bg_user_group_join"
             android:text="Join"
-            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#ffffff"
             android:textStyle="bold"
             android:visibility="gone" />
@@ -64,10 +64,10 @@
         <Button
             android:id="@+id/btnUnJoinGroup"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/button_bg_user_group_unjoin"
             android:text="Unfollow"
-            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#ffffff"
             android:textStyle="bold" />
     </LinearLayout>

@@ -19,10 +19,10 @@
 
 package com.openerp.support;
 
-import com.openerp.MainActivity;
-
 import android.content.Context;
 import android.support.v4.app.Fragment;
+
+import com.openerp.MainActivity;
 
 /**
  * The Class AppScope.

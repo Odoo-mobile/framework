@@ -39,6 +39,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,9 +54,9 @@ import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
-import com.openerp.support.listview.OEListViewAdapter;
-import com.openerp.support.listview.OEListViewOnCreateListener;
+import com.openerp.support.listview.OEListAdapter;
 import com.openerp.support.listview.OEListViewRow;
+import com.openerp.util.Base64Helper;
 import com.openerp.util.drawer.DrawerItem;
 
 public class UserGroups extends BaseFragment implements
@@ -63,13 +64,17 @@ public class UserGroups extends BaseFragment implements
 	public static final String TAG = "com.openerp.addons.UserGroups";
 	private OETouchListener mTouchAttacher;
 	View rootView = null;
-	GridView lstGroups = null;
 	String tag_colors[] = new String[] { "#218559", "#192823", "#FF8800",
 			"#CC0000", "#59A2BE", "#808080", "#9933CC", "#0099CC", "#669900",
 			"#EBB035" };
 	public static HashMap<String, Integer> menu_color = new HashMap<String, Integer>();
 	public static HashMap<String, String> group_names = new HashMap<String, String>();
-	LoadGroups groups_loader = null;
+
+	GridView mGridGroups = null;
+	GroupsLoader mGroupLoader = null;
+	List<Object> mGroupsList = new ArrayList<Object>();
+	OEListAdapter mGroupsAdapter = null;
+
 	JoinUnfollowGroup joinUnfollow = null;
 	MailFollowerDb follower = null;
 
@@ -81,44 +86,39 @@ public class UserGroups extends BaseFragment implements
 		db = (BaseDBHelper) databaseHelper(scope.context());
 		rootView = inflater.inflate(R.layout.fragment_message_groups_list,
 				container, false);
+		setupGridView();
 		return rootView;
-	}
-
-	@Override
-	public Object databaseHelper(Context context) {
-		MailFollowerDb follower = new MailFollowerDb(context);
-		follower.createTable(follower.createStatement(follower));
-		return new UserGroupsDb(context);
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		follower = new MailFollowerDb(scope.context());
-		scope.main().setTitle("Join a Group");
-		lstGroups = (GridView) rootView.findViewById(R.id.listGroups);
-		groups_loader = new LoadGroups();
-		groups_loader.execute((Void) null);
 
 	}
 
-	private Boolean setupView() {
-		List<OEListViewRow> groups = getGroups();
-		String[] from = new String[] { "name", "image_medium", "description" };
-		int[] to = new int[] { R.id.txvGroupName, R.id.imgGroupPic,
-				R.id.txvGroupDescription };
-		final OEListViewAdapter adapter = new OEListViewAdapter(
-				scope.context(), R.layout.fragment_message_groups_list_item,
-				groups, from, to, db);
-		adapter.addViewListener(new OEListViewOnCreateListener() {
-
+	private void setupGridView() {
+		mGridGroups = (GridView) rootView.findViewById(R.id.listGroups);
+		mGroupsAdapter = new OEListAdapter(getActivity(),
+				R.layout.fragment_message_groups_list_item, mGroupsList) {
 			@Override
-			public View listViewOnCreateListener(int position, View row_view,
-					OEListViewRow row_data) {
-				final int group_id = row_data.getRow_id();
-				final Button btnJoin = (Button) row_view
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View mView = convertView;
+				if (mView == null) {
+					mView = getActivity().getLayoutInflater().inflate(
+							getResource(), parent, false);
+				}
+				OEListViewRow row = (OEListViewRow) mGroupsList.get(position);
+				TextView txvName = (TextView) mView
+						.findViewById(R.id.txvGroupName);
+				TextView txvDesc = (TextView) mView
+						.findViewById(R.id.txvGroupDescription);
+				ImageView imgGroupPic = (ImageView) mView
+						.findViewById(R.id.imgGroupPic);
+				imgGroupPic.setImageBitmap(Base64Helper.getBitmapImage(
+						getActivity(),
+						row.getRow_data().getString("image_medium")));
+				txvName.setText(row.getRow_data().getString("name"));
+				txvDesc.setText(row.getRow_data().getString("description"));
+
+				final int group_id = row.getRow_id();
+				final Button btnJoin = (Button) mView
 						.findViewById(R.id.btnJoinGroup);
-				final Button btnUnJoin = (Button) row_view
+				final Button btnUnJoin = (Button) mView
 						.findViewById(R.id.btnUnJoinGroup);
 				int total = follower.count(follower, new String[] {
 						"res_model = ?", "AND", "res_id = ?", "AND",
@@ -153,32 +153,34 @@ public class UserGroups extends BaseFragment implements
 					btnJoin.setVisibility(View.VISIBLE);
 					btnUnJoin.setVisibility(View.GONE);
 				}
-				return row_view;
+				return mView;
 			}
-		});
-		adapter.addImageColumn("image_medium");
-		scope.main().runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				lstGroups.setAdapter(adapter);
-			}
-		});
-
+		};
+		mGridGroups.setAdapter(mGroupsAdapter);
 		// Getting Pull To Refresh Attacher from Main Activity
 		mTouchAttacher = scope.main().getTouchAttacher();
-
 		// Set the Refreshable View to be the ListView and the refresh listener
 		// to be this.
-		if (mTouchAttacher != null & lstGroups != null) {
-			mTouchAttacher.setPullableView(lstGroups, this);
-		}
-		return true;
-
+		mTouchAttacher.setPullableView(mGridGroups, this);
+		mGroupLoader = new GroupsLoader();
+		mGroupLoader.execute((Void) null);
 	}
 
-	private List<OEListViewRow> getGroups() {
-		List<OEListViewRow> groups = new ArrayList<OEListViewRow>();
+	@Override
+	public Object databaseHelper(Context context) {
+		MailFollowerDb follower = new MailFollowerDb(context);
+		follower.createTable(follower.createStatement(follower));
+		return new UserGroupsDb(context);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		follower = new MailFollowerDb(scope.context());
+		scope.main().setTitle("Join a Group");
+	}
+
+	private void checkStatus() {
 
 		if (!db.isEmptyTable(db)) {
 			scope.main().runOnUiThread(new Runnable() {
@@ -187,20 +189,8 @@ public class UserGroups extends BaseFragment implements
 				public void run() {
 					rootView.findViewById(R.id.groupSyncWaiter).setVisibility(
 							View.GONE);
-					rootView.findViewById(R.id.listGroups).setVisibility(
-							View.VISIBLE);
 				}
 			});
-
-			List<OEDataRow> group_data = db.search(db);
-			if (group_data.size() > 0) {
-				for (OEDataRow row : group_data) {
-					int id = row.getInt("id");
-					OEListViewRow row_data = new OEListViewRow(id, row);
-					groups.add(row_data);
-				}
-			}
-
 		} else {
 			scope.main().runOnUiThread(new Runnable() {
 				@Override
@@ -210,14 +200,11 @@ public class UserGroups extends BaseFragment implements
 					TextView txvSyncDetail = (TextView) rootView
 							.findViewById(R.id.txvMessageHeaderSubtitle);
 					txvSyncDetail.setText("Your groups will appear shortly");
-					rootView.findViewById(R.id.listGroups).setVisibility(
-							View.GONE);
 					Log.d(TAG, "Requesting for sync groups");
 					scope.main().requestSync(UserGroupsProvider.AUTHORITY);
 				}
 			});
 		}
-		return groups;
 	}
 
 	@Override
@@ -307,7 +294,8 @@ public class UserGroups extends BaseFragment implements
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			mTouchAttacher.setPullComplete();
-			setupView();
+			mGroupLoader = new GroupsLoader();
+			mGroupLoader.execute();
 			scope.main().refreshDrawer(TAG, context);
 		}
 
@@ -396,25 +384,31 @@ public class UserGroups extends BaseFragment implements
 		}
 	}
 
-	public class LoadGroups extends AsyncTask<Void, Void, Boolean> {
+	public class GroupsLoader extends AsyncTask<Void, Void, Boolean> {
 
 		@Override
 		protected void onPreExecute() {
 			scope.main().runOnUiThread(new Runnable() {
-
 				@Override
 				public void run() {
-					rootView.findViewById(R.id.loadingHeader).setVisibility(
+					rootView.findViewById(R.id.loadingProgress).setVisibility(
 							View.VISIBLE);
-					rootView.findViewById(R.id.listGroups).setVisibility(
-							View.GONE);
 				}
 			});
 		}
 
 		@Override
 		protected Boolean doInBackground(Void... arg0) {
-			return setupView();
+			mGroupsList.clear();
+			List<OEDataRow> group_data = db.search(db);
+			if (group_data.size() > 0) {
+				for (OEDataRow row : group_data) {
+					int id = row.getInt("id");
+					OEListViewRow row_data = new OEListViewRow(id, row);
+					mGroupsList.add(row_data);
+				}
+			}
+			return true;
 		}
 
 		@Override
@@ -424,11 +418,11 @@ public class UserGroups extends BaseFragment implements
 				@Override
 				public void run() {
 					try {
-						rootView.findViewById(R.id.loadingHeader)
+						rootView.findViewById(R.id.loadingProgress)
 								.setVisibility(View.GONE);
-						rootView.findViewById(R.id.listGroups).setVisibility(
-								View.VISIBLE);
-						groups_loader = null;
+						mGroupsAdapter.notifiyDataChange(mGroupsList);
+						mGroupLoader = null;
+						checkStatus();
 					} catch (Exception e) {
 					}
 				}

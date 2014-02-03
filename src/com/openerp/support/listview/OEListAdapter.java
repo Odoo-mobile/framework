@@ -3,8 +3,6 @@ package com.openerp.support.listview;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.openerp.util.logger.OELog;
-
 import android.content.Context;
 import android.text.TextUtils;
 import android.widget.ArrayAdapter;
@@ -16,6 +14,7 @@ public class OEListAdapter extends ArrayAdapter<Object> {
 	List<Object> mAllObjects = null;
 	RowFilter mFilter = null;
 	int mResourceId = 0;
+	RowFilterTextListener mRowFilterTextListener = null;
 
 	public OEListAdapter(Context context, int resource, List<Object> objects) {
 		super(context, resource, objects);
@@ -52,7 +51,14 @@ public class OEListAdapter extends ArrayAdapter<Object> {
 				String searchingStr = constraint.toString().toLowerCase();
 				List<Object> filteredItems = new ArrayList<Object>();
 				for (Object item : mAllObjects) {
-					if (item.toString().toLowerCase().contains(searchingStr)) {
+					String filterText = "";
+					if (mRowFilterTextListener != null) {
+						filterText = mRowFilterTextListener
+								.filterCompareWith(item);
+					} else {
+						filterText = item.toString().toLowerCase();
+					}
+					if (filterText.contains(searchingStr)) {
 						filteredItems.add(item);
 					}
 				}
@@ -77,6 +83,14 @@ public class OEListAdapter extends ArrayAdapter<Object> {
 			}
 			notifyDataSetChanged();
 		}
+	}
+
+	public void setRowFilterTextListener(RowFilterTextListener listener) {
+		mRowFilterTextListener = listener;
+	}
+
+	public interface RowFilterTextListener {
+		public String filterCompareWith(Object object);
 	}
 
 }

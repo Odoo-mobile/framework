@@ -35,7 +35,6 @@ import android.widget.SearchView.OnQueryTextListener;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEHelper;
-import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
