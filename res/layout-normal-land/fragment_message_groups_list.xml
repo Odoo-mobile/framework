@@ -22,7 +22,7 @@
         android:id="@+id/listGroups"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:numColumns="auto_fit"
+        android:numColumns="3"
         android:padding="5dp" >
     </GridView>
 

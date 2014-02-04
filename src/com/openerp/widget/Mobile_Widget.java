@@ -80,7 +80,7 @@ public class Mobile_Widget extends AppWidgetProvider {
 
 				// Fetching UNREAD Messages From Account
 				Message message = new Message();
-				total_unreadMessges = message.getCount(Message.TYPE.INBOX,
+				total_unreadMessges = message.getCount(Message.Type.INBOX,
 						context);
 
 				if (String.valueOf(total_unreadMessges) == null

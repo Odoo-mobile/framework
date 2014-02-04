@@ -40,7 +40,6 @@ import com.openerp.config.ModulesConfig;
 import com.openerp.support.Module;
 import com.openerp.support.OEUser;
 import com.openerp.support.OpenERPServerConnection;
-import com.openerp.util.logger.OELog;
 
 /**
  * The Class ORM.
@@ -1163,8 +1162,9 @@ public class ORM extends SQLiteDatabaseHelper {
 		}
 		StringBuffer statement = new StringBuffer();
 		for (String whr : where) {
-			if (whr.contains(".")) {
-				String[] datas = whr.split("\\.");
+			String[] colAndMark = whr.split("=");
+			if (colAndMark[0].contains(".")) {
+				String[] datas = colAndMark[0].split("\\.");
 				String table = datas[0];
 				String rel_id = table + "_id";
 				String fetch_id = modelToTable(db.getModelName()) + "_id";

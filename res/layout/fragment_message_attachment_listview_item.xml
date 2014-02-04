@@ -7,6 +7,14 @@
     android:padding="5dp"
     android:weightSum="3" >
 
+    <ImageView
+        android:id="@+id/imgAttachment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingRight="5dp"
+        android:src="@drawable/ic_action_content_attachment" />
+
     <com.openerp.util.controls.OETextView
         android:id="@+id/txvFileName"
         android:layout_width="0dp"

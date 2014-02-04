@@ -39,7 +39,6 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.JSONDataHelper;
-import com.openerp.util.logger.OELog;
 import com.openerp.widget.Mobile_Widget;
 
 public class NoteSyncService extends Service {

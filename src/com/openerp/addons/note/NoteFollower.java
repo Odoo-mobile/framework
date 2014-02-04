@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.GridView;
 
 import com.openerp.R;
@@ -37,7 +36,6 @@ import com.openerp.util.Base64Helper;
 import com.openerp.util.contactview.OEContactView;
 import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.logger.OELog;
 import com.openerp.util.tags.TagsItem;
 import com.openerp.util.tags.TagsView;
 

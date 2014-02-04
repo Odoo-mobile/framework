@@ -83,4 +83,9 @@ public class OEListViewRow {
 		this.row_data = row_data;
 	}
 
+	@Override
+	public String toString() {
+		return getRow_data().toString();
+	}
+
 }

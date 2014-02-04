@@ -99,12 +99,12 @@ public class TagsView extends MultiTagsTextView implements
 
 	@Override
 	protected View getViewForObject(Object object) {
-		TagsItem item = (TagsItem) object;
 		View view = null;
 		ViewGroup tagsParentView = (ViewGroup) TagsView.this.getParent();
 		LayoutInflater l = (LayoutInflater) getContext().getSystemService(
 				Activity.LAYOUT_INFLATER_SERVICE);
 		if (mCustomTagView == null) {
+			TagsItem item = (TagsItem) object;
 			view = l.inflate(R.layout.fragment_message_receipient_tag_layout,
 					tagsParentView, false);
 			((TextView) view.findViewById(R.id.txvTagSubject)).setText(item
