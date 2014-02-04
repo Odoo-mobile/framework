@@ -4,7 +4,7 @@
     android:orientation="vertical" >
 
     <include
-        android:id="@+id/loadingHeader"
+        android:id="@+id/loadingProgress"
         layout="@layout/listview_data_loading_progress"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
@@ -13,7 +13,7 @@
     <LinearLayout
         android:id="@+id/messageDetailView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="5"
         android:background="#eeeeee"
         android:orientation="vertical" >
@@ -38,18 +38,17 @@
             android:textColor="#414141"
             android:textStyle="bold" />
 
-        <GridView
+        <ListView
             android:id="@+id/lstMessageDetail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:numColumns="1"
+            android:divider="#00ffffff"
+            android:dividerHeight="0dp"
             android:paddingBottom="20dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:paddingTop="10dp"
-            android:scrollbars="none" >
-        </GridView>
+            android:scrollbars="none" />
     </LinearLayout>
 
 </LinearLayout>

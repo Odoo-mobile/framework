@@ -36,6 +36,13 @@ public class OEListAdapter extends ArrayAdapter<Object> {
 		return mResourceId;
 	}
 
+	public void replaceObjectAtPosition(int position, Object object) {
+		mAllObjects.remove(position);
+		mAllObjects.add(position, object);
+		mObjects.remove(position);
+		mObjects.add(position, object);
+	}
+
 	public void notifiyDataChange(List<Object> objects) {
 		mAllObjects = new ArrayList<Object>(objects);
 		mObjects = new ArrayList<Object>(objects);

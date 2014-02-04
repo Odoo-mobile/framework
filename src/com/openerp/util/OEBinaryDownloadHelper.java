@@ -33,7 +33,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
@@ -160,7 +159,6 @@ public class OEBinaryDownloadHelper {
 				Uri uri = Uri.fromFile(fl);
 				String mimeType = mime.getContentTypeFor(uri.getPath());
 				intent.setDataAndType(uri, mimeType);
-				Log.e(">> uri mime content", mimeType);
 				notification.setResultIntent(intent, MainActivity.context);
 				notification.showNotification(MainActivity.context,
 						downloadFileName + " Download complete", downloadPath,

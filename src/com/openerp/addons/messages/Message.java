@@ -1100,7 +1100,9 @@ public class Message extends BaseFragment implements
 		@Override
 		protected void onPostExecute(Boolean result) {
 			if (result) {
-				for (int position : mMultiSelectedRows.keySet()) {
+				ArrayList<Integer> keys = new ArrayList<Integer>(
+						mMultiSelectedRows.keySet());
+				for (int position = keys.size() - 1; position >= 0; position--) {
 					if (!mToRead && !mType.equals(Type.ARCHIVE)) {
 						mMessageObjects.remove(position);
 					}
