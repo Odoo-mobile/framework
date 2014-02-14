@@ -177,9 +177,7 @@ public class OEHelper extends OpenERP {
 
 			}
 		} catch (Exception e) {
-			// e.printStackTrace();
-			Toast.makeText(mContext, "Unable to reach OpenERP 7.0 Server ! ",
-					Toast.LENGTH_LONG).show();
+			e.printStackTrace();
 		}
 		return userObj;
 	}
