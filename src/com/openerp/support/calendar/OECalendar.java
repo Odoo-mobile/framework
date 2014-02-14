@@ -51,6 +51,7 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.OEUser;
+import com.openerp.util.logger.OELog;
 
 /**
  * The Class OECalendar.
@@ -267,7 +268,6 @@ public class OECalendar {
 
 						String description = cursor.getString(cursor
 								.getColumnIndex("description"));
-
 						int newId = writeMeeting(name, date, enddate, duration,
 								allDay, categ_id, location, description);
 
@@ -592,11 +592,13 @@ public class OECalendar {
 			args.put("partner_ids", new JSONArray("[" + Partner_ids.toString()
 					+ "]"));
 			args.put("allday", allDay); // IMP Field REQ
+			if (endDate.equals("1970-01-01 00:00:00")) {
+				endDate = date;
+			}
 			args.put("date_deadline", endDate); // IMP Field REQ
 			args.put("location", location);
 			args.put("description", description);
-
-			response = openerp.createNew("crm.meeting", args);
+			response = openerp.createNew(db.getModelName(), args);
 			new_generated_id = response.getString("result");
 			addMeetings_TOlocaldb(Integer.parseInt(new_generated_id), name,
 					date, endDate, Duration, location, description);

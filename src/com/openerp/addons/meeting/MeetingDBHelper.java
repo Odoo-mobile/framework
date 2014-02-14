@@ -18,42 +18,50 @@
  */
 package com.openerp.addons.meeting;
 
+import openerp.OpenERP.OEVersion;
 import android.content.Context;
 
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEColumn;
+import com.openerp.orm.OEHelper;
 import com.openerp.orm.OETypes;
 
 public class MeetingDBHelper extends BaseDBHelper {
 
-    public MeetingDBHelper(Context context) {
-	super(context);
+	public MeetingDBHelper(Context context) {
+		super(context);
+		/* setting model name */
+		name = "crm.meeting";
+		OEHelper oe = getOEInstance();
+		OEVersion version = oe.getOEVersion();
+		if ((version.getVersion_number() == 7
+				&& version.getVersion_type().equals("saas") && version
+				.getVersion_type_number() == 3)
+				|| (version.getVersion_number() >= 8)) {
+			name = "calendar.event";
+		}
+		/* providing model columns */
+		columns.add(new OEColumn("name", "Name", OETypes.varchar(64)));
+		columns.add(new OEColumn("date", "Date", OETypes.text()));
+		columns.add(new OEColumn("duration", "Duration", OETypes.text()));
+		columns.add(new OEColumn("description", "Description", OETypes.text()));
+		columns.add(new OEColumn("location", "Location", OETypes.text()));
+		columns.add(new OEColumn("date_deadline", "Dead_line", OETypes.text()));
+		columns.add(new OEColumn("partner_ids", "Partner_ids", OETypes
+				.many2Many(new Res_PartnerDBHelper(context))));
 
-	/* setting model name */
-	name = "crm.meeting";
+		// Is meeting synced in OpenERP Mobile Calendar as Event ?
+		columns.add(new OEColumn("in_cal_sync", "In_cal_sync", OETypes.text(),
+				false));
 
-	/* providing model columns */
-	columns.add(new OEColumn("name", "Name", OETypes.varchar(64)));
-	columns.add(new OEColumn("date", "Date", OETypes.text()));
-	columns.add(new OEColumn("duration", "Duration", OETypes.text()));
-	columns.add(new OEColumn("description", "Description", OETypes.text()));
-	columns.add(new OEColumn("location", "Location", OETypes.text()));
-	columns.add(new OEColumn("date_deadline", "Dead_line", OETypes.text()));
-	columns.add(new OEColumn("partner_ids", "Partner_ids", OETypes
-		.many2Many(new Res_PartnerDBHelper(context))));
+		// Event id of OpenERP Mobile Calendar for meeting
+		columns.add(new OEColumn("calendar_event_id", "Calendar_event_id",
+				OETypes.text(), false));
 
-	// Is meeting synced in OpenERP Mobile Calendar as Event ?
-	columns.add(new OEColumn("in_cal_sync", "In_cal_sync", OETypes.text(),
-		false));
-
-	// Event id of OpenERP Mobile Calendar for meeting
-	columns.add(new OEColumn("calendar_event_id", "Calendar_event_id", OETypes
-		.text(), false));
-
-	// OpenERP Calendar Id under which meetings synced as events
-	columns.add(new OEColumn("calendar_id", "Calendar_id", OETypes.text(),
-		false));
-    }
+		// OpenERP Calendar Id under which meetings synced as events
+		columns.add(new OEColumn("calendar_id", "Calendar_id", OETypes.text(),
+				false));
+	}
 
 }
