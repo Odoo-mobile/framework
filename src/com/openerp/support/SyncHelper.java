@@ -22,9 +22,8 @@ import java.util.HashMap;
 
 import org.json.JSONArray;
 
-import com.openerp.orm.BaseDBHelper;
+import com.openerp.orm.OEDatabase;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface SyncHelper.
  */
@@ -39,6 +38,5 @@ public interface SyncHelper {
 	 *            the args
 	 * @return the hash map
 	 */
-	public HashMap<String, Object> syncWithServer(BaseDBHelper db,
-			JSONArray args);
+	public HashMap<String, Object> syncWithServer(OEDatabase db, JSONArray args);
 }

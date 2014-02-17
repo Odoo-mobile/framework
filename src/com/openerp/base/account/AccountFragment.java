@@ -119,18 +119,6 @@ public class AccountFragment extends BaseFragment {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.openerp.support.FragmentHelper#databaseHelper(android.content.Context
-	 * )
-	 */
-	@Override
-	public Object databaseHelper(Context context) {
-		return new AccountDBHelper(context);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
 	 * android.view.MenuInflater)
 	 */
@@ -220,7 +208,6 @@ public class AccountFragment extends BaseFragment {
 			}
 
 			OpenERPServerConnection oeConnect = new OpenERPServerConnection();
-
 			boolean flag = false;
 			try {
 				flag = oeConnect
@@ -273,6 +260,11 @@ public class AccountFragment extends BaseFragment {
 		scope.main().getActionBar().setDisplayHomeAsUpEnabled(true);
 		scope.main().getActionBar().setHomeButtonEnabled(true);
 
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

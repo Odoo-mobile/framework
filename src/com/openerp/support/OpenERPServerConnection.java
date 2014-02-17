@@ -32,7 +32,6 @@ import android.text.TextUtils;
 
 import com.openerp.auth.OpenERPAccountManager;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class OpenERPServerConnection.
  */

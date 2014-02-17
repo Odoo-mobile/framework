@@ -30,20 +30,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.openerp.support.BaseFragment;
+import com.openerp.support.fragment.FragmentHelper;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
  * The Class ResFragment.
  */
-public class ResFragment extends BaseFragment {
+public class ResFragment extends BaseFragment implements FragmentHelper {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
-	 * android.view.ViewGroup, android.os.Bundle)
-	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -52,37 +46,11 @@ public class ResFragment extends BaseFragment {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#databaseHelper(android.content.Context
-	 * )
-	 */
-	@Override
-	public Object databaseHelper(Context context) {
-		return new Res_PartnerDBHelper(context);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
-	 * android.view.MenuInflater)
-	 */
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem
-	 * )
-	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// handle item selection
@@ -92,6 +60,11 @@ public class ResFragment extends BaseFragment {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return new Res_PartnerDBHelper(context);
 	}
 
 	@Override

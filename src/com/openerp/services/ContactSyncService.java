@@ -103,9 +103,9 @@ public class ContactSyncService extends Service {
 					JSONObject domain = new JSONObject();
 					domain.accumulate("domain", new JSONArray(
 							"[[\"company_id\", \"=\", " + company_id + "]]"));
-					if (oe.syncWithServer(db, domain, false)) {
-						helper.syncContacts(context, account);
-					}
+//					if (oe.syncWithServer(db, domain, false)) {
+//						helper.syncContacts(context, account);
+//					}
 				} else {
 					helper.syncContacts(context, account);
 				}

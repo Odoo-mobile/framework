@@ -30,10 +30,10 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
-import com.openerp.orm.SQLiteDatabaseHelper;
+import com.openerp.orm.OEDatabase;
+import com.openerp.orm.OESQLiteHelper;
 import com.openerp.providers.note.NoteProvider;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class OEContentProvider.
  */
@@ -59,7 +59,7 @@ public abstract class OEContentProvider extends ContentProvider implements
 	public static String CONTENTURI = "";
 
 	/** The db. */
-	SQLiteDatabaseHelper db = null;
+	OESQLiteHelper db = null;
 
 	/**
 	 * The Class Constants.
@@ -148,8 +148,7 @@ public abstract class OEContentProvider extends ContentProvider implements
 	 */
 	@Override
 	public boolean onCreate() {
-		// TODO Auto-generated method stub
-		db = new SQLiteDatabaseHelper(getContext());
+		db = new OESQLiteHelper(getContext());
 		AUTHORITY = authority();
 		CONTENTURI = contentUri();
 		return ((db == null) ? false : true);

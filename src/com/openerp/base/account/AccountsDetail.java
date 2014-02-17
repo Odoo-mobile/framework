@@ -118,8 +118,8 @@ public class AccountsDetail extends BaseFragment {
 									row_data.getRow_data().get("name")
 											.toString());
 							scope.main().finish();
-							scope.main().startActivity(
-									scope.main().getIntent());
+							scope.main()
+									.startActivity(scope.main().getIntent());
 						}
 					});
 				}
@@ -146,11 +146,6 @@ public class AccountsDetail extends BaseFragment {
 			list.add(row);
 		}
 		return list;
-	}
-
-	@Override
-	public Object databaseHelper(Context context) {
-		return null;
 	}
 
 	@Override
@@ -240,6 +235,11 @@ public class AccountsDetail extends BaseFragment {
 						});
 
 		return builder.create();
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

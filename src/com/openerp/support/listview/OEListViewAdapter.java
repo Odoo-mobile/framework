@@ -38,7 +38,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.openerp.MainActivity;
-import com.openerp.orm.BaseDBHelper;
+import com.openerp.orm.OEDBHelper;
 import com.openerp.orm.OEDataRow;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.util.Base64Helper;
@@ -96,7 +96,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRow> {
 	HashMap<Integer, ControlClickEventListener> controlClickHandler = new HashMap<Integer, ControlClickEventListener>();
 
 	/** The db helper. */
-	BaseDBHelper dbHelper = null;
+	OEDBHelper dbHelper = null;
 
 	/** The rowdata. */
 	OEDataRow rowdata = null;
@@ -152,8 +152,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRow> {
 	 *            the db
 	 */
 	public OEListViewAdapter(Context context, int resource,
-			List<OEListViewRow> objects, String[] from, int[] to,
-			BaseDBHelper db) {
+			List<OEListViewRow> objects, String[] from, int[] to, OEDBHelper db) {
 		super(context, resource, objects);
 		this.context = context;
 		this.resource_id = resource;
@@ -188,7 +187,7 @@ public class OEListViewAdapter extends ArrayAdapter<OEListViewRow> {
 	 */
 	public OEListViewAdapter(Context context, int resource,
 			List<OEListViewRow> objects, String[] from, int[] to,
-			BaseDBHelper db, boolean changeBackground, int[] colors,
+			OEDBHelper db, boolean changeBackground, int[] colors,
 			String conditionKey) {
 		super(context, resource, objects);
 		this.context = context;

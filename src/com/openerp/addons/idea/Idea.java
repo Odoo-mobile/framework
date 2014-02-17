@@ -19,6 +19,7 @@
 
 package com.openerp.addons.idea;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -28,35 +29,26 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.openerp.R;
+import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.support.BaseFragment;
 import com.openerp.util.drawer.DrawerItem;
+import com.openerp.util.logger.OELog;
 
 /**
  * The Class Idea.
  */
 public class Idea extends BaseFragment {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
-	 * android.view.ViewGroup, android.os.Bundle)
-	 */
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_idea, container,
 				false);
+		Res_PartnerDBHelper partner = new Res_PartnerDBHelper(getActivity());
+		boolean flag = partner.getOEInstance().syncWithServer();
+		OELog.log("Synced: " + flag);
 		return rootView;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#databaseHelper(android.content.Context
-	 * )
-	 */
 	@Override
 	public Object databaseHelper(Context context) {
 		return new IdeaDBHelper(context);
@@ -64,7 +56,14 @@ public class Idea extends BaseFragment {
 
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
-		return null;
+		List<DrawerItem> menu = new ArrayList<DrawerItem>();
+		menu.add(new DrawerItem("idea_home", "Idea", true));
+		Idea idea = new Idea();
+		Bundle args = new Bundle();
+		args.putString("key", "idea");
+		idea.setArguments(args);
+		menu.add(new DrawerItem("idea_home", "Idea", 0, 0, idea));
+		return menu;
 	}
 
 }

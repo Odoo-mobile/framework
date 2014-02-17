@@ -37,7 +37,7 @@ import android.widget.Toast;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
-import com.openerp.orm.BaseDBHelper;
+import com.openerp.orm.OEDatabase;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.OpenERPServerConnection;
 
@@ -45,7 +45,7 @@ public class OEBinaryDownloadHelper {
 	ProgressDialog mProgressDialog;
 	DownloadTask downloadTask = null;
 
-	public void downloadBinary(int id, BaseDBHelper db) {
+	public void downloadBinary(int id, OEDatabase db) {
 		try {
 			if (OpenERPServerConnection
 					.isNetworkAvailable(MainActivity.context)) {
@@ -69,11 +69,11 @@ public class OEBinaryDownloadHelper {
 	private class DownloadTask extends AsyncTask<Integer, Integer, Boolean> {
 
 		int attachment_id = 0;
-		BaseDBHelper db = null;
+		OEDatabase db = null;
 		String downloadPath = "";
 		String downloadFileName = "";
 
-		public DownloadTask(BaseDBHelper db) {
+		public DownloadTask(OEDatabase db) {
 			this.db = db;
 		}
 

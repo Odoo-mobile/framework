@@ -74,11 +74,6 @@ public class SyncWizard extends BaseFragment {
 		return rootView;
 	}
 
-	@Override
-	public Object databaseHelper(Context context) {
-		return null;
-	}
-
 	private void generateLayout() {
 
 		LinearLayout layout = (LinearLayout) rootView
@@ -200,6 +195,11 @@ public class SyncWizard extends BaseFragment {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

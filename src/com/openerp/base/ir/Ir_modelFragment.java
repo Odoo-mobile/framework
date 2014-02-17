@@ -23,13 +23,14 @@ import java.util.List;
 import android.content.Context;
 
 import com.openerp.support.BaseFragment;
+import com.openerp.support.fragment.FragmentHelper;
 import com.openerp.util.drawer.DrawerItem;
 
-public class Ir_modelFragment extends BaseFragment {
+public class Ir_modelFragment extends BaseFragment implements FragmentHelper {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new Ir_model(context);
+		return null;
 	}
 
 	@Override

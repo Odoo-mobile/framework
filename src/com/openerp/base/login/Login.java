@@ -151,18 +151,6 @@ public class Login extends BaseFragment {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.openerp.support.FragmentHelper#databaseHelper(android.content.Context
-	 * )
-	 */
-	@Override
-	public Object databaseHelper(Context context) {
-		return new LoginDBHelper(context);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
 	 * android.view.MenuInflater)
 	 */
@@ -319,6 +307,11 @@ public class Login extends BaseFragment {
 	public void onDestroyView() {
 		super.onDestroyView();
 		rootView = null; // now cleaning up!
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

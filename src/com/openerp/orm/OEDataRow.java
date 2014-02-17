@@ -18,7 +18,9 @@
  */
 package com.openerp.orm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 
@@ -64,6 +66,20 @@ public class OEDataRow {
 		} catch (Exception e) {
 		}
 		return val;
+	}
+
+	public OEM2ORecord getM2ORecord(String key) {
+		return (OEM2ORecord) _data.get(key);
+	}
+
+	public OEM2MRecord getM2MRecord(String key) {
+		return (OEM2MRecord) _data.get(key);
+	}
+
+	public List<String> keys() {
+		List<String> list = new ArrayList<String>();
+		list.addAll(_data.keySet());
+		return list;
 	}
 
 	@Override

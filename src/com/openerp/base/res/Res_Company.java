@@ -18,27 +18,33 @@
  */
 package com.openerp.base.res;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 
-import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEColumn;
-import com.openerp.orm.OETypes;
+import com.openerp.orm.OEDatabase;
+import com.openerp.orm.OEFields;
 
 /**
  * The Class Res_Company.
  */
-public class Res_Company extends BaseDBHelper {
-
-	/**
-	 * Instantiates a new res_company.
-	 * 
-	 * @param context
-	 *            the context
-	 */
+public class Res_Company extends OEDatabase {
 	public Res_Company(Context context) {
 		super(context);
-		name = "res.company";
-		columns.add(new OEColumn("name", "Name", OETypes.varchar(100)));
+	}
+
+	@Override
+	public String getModelName() {
+		return "res.company";
+	}
+
+	@Override
+	public List<OEColumn> getModelColumns() {
+		List<OEColumn> columns = new ArrayList<OEColumn>();
+		columns.add(new OEColumn("name", "Name", OEFields.varchar(100)));
+		return columns;
 	}
 
 }

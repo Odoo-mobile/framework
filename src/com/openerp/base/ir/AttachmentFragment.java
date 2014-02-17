@@ -30,12 +30,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.openerp.support.BaseFragment;
+import com.openerp.support.fragment.FragmentHelper;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
  * The Class AttachmentFragment.
  */
-public class AttachmentFragment extends BaseFragment {
+public class AttachmentFragment extends BaseFragment implements FragmentHelper {
 
 	/*
 	 * (non-Javadoc)
@@ -50,18 +51,6 @@ public class AttachmentFragment extends BaseFragment {
 		setHasOptionsMenu(true);
 
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#databaseHelper(android.content.Context
-	 * )
-	 */
-	@Override
-	public Object databaseHelper(Context context) {
-		return new Ir_AttachmentDBHelper(context);
 	}
 
 	/*
@@ -92,6 +81,11 @@ public class AttachmentFragment extends BaseFragment {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override
