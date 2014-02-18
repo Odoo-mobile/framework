@@ -18,8 +18,6 @@
  */
 package com.openerp.config;
 
-import com.openerp.addons.idea.Idea;
-import com.openerp.support.Module;
 import com.openerp.support.ModulesConfigHelper;
 
 /**
@@ -32,6 +30,6 @@ public class ModulesConfig extends ModulesConfigHelper {
 	 */
 	public ModulesConfig() {
 		/* application modules */
-		add(new Module("module_idea", "Idea", new Idea(), 0), true);
+		// add(new Module("module_idea", "Idea", new Idea(), 0), true);
 	}
 }

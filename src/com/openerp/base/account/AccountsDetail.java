@@ -43,6 +43,7 @@ import com.openerp.orm.OEDataRow;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
+import com.openerp.support.fragment.FragmentListener;
 import com.openerp.support.listview.OEListViewAdapter;
 import com.openerp.support.listview.OEListViewOnCreateListener;
 import com.openerp.support.listview.OEListViewRow;
@@ -157,9 +158,9 @@ public class AccountsDetail extends BaseFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_add_new_account:
-			Fragment fragment = new AccountFragment();
-			scope.main().fragmentHandler.setBackStack(true, null);
-			scope.main().fragmentHandler.replaceFragmnet(fragment);
+			AccountFragment fragment = new AccountFragment();
+			FragmentListener mFragment = (FragmentListener) getActivity();
+			mFragment.startMainFragment(fragment, true);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

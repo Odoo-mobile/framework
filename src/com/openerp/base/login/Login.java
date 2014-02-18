@@ -44,6 +44,7 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OEUser;
+import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
 
@@ -275,7 +276,8 @@ public class Login extends BaseFragment {
 					loginUserASync.cancel(true);
 					pdialog.hide();
 					SyncWizard syncWizard = new SyncWizard();
-					scope.main().fragmentHandler.replaceFragmnet(syncWizard);
+					FragmentListener mFragment = (FragmentListener) getActivity();
+					mFragment.startMainFragment(syncWizard, false);
 
 				}
 			} else {

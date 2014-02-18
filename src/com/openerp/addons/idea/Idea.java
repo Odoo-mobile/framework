@@ -29,10 +29,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.openerp.R;
-import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.support.BaseFragment;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.logger.OELog;
+import com.openerp.util.drawer.DrawerListener;
 
 /**
  * The Class Idea.
@@ -43,9 +42,11 @@ public class Idea extends BaseFragment {
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_idea, container,
 				false);
-		Res_PartnerDBHelper partner = new Res_PartnerDBHelper(getActivity());
-		boolean flag = partner.getOEInstance().syncWithServer();
-		OELog.log("Synced: " + flag);
+		// Res_PartnerDBHelper partner = new Res_PartnerDBHelper(getActivity());
+		// boolean flag = partner.getOEInstance().syncWithServer();
+		// OELog.log("Synced: " + flag);
+		DrawerListener drawer = (DrawerListener) getActivity();
+		drawer.refreshDrawer("idea");
 		return rootView;
 	}
 
@@ -62,7 +63,7 @@ public class Idea extends BaseFragment {
 		Bundle args = new Bundle();
 		args.putString("key", "idea");
 		idea.setArguments(args);
-		menu.add(new DrawerItem("idea_home", "Idea", 0, 0, idea));
+		menu.add(new DrawerItem("idea_home", "Idea", 5, 0, idea));
 		return menu;
 	}
 

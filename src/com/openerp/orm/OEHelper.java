@@ -97,8 +97,7 @@ public class OEHelper extends OpenERP {
 				userObj.setHost(serverURL);
 				userObj.setIsactive(true);
 				userObj.setAndroidName(androidName(username, database));
-				userObj.setPartner_id(res.getJSONArray("partner_id").getString(
-						0));
+				userObj.setPartner_id(res.getJSONArray("partner_id").getInt(0));
 				userObj.setTimezone(res.getString("tz"));
 				userObj.setUser_id(String.valueOf(userId));
 				userObj.setUsername(username);
@@ -141,6 +140,8 @@ public class OEHelper extends OpenERP {
 			JSONObject result = search_read(mDatabase.getModelName(),
 					fields.get(), domain.get(), 0, 30, null, null);
 			fields.addAll(result.getJSONArray("records"));
+
+			// Handling many2many and many2one records
 			List<OERelationData> rel_models = fields.getRelationData();
 			for (OERelationData rel : rel_models) {
 				rel.getDb().getOEInstance().syncWithServer(false, rel.getIds());

@@ -2,7 +2,6 @@ package com.openerp.orm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -128,6 +127,7 @@ public class OEFieldsHelper {
 		private HashMap<String, Object> _models = new HashMap<String, Object>();
 		private HashMap<String, List<Object>> _model_ids = new HashMap<String, List<Object>>();
 
+		@SuppressWarnings("unchecked")
 		public void add(OEDatabase db, Object ids) {
 			if (!_models.containsKey(db.getModelName())) {
 				_models.put(db.getModelName(), db);

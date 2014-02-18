@@ -41,7 +41,10 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,25 +58,28 @@ import com.openerp.base.account.AccountFragment;
 import com.openerp.base.account.AccountsDetail;
 import com.openerp.base.account.UserProfile;
 import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.orm.OEDataRow;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.Boot;
-import com.openerp.support.FragmentHandler;
 import com.openerp.support.OEUser;
+import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.OnBackButtonPressedListener;
 import com.openerp.util.actionbar.ActionbarHandler;
 import com.openerp.util.drawer.DrawerAdatper;
+import com.openerp.util.drawer.DrawerHelper;
 import com.openerp.util.drawer.DrawerItem;
+import com.openerp.util.drawer.DrawerListener;
 
 /**
  * The Class MainActivity.
  */
 public class MainActivity extends FragmentActivity implements
-		DrawerItem.DrawerItemClickListener {
+		DrawerItem.DrawerItemClickListener, FragmentListener, DrawerListener {
 
+	public static final String TAG = "com.openerp.MainActivity";
 	public static final int RESULT_SETTINGS = 1;
 	public static boolean set_setting_menu = false;
-	public static Context context = null;
+	public Context mContext = null;
 
 	DrawerLayout mDrawerLayout = null;
 	ActionBarDrawerToggle mDrawerToggle = null;
@@ -85,95 +91,236 @@ public class MainActivity extends FragmentActivity implements
 	int mDrawerItemSelectedPosition = -1;
 	ListView mDrawerListView = null;
 
-	public FragmentHandler fragmentHandler;
+	FragmentManager mFragment = null;
 
-	public enum SETTING_KEYS {
+	public enum SettingKeys {
 		GLOBAL_SETTING, PROFILE, LOGOUT, ACCOUNTS, ADD_ACCOUNT, ABOUT_US
 	}
 
 	private CharSequence mTitle;
 	private OETouchListener mTouchAttacher;
 	private OnBackButtonPressedListener backPressed = null;
+	private boolean mLandscape = false;
 
-	private Boot boot = null;
-
-	@SuppressWarnings("unused")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		context = this;
+		if (savedInstanceState != null) {
+			mDrawerItemSelectedPosition = savedInstanceState
+					.getInt("current_drawer_item");
+		}
+		mContext = this;
+		mFragment = getSupportFragmentManager();
 		if (findViewById(R.id.fragment_container) != null) {
-			initDrawerControls();
-			fragmentHandler = new FragmentHandler(this);
-			boot = new Boot(this);
-			if (savedInstanceState != null) {
-				mDrawerItemSelectedPosition = savedInstanceState
-						.getInt("current_drawer_item");
-				mTouchAttacher = new OETouchListener(this);
-				initDrawer(boot.getDrawerItems());
-				return;
-			}
+			mLandscape = false;
+		} else {
+			mLandscape = true;
+		}
+		init();
+	}
+
+	private void init() {
+		Log.d(TAG, "MainActivity->init()");
+		initDrawerControls();
+		boolean reqForNewAccount = getIntent().getBooleanExtra(
+				"create_new_account", false);
+		/**
+		 * checks for available account related to OpenERP
+		 */
+		if (!OpenERPAccountManager.hasAccounts(this) || reqForNewAccount) {
+			getActionBar().setDisplayHomeAsUpEnabled(false);
+			getActionBar().setHomeButtonEnabled(false);
+			lockDrawer(true);
+			AccountFragment account = new AccountFragment();
+			startMainFragment(account, false);
+		} else {
+			lockDrawer(false);
 			/**
-			 * Getting Application users list. If it's null that means
-			 * application does not contain any account and it will request user
-			 * to create new one.
+			 * User found but not logged in. Requesting for login with available
+			 * accounts.
 			 */
-			if (OpenERPAccountManager.hasAccounts(this) == false) {
-				getActionBar().setDisplayHomeAsUpEnabled(false);
-				getActionBar().setHomeButtonEnabled(false);
-				lockDrawer(true);
-				// Starting New account setup wizard.
-				Fragment fragment = new AccountFragment();
-				fragmentHandler.setBackStack(true, null);
-				fragmentHandler.startNewFragmnet(fragment);
-
-				return;
+			if (!OpenERPAccountManager.isAnyUser(mContext)) {
+				accountSelectionDialog(
+						OpenERPAccountManager.fetchAllAccounts(mContext))
+						.show();
 			} else {
-				// Application contain user account, so going for next stuff.
-				// Checking that rather user have requested to create new
-				// account from application account setting.
-				lockDrawer(false);
-				Intent intent = getIntent();
-				boolean reqForNewAccount = intent.getBooleanExtra(
-						"create_new_account", false);
-
-				// checking for logged in user and not request for new account
-				// setup.
-				if (OpenERPAccountManager.isAnyUser(this) && !reqForNewAccount) {
-					// The attacher should always be created in the Activity's
-					// onCreate
-					initDrawer(boot.getDrawerItems());
-					mTouchAttacher = new OETouchListener(this);
-					if (savedInstanceState != null) {
-						return;
-					}
-				} else {
-
-					// Load new account setup wizard if user have requested to
-					// create new account.
-					if (reqForNewAccount) {
-						getActionBar().setDisplayHomeAsUpEnabled(false);
-						getActionBar().setHomeButtonEnabled(false);
-						Fragment fragment = new AccountFragment();
-						fragmentHandler.startNewFragmnet(fragment);
-						return;
-					} else {
-
-						// If user had not request for new account than showing
-						// list of account to user for login.
-						Dialog dialog = onCreateDialogSingleChoice();
-						dialog.setCancelable(false);
-						dialog.show();
-					}
-				}
+				initDrawer();
 			}
-
 		}
 
 	}
 
-	public void refreshDrawer(String tag_key, Context context) {
+	private void initDrawerControls() {
+		Log.d(TAG, "MainActivity->initDrawerControls()");
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+				R.drawable.ic_drawer, R.string.drawer_open, R.string.app_name) {
+
+			@Override
+			public void onDrawerClosed(View drawerView) {
+				super.onDrawerClosed(drawerView);
+				getActionBar().setIcon(R.drawable.ic_launcher);
+				setTitle(mAppTitle, null);
+			}
+
+			@Override
+			public void onDrawerOpened(View drawerView) {
+				super.onDrawerOpened(drawerView);
+				setTitle(mDrawerTitle, mDrawerSubtitle);
+				setUserPicIcon(mContext);
+			}
+		};
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+	}
+
+	private void setDrawerItems() {
+		Log.d(TAG, "MainActivity->setDrawerItems()");
+		getActionBar().setHomeButtonEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		mDrawerListItems.addAll(DrawerHelper.drawerItems(mContext));
+		mDrawerListItems.addAll(setSettingMenu());
+		mDrawerAdatper = new DrawerAdatper(this, R.layout.drawer_item_layout,
+				R.layout.drawer_item_group_layout, mDrawerListItems);
+		mDrawerListView.setAdapter(mDrawerAdatper);
+		mDrawerAdatper.notifyDataSetChanged();
+		if (mDrawerItemSelectedPosition >= 0) {
+			mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
+		}
+		if (OEUser.current(mContext) != null) {
+			mDrawerTitle = OEUser.current(mContext).getUsername();
+			mDrawerSubtitle = OEUser.current(mContext).getHost();
+			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(mContext);
+			OEDataRow partnerInfo = partner.select(OEUser.current(mContext)
+					.getPartner_id());
+			if (partnerInfo != null) {
+				mDrawerTitle = partnerInfo.getString("name");
+			}
+		}
+	}
+
+	private void initDrawer() {
+		setDrawerItems();
+		Log.d(TAG, "MainActivity->initDrawer()");
+		ActionbarHandler actionbarHandler = new ActionbarHandler(this,
+				getActionBar());
+		actionbarHandler.applyCustomFonts(Typeface.createFromAsset(
+				getResources().getAssets(), "fonts/RobotoSlab-Regular.ttf"));
+
+		mDrawerListView.setOnItemClickListener(this);
+		int position = -1;
+		if (mDrawerListItems.size() > 0) {
+			if (!mDrawerListItems.get(0).isGroupTitle()) {
+				mDrawerListView.setItemChecked(0, true);
+				position = 0;
+			} else {
+				mDrawerListView.setItemChecked(1, true);
+				position = 1;
+			}
+		}
+		if (mDrawerItemSelectedPosition >= 0) {
+			position = mDrawerItemSelectedPosition;
+		}
+		mAppTitle = mDrawerListItems.get(position).getTitle();
+		setTitle(mAppTitle);
+		if (getIntent().getAction() != null
+				&& !getIntent().getAction().toString()
+						.equalsIgnoreCase("android.intent.action.MAIN")) {
+			if (getIntent().getAction().toString().equalsIgnoreCase("MESSAGE")) {
+				int size = mDrawerListItems.size();
+				for (int i = 0; i < size; i++) {
+					if (mDrawerAdatper.getItem(i).getTitle()
+							.equalsIgnoreCase("Messages")) {
+						loadFragment(mDrawerAdatper.getItem(i + 1));
+					}
+				}
+			}
+			if (getIntent().getAction().toString().equalsIgnoreCase("NOTES")) {
+				int size = mDrawerListItems.size();
+				for (int i = 0; i < size; i++) {
+					if (mDrawerAdatper.getItem(i).getTitle()
+							.equalsIgnoreCase("Notes")) {
+						loadFragment(mDrawerAdatper.getItem(i + 1));
+						break;
+					}
+				}
+			}
+		} else {
+			if (position > 0) {
+				if (position != mDrawerItemSelectedPosition) {
+					loadFragment(mDrawerListItems.get(position));
+				}
+			}
+		}
+	}
+
+	private String[] accountList(List<OEUser> accounts) {
+		String[] account_list = new String[accounts.size()];
+		int i = 0;
+		for (OEUser user : accounts) {
+			account_list[i] = user.getAndroidName();
+			i++;
+		}
+		return account_list;
+	}
+
+	OEUser mAccount = null;
+
+	public Dialog accountSelectionDialog(final List<OEUser> accounts) {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		builder.setTitle("Select Account")
+				.setSingleChoiceItems(accountList(accounts), 1,
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								mAccount = accounts.get(which);
+							}
+						})
+				.setNeutralButton("New", new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						getActionBar().setDisplayHomeAsUpEnabled(false);
+						getActionBar().setHomeButtonEnabled(false);
+						AccountFragment fragment = new AccountFragment();
+						startMainFragment(fragment, false);
+					}
+				})
+				// Set the action buttons
+				.setPositiveButton("Login",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								if (mAccount != null) {
+									OpenERPAccountManager.loginUser(mContext,
+											mAccount.getAndroidName());
+								} else {
+									Toast.makeText(mContext,
+											"Please select account",
+											Toast.LENGTH_LONG).show();
+								}
+								init();
+							}
+						})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								finish();
+							}
+						});
+
+		return builder.create();
+	}
+
+	@Override
+	public void refreshDrawer(String tag_key) {
+		Log.d(TAG, "MainActivity->DrawerListener->refreshDrawer()");
 		int start_index = -1;
 		List<DrawerItem> updated_menus = new ArrayList<DrawerItem>();
 		for (int i = 0; i < mDrawerListItems.size(); i++) {
@@ -183,8 +330,7 @@ public class MainActivity extends FragmentActivity implements
 					start_index = i - 1;
 					BaseFragment instance = (BaseFragment) item
 							.getFragmentInstace();
-					// TODO:
-					// updated_menus.addAll(instance.drawerMenus(context));
+					updated_menus.addAll(instance.drawerMenus(mContext));
 					break;
 				}
 			}
@@ -195,106 +341,20 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	String[] accountNames = null;
-	String selectedAccountName = "";
-
-	public Dialog onCreateDialogSingleChoice() {
-
-		// Initialize the Alert Dialog
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		// Source of the data in the DIalog
-
-		List<OEUser> accounts = OpenERPAccountManager.fetchAllAccounts(this);
-		accountNames = new String[accounts.size()];
-		int i = 0;
-		for (OEUser user : accounts) {
-			accountNames[i] = user.getAndroidName();
-			i++;
-		}
-		// Set the dialog title
-		builder.setTitle("Select Account")
-				// Specify the list array, the items to be selected by default
-				// (null for none),
-				// and the listener through which to receive callbacks when
-				// items are selected
-				.setSingleChoiceItems(accountNames, 1,
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								selectedAccountName = accountNames[which];
-							}
-						})
-				.setNeutralButton("New", new OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						getActionBar().setDisplayHomeAsUpEnabled(false);
-						getActionBar().setHomeButtonEnabled(false);
-						Fragment fragment = new AccountFragment();
-						fragmentHandler.startNewFragmnet(fragment);
-					}
-				})
-				// Set the action buttons
-				.setPositiveButton("Login",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								OpenERPAccountManager.loginUser(context,
-										selectedAccountName);
-								finish();
-								startActivity(getIntent());
-							}
-						})
-				.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								finish();
-							}
-						});
-
-		return builder.create();
-	}
-
 	private Dialog logoutConfirmDialog() {
 
-		// Initialize the Alert Dialog
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		// Source of the data in the DIalog
+		builder.setTitle("Confirm").setMessage("Are you sure want to logout?")
 
-		// Set the dialog title
-		builder.setTitle("Confirm")
-				.setMessage("Are you sure want to logout?")
-
-				// Set the action buttons
-				.setPositiveButton("Yes",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								// User clicked OK, so save the result somewhere
-								// or return them to the component that opened
-								// the dialog
-								OpenERPAccountManager.logoutUser(context,
-										OEUser.current(context)
-												.getAndroidName());
-								finish();
-							}
-						})
-				.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								return;
-							}
-						});
-
+		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				OpenERPAccountManager.logoutUser(mContext,
+						OEUser.current(mContext).getAndroidName());
+				finish();
+			}
+		}).setNegativeButton("Cancel", null);
 		return builder.create();
-	}
-
-	public OEUser getUserContext() {
-		return OEUser.current(context);
 	}
 
 	@Override
@@ -317,7 +377,7 @@ public class MainActivity extends FragmentActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	public boolean onSettingItemSelected(SETTING_KEYS key) {
+	public boolean onSettingItemSelected(SettingKeys key) {
 		switch (key) {
 		case GLOBAL_SETTING:
 			set_setting_menu = false;
@@ -332,29 +392,25 @@ public class MainActivity extends FragmentActivity implements
 			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
-			Fragment about = new AboutFragment();
-			fragmentHandler.setBackStack(true, null);
-			fragmentHandler.replaceFragmnet(about);
+			AboutFragment about = new AboutFragment();
+			startMainFragment(about, true);
 			return true;
 		case ADD_ACCOUNT:
 			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
-			Fragment fragment = new AccountFragment();
-			fragmentHandler.setBackStack(true, null);
-			fragmentHandler.replaceFragmnet(fragment);
+			AccountFragment fragment = new AccountFragment();
+			startMainFragment(fragment, true);
 			return true;
 		case ACCOUNTS:
 			set_setting_menu = true;
-			Fragment acFragment = new AccountsDetail();
-			fragmentHandler.setBackStack(true, null);
-			fragmentHandler.replaceFragmnet(acFragment);
+			AccountsDetail acFragment = new AccountsDetail();
+			startMainFragment(acFragment, true);
 			return true;
 		case PROFILE:
 			set_setting_menu = true;
-			Fragment profileFragment = new UserProfile();
-			fragmentHandler.setBackStack(true, null);
-			fragmentHandler.replaceFragmnet(profileFragment);
+			UserProfile profileFragment = new UserProfile();
+			startMainFragment(profileFragment, true);
 			return true;
 		default:
 			return true;
@@ -419,7 +475,7 @@ public class MainActivity extends FragmentActivity implements
 	public void setAutoSync(String authority, boolean isON) {
 		try {
 			Account account = OpenERPAccountManager.getAccount(this, OEUser
-					.current(context).getAndroidName());
+					.current(mContext).getAndroidName());
 			if (!ContentResolver.isSyncActive(account, authority)) {
 				ContentResolver.setSyncAutomatically(account, authority, isON);
 			}
@@ -438,7 +494,7 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public void requestSync(String authority, Bundle bundle) {
 		Account account = OpenERPAccountManager.getAccount(this, OEUser
-				.current(context).getAndroidName());
+				.current(mContext).getAndroidName());
 		Bundle settingsBundle = new Bundle();
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -473,7 +529,7 @@ public class MainActivity extends FragmentActivity implements
 	public void setSyncPeriodic(String authority, long interval_in_minute,
 			long seconds_per_minute, long milliseconds_per_second) {
 		Account account = OpenERPAccountManager.getAccount(this, OEUser
-				.current(context).getAndroidName());
+				.current(mContext).getAndroidName());
 		Bundle extras = new Bundle();
 		this.setAutoSync(authority, true);
 		ContentResolver.setIsSyncable(account, authority, 1);
@@ -492,7 +548,7 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public void cancelSync(String authority) {
 		Account account = OpenERPAccountManager.getAccount(this, OEUser
-				.current(context).getAndroidName());
+				.current(mContext).getAndroidName());
 		ContentResolver.cancelSync(account, authority);
 	}
 
@@ -558,121 +614,6 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-	private void initDrawerControls() {
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_drawer, R.string.drawer_open, R.string.app_name) {
-
-			@Override
-			public void onDrawerClosed(View drawerView) {
-				super.onDrawerClosed(drawerView);
-				getActionBar().setIcon(R.drawable.ic_launcher);
-				setTitle(mAppTitle, null);
-			}
-
-			@Override
-			public void onDrawerOpened(View drawerView) {
-				super.onDrawerOpened(drawerView);
-				setTitle(mDrawerTitle, mDrawerSubtitle);
-				setUserPicIcon(context);
-			}
-		};
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
-	}
-
-	private void initDrawer(List<DrawerItem> drawerItems) {
-		if (OEUser.current(context) != null) {
-			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(context);
-			// List<OEDataRow> obj = partner.search(partner,
-			// new String[] { "name" }, new String[] { "id = ?" },
-			// new String[] { OEUser.current(context).getPartner_id() });
-			String user_name = "";
-			// if (obj.size() <= 0) {
-			user_name = OEUser.current(context).getUsername();
-			// } else {
-			// user_name = obj.get(0).getString("name");
-			// }
-			mDrawerTitle = user_name;
-			mDrawerSubtitle = OEUser.current(context).getHost();
-			getActionBar().setHomeButtonEnabled(true);
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-			setDrawerItems(drawerItems);
-			if (mDrawerItemSelectedPosition > 0) {
-				mAppTitle = mDrawerListItems.get(mDrawerItemSelectedPosition)
-						.getTitle();
-				setTitle(mAppTitle);
-			}
-		}
-	}
-
-	private void setDrawerItems(List<DrawerItem> drawerItems) {
-		mDrawerListItems.addAll(drawerItems);
-		mDrawerListItems.addAll(setSettingMenu());
-		mDrawerAdatper = new DrawerAdatper(this, R.layout.drawer_item_layout,
-				R.layout.drawer_item_group_layout, mDrawerListItems);
-		mDrawerListView.setAdapter(mDrawerAdatper);
-		mDrawerAdatper.notifyDataSetChanged();
-		if (mDrawerItemSelectedPosition >= 0) {
-			mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
-		}
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-
-		ActionbarHandler actionbarHandler = new ActionbarHandler(this,
-				getActionBar());
-		actionbarHandler.applyCustomFonts(Typeface.createFromAsset(
-				getResources().getAssets(), "fonts/RobotoSlab-Regular.ttf"));
-
-		mDrawerListView.setOnItemClickListener(this);
-		int position = -1;
-		if (mDrawerListItems.size() > 0) {
-			if (!mDrawerListItems.get(0).isGroupTitle()) {
-				mDrawerListView.setItemChecked(0, true);
-				position = 0;
-			} else {
-				mDrawerListView.setItemChecked(1, true);
-				position = 1;
-			}
-		}
-		if (mDrawerItemSelectedPosition >= 0) {
-			position = mDrawerItemSelectedPosition;
-		}
-
-		if (getIntent().getAction() != null
-				&& !getIntent().getAction().toString()
-						.equalsIgnoreCase("android.intent.action.MAIN")) {
-			if (getIntent().getAction().toString().equalsIgnoreCase("MESSAGE")) {
-				int size = mDrawerListItems.size();
-				for (int i = 0; i < size; i++) {
-					if (mDrawerAdatper.getItem(i).getTitle()
-							.equalsIgnoreCase("Messages")) {
-						loadFragment(mDrawerAdatper.getItem(i + 1));
-					}
-				}
-			}
-			if (getIntent().getAction().toString().equalsIgnoreCase("NOTES")) {
-				int size = mDrawerListItems.size();
-				for (int i = 0; i < size; i++) {
-					if (mDrawerAdatper.getItem(i).getTitle()
-							.equalsIgnoreCase("Notes")) {
-						loadFragment(mDrawerAdatper.getItem(i + 1));
-						break;
-					}
-				}
-			}
-		} else {
-			if (position > 0) {
-				if (position != mDrawerItemSelectedPosition) {
-					loadFragment(mDrawerListItems.get(position));
-				}
-			}
-		}
-	}
-
 	private void loadFragment(DrawerItem item) {
 		Object instance = item.getFragmentInstace();
 		if (instance instanceof Intent) {
@@ -681,7 +622,7 @@ public class MainActivity extends FragmentActivity implements
 			Fragment fragment = (Fragment) instance;
 			if (fragment.getArguments() != null
 					&& fragment.getArguments().containsKey("settings")) {
-				onSettingItemSelected(SETTING_KEYS.valueOf(fragment
+				onSettingItemSelected(SettingKeys.valueOf(fragment
 						.getArguments().get("settings").toString()));
 			} else {
 				if (item.getTagColor() != null
@@ -694,8 +635,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 			if (fragment != null
 					&& !fragment.getArguments().containsKey("settings")) {
-				fragmentHandler.setBackStack(false, null);
-				fragmentHandler.replaceFragmnet(fragment);
+				startMainFragment(fragment, false);
 			}
 		}
 	}
@@ -714,33 +654,29 @@ public class MainActivity extends FragmentActivity implements
 		String key = "com.openerp.settings";
 		sys.add(new DrawerItem(key, "Settings", true));
 		sys.add(new DrawerItem(key, "Profile", 0, R.drawable.ic_action_user,
-				getFragBundle(new Fragment(), "settings", SETTING_KEYS.PROFILE)));
+				getFragBundle(new Fragment(), "settings", SettingKeys.PROFILE)));
 
 		sys.add(new DrawerItem(key, "Settings", 0,
 				R.drawable.ic_action_settings, getFragBundle(new Fragment(),
-						"settings", SETTING_KEYS.GLOBAL_SETTING)));
+						"settings", SettingKeys.GLOBAL_SETTING)));
 
 		sys.add(new DrawerItem(key, "Accounts", 0,
 				R.drawable.ic_action_accounts, getFragBundle(new Fragment(),
-						"settings", SETTING_KEYS.ACCOUNTS)));
+						"settings", SettingKeys.ACCOUNTS)));
 
 		sys.add(new DrawerItem(key, "Add Account", 0,
 				R.drawable.ic_action_add_account, getFragBundle(new Fragment(),
-						"settings", SETTING_KEYS.ADD_ACCOUNT)));
-		sys.add(new DrawerItem(
-				key,
-				"About Us",
-				0,
-				R.drawable.ic_action_about,
-				getFragBundle(new Fragment(), "settings", SETTING_KEYS.ABOUT_US)));
+						"settings", SettingKeys.ADD_ACCOUNT)));
+		sys.add(new DrawerItem(key, "About Us", 0, R.drawable.ic_action_about,
+				getFragBundle(new Fragment(), "settings", SettingKeys.ABOUT_US)));
 		sys.add(new DrawerItem(key, "Logout", 0, R.drawable.ic_action_logout,
-				getFragBundle(new Fragment(), "settings", SETTING_KEYS.LOGOUT)));
+				getFragBundle(new Fragment(), "settings", SettingKeys.LOGOUT)));
 
 		return sys;
 	}
 
 	private Fragment getFragBundle(Fragment fragment, String key,
-			SETTING_KEYS val) {
+			SettingKeys val) {
 		Bundle bundle = new Bundle();
 		bundle.putString(key, val.toString());
 		fragment.setArguments(bundle);
@@ -760,5 +696,34 @@ public class MainActivity extends FragmentActivity implements
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putInt("current_drawer_item", mDrawerItemSelectedPosition);
 		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void startMainFragment(Fragment fragment, boolean addToBackState) {
+		Log.d(TAG, "MainActivity->FragmentListener->startMainFragment()");
+		FragmentTransaction tran = mFragment.beginTransaction().replace(
+				R.id.fragment_container, fragment);
+		if (addToBackState) {
+			tran.addToBackStack(null);
+		}
+		tran.commit();
+	}
+
+	@Override
+	public void startDetailFragment(Fragment fragment) {
+		Log.d(TAG, "MainActivity->FragmentListener->startDetailFragment()");
+		FragmentTransaction tran = mFragment.beginTransaction().replace(
+				R.id.fragment_container, fragment);
+		if (!mLandscape) {
+			tran.addToBackStack(null);
+		}
+		tran.commit();
+	}
+
+	@Override
+	public void restart() {
+		Log.d(TAG, "MainActivity->FragmentListener->restart()");
+		getIntent().putExtra("create_new_account", false);
+		init();
 	}
 }
