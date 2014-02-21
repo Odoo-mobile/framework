@@ -7,11 +7,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.openerp.base.ir.AttachmentFragment;
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.base.ir.Ir_model;
-import com.openerp.base.ir.Ir_modelFragment;
-import com.openerp.base.res.ResFragment;
+import com.openerp.base.mail.MailFollowers;
 import com.openerp.base.res.Res_Company;
 import com.openerp.base.res.Res_PartnerDBHelper;
 import com.openerp.config.ModulesConfig;
@@ -37,6 +35,7 @@ public class OESQLiteHelper extends SQLiteOpenHelper {
 		baseModels.add(new Res_Company(mContext));
 		baseModels.add(new Ir_model(mContext));
 		baseModels.add(new Ir_AttachmentDBHelper(mContext));
+		baseModels.add(new MailFollowers(mContext));
 		return baseModels;
 	}
 

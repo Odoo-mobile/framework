@@ -6,6 +6,13 @@
     android:orientation="vertical"
     android:padding="10dp" >
 
+    <include
+        android:id="@+id/loadingProgress"
+        layout="@layout/listview_data_loading_progress"
+        android:alpha="99"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,6 +42,13 @@
             android:padding="3dp"
             android:src="@drawable/ic_menu_new_plus" />
     </LinearLayout>
+
+    <include
+        android:id="@+id/waitingForSyncToStart"
+        layout="@layout/fragment_message_listview_header"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:visibility="gone" />
 
     <com.openerp.util.controls.OETextView
         android:id="@+id/txvNoteAllArchive"

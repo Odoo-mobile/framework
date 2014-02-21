@@ -47,6 +47,7 @@ import com.openerp.support.OEUser;
 import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
+import com.openerp.util.logger.OELog;
 
 /**
  * The Class Login.
@@ -239,7 +240,6 @@ public class Login extends BaseFragment {
 				String userName = edtUsername.getText().toString();
 				String password = edtPassword.getText().toString();
 				String database = dbListSpinner.getSelectedItem().toString();
-
 				userData = openerp.login(userName, password, database,
 						openERPServerURL);
 				if (userData != null) {

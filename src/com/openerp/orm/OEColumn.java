@@ -21,6 +21,9 @@ public class OEColumn {
 	/** The can sync. */
 	private boolean mCanSync = true;
 
+	/** The column domain */
+	OEColumnDomain mColumnDomain = null;
+
 	/**
 	 * Instantiates a new database column.
 	 * 
@@ -54,6 +57,14 @@ public class OEColumn {
 		this.mTitle = mTitle;
 		this.mType = mType;
 		this.mCanSync = mCanSync;
+	}
+
+	public OEColumn(String name, String title, Object type,
+			OEColumnDomain columnDomain) {
+		this.mName = name;
+		this.mTitle = title;
+		this.mType = type;
+		this.mColumnDomain = columnDomain;
 	}
 
 	/**
@@ -174,4 +185,11 @@ public class OEColumn {
 		this.mCanSync = mCanSync;
 	}
 
+	public OEColumnDomain getColumnDomain() {
+		return mColumnDomain;
+	}
+
+	public void setColumnDomain(OEColumnDomain columnDomain) {
+		mColumnDomain = columnDomain;
+	}
 }

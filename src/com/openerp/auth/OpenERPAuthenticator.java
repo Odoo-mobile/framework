@@ -29,7 +29,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.openerp.MainActivity;
-import com.openerp.orm.ORM;
 
 // TODO: Auto-generated Javadoc
 /**

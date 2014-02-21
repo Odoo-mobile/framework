@@ -40,7 +40,10 @@ public class OEDataRow {
 	}
 
 	public String getString(String key) {
-		return _data.get(key).toString();
+		if (_data.containsKey(key) && _data.get(key) != null)
+			return _data.get(key).toString();
+		else
+			return "false";
 	}
 
 	public Boolean getBoolean(String key) {

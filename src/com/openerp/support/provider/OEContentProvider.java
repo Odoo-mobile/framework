@@ -30,7 +30,6 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
-import com.openerp.orm.OEDatabase;
 import com.openerp.orm.OESQLiteHelper;
 import com.openerp.providers.note.NoteProvider;
 

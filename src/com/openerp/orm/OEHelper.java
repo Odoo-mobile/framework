@@ -19,9 +19,10 @@
 package com.openerp.orm;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
+import openerp.OEArguments;
 import openerp.OEDomain;
 import openerp.OEVersionException;
 import openerp.OpenERP;
@@ -38,7 +39,6 @@ import android.util.Log;
 import com.openerp.base.ir.Ir_model;
 import com.openerp.orm.OEFieldsHelper.OERelationData;
 import com.openerp.support.OEUser;
-import com.openerp.util.logger.OELog;
 
 public class OEHelper extends OpenERP {
 	public static final String TAG = "com.openerp.orm.OEHelper";
@@ -99,7 +99,7 @@ public class OEHelper extends OpenERP {
 				userObj.setAndroidName(androidName(username, database));
 				userObj.setPartner_id(res.getJSONArray("partner_id").getInt(0));
 				userObj.setTimezone(res.getString("tz"));
-				userObj.setUser_id(String.valueOf(userId));
+				userObj.setUser_id(userId);
 				userObj.setUsername(username);
 				userObj.setPassword(password);
 				String company_id = new JSONArray(res.getString("company_id"))
@@ -123,17 +123,24 @@ public class OEHelper extends OpenERP {
 	}
 
 	public boolean syncWithServer() {
-		return syncWithServer(false, null);
+		return syncWithServer(false, null, null);
 	}
 
-	public boolean syncWithServer(boolean twoWay, List<Object> ids) {
+	public boolean syncWithServer(OEDomain domain) {
+		return syncWithServer(false, domain, null);
+	}
+
+	public boolean syncWithServer(boolean twoWay, OEDomain domain,
+			List<Object> ids) {
 		boolean synced = false;
 		Log.d(TAG, "OEHelper->syncWithServer()");
 		Log.d(TAG, "Model: " + mDatabase.getModelName());
 		OEFieldsHelper fields = new OEFieldsHelper(
 				mDatabase.getDatabaseColumns());
 		try {
-			OEDomain domain = new OEDomain();
+			if (domain == null) {
+				domain = new OEDomain();
+			}
 			if (ids != null) {
 				domain.add("id", "in", ids);
 			}
@@ -144,7 +151,8 @@ public class OEHelper extends OpenERP {
 			// Handling many2many and many2one records
 			List<OERelationData> rel_models = fields.getRelationData();
 			for (OERelationData rel : rel_models) {
-				rel.getDb().getOEInstance().syncWithServer(false, rel.getIds());
+				rel.getDb().getOEInstance()
+						.syncWithServer(false, null, rel.getIds());
 			}
 			List<Long> result_ids = mDatabase.createORReplace(fields
 					.getValues());
@@ -155,10 +163,11 @@ public class OEHelper extends OpenERP {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		Log.d(TAG, mDatabase.getModelName() + " synced");
 		return synced;
 	}
 
-	public boolean isModuleInstalled(String model) {
+	public boolean isModelInstalled(String model) {
 		boolean installed = false;
 		Ir_model ir_model = new Ir_model(mContext);
 		try {
@@ -187,5 +196,141 @@ public class OEHelper extends OpenERP {
 			Log.e(TAG, e.getMessage() + ". No connection with OpenERP server");
 		}
 		return installed;
+	}
+
+	public List<OEDataRow> search_read() {
+		Log.d(TAG, "OEHelper->search_read()");
+		List<OEDataRow> rows = new ArrayList<OEDataRow>();
+		OEFieldsHelper fields = new OEFieldsHelper(
+				mDatabase.getDatabaseServerColumns());
+		try {
+			JSONObject result = search_read(mDatabase.getModelName(),
+					fields.get(), null, 0, 100, null, null);
+			for (int i = 0; i < result.getJSONArray("records").length(); i++) {
+				JSONObject record = result.getJSONArray("records")
+						.getJSONObject(i);
+				OEDataRow row = new OEDataRow();
+				row.put("id", record.getInt("id"));
+				for (OEColumn col : mDatabase.getDatabaseServerColumns()) {
+					row.put(col.getName(), record.get(col.getName()));
+				}
+				rows.add(row);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return rows;
+	}
+
+	public void delete(int id) {
+		Log.d(TAG, "OEHelper->delete()");
+		try {
+			unlink(mDatabase.getModelName(), id);
+			mDatabase.delete(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public Object call_kw(String method, OEArguments arguments) {
+		return call_kw(method, arguments, new JSONObject());
+	}
+
+	public Object call_kw(String method, OEArguments arguments,
+			JSONObject context) {
+		return call_kw(null, method, arguments, context);
+	}
+
+	public Object call_kw(String model, String method, OEArguments arguments,
+			JSONObject context) {
+		Log.d(TAG, "OEHelper->call_kw()");
+		JSONObject result = null;
+		if (model == null) {
+			model = mDatabase.getModelName();
+		}
+		try {
+			if (context != null) {
+				arguments.add(updateContext(context));
+			}
+			result = call_kw(model, method, arguments.get());
+			return result.get("result");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Integer create(OEValues values) {
+		Log.d(TAG, "OEHelper->create()");
+		Integer newId = null;
+		try {
+			JSONObject result = createNew(mDatabase.getModelName(),
+					generateArguments(values));
+			newId = result.getInt("result");
+			values.put("id", newId);
+			mDatabase.create(values);
+			return newId;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return newId;
+	}
+
+	public Boolean update(OEValues values, Integer id) {
+		Log.d(TAG, "OEHelper->update()");
+		Boolean flag = false;
+		try {
+			flag = updateValues(mDatabase.getModelName(),
+					generateArguments(values), id);
+			if (flag)
+				mDatabase.update(values, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	private JSONObject generateArguments(OEValues values) {
+		Log.d(TAG, "OEHelper->generateArguments()");
+		JSONObject arguments = new JSONObject();
+		try {
+			for (String key : values.keys()) {
+				if (values.get(key) instanceof OEM2MIds) {
+					OEM2MIds m2mIds = (OEM2MIds) values.get(key);
+					JSONArray m2mArray = new JSONArray();
+					m2mArray.put(6);
+					m2mArray.put(false);
+					m2mArray.put(m2mIds.getJSONIds());
+					arguments.put(key, new JSONArray("[" + m2mArray.toString()
+							+ "]"));
+				} else {
+					arguments.put(key, values.get(key));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return arguments;
+	}
+
+	public boolean moduleExists(String name) {
+		Log.d(TAG, "OEHelper->moduleExists()");
+		boolean flag = false;
+		try {
+			OEDomain domain = new OEDomain();
+			domain.add("name", "ilike", name);
+			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "state" });
+			JSONObject result = search_read("ir.module.module", fields.get(),
+					domain.get());
+			JSONArray records = result.getJSONArray("records");
+			if (records.length() > 0
+					&& records.getJSONObject(0).getString("state")
+							.equalsIgnoreCase("installed")) {
+				flag = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return flag;
 	}
 }

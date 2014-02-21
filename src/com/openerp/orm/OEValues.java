@@ -7,6 +7,11 @@ import java.util.List;
 public class OEValues {
 	private HashMap<String, Object> _values = new HashMap<String, Object>();
 
+	public OEValues() {
+		_values.clear();
+		_values = new HashMap<String, Object>();
+	}
+
 	public void put(String key, Object value) {
 		_values.put(key, value);
 	}

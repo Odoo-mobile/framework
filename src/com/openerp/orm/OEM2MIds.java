@@ -1,6 +1,9 @@
 package com.openerp.orm;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONArray;
 
 /**
  * The Class OEM2MIds. handling many2many ids operations.
@@ -29,7 +32,7 @@ public class OEM2MIds {
 	Operation mOperation = null;
 
 	/** The List<Integer> ids. */
-	List<Integer> mIds = null;
+	private List<Integer> mIds = new ArrayList<Integer>();
 
 	/**
 	 * Instantiates a new Many2Many operation and ids.
@@ -40,8 +43,9 @@ public class OEM2MIds {
 	 *            the ids list
 	 */
 	public OEM2MIds(Operation operation, List<Integer> ids) {
+		mIds.clear();
 		mOperation = operation;
-		mIds = ids;
+		mIds.addAll(ids);
 	}
 
 	/**
@@ -72,14 +76,26 @@ public class OEM2MIds {
 		return mIds;
 	}
 
+	public JSONArray getJSONIds() {
+		JSONArray ids = new JSONArray();
+		try {
+			for (int id : mIds) {
+				ids.put(id);
+			}
+		} catch (Exception e) {
+		}
+		return ids;
+	}
+
 	/**
 	 * Sets the ids.
 	 * 
 	 * @param mIds
 	 *            the new ids
 	 */
-	public void setIds(List<Integer> mIds) {
-		this.mIds = mIds;
+	public void setIds(List<Integer> ids) {
+		mIds.clear();
+		mIds.addAll(ids);
 	}
 
 }

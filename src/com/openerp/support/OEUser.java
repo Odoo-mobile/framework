@@ -35,7 +35,7 @@ public class OEUser {
 	private String username;
 
 	/** The user_id. */
-	private String user_id;
+	private int user_id;
 
 	/** The partner_id. */
 	private int partner_id;
@@ -72,8 +72,8 @@ public class OEUser {
 	public Bundle getAsBundle() {
 		Bundle bundle = new Bundle();
 		bundle.putString("username", this.getUsername());
-		bundle.putString("user_id", this.getUser_id());
-		bundle.putInt("partner_id", this.getPartner_id());
+		bundle.putString("user_id", this.getUser_id() + "");
+		bundle.putString("partner_id", this.getPartner_id() + "");
 		bundle.putString("timezone", this.getTimezone());
 		bundle.putString("isactive", String.valueOf(this.isIsactive()));
 		bundle.putString("avatar", this.getAvatar());
@@ -112,8 +112,8 @@ public class OEUser {
 	 */
 	public void setFromBundle(Bundle data) {
 		this.setUsername(data.getString("username"));
-		this.setUser_id(data.getString("user_id"));
-		this.setPartner_id(data.getInt("partner_id"));
+		this.setUser_id(Integer.parseInt(data.getString("user_id")));
+		this.setPartner_id(Integer.parseInt(data.getString("partner_id")));
 		this.setTimezone(data.getString("timezone"));
 		this.setIsactive(data.getBoolean("isactive"));
 		this.setAvatar(data.getString("avatar"));
@@ -134,8 +134,9 @@ public class OEUser {
 	 */
 	public void fillFromAccount(AccountManager accMgr, Account account) {
 		this.setUsername(accMgr.getUserData(account, "username"));
-		this.setUser_id(accMgr.getUserData(account, "user_id"));
-		this.setPartner_id(Integer.parseInt(accMgr.getUserData(account, "partner_id")));
+		this.setUser_id(Integer.parseInt(accMgr.getUserData(account, "user_id")));
+		this.setPartner_id(Integer.parseInt(accMgr.getUserData(account,
+				"partner_id")));
 		this.setTimezone(accMgr.getUserData(account, "timezone"));
 		this.setIsactive(Boolean.parseBoolean(accMgr.getUserData(account,
 				"isactive")));
@@ -209,7 +210,7 @@ public class OEUser {
 	 * 
 	 * @return the user_id
 	 */
-	public String getUser_id() {
+	public int getUser_id() {
 		return user_id;
 	}
 
@@ -219,7 +220,7 @@ public class OEUser {
 	 * @param user_id
 	 *            the new user_id
 	 */
-	public void setUser_id(String user_id) {
+	public void setUser_id(int user_id) {
 		this.user_id = user_id;
 	}
 

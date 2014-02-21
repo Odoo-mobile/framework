@@ -56,6 +56,27 @@
             </intent-filter>
         </activity>
         <activity android:name="com.openerp.AppSettingsActivity" />
+        <activity android:name="com.openerp.addons.note.NoteComposeActivity" />
+
+        <provider
+            android:name="com.openerp.providers.note.NoteProvider"
+            android:authorities="com.openerp.providers.note"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Notes"
+            android:syncable="true" />
+
+        <service
+            android:name="com.openerp.services.NoteSyncService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_notes" />
+        </service>
     </application>
 
 </manifest>

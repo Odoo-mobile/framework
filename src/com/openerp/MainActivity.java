@@ -145,6 +145,7 @@ public class MainActivity extends FragmentActivity implements
 						OpenERPAccountManager.fetchAllAccounts(mContext))
 						.show();
 			} else {
+				mTouchAttacher = new OETouchListener(this);
 				initDrawer();
 			}
 		}

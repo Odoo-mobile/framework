@@ -5,10 +5,12 @@ import java.util.List;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
 public class OEListAdapter extends ArrayAdapter<Object> {
+	public static final String TAG = "com.openerp.support.listview.OEListAdapter";
 	Context mContext = null;
 	List<Object> mObjects = null;
 	List<Object> mAllObjects = null;
@@ -18,6 +20,7 @@ public class OEListAdapter extends ArrayAdapter<Object> {
 
 	public OEListAdapter(Context context, int resource, List<Object> objects) {
 		super(context, resource, objects);
+		Log.d(TAG, "OEListAdapter->constructor()");
 		mContext = context;
 		mObjects = new ArrayList<Object>(objects);
 		mAllObjects = new ArrayList<Object>(objects);
@@ -44,6 +47,7 @@ public class OEListAdapter extends ArrayAdapter<Object> {
 	}
 
 	public void notifiyDataChange(List<Object> objects) {
+		Log.d(TAG, "OEListAdapter->notifiyDataChange()");
 		mAllObjects = new ArrayList<Object>(objects);
 		mObjects = new ArrayList<Object>(objects);
 		notifyDataSetChanged();
@@ -80,14 +84,13 @@ public class OEListAdapter extends ArrayAdapter<Object> {
 			return result;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void publishResults(CharSequence constraint,
 				FilterResults results) {
-			if (results.count > 0) {
-				clear();
-				mObjects = (List<Object>) results.values;
-				addAll(mObjects);
-			}
+			clear();
+			mObjects = (List<Object>) results.values;
+			addAll(mObjects);
 			notifyDataSetChanged();
 		}
 	}

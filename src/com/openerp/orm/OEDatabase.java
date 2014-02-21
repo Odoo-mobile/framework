@@ -67,6 +67,19 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		return update(values, "id = ?", new String[] { id + "" });
 	}
 
+	public void updateManyToManyRecords(String column, Operation operation,
+			int id, int rel_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(rel_id);
+		updateManyToManyRecords(column, operation, id, ids);
+	}
+
+	public void updateManyToManyRecords(String column, Operation operation,
+			int id, List<Integer> ids) {
+		OEDBHelper m2mObj = findFieldModel(column);
+		manageMany2ManyRecords(m2mObj, operation, (long) id, ids);
+	}
+
 	public int update(OEValues values, String where, String[] whereArgs) {
 		if (where == null) {
 			where = " oea_name = ?";
@@ -86,13 +99,17 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		ContentValues cValues = (ContentValues) res.get("cValues");
 		int count = db.update(tableName(), cValues, where, whereArgs);
 		db.close();
-		if (res.containsKey("m2mObject")) {
-			OEDBHelper m2mDb = (OEDBHelper) res.get("m2mObject");
-			for (OEDataRow row : select(where, whereArgs, null, null, null)) {
-				manageMany2ManyRecords(m2mDb, row.getInt("id"),
-						res.get("m2mRecordsObj"));
+		if (res.containsKey("m2mObjects")) {
+			@SuppressWarnings("unchecked")
+			List<HashMap<String, Object>> objectList = (List<HashMap<String, Object>>) res
+					.get("m2mObjects");
+			for (HashMap<String, Object> obj : objectList) {
+				OEDBHelper m2mDb = (OEDBHelper) obj.get("m2mObject");
+				for (OEDataRow row : select(where, whereArgs, null, null, null)) {
+					manageMany2ManyRecords(m2mDb, Operation.ADD,
+							row.getInt("id"), obj.get("m2mRecordsObj"));
+				}
 			}
-
 		}
 		return count;
 
@@ -122,39 +139,50 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		SQLiteDatabase db = getWritableDatabase();
 		HashMap<String, Object> res = getContentValues(values);
 		ContentValues cValues = (ContentValues) res.get("cValues");
-		newId = db.insert(tableName(), null, cValues);
-		if (res.containsKey("m2mObject")) {
-			OEDBHelper m2mDb = (OEDBHelper) res.get("m2mObject");
-			manageMany2ManyRecords(m2mDb, newId, res.get("m2mRecordsObj"));
-		}
+		db.insert(tableName(), null, cValues);
+		newId = cValues.getAsInteger("id");
 		db.close();
+		if (res.containsKey("m2mObjects")) {
+			@SuppressWarnings("unchecked")
+			List<HashMap<String, Object>> objectList = (List<HashMap<String, Object>>) res
+					.get("m2mObjects");
+			for (HashMap<String, Object> obj : objectList) {
+				OEDBHelper m2mDb = (OEDBHelper) obj.get("m2mObject");
+				manageMany2ManyRecords(m2mDb, Operation.ADD, newId,
+						obj.get("m2mRecordsObj"));
+			}
+		}
 		return newId;
 	}
 
 	private HashMap<String, Object> getContentValues(OEValues values) {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		ContentValues cValues = new ContentValues();
+		List<HashMap<String, Object>> m2mObjectList = new ArrayList<HashMap<String, Object>>();
 		for (String key : values.keys()) {
 			if (values.get(key) instanceof OEM2MIds
 					|| values.get(key) instanceof List) {
+				HashMap<String, Object> m2mObjects = new HashMap<String, Object>();
 				OEDBHelper m2mDb = findFieldModel(key);
-				result.put("m2mObject", m2mDb);
-				result.put("m2mRecordsObj", values.get(key));
+				m2mObjects.put("m2mObject", m2mDb);
+				m2mObjects.put("m2mRecordsObj", values.get(key));
+				m2mObjectList.add(m2mObjects);
 				continue;
 			}
 			cValues.put(key, values.get(key).toString());
 		}
+		result.put("m2mObjects", m2mObjectList);
 		result.put("cValues", cValues);
 		return result;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void manageMany2ManyRecords(OEDBHelper relDb, long id, Object idsObj) {
+	private void manageMany2ManyRecords(OEDBHelper relDb, Operation operation,
+			long id, Object idsObj) {
 		String first_table = tableName();
 		String second_table = relDb.getModelName().replaceAll("\\.", "_");
 		String rel_table = first_table + "_" + second_table + "_rel";
 		List<Integer> ids = new ArrayList<Integer>();
-		Operation operation = Operation.ADD;
 		if (idsObj instanceof OEM2MIds) {
 			OEM2MIds idsObject = (OEM2MIds) idsObj;
 			operation = idsObject.getOperation();
@@ -172,7 +200,6 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 					new String[] { id + "", mUser.getAndroidName() });
 			db.close();
 		}
-
 		for (Integer rId : ids) {
 			ContentValues values = new ContentValues();
 			values.put(col_first, id);
@@ -183,7 +210,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			case APPEND:
 			case REPLACE:
 				Log.d(TAG,
-						"createMany2ManyRecords() ADD, APPEND, REPLACE called");
+						"manageMany2ManyRecords() ADD, APPEND, REPLACE called");
 				if (!hasRecord(rel_table, col_first + " = ? AND " + col_second
 						+ " = ? AND oea_name = ?", new String[] { id + "",
 						rId + "", mUser.getAndroidName() })) {
@@ -402,7 +429,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		OEHelper oe = getOEInstance();
 		boolean installed = false;
 		if (oe != null) {
-			installed = oe.isModuleInstalled(getModelName());
+			installed = oe.isModelInstalled(getModelName());
 		} else {
 			Ir_model ir = new Ir_model(mContext);
 			List<OEDataRow> rows = ir.select("model = ?",
@@ -470,9 +497,5 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			}
 		}
 		return cols;
-	}
-
-	public String getModelName() {
-		return mDBHelper.getModelName();
 	}
 }

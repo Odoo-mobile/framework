@@ -18,28 +18,6 @@
  */
 package com.openerp.orm;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.config.ModulesConfig;
-import com.openerp.support.Module;
-import com.openerp.support.OEUser;
-import com.openerp.support.OpenERPServerConnection;
 
 /**
  * The Class ORM.

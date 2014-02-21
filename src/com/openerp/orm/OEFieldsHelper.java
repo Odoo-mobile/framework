@@ -8,9 +8,12 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.openerp.orm.OEM2MIds.Operation;
 
 public class OEFieldsHelper {
+	public static final String TAG = "com.openerp.orm.OEFieldsHelper";
 	JSONObject mFields = new JSONObject();
 	List<OEValues> mValues = new ArrayList<OEValues>();
 	List<OEColumn> mColumns = new ArrayList<OEColumn>();
@@ -38,7 +41,10 @@ public class OEFieldsHelper {
 				for (OEColumn col : mColumns) {
 					if (col.canSync()) {
 						String key = col.getName();
-						Object value = record.get(key);
+						Object value = false;
+						if (record.has(key)) {
+							value = record.get(key);
+						}
 						if (col.getType() instanceof OEManyToOne) {
 							if (value instanceof JSONArray) {
 								JSONArray m2oRec = new JSONArray(
@@ -68,6 +74,8 @@ public class OEFieldsHelper {
 				mValues.add(cValue);
 			}
 		} catch (Exception e) {
+			Log.d(TAG, "OEFieldsHelper->addAll(JSONArray records)");
+			e.printStackTrace();
 		}
 	}
 
