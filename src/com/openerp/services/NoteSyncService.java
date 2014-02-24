@@ -70,10 +70,13 @@ public class NoteSyncService extends Service {
 			// update_widget.setAction(Mobile_Widget.TAG);
 
 			NoteDB note = new NoteDB(context);
+			note.setAccountUser(OpenERPAccountManager.getAccountDetail(context,
+					account.name));
 			OEHelper oe = note.getOEInstance();
-
 			if (oe != null && oe.syncWithServer()) {
-				context.sendBroadcast(intent);
+				if (OpenERPAccountManager.currentUser(context).getAndroidName()
+						.equals(account.name))
+					context.sendBroadcast(intent);
 			}
 
 		} catch (Exception e) {
@@ -93,21 +96,15 @@ public class NoteSyncService extends Service {
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
 			Log.d(TAG, "Note sync service started");
-			if (OpenERPAccountManager.isAnyUser(mContext)) {
-				account = OpenERPAccountManager.getAccount(mContext,
-						OpenERPAccountManager.currentUser(mContext)
-								.getAndroidName());
-				try {
-					if (account != null) {
-						new NoteSyncService().performSync(mContext, account,
-								bundle, str, providerClient, syncResult);
-					}
-				} catch (Exception e) {
-
+			try {
+				if (account != null) {
+					new NoteSyncService().performSync(mContext, account,
+							bundle, str, providerClient, syncResult);
 				}
-			} else {
-				return;
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+
 		}
 	}
 }

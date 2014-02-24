@@ -36,6 +36,10 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		return mDBHelper.getModelName().replaceAll("\\.", "_");
 	}
 
+	public void setAccountUser(OEUser user) {
+		mUser = user;
+	}
+
 	public int count() {
 		return count(null, null);
 	}

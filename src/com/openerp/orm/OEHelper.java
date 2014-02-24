@@ -39,15 +39,19 @@ import android.util.Log;
 import com.openerp.base.ir.Ir_model;
 import com.openerp.orm.OEFieldsHelper.OERelationData;
 import com.openerp.support.OEUser;
+import com.openerp.util.OEDate;
+import com.openerp.util.PreferenceManager;
 
 public class OEHelper extends OpenERP {
 	public static final String TAG = "com.openerp.orm.OEHelper";
 	Context mContext = null;
 	OEDatabase mDatabase = null;
 	OEUser mUser = null;
+	PreferenceManager mPref = null;
 
 	public OEHelper(SharedPreferences pref) {
 		super(pref);
+		init();
 	}
 
 	public OEHelper(Context context, String host)
@@ -55,6 +59,7 @@ public class OEHelper extends OpenERP {
 			OEVersionException {
 		super(host);
 		mContext = context;
+		init();
 	}
 
 	public OEHelper(Context context, OEUser data, OEDatabase oeDatabase)
@@ -66,11 +71,17 @@ public class OEHelper extends OpenERP {
 		mContext = context;
 		mDatabase = oeDatabase;
 		mUser = data;
+		init();
 		/*
 		 * Required to login with server.
 		 */
 		login(mUser.getUsername(), mUser.getPassword(), mUser.getDatabase(),
 				mUser.getHost());
+	}
+
+	private void init() {
+		Log.d(TAG, "OEHelper->init()");
+		mPref = new PreferenceManager(mContext);
 	}
 
 	public OEUser login(String username, String password, String database,
@@ -123,18 +134,24 @@ public class OEHelper extends OpenERP {
 	}
 
 	public boolean syncWithServer() {
-		return syncWithServer(false, null, null);
+		return syncWithServer(false, null, null, false);
 	}
 
 	public boolean syncWithServer(OEDomain domain) {
-		return syncWithServer(false, domain, null);
+		return syncWithServer(false, domain, null, false);
 	}
 
 	public boolean syncWithServer(boolean twoWay, OEDomain domain,
 			List<Object> ids) {
+		return syncWithServer(twoWay, domain, ids, false);
+	}
+
+	public boolean syncWithServer(boolean twoWay, OEDomain domain,
+			List<Object> ids, boolean limitedData) {
 		boolean synced = false;
 		Log.d(TAG, "OEHelper->syncWithServer()");
 		Log.d(TAG, "Model: " + mDatabase.getModelName());
+		Log.d(TAG, "User: " + mUser.getAndroidName());
 		OEFieldsHelper fields = new OEFieldsHelper(
 				mDatabase.getDatabaseColumns());
 		try {
@@ -144,6 +161,11 @@ public class OEHelper extends OpenERP {
 			if (ids != null) {
 				domain.add("id", "in", ids);
 			}
+			if (limitedData) {
+				int data_limit = mPref.getInt("sync_data_limit", 60);
+				domain.add("create_date", ">=",
+						OEDate.getDateBefore(data_limit));
+			}
 			JSONObject result = search_read(mDatabase.getModelName(),
 					fields.get(), domain.get(), 0, 30, null, null);
 			fields.addAll(result.getJSONArray("records"));
@@ -152,7 +174,7 @@ public class OEHelper extends OpenERP {
 			List<OERelationData> rel_models = fields.getRelationData();
 			for (OERelationData rel : rel_models) {
 				rel.getDb().getOEInstance()
-						.syncWithServer(false, null, rel.getIds());
+						.syncWithServer(false, null, rel.getIds(), false);
 			}
 			List<Long> result_ids = mDatabase.createORReplace(fields
 					.getValues());
