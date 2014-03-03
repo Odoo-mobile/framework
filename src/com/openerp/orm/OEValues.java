@@ -21,6 +21,9 @@ public class OEValues {
 	}
 
 	public Integer getInt(String key) {
+		if (_values.get(key).toString().equals("false")) {
+			return -1;
+		}
 		return Integer.parseInt(_values.get(key).toString());
 	}
 
@@ -40,6 +43,11 @@ public class OEValues {
 		List<String> list = new ArrayList<String>();
 		list.addAll(_values.keySet());
 		return list;
+	}
+
+	public void setAll(OEValues values) {
+		for (String key : values.keys())
+			_values.put(key, values.get(key));
 	}
 
 	public int size() {

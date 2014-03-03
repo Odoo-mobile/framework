@@ -494,8 +494,9 @@ public class MainActivity extends FragmentActivity implements
 	 *            the extra data
 	 */
 	public void requestSync(String authority, Bundle bundle) {
-		Account account = OpenERPAccountManager.getAccount(this, OEUser
-				.current(mContext).getAndroidName());
+		Account account = OpenERPAccountManager.getAccount(
+				getApplicationContext(), OEUser
+						.current(getApplicationContext()).getAndroidName());
 		Bundle settingsBundle = new Bundle();
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);

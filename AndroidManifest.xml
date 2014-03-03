@@ -57,7 +57,61 @@
         </activity>
         <activity android:name="com.openerp.AppSettingsActivity" />
         <activity android:name="com.openerp.addons.note.NoteComposeActivity" />
+        <activity android:name="com.openerp.addons.message.MessageComposeActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.VIEW" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.com.openerp.auth.profile" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
+        <!-- Message provider -->
+        <provider
+            android:name="com.openerp.providers.message.MessageProvider"
+            android:authorities="com.openerp.providers.message"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Messages"
+            android:syncable="true" />
+        <!-- Message provider service -->
+        <service
+            android:name="com.openerp.services.MessageSyncService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_messages" />
+        </service>
+
+        <!-- Note provider -->
         <provider
             android:name="com.openerp.providers.note.NoteProvider"
             android:authorities="com.openerp.providers.note"
@@ -65,7 +119,7 @@
             android:exported="true"
             android:label="Notes"
             android:syncable="true" />
-
+        <!-- Note provider service -->
         <service
             android:name="com.openerp.services.NoteSyncService"
             android:exported="true" >

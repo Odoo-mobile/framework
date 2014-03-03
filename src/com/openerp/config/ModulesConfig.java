@@ -18,6 +18,7 @@
  */
 package com.openerp.config;
 
+import com.openerp.addons.message.Message;
 import com.openerp.addons.note.Note;
 import com.openerp.support.Module;
 import com.openerp.support.ModulesConfigHelper;
@@ -33,6 +34,7 @@ public class ModulesConfig extends ModulesConfigHelper {
 	public ModulesConfig() {
 		/* application modules */
 		// add(new Module("module_idea", "Idea", new Idea(), 0), true);
-		add(new Module("moduel_note", "Note", new Note()), true);
+		add(new Module("module_message", "Message", new Message()), true);
+		add(new Module("module_note", "Note", new Note()));
 	}
 }

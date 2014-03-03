@@ -18,6 +18,7 @@ public class OEFieldsHelper {
 	List<OEValues> mValues = new ArrayList<OEValues>();
 	List<OEColumn> mColumns = new ArrayList<OEColumn>();
 	OERelRecord mRelRecord = new OERelRecord();
+	ValueWatcher mValueWatcher = null;
 
 	public OEFieldsHelper(String[] fields) {
 		addAll(fields);
@@ -45,14 +46,25 @@ public class OEFieldsHelper {
 						if (record.has(key)) {
 							value = record.get(key);
 						}
+						if (col.getmValueWatcher() != null) {
+							OEValues values = col.getmValueWatcher().getValue(
+									col, value);
+							cValue.setAll(values);
+						}
 						if (col.getType() instanceof OEManyToOne) {
 							if (value instanceof JSONArray) {
 								JSONArray m2oRec = new JSONArray(
 										value.toString());
 								value = m2oRec.get(0);
-								OEManyToOne m2o = (OEManyToOne) col.getType();
-								OEDatabase db = (OEDatabase) m2o.getDBHelper();
-								mRelRecord.add(db, value);
+								if ((Integer) value != 0) {
+									OEManyToOne m2o = (OEManyToOne) col
+											.getType();
+									OEDatabase db = (OEDatabase) m2o
+											.getDBHelper();
+									mRelRecord.add(db, value);
+								} else {
+									value = false;
+								}
 							}
 						}
 						if (col.getType() instanceof OEManyToMany) {
@@ -69,6 +81,7 @@ public class OEFieldsHelper {
 							}
 						}
 						cValue.put(key, value);
+
 					}
 				}
 				mValues.add(cValue);
@@ -80,12 +93,21 @@ public class OEFieldsHelper {
 	}
 
 	private List<Integer> getIdsList(JSONArray array) {
+		Log.d(TAG, "OEFieldsHelper->getIdsList()");
 		List<Integer> ids = new ArrayList<Integer>();
 		try {
 			for (int i = 0; i < array.length(); i++) {
-				ids.add(array.getInt(i));
+				if (array.get(i) instanceof JSONArray)
+					ids.add(array.getJSONArray(i).getInt(0));
+				else if (array.get(i) instanceof JSONObject) {
+					JSONObject rec = (JSONObject) array.get(i);
+					if (rec.has("id"))
+						ids.add(rec.getInt("id"));
+				} else
+					ids.add(array.getInt(i));
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return ids;
 	}
@@ -105,8 +127,9 @@ public class OEFieldsHelper {
 	public void addAll(List<OEColumn> cols) {
 		try {
 			for (OEColumn col : cols) {
-				if (col.canSync())
+				if (col.canSync()) {
 					mFields.accumulate("fields", col.getName());
+				}
 			}
 			if (cols.size() == 1) {
 				mFields.accumulate("fields", cols.get(0));
@@ -194,4 +217,7 @@ public class OEFieldsHelper {
 
 	}
 
+	public interface ValueWatcher {
+		public OEValues getValue(OEColumn col, Object value);
+	}
 }

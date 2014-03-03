@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.openerp.R;
+import com.openerp.addons.message.MessageComposeActivity;
 import com.openerp.addons.note.Note.NoteToggleStatus;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
@@ -41,6 +42,7 @@ public class NoteDetail extends BaseFragment implements TokenListener {
 	int mStageColor = 0;
 	String mPadURL = "";
 	String mNoteMemo = "";
+	String mMessageBody = "";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -110,6 +112,7 @@ public class NoteDetail extends BaseFragment implements TokenListener {
 		if (noteTags.size() == 0) {
 			mNoteTags.setVisibility(View.GONE);
 		}
+		mMessageBody = result.getString("memo");
 		mNoteDetailTitle.setText(result.getString("name"));
 		mNoteDetailMemo.setText(HTMLHelper.stringToHtml(result
 				.getString("memo")));
@@ -122,7 +125,6 @@ public class NoteDetail extends BaseFragment implements TokenListener {
 		// disabling the Compose Note option cause you are already in that menu
 		if (getArguments() != null) {
 			mArgument = getArguments();
-			// row_status = getArguments().getString("row_status");
 			boolean open = mArgument.getBoolean("row_status");
 			if (open) {
 				MenuItem mark_as_open = menu
@@ -155,11 +157,10 @@ public class NoteDetail extends BaseFragment implements TokenListener {
 
 		case R.id.menu_note_forward_asmail:
 
-			/*
-			 * Intent sendAsMail = new Intent(MainActivity.context,
-			 * MessageComposeActivty.class); sendAsMail.putExtra("note_body",
-			 * message); scope.context().startActivity(sendAsMail);
-			 */
+			Intent sendAsMail = new Intent(getActivity(),
+					MessageComposeActivity.class);
+			sendAsMail.putExtra("note_body", mMessageBody);
+			getActivity().startActivity(sendAsMail);
 			return true;
 
 		case R.id.menu_note_mark_asdone:

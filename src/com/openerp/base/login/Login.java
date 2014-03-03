@@ -47,7 +47,6 @@ import com.openerp.support.OEUser;
 import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.logger.OELog;
 
 /**
  * The Class Login.

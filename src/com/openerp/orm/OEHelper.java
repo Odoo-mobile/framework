@@ -48,6 +48,8 @@ public class OEHelper extends OpenERP {
 	OEDatabase mDatabase = null;
 	OEUser mUser = null;
 	PreferenceManager mPref = null;
+	int mAffectedRows = 0;
+	List<Long> mResultIds = new ArrayList<Long>();
 
 	public OEHelper(SharedPreferences pref) {
 		super(pref);
@@ -146,6 +148,38 @@ public class OEHelper extends OpenERP {
 		return syncWithServer(twoWay, domain, ids, false);
 	}
 
+	public int getAffectedRows() {
+		return mAffectedRows;
+	}
+
+	public List<Integer> getAffectedIds() {
+		List<Integer> ids = new ArrayList<Integer>();
+		for (Long id : mResultIds) {
+			ids.add(Integer.parseInt(id.toString()));
+		}
+		return ids;
+	}
+
+	public boolean syncWithMethod(String method, OEArguments args) {
+		Log.d(TAG, "OEHelper->syncWithMethod()");
+		Log.d(TAG, "Model: " + mDatabase.getModelName());
+		Log.d(TAG, "User: " + mUser.getAndroidName());
+		Log.d(TAG, "Method: " + method);
+		boolean synced = false;
+		OEFieldsHelper fields = new OEFieldsHelper(
+				mDatabase.getDatabaseColumns());
+		try {
+			JSONObject result = call_kw(mDatabase.getModelName(), method,
+					args.getArray());
+			if (result.getJSONArray("result").length() > 0)
+				mAffectedRows = result.getJSONArray("result").length();
+			synced = handleResultArray(fields, result.getJSONArray("result"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return synced;
+	}
+
 	public boolean syncWithServer(boolean twoWay, OEDomain domain,
 			List<Object> ids, boolean limitedData) {
 		boolean synced = false;
@@ -168,8 +202,20 @@ public class OEHelper extends OpenERP {
 			}
 			JSONObject result = search_read(mDatabase.getModelName(),
 					fields.get(), domain.get(), 0, 30, null, null);
-			fields.addAll(result.getJSONArray("records"));
+			mAffectedRows = result.getJSONArray("records").length();
+			synced = handleResultArray(fields, result.getJSONArray("records"));
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Log.d(TAG, mDatabase.getModelName() + " synced");
+		return synced;
+	}
+
+	private boolean handleResultArray(OEFieldsHelper fields, JSONArray results) {
+		boolean flag = false;
+		try {
+			fields.addAll(results);
 			// Handling many2many and many2one records
 			List<OERelationData> rel_models = fields.getRelationData();
 			for (OERelationData rel : rel_models) {
@@ -178,15 +224,14 @@ public class OEHelper extends OpenERP {
 			}
 			List<Long> result_ids = mDatabase.createORReplace(fields
 					.getValues());
+			mResultIds.addAll(result_ids);
 			if (result_ids.size() > 0) {
-				synced = true;
+				flag = true;
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Log.d(TAG, mDatabase.getModelName() + " synced");
-		return synced;
+		return flag;
 	}
 
 	public boolean isModelInstalled(String model) {
@@ -220,14 +265,31 @@ public class OEHelper extends OpenERP {
 		return installed;
 	}
 
-	public List<OEDataRow> search_read() {
-		Log.d(TAG, "OEHelper->search_read()");
+	public List<OEDataRow> search_read_remain() {
+		Log.d(TAG, "OEHelper->search_read_remain()");
+		return search_read(true);
+	}
+
+	private OEDomain getLocalIdsDomain(String operator) {
+		OEDomain domain = new OEDomain();
+		JSONArray ids = new JSONArray();
+		for (OEDataRow row : mDatabase.select()) {
+			ids.put(row.getInt("id"));
+		}
+		domain.add("id", operator, ids);
+		return domain;
+	}
+
+	private List<OEDataRow> search_read(boolean getRemain) {
 		List<OEDataRow> rows = new ArrayList<OEDataRow>();
-		OEFieldsHelper fields = new OEFieldsHelper(
-				mDatabase.getDatabaseServerColumns());
 		try {
+			OEFieldsHelper fields = new OEFieldsHelper(
+					mDatabase.getDatabaseServerColumns());
+			JSONObject domain = null;
+			if (getRemain)
+				domain = getLocalIdsDomain("not in").get();
 			JSONObject result = search_read(mDatabase.getModelName(),
-					fields.get(), null, 0, 100, null, null);
+					fields.get(), domain, 0, 100, null, null);
 			for (int i = 0; i < result.getJSONArray("records").length(); i++) {
 				JSONObject record = result.getJSONArray("records")
 						.getJSONObject(i);
@@ -242,6 +304,11 @@ public class OEHelper extends OpenERP {
 			e.printStackTrace();
 		}
 		return rows;
+	}
+
+	public List<OEDataRow> search_read() {
+		Log.d(TAG, "OEHelper->search_read()");
+		return search_read(false);
 	}
 
 	public void delete(int id) {
@@ -274,7 +341,7 @@ public class OEHelper extends OpenERP {
 			if (context != null) {
 				arguments.add(updateContext(context));
 			}
-			result = call_kw(model, method, arguments.get());
+			result = call_kw(model, method, arguments.getArray());
 			return result.get("result");
 		} catch (Exception e) {
 			e.printStackTrace();

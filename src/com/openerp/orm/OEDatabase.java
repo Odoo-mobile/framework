@@ -7,12 +7,14 @@ import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.openerp.base.ir.Ir_model;
 import com.openerp.orm.OEM2MIds.Operation;
+import com.openerp.receivers.DataSetChangeReceiver;
 import com.openerp.support.OEUser;
 
 public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
@@ -123,6 +125,8 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		List<Long> ids = new ArrayList<Long>();
 		for (OEValues values : listValues) {
 			long id = values.getInt("id");
+			if (id == -1)
+				continue;
 			int count = count("id = ?", new String[] { values.getString("id") });
 			if (count == 0) {
 				ids.add(id);
@@ -145,6 +149,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		ContentValues cValues = (ContentValues) res.get("cValues");
 		db.insert(tableName(), null, cValues);
 		newId = cValues.getAsInteger("id");
+		broadcastInfo(newId);
 		db.close();
 		if (res.containsKey("m2mObjects")) {
 			@SuppressWarnings("unchecked")
@@ -163,17 +168,22 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		ContentValues cValues = new ContentValues();
 		List<HashMap<String, Object>> m2mObjectList = new ArrayList<HashMap<String, Object>>();
-		for (String key : values.keys()) {
-			if (values.get(key) instanceof OEM2MIds
-					|| values.get(key) instanceof List) {
-				HashMap<String, Object> m2mObjects = new HashMap<String, Object>();
-				OEDBHelper m2mDb = findFieldModel(key);
-				m2mObjects.put("m2mObject", m2mDb);
-				m2mObjects.put("m2mRecordsObj", values.get(key));
-				m2mObjectList.add(m2mObjects);
-				continue;
+		List<OEColumn> cols = mDBHelper.getModelColumns();
+		cols.addAll(getDefaultCols());
+		for (OEColumn col : cols) {
+			String key = col.getName();
+			if (values.contains(key)) {
+				if (values.get(key) instanceof OEM2MIds
+						|| values.get(key) instanceof List) {
+					HashMap<String, Object> m2mObjects = new HashMap<String, Object>();
+					OEDBHelper m2mDb = findFieldModel(key);
+					m2mObjects.put("m2mObject", m2mDb);
+					m2mObjects.put("m2mRecordsObj", values.get(key));
+					m2mObjectList.add(m2mObjects);
+					continue;
+				}
+				cValues.put(key, values.get(key).toString());
 			}
-			cValues.put(key, values.get(key).toString());
 		}
 		result.put("m2mObjects", m2mObjectList);
 		result.put("cValues", cValues);
@@ -318,6 +328,14 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 
 	public List<OEDataRow> select(String where, String[] whereArgs) {
 		return select(where, whereArgs, null, null, null);
+	}
+
+	public List<Integer> ids() {
+		List<Integer> ids = new ArrayList<Integer>();
+		for (OEDataRow row : select()) {
+			ids.add(row.getInt("id"));
+		}
+		return ids;
 	}
 
 	public List<OEDataRow> select(String where, String[] whereArgs,
@@ -501,5 +519,26 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			}
 		}
 		return cols;
+	}
+
+	public int lastId() {
+		int last_id = 0;
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cr = db.query(tableName(), new String[] { "MAX(id) as id" },
+				"oea_name = ?", new String[] { mUser.getAndroidName() }, null,
+				null, null);
+		if (cr.moveToFirst())
+			last_id = cr.getInt(0);
+		cr.close();
+		db.close();
+		return last_id;
+	}
+
+	private void broadcastInfo(long newId) {
+		Intent intent = new Intent();
+		intent.setAction(DataSetChangeReceiver.DATA_CHANGED);
+		intent.putExtra("id", String.valueOf(newId));
+		intent.putExtra("model", modelName());
+		mContext.sendBroadcast(intent);
 	}
 }

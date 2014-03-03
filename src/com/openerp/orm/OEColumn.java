@@ -1,5 +1,7 @@
 package com.openerp.orm;
 
+import com.openerp.orm.OEFieldsHelper.ValueWatcher;
+
 /**
  * The Class OEColumn. Handle each database column with name, title, type
  * (OEFields) and help.
@@ -24,6 +26,8 @@ public class OEColumn {
 	/** The column domain */
 	OEColumnDomain mColumnDomain = null;
 
+	ValueWatcher mValueWatcher = null;
+
 	/**
 	 * Instantiates a new database column.
 	 * 
@@ -38,6 +42,14 @@ public class OEColumn {
 		this.mName = mName;
 		this.mTitle = mTitle;
 		this.mType = mType;
+	}
+
+	public OEColumn(String mName, String mTitle, Object mType,
+			ValueWatcher valueWatcher) {
+		this.mName = mName;
+		this.mTitle = mTitle;
+		this.mType = mType;
+		this.mValueWatcher = valueWatcher;
 	}
 
 	/**
@@ -192,4 +204,13 @@ public class OEColumn {
 	public void setColumnDomain(OEColumnDomain columnDomain) {
 		mColumnDomain = columnDomain;
 	}
+
+	public ValueWatcher getmValueWatcher() {
+		return mValueWatcher;
+	}
+
+	public void setmValueWatcher(ValueWatcher mValueWatcher) {
+		this.mValueWatcher = mValueWatcher;
+	}
+
 }

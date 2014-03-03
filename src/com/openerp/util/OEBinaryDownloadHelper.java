@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.openerp.R;
@@ -42,11 +43,14 @@ import com.openerp.orm.OEHelper;
 import com.openerp.support.OpenERPServerConnection;
 
 public class OEBinaryDownloadHelper {
+	public static final String TAG = "com.openerp.util.OEBinaryDownloadHelper";
 	ProgressDialog mProgressDialog;
 	DownloadTask downloadTask = null;
 	Context mContext = null;
 
-	public void downloadBinary(int id, OEDatabase db) {
+	public void downloadBinary(int id, OEDatabase db, Context context) {
+		Log.d(TAG, "OEBinaryDownloadHelper->downloadBinary()");
+		mContext = context;
 		try {
 			if (OpenERPServerConnection.isNetworkAvailable(mContext)) {
 				mProgressDialog = new ProgressDialog(mContext);
@@ -63,6 +67,7 @@ public class OEBinaryDownloadHelper {
 						Toast.LENGTH_LONG).show();
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -85,7 +90,6 @@ public class OEBinaryDownloadHelper {
 
 		@Override
 		protected void onProgressUpdate(Integer... values) {
-			// TODO Auto-generated method stub
 			super.onProgressUpdate(values);
 			mProgressDialog.setIndeterminate(false);
 			mProgressDialog.setMax(100);

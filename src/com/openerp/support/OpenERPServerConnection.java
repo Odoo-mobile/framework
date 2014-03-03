@@ -29,6 +29,7 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.openerp.auth.OpenERPAccountManager;
 
@@ -37,6 +38,7 @@ import com.openerp.auth.OpenERPAccountManager;
  */
 public class OpenERPServerConnection {
 
+	public static final String TAG = "com.openerp.support.OpenERPServerConnection";
 	/** The openerp. */
 	public OpenERP openerp = null;
 
@@ -52,6 +54,7 @@ public class OpenERPServerConnection {
 	 */
 	public boolean testConnection(Context context, String serverURL)
 			throws OEVersionException {
+		Log.d(TAG, "OpenERPServerConnection->testConnection()");
 		if (TextUtils.isEmpty(serverURL)) {
 			return false;
 		}
@@ -61,6 +64,7 @@ public class OpenERPServerConnection {
 		} catch (OEVersionException version) {
 			throw new OEVersionException(version.getMessage());
 		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 		return true;

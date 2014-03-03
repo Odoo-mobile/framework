@@ -25,7 +25,7 @@ import com.openerp.support.provider.OEContentProvider;
  * The Class MessageProvider.
  */
 public class MessageProvider extends OEContentProvider {
-	public static String CONTENTURI = "com.openerp.providers.note.MessageProvider";
+	public static String CONTENTURI = "com.openerp.providers.message.MessageProvider";
 	public static String AUTHORITY = "com.openerp.providers.message";
 
 	@Override

@@ -255,10 +255,11 @@ public class NoteFollowers extends BaseFragment implements TokenListener,
 							.createNew("mail.wizard.invite", args);
 					int id = result.getInt("result");
 					OEArguments arguments = new OEArguments();
-					arguments.add(id);
+					arguments.add(new JSONArray("[" + id + "]"));
 					JSONObject context = new JSONObject();
 					context.put("default_res_model", "note.note");
 					context.put("default_res_id", mNoteID);
+					oe.debugMode(true);
 					JSONObject res = (JSONObject) oe.call_kw(
 							"mail.wizard.invite", "add_followers", arguments,
 							context);

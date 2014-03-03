@@ -37,7 +37,6 @@ import com.openerp.R;
 import com.openerp.addons.note.NoteDB.NoteStages;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
-import com.openerp.orm.OEM2MRecord;
 import com.openerp.orm.OEValues;
 import com.openerp.providers.note.NoteProvider;
 import com.openerp.receivers.SyncFinishReceiver;
@@ -141,7 +140,7 @@ public class Note extends BaseFragment implements
 					tags.add(tag.getString("name"));
 				}
 				txvTags.setText(new TextViewTags(getActivity(), tags,
-						"#ebebeb", "#414141", 20).generate());
+						"#ebebeb", "#414141", 25).generate());
 				mView.findViewById(R.id.noteGridClildView).setBackgroundColor(
 						color);
 				txvStage.setTextColor(color);
