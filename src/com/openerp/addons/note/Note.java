@@ -445,8 +445,10 @@ public class Note extends BaseFragment implements
 		OEDataRow stage = row.getM2ORecord("stage_id").browse();
 		if (stage != null) {
 			bundle.putString("stage_id", stage.getString("id"));
-			bundle.putInt("stage_color",
-					getTagColor("key_" + bundle.getString("stage_id")));
+			Integer tag_color = getTagColor("key_"
+					+ bundle.getString("stage_id"));
+			if (tag_color != null)
+				bundle.putInt("stage_color", tag_color);
 		}
 		NoteDetail note = new NoteDetail();
 		note.setArguments(bundle);

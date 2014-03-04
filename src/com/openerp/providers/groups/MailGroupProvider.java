@@ -21,14 +21,13 @@ package com.openerp.providers.groups;
 
 import com.openerp.support.provider.OEContentProvider;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class NoteProvider.
  */
-public class UserGroupsProvider extends OEContentProvider {
+public class MailGroupProvider extends OEContentProvider {
 
 	/** The contenturi. */
-	public static String CONTENTURI = "com.openerp.providers.groups.UserGroupsProvider";
+	public static String CONTENTURI = "com.openerp.providers.groups.MailGroupProvider";
 
 	/** The authority. */
 	public static String AUTHORITY = "com.openerp.providers.groups";

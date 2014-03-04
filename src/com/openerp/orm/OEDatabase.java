@@ -112,7 +112,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			for (HashMap<String, Object> obj : objectList) {
 				OEDBHelper m2mDb = (OEDBHelper) obj.get("m2mObject");
 				for (OEDataRow row : select(where, whereArgs, null, null, null)) {
-					manageMany2ManyRecords(m2mDb, Operation.ADD,
+					manageMany2ManyRecords(m2mDb, Operation.REPLACE,
 							row.getInt("id"), obj.get("m2mRecordsObj"));
 				}
 			}
@@ -122,6 +122,11 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	}
 
 	public List<Long> createORReplace(List<OEValues> listValues) {
+		return createORReplace(listValues, false);
+	}
+
+	public List<Long> createORReplace(List<OEValues> listValues,
+			boolean canDeleteLocalIfNotExists) {
 		List<Long> ids = new ArrayList<Long>();
 		for (OEValues values : listValues) {
 			long id = values.getInt("id");
@@ -134,6 +139,13 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			} else {
 				ids.add(id);
 				update(values, values.getInt("id"));
+			}
+		}
+		if (canDeleteLocalIfNotExists) {
+			for (OEDataRow row : select()) {
+				if (!ids.contains(Long.parseLong(row.getString("id")))) {
+					delete(row.getInt("id"));
+				}
 			}
 		}
 		return ids;
@@ -296,7 +308,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		return delete(tableName(), where, whereArgs);
 	}
 
-	public int delete(String table, String where, String[] whereArgs) {
+	private int delete(String table, String where, String[] whereArgs) {
 		if (where == null) {
 			where = "oea_name = ?";
 			whereArgs = new String[] { mUser.getAndroidName() };
@@ -307,10 +319,32 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			tmpWhereArgs.add(mUser.getAndroidName());
 			whereArgs = tmpWhereArgs.toArray(new String[tmpWhereArgs.size()]);
 		}
-		SQLiteDatabase db = getWritableDatabase();
-		int count = db.delete(table, where, whereArgs);
-		db.close();
+
+		int count = 0;
+		if (deleteMany2ManyRecord(select(where, whereArgs))) {
+			SQLiteDatabase db = getWritableDatabase();
+			count = db.delete(table, where, whereArgs);
+			db.close();
+		}
 		return count;
+	}
+
+	private boolean deleteMany2ManyRecord(List<OEDataRow> records) {
+		for (OEDataRow rec : records) {
+			int id = rec.getInt("id");
+			for (OEColumn col : getModelColumns()) {
+				if (col.getType() instanceof OEManyToMany) {
+					OEDatabase m2mDB = (OEDatabase) ((OEManyToMany) col
+							.getType()).getDBHelper();
+					List<Integer> idsObj = new ArrayList<Integer>();
+					for (OEDataRow m2mRec : rec.getM2MRecord(col.getName())
+							.browseEach())
+						idsObj.add(m2mRec.getInt("id"));
+					manageMany2ManyRecords(m2mDB, Operation.REMOVE, id, idsObj);
+				}
+			}
+		}
+		return true;
 	}
 
 	public List<OEDataRow> select() {

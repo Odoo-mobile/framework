@@ -44,6 +44,7 @@ import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.addons.message.MessageDB;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.orm.OEValues;
 import com.openerp.receivers.SyncFinishReceiver;
@@ -120,14 +121,13 @@ public class MessageSyncService extends Service {
 	public void performSync(Context context, Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
+		Intent intent = new Intent();
+		// Intent update_widget = new Intent();
+		// update_widget.setAction(Mobile_Widget.TAG);
+		intent.setAction(SyncFinishReceiver.SYNC_FINISH);
+		OEUser user = OpenERPAccountManager.getAccountDetail(context,
+				account.name);
 		try {
-			Intent intent = new Intent();
-			// Intent update_widget = new Intent();
-			// update_widget.setAction(Mobile_Widget.TAG);
-			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-
-			OEUser user = OpenERPAccountManager.getAccountDetail(context,
-					account.name);
 			MessageDB msgDb = new MessageDB(context);
 			msgDb.setAccountUser(user);
 			OEHelper oe = msgDb.getOEInstance();
@@ -146,8 +146,6 @@ public class MessageSyncService extends Service {
 			arguments.addNull();
 			// Param 2 : domain
 			OEDomain domain = new OEDomain();
-			// Last id
-			domain.add("id", ">", msgDb.lastId());
 
 			// Data limit.
 			PreferenceManager mPref = new PreferenceManager(context);
@@ -155,6 +153,12 @@ public class MessageSyncService extends Service {
 			domain.add("create_date", ">=", OEDate.getDateBefore(data_limit));
 
 			if (!extras.containsKey("group_ids")) {
+				// Last id
+				JSONArray msgIds = new JSONArray();
+				for (OEDataRow row : msgDb.select()) {
+					msgIds.put(row.getInt("id"));
+				}
+				domain.add("id", "not in", msgIds);
 
 				domain.add("|");
 				// Argument for check partner_ids.user_id is current user
@@ -224,13 +228,11 @@ public class MessageSyncService extends Service {
 			List<Integer> updated_ids = updateOldMessages(msgDb, oe, user, ids);
 			intent.putIntegerArrayListExtra("updated_ids",
 					(ArrayList<Integer>) updated_ids);
-			if (user.getAndroidName().equals(account.name))
-				context.sendBroadcast(intent);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		if (user.getAndroidName().equals(account.name))
+			context.sendBroadcast(intent);
 	}
 
 	private List<Integer> updateOldMessages(MessageDB db, OEHelper oe,

@@ -18,10 +18,15 @@
  */
 package com.openerp.services;
 
+import openerp.OEDomain;
+
+import org.json.JSONArray;
+
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
@@ -29,18 +34,22 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.openerp.addons.note.NoteDB;
+import com.openerp.addons.message.MailGroupDB;
 import com.openerp.auth.OpenERPAccountManager;
+import com.openerp.base.mail.MailFollowers;
+import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
+import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.SyncFinishReceiver;
+import com.openerp.util.logger.OELog;
 
-public class NoteSyncService extends Service {
-	public static final String TAG = "com.openerp.services.NoteSyncService";
+public class MailGroupSyncService extends Service {
+	public static final String TAG = "com.openerp.services.MailGroupSyncService";
 	private static SyncAdapterImpl sSyncAdapter = null;
 	static int i = 0;
 	Context mContext = null;
 
-	public NoteSyncService() {
+	public MailGroupSyncService() {
 		mContext = this;
 	}
 
@@ -66,19 +75,43 @@ public class NoteSyncService extends Service {
 		try {
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-			// Intent update_widget = new Intent();
-			// update_widget.setAction(Mobile_Widget.TAG);
 
-			NoteDB note = new NoteDB(context);
-			note.setAccountUser(OpenERPAccountManager.getAccountDetail(context,
+			MailGroupDB db = new MailGroupDB(context);
+			db.setAccountUser(OpenERPAccountManager.getAccountDetail(context,
 					account.name));
-			OEHelper oe = note.getOEInstance();
-			if (oe != null) {
-				oe.syncWithServer(true);
+			OEHelper oe = db.getOEInstance();
+			if (oe != null && oe.syncWithServer(true)) {
+				MailFollowers followers = new MailFollowers(context);
+
+				OEDomain domain = new OEDomain();
+				domain.add("partner_id", "=", oe.getUser().getPartner_id());
+				domain.add("res_model", "=", db.getModelName());
+
+				if (followers.getOEInstance().syncWithServer(domain, true)) {
+					// syncing group messages
+					JSONArray group_ids = new JSONArray();
+					for (OEDataRow grp : followers.select(
+							"res_model = ? AND partner_id = ?", new String[] {
+									db.getModelName(),
+									oe.getUser().getPartner_id() + "" })) {
+						group_ids.put(grp.getInt("res_id"));
+					}
+					Bundle messageBundle = new Bundle();
+					OELog.log("GroupIds: " + group_ids.toString());
+					messageBundle.putString("group_ids", group_ids.toString());
+					messageBundle.putBoolean(
+							ContentResolver.SYNC_EXTRAS_MANUAL, true);
+					messageBundle.putBoolean(
+							ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+					ContentResolver.requestSync(account,
+							MessageProvider.AUTHORITY, messageBundle);
+
+				}
 			}
 			if (OpenERPAccountManager.currentUser(context).getAndroidName()
 					.equals(account.name))
 				context.sendBroadcast(intent);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -95,10 +128,10 @@ public class NoteSyncService extends Service {
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
-			Log.d(TAG, "Note sync service started");
+			Log.d(TAG, "Mail Group sync service started");
 			try {
 				if (account != null) {
-					new NoteSyncService().performSync(mContext, account,
+					new MailGroupSyncService().performSync(mContext, account,
 							bundle, str, providerClient, syncResult);
 				}
 			} catch (Exception e) {

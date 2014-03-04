@@ -126,6 +126,10 @@ public class OEHelper extends OpenERP {
 		return userObj;
 	}
 
+	public OEUser getUser() {
+		return mUser;
+	}
+
 	private String androidName(String username, String database) {
 		StringBuffer android_name = new StringBuffer();
 		android_name.append(username);
@@ -136,16 +140,26 @@ public class OEHelper extends OpenERP {
 	}
 
 	public boolean syncWithServer() {
-		return syncWithServer(false, null, null, false);
+		return syncWithServer(false, null, null, false, false);
+	}
+
+	public boolean syncWithServer(boolean removeLocalIfNotExists) {
+		return syncWithServer(false, null, null, false, removeLocalIfNotExists);
+	}
+
+	public boolean syncWithServer(OEDomain domain,
+			boolean removeLocalIfNotExists) {
+		return syncWithServer(false, domain, null, false,
+				removeLocalIfNotExists);
 	}
 
 	public boolean syncWithServer(OEDomain domain) {
-		return syncWithServer(false, domain, null, false);
+		return syncWithServer(false, domain, null, false, false);
 	}
 
 	public boolean syncWithServer(boolean twoWay, OEDomain domain,
 			List<Object> ids) {
-		return syncWithServer(twoWay, domain, ids, false);
+		return syncWithServer(twoWay, domain, ids, false, false);
 	}
 
 	public int getAffectedRows() {
@@ -161,6 +175,11 @@ public class OEHelper extends OpenERP {
 	}
 
 	public boolean syncWithMethod(String method, OEArguments args) {
+		return syncWithMethod(method, args, false);
+	}
+
+	public boolean syncWithMethod(String method, OEArguments args,
+			boolean removeLocalIfNotExists) {
 		Log.d(TAG, "OEHelper->syncWithMethod()");
 		Log.d(TAG, "Model: " + mDatabase.getModelName());
 		Log.d(TAG, "User: " + mUser.getAndroidName());
@@ -173,7 +192,8 @@ public class OEHelper extends OpenERP {
 					args.getArray());
 			if (result.getJSONArray("result").length() > 0)
 				mAffectedRows = result.getJSONArray("result").length();
-			synced = handleResultArray(fields, result.getJSONArray("result"));
+			synced = handleResultArray(fields, result.getJSONArray("result"),
+					false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -181,7 +201,8 @@ public class OEHelper extends OpenERP {
 	}
 
 	public boolean syncWithServer(boolean twoWay, OEDomain domain,
-			List<Object> ids, boolean limitedData) {
+			List<Object> ids, boolean limitedData,
+			boolean removeLocalIfNotExists) {
 		boolean synced = false;
 		Log.d(TAG, "OEHelper->syncWithServer()");
 		Log.d(TAG, "Model: " + mDatabase.getModelName());
@@ -201,9 +222,10 @@ public class OEHelper extends OpenERP {
 						OEDate.getDateBefore(data_limit));
 			}
 			JSONObject result = search_read(mDatabase.getModelName(),
-					fields.get(), domain.get(), 0, 30, null, null);
+					fields.get(), domain.get(), 0, 50, null, null);
 			mAffectedRows = result.getJSONArray("records").length();
-			synced = handleResultArray(fields, result.getJSONArray("records"));
+			synced = handleResultArray(fields, result.getJSONArray("records"),
+					removeLocalIfNotExists);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -212,18 +234,20 @@ public class OEHelper extends OpenERP {
 		return synced;
 	}
 
-	private boolean handleResultArray(OEFieldsHelper fields, JSONArray results) {
+	private boolean handleResultArray(OEFieldsHelper fields, JSONArray results,
+			boolean removeLocalIfNotExists) {
 		boolean flag = false;
 		try {
 			fields.addAll(results);
 			// Handling many2many and many2one records
 			List<OERelationData> rel_models = fields.getRelationData();
 			for (OERelationData rel : rel_models) {
-				rel.getDb().getOEInstance()
-						.syncWithServer(false, null, rel.getIds(), false);
+				rel.getDb()
+						.getOEInstance()
+						.syncWithServer(false, null, rel.getIds(), false, false);
 			}
-			List<Long> result_ids = mDatabase.createORReplace(fields
-					.getValues());
+			List<Long> result_ids = mDatabase.createORReplace(
+					fields.getValues(), removeLocalIfNotExists);
 			mResultIds.addAll(result_ids);
 			if (result_ids.size() > 0) {
 				flag = true;

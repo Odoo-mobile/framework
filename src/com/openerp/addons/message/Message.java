@@ -279,11 +279,13 @@ public class Message extends BaseFragment implements
 			}
 		}
 		if (row.getString("model").equals("mail.group")) {
-			// String res_id = row.getString("res_id");
-			// if (UserGroups.group_names.containsKey("group_" + res_id)) {
-			// model_name = UserGroups.group_names.get("group_" + res_id);
-			// tag_color = UserGroups.menu_color.get("group_" + res_id);
-			// }
+			String res_id = row.getString("res_id");
+			if (MailGroup.mMenuGroups.containsKey("group_" + res_id)) {
+				OEDataRow grp = (OEDataRow) MailGroup.mMenuGroups.get("group_"
+						+ res_id);
+				model_name = grp.getString("name");
+				tag_color = grp.getInt("tag_color");
+			}
 		}
 		txvTag.setBackgroundColor(tag_color);
 		txvTag.setText(model_name);
