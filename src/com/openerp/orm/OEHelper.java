@@ -50,6 +50,7 @@ public class OEHelper extends OpenERP {
 	PreferenceManager mPref = null;
 	int mAffectedRows = 0;
 	List<Long> mResultIds = new ArrayList<Long>();
+	List<OEDataRow> mRemovedRecordss = new ArrayList<OEDataRow>();
 
 	public OEHelper(SharedPreferences pref) {
 		super(pref);
@@ -166,6 +167,10 @@ public class OEHelper extends OpenERP {
 		return mAffectedRows;
 	}
 
+	public List<OEDataRow> getRemovedRecords() {
+		return mRemovedRecordss;
+	}
+
 	public List<Integer> getAffectedIds() {
 		List<Integer> ids = new ArrayList<Integer>();
 		for (Long id : mResultIds) {
@@ -249,6 +254,7 @@ public class OEHelper extends OpenERP {
 			List<Long> result_ids = mDatabase.createORReplace(
 					fields.getValues(), removeLocalIfNotExists);
 			mResultIds.addAll(result_ids);
+			mRemovedRecordss.addAll(mDatabase.getRemovedRecords());
 			if (result_ids.size() > 0) {
 				flag = true;
 			}

@@ -373,6 +373,7 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public void onPullStarted(View view) {
+		Log.d(TAG, "Note->onPullStarted()");
 		scope.main().requestSync(NoteProvider.AUTHORITY);
 	}
 

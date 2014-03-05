@@ -24,10 +24,12 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-// TODO: Auto-generated Javadoc
+import android.annotation.SuppressLint;
+
 /**
  * The Class OEDate.
  */
+@SuppressLint("SimpleDateFormat")
 public class OEDate {
 
 	/** The time format. */
@@ -74,41 +76,36 @@ public class OEDate {
 
 	}
 
-	/**
-	 * Gets the date.
-	 * 
-	 * @param date
-	 *            the date
-	 * @param timezone
-	 *            the timezone
-	 * @return the date
-	 */
-	// public static String getDate(String date, String toTimezone,
-	// String fromTimezone) {
-	// Calendar cal = Calendar.getInstance();
-	// // cal.setTimeZone(TimeZone.getTimeZone(fromTimezone));
-	// Date originalDate = convertToDate(date);
-	// cal.setTime(originalDate);
-	//
-	// Date oDate = removeTime(originalDate);
-	// Date today = removeTime(currentDate());
-	// dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
-	// timeFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
-	// String finalDateTime = "";
-	// if (today.compareTo(oDate) > 0) {
-	// // sending date
-	// finalDateTime = dateFormat.format(oDate);
-	// } else {
-	// // sending time because it's today.
-	// finalDateTime = timeFormat
-	// .format(convertToTimezone(cal, toTimezone).getTime());
-	// }
-	// return finalDateTime;
-	//
-	// }
+	public static String getDateFromMilis(long timeInMilis) {
+		String date = "";
+		Date original = new Date(timeInMilis);
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Date parsedDate = null;
+		try {
+			parsedDate = formatter.parse(formatter.format(original).toString());
+			SimpleDateFormat destFormat = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
+			destFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+			date = destFormat.format(parsedDate);
+		} catch (Exception e) {
+		}
+
+		return date;
+	}
+
+	public static long getDateTimeInMilis(String dateString) {
+		Calendar cal = Calendar.getInstance();
+		Date date = convertToDate(dateString);
+		cal.setTime(date);
+		return cal.getTimeInMillis();
+	}
 
 	private static Date currentDate() {
 		return new Date();
+	}
+
+	private static Date convertToDate(String date) {
+		return convertToDate(date, "yyyy-MM-dd HH:mm:ss");
 	}
 
 	/**
@@ -118,10 +115,10 @@ public class OEDate {
 	 *            the date
 	 * @return the date
 	 */
-	private static Date convertToDate(String date) {
+	private static Date convertToDate(String date, String format) {
 		Date dt = null;
 		try {
-			SimpleDateFormat temp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat temp = new SimpleDateFormat(format);
 			temp.setTimeZone(TimeZone.getTimeZone("GMT"));
 			dt = temp.parse(date);
 

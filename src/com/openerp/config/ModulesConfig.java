@@ -18,6 +18,7 @@
  */
 package com.openerp.config;
 
+import com.openerp.addons.meeting.Meeting;
 import com.openerp.addons.message.MailGroup;
 import com.openerp.addons.message.Message;
 import com.openerp.addons.note.Note;
@@ -38,5 +39,7 @@ public class ModulesConfig extends ModulesConfigHelper {
 		add(new Module("module_message", "Message", new Message()), true);
 		add(new Module("module_mail_groups", "Mail Groups", new MailGroup()));
 		add(new Module("module_note", "Note", new Note()));
+		add(new Module("module_meeting", "Meeting/Calendar Event",
+				new Meeting()));
 	}
 }

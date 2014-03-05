@@ -22,7 +22,7 @@ package com.openerp.providers.groups;
 import com.openerp.support.provider.OEContentProvider;
 
 /**
- * The Class NoteProvider.
+ * The Class MailGroupProvider.
  */
 public class MailGroupProvider extends OEContentProvider {
 

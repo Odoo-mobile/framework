@@ -766,6 +766,8 @@ public class Message extends BaseFragment implements
 				}
 				DrawerListener drawer = (DrawerListener) getActivity();
 				drawer.refreshDrawer(TAG);
+				drawer.refreshDrawer(MailGroup.TAG);
+
 			} else {
 				Toast.makeText(getActivity(), "No connection",
 						Toast.LENGTH_LONG).show();
@@ -899,6 +901,7 @@ public class Message extends BaseFragment implements
 				mListViewAdapter.notifiyDataChange(mMessageObjects);
 				DrawerListener drawer = (DrawerListener) getActivity();
 				drawer.refreshDrawer(TAG);
+				drawer.refreshDrawer(MailGroup.TAG);
 			} else {
 				Toast.makeText(getActivity(), "No connection",
 						Toast.LENGTH_LONG).show();

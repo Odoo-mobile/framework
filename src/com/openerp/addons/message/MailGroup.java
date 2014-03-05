@@ -191,6 +191,7 @@ public class MailGroup extends BaseFragment implements OnPullListener {
 					new String[] { db.getModelName(),
 							OEUser.current(context).getPartner_id() + "" });
 			int index = 0;
+			MessageDB messageDB = new MessageDB(context);
 			for (OEDataRow row : groups) {
 				if (mTagColors.length - 1 < index)
 					index = 0;
@@ -201,7 +202,11 @@ public class MailGroup extends BaseFragment implements OnPullListener {
 				bundle.putInt("group_id", grp.getInt("id"));
 				message.setArguments(bundle);
 
-				menu.add(new DrawerItem(TAG, grp.getString("name"), 0,
+				int count = messageDB.count(
+						"to_read = ? AND model = ? AND res_id = ?",
+						new String[] { "true", db().getModelName(),
+								row.getString("id") });
+				menu.add(new DrawerItem(TAG, grp.getString("name"), count,
 						mTagColors[index], message));
 				grp.put("tag_color", Color.parseColor(mTagColors[index]));
 				mMenuGroups.put("group_" + grp.getInt("id"), grp);
@@ -283,6 +288,7 @@ public class MailGroup extends BaseFragment implements OnPullListener {
 			mGroupsLoader.execute();
 			DrawerListener drawer = (DrawerListener) getActivity();
 			drawer.refreshDrawer(TAG);
+			drawer.refreshDrawer(Message.TAG);
 		}
 
 	};
@@ -339,6 +345,7 @@ public class MailGroup extends BaseFragment implements OnPullListener {
 			Toast.makeText(getActivity(), mToast, Toast.LENGTH_LONG).show();
 			DrawerListener drawer = (DrawerListener) getActivity();
 			drawer.refreshDrawer(TAG);
+			drawer.refreshDrawer(Message.TAG);
 		}
 	}
 }

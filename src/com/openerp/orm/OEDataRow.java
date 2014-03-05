@@ -39,6 +39,10 @@ public class OEDataRow {
 		return Integer.parseInt(_data.get(key).toString());
 	}
 
+	public Float getFloat(String key) {
+		return Float.parseFloat(_data.get(key).toString());
+	}
+
 	public String getString(String key) {
 		if (_data.containsKey(key) && _data.get(key) != null)
 			return _data.get(key).toString();

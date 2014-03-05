@@ -198,8 +198,8 @@ public class NoteFollowers extends BaseFragment implements TokenListener,
 			mToast = "No Connection.";
 			if (oe != null) {
 				OEArguments arguments = new OEArguments();
-				arguments.add(mNoteID);
-				arguments.add(mPartnerId);
+				arguments.add(new JSONArray().put(mNoteID));
+				arguments.add(new JSONArray().put(mPartnerId));
 				Boolean result = (Boolean) oe.call_kw("message_unsubscribe",
 						arguments);
 				if (result) {

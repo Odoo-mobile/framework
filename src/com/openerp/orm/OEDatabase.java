@@ -22,6 +22,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	Context mContext = null;
 	OEDBHelper mDBHelper = null;
 	OEUser mUser = null;
+	List<OEDataRow> mRemovedRecords = new ArrayList<OEDataRow>();
 
 	public OEDatabase(Context context) {
 		super(context);
@@ -142,13 +143,19 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			}
 		}
 		if (canDeleteLocalIfNotExists) {
+			mRemovedRecords = new ArrayList<OEDataRow>();
 			for (OEDataRow row : select()) {
 				if (!ids.contains(Long.parseLong(row.getString("id")))) {
 					delete(row.getInt("id"));
+					mRemovedRecords.add(row);
 				}
 			}
 		}
 		return ids;
+	}
+
+	public List<OEDataRow> getRemovedRecords() {
+		return mRemovedRecords;
 	}
 
 	public long create(OEValues values) {
