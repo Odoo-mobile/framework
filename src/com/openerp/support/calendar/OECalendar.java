@@ -230,7 +230,10 @@ public class OECalendar {
 		if (cr.moveToFirst()) {
 			for (String key : mEventsProjection) {
 				int index = cr.getColumnIndex(key);
-				event.put(key, cr.getString(index));
+				Object value = "";
+				if (cr.getString(index) != null)
+					value = cr.getString(index);
+				event.put(key, value);
 			}
 		}
 		cr.close();
@@ -277,34 +280,28 @@ public class OECalendar {
 	private long createEvent(OEDataRow meeting) {
 		Log.d(TAG, "OECalendar->createEvent()");
 		long calendar_event_id = 0L;
-		ContentValues values = new ContentValues();
-		values.put(CalendarContract.Events.TITLE, meeting.getString("name"));
-		values.put(CalendarContract.Events.DESCRIPTION,
-				meeting.getString("description"));
-		values.put(CalendarContract.Events.CALENDAR_ID, mCalendarId);
-		values.put(CalendarContract.Events.DTSTART,
-				OEDate.getDateTimeInMilis(meeting.getString("date")));
-		values.put(CalendarContract.Events.ALL_DAY,
-				meeting.getBoolean("allday"));
-
-		values.put(CalendarContract.Events.DTEND,
-				OEDate.getDateTimeInMilis(meeting.getString("date_deadline")));
-		values.put(CalendarContract.Events.EVENT_LOCATION,
-				meeting.getString("location"));
-		values.put(CalendarContract.Events.EVENT_TIMEZONE,
-				OEUser.current(mContext).getTimezone());
 		calendar_event_id = Long.parseLong(mContentResolver.insert(
-				Events.CONTENT_URI, values).getLastPathSegment());
+				Events.CONTENT_URI, getValues(meeting)).getLastPathSegment());
 		Log.i(TAG, "OECalendar->createEvent() : " + calendar_event_id);
 		return calendar_event_id;
 	}
 
 	private void updateEvent(OEDataRow meeting) {
 		Log.d(TAG, "OECalendar->updateEvent()");
+		mContentResolver.update(Events.CONTENT_URI, getValues(meeting),
+				Events._ID + " = ?",
+				new String[] { meeting.getString("calendar_event_id") });
+		Log.i(TAG,
+				"OECalendar->updateEvent() : "
+						+ meeting.getString("calendar_event_id"));
+	}
+
+	private ContentValues getValues(OEDataRow meeting) {
 		ContentValues values = new ContentValues();
 		values.put(CalendarContract.Events.TITLE, meeting.getString("name"));
+		String description = meeting.getString("description");
 		values.put(CalendarContract.Events.DESCRIPTION,
-				meeting.getString("description"));
+				(description.equals("false")) ? "" : description);
 		values.put(CalendarContract.Events.CALENDAR_ID, mCalendarId);
 		values.put(CalendarContract.Events.DTSTART,
 				OEDate.getDateTimeInMilis(meeting.getString("date")));
@@ -313,16 +310,11 @@ public class OECalendar {
 
 		values.put(CalendarContract.Events.DTEND,
 				OEDate.getDateTimeInMilis(meeting.getString("date_deadline")));
+		String location = meeting.getString("location");
 		values.put(CalendarContract.Events.EVENT_LOCATION,
-				meeting.getString("location"));
+				(location.equals("false")) ? "" : location);
 		values.put(CalendarContract.Events.EVENT_TIMEZONE,
 				OEUser.current(mContext).getTimezone());
-
-		mContentResolver.update(Events.CONTENT_URI, values,
-				Events._ID + " = ?",
-				new String[] { meeting.getString("calendar_event_id") });
-		Log.i(TAG,
-				"OECalendar->updateEvent() : "
-						+ meeting.getString("calendar_event_id"));
+		return values;
 	}
 }
