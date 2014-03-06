@@ -187,8 +187,10 @@ public class SyncWizard extends BaseFragment {
 					}
 				}
 			}
-			FragmentListener mFragment = (FragmentListener) getActivity();
-			mFragment.restart();
+			// FragmentListener mFragment = (FragmentListener) getActivity();
+			// mFragment.restart();
+			getActivity().finish();
+			getActivity().startActivity(getActivity().getIntent());
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
