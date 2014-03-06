@@ -23,5 +23,4 @@ public class OEColumnDomain {
 	public void setValue(String value) {
 		this.value = value;
 	}
-
 }

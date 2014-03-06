@@ -42,6 +42,7 @@ import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OpenERPServerConnection;
+import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
 
@@ -113,18 +114,6 @@ public class AccountFragment extends BaseFragment {
 			}
 		});
 		return rootView;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#databaseHelper(android.content.Context
-	 * )
-	 */
-	@Override
-	public Object databaseHelper(Context context) {
-		return new AccountDBHelper(context);
 	}
 
 	/*
@@ -220,7 +209,6 @@ public class AccountFragment extends BaseFragment {
 			}
 
 			OpenERPServerConnection oeConnect = new OpenERPServerConnection();
-
 			boolean flag = false;
 			try {
 				flag = oeConnect
@@ -250,10 +238,9 @@ public class AccountFragment extends BaseFragment {
 				Login loginFragment = new Login();
 				Bundle bundle = new Bundle();
 				bundle.putString("openERPServerURL", openERPServerURL);
-				scope.main().fragmentHandler.setFragmentArguments(bundle);
-				scope.main().fragmentHandler.setBackStack(true, null);
-				scope.main().fragmentHandler.replaceFragmnet(loginFragment);
-
+				loginFragment.setArguments(bundle);
+				FragmentListener fragment = (FragmentListener) getActivity();
+				fragment.startMainFragment(loginFragment, true);
 				serverConnectASync.cancel(true);
 				serverConnectASync = null;
 
@@ -273,6 +260,11 @@ public class AccountFragment extends BaseFragment {
 		scope.main().getActionBar().setDisplayHomeAsUpEnabled(true);
 		scope.main().getActionBar().setHomeButtonEnabled(true);
 
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

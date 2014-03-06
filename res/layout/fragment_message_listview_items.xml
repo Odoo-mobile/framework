@@ -105,6 +105,16 @@
                 android:textStyle="bold" />
 
             <com.openerp.util.controls.OETextView
+                android:id="@+id/txvChilds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:lines="1"
+                android:text="5"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#414141" />
+
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/txvMessageTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

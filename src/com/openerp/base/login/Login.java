@@ -44,6 +44,7 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OEUser;
+import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
 
@@ -151,18 +152,6 @@ public class Login extends BaseFragment {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.openerp.support.FragmentHelper#databaseHelper(android.content.Context
-	 * )
-	 */
-	@Override
-	public Object databaseHelper(Context context) {
-		return new LoginDBHelper(context);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
 	 * android.view.MenuInflater)
 	 */
@@ -250,7 +239,6 @@ public class Login extends BaseFragment {
 				String userName = edtUsername.getText().toString();
 				String password = edtPassword.getText().toString();
 				String database = dbListSpinner.getSelectedItem().toString();
-
 				userData = openerp.login(userName, password, database,
 						openERPServerURL);
 				if (userData != null) {
@@ -287,7 +275,8 @@ public class Login extends BaseFragment {
 					loginUserASync.cancel(true);
 					pdialog.hide();
 					SyncWizard syncWizard = new SyncWizard();
-					scope.main().fragmentHandler.replaceFragmnet(syncWizard);
+					FragmentListener mFragment = (FragmentListener) getActivity();
+					mFragment.startMainFragment(syncWizard, false);
 
 				}
 			} else {
@@ -319,6 +308,11 @@ public class Login extends BaseFragment {
 	public void onDestroyView() {
 		super.onDestroyView();
 		rootView = null; // now cleaning up!
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

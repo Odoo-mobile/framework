@@ -113,11 +113,6 @@ public class UserProfile extends BaseFragment {
 
 	}
 
-	@Override
-	public Object databaseHelper(Context context) {
-		return null;
-	}
-
 	private Dialog inputPasswordDialog() {
 		builder = new Builder(scope.context());
 		password = new EditText(scope.context());
@@ -160,6 +155,11 @@ public class UserProfile extends BaseFragment {
 		});
 		return builder.create();
 
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

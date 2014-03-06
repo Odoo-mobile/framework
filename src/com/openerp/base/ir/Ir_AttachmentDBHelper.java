@@ -19,38 +19,44 @@
 
 package com.openerp.base.ir;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 
 import com.openerp.base.res.Res_Company;
-import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEColumn;
-import com.openerp.orm.OETypes;
+import com.openerp.orm.OEDatabase;
+import com.openerp.orm.OEFields;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Ir_AttachmentDBHelper.
  */
-public class Ir_AttachmentDBHelper extends BaseDBHelper {
+public class Ir_AttachmentDBHelper extends OEDatabase {
+	Context mContext = null;
 
-	/**
-	 * Instantiates a new ir_ attachment db helper.
-	 * 
-	 * @param context
-	 *            the context
-	 */
 	public Ir_AttachmentDBHelper(Context context) {
 		super(context);
-		/* setting model name */
-		this.name = "ir.attachment";
+		mContext = context;
+	}
 
-		/* providing model columns */
-		columns.add(new OEColumn("name", "Name", OETypes.text()));
-		columns.add(new OEColumn("datas_fname", "Data File Name", OETypes.text()));
-		columns.add(new OEColumn("type", "Type", OETypes.text()));
-		columns.add(new OEColumn("file_size", "File Size", OETypes.integer()));
-		columns.add(new OEColumn("res_model", "Model", OETypes.varchar(100)));
-		columns.add(new OEColumn("company_id", "company id", OETypes
-				.many2One(new Res_Company(context))));
-		columns.add(new OEColumn("res_id", "resource id", OETypes.integer()));
+	@Override
+	public String getModelName() {
+		return "ir.attachment";
+	}
+
+	@Override
+	public List<OEColumn> getModelColumns() {
+		List<OEColumn> columns = new ArrayList<OEColumn>();
+		columns.add(new OEColumn("name", "Name", OEFields.text()));
+		columns.add(new OEColumn("datas_fname", "Data File Name", OEFields
+				.text()));
+		columns.add(new OEColumn("type", "Type", OEFields.text()));
+		columns.add(new OEColumn("file_size", "File Size", OEFields.integer()));
+		columns.add(new OEColumn("res_model", "Model", OEFields.varchar(100)));
+		columns.add(new OEColumn("company_id", "company id", OEFields
+				.manyToOne(new Res_Company(mContext))));
+		columns.add(new OEColumn("res_id", "resource id", OEFields.integer()));
+		return columns;
 	}
 }

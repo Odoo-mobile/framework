@@ -18,24 +18,13 @@
  */
 package com.openerp.support;
 
-import java.util.List;
-
-import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView.OnQueryTextListener;
 
-import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.orm.BaseDBHelper;
-import com.openerp.orm.OEHelper;
-import com.openerp.util.drawer.DrawerItem;
+import com.openerp.orm.OEDatabase;
+import com.openerp.support.fragment.FragmentHelper;
 
 /**
  * The Class BaseFragment.
@@ -44,38 +33,9 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 
 	/** The scope. */
 	public AppScope scope;
-
-	/** The db. */
-	public BaseDBHelper db;
-
+	private OEDatabase mDb = null;
 	/** The list search adapter. */
 	private ArrayAdapter listSearchAdapter;
-
-	/**
-	 * Gets the oE instance.
-	 * 
-	 * @return the oE instance
-	 */
-	public OEHelper getOEInstance() {
-		OEHelper openerp = null;
-		try {
-			openerp = new OEHelper(scope.context(),
-					OpenERPAccountManager.currentUser(scope.context()));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-		}
-		return openerp;
-	}
-
-	/**
-	 * Gets the model.
-	 * 
-	 * @return the model
-	 */
-	public BaseDBHelper getModel() {
-		return (BaseDBHelper) databaseHelper(scope.context());
-	}
 
 	/**
 	 * Gets the query listener.
@@ -123,15 +83,8 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 		}
 	};
 
-}
-
-interface FragmentHelper {
-	public Object databaseHelper(Context context);
-
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState);
-
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
-
-	public List<DrawerItem> drawerMenus(Context context);
+	public OEDatabase db() {
+		mDb = (OEDatabase) databaseHelper(getActivity());
+		return mDb;
+	}
 }

@@ -21,29 +21,22 @@ package com.openerp.providers.note;
 
 import com.openerp.support.provider.OEContentProvider;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class NoteProvider.
  */
 public class NoteProvider extends OEContentProvider {
-	
+
 	/** The contenturi. */
 	public static String CONTENTURI = "com.openerp.providers.note.NoteProvider";
-	
+
 	/** The authority. */
 	public static String AUTHORITY = "com.openerp.providers.note";
 
-	/* (non-Javadoc)
-	 * @see com.openerp.support.provider.OEContentProviderHelper#authority()
-	 */
 	@Override
 	public String authority() {
 		return AUTHORITY;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.openerp.support.provider.OEContentProviderHelper#contentUri()
-	 */
 	@Override
 	public String contentUri() {
 		return CONTENTURI;

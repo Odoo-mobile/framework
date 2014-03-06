@@ -19,54 +19,110 @@
 
 package com.openerp.addons.idea;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 
-import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEColumn;
-import com.openerp.orm.OETypes;
+import com.openerp.orm.OEDBHelper;
+import com.openerp.orm.OEDatabase;
+import com.openerp.orm.OEFields;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class IdeaDBHelper.
- */
-public class IdeaDBHelper extends BaseDBHelper {
+public class IdeaDBHelper extends OEDatabase {
+	Context mContext = null;
 
-	/**
-	 * Instantiates a new idea db helper.
-	 * 
-	 * @param context
-	 *            the context
-	 */
 	public IdeaDBHelper(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
-		name = "idea.idea";
+		mContext = context;
+	}
 
-		columns.add(new OEColumn("name", "Name", OETypes.varchar(64)));
-		columns.add(new OEColumn("description", "Description", OETypes.text()));
-		columns.add(new OEColumn("categoriy_ids", "Idea Category", OETypes
-				.many2Many(new IdeaCategory(context))));
+	class IdeaCategory extends OEDatabase implements OEDBHelper {
+		Context mContext = null;
+
+		public IdeaCategory(Context context) {
+			super(context);
+			mContext = context;
+
+		}
+
+		@Override
+		public String getModelName() {
+			return "idea.category";
+		}
+
+		@Override
+		public List<OEColumn> getModelColumns() {
+			List<OEColumn> cols = new ArrayList<OEColumn>();
+			cols.add(new OEColumn("name", "Name", OEFields.varchar(50)));
+			return cols;
+		}
 
 	}
 
-	/**
-	 * The Class IdeaCategory.
-	 */
-	class IdeaCategory extends BaseDBHelper {
+	class IdeaUsers extends OEDatabase implements OEDBHelper {
+		Context mContext = null;
 
-		/**
-		 * Instantiates a new idea category.
-		 * 
-		 * @param context
-		 *            the context
-		 */
-		public IdeaCategory(Context context) {
+		public IdeaUsers(Context context) {
 			super(context);
-			// TODO Auto-generated constructor stub
-			name = "idea.category";
-			columns.add(new OEColumn("name", "Name", OETypes.text()));
+			mContext = context;
 		}
 
+		@Override
+		public String getModelName() {
+			return "idea.users";
+		}
+
+		@Override
+		public List<OEColumn> getModelColumns() {
+			List<OEColumn> cols = new ArrayList<OEColumn>();
+			cols.add(new OEColumn("name", "Name", OEFields.varchar(50)));
+			cols.add(new OEColumn("city", "city", OEFields.varchar(50)));
+			cols.add(new OEColumn("user_type", "Type", OEFields
+					.manyToOne(new IdeaUserType(mContext))));
+			return cols;
+		}
+
+	}
+
+	class IdeaUserType extends OEDatabase implements OEDBHelper {
+		Context mContext = null;
+
+		public IdeaUserType(Context context) {
+			super(context);
+			mContext = context;
+		}
+
+		@Override
+		public String getModelName() {
+			return "idea.user.type";
+		}
+
+		@Override
+		public List<OEColumn> getModelColumns() {
+			List<OEColumn> cols = new ArrayList<OEColumn>();
+			cols.add(new OEColumn("type", "Name", OEFields.varchar(50)));
+			return cols;
+		}
+
+	}
+
+	@Override
+	public String getModelName() {
+		return "idea.idea";
+	}
+
+	@Override
+	public List<OEColumn> getModelColumns() {
+		List<OEColumn> columns = new ArrayList<OEColumn>();
+
+		columns.add(new OEColumn("name", "Name", OEFields.varchar(64)));
+		columns.add(new OEColumn("description", "Description", OEFields.text()));
+		columns.add(new OEColumn("category_id", "Idea Category", OEFields
+				.manyToOne(new IdeaCategory(mContext))));
+		columns.add(new OEColumn("user_ids", "Idea Users", OEFields
+				.manyToMany(new IdeaUsers(mContext))));
+		return columns;
 	}
 
 }

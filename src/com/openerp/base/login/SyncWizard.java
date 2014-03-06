@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
@@ -44,6 +43,7 @@ import com.openerp.config.SyncWizardValues;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.SyncValue;
+import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.controls.OECheckBox;
 import com.openerp.util.controls.OERadioButton;
 import com.openerp.util.controls.OETextView;
@@ -72,11 +72,6 @@ public class SyncWizard extends BaseFragment {
 		generateLayout();
 
 		return rootView;
-	}
-
-	@Override
-	public Object databaseHelper(Context context) {
-		return null;
 	}
 
 	private void generateLayout() {
@@ -192,14 +187,19 @@ public class SyncWizard extends BaseFragment {
 					}
 				}
 			}
-			Intent intent = getActivity().getIntent();
-			intent.putExtra("create_new_account", false);
+			// FragmentListener mFragment = (FragmentListener) getActivity();
+			// mFragment.restart();
 			getActivity().finish();
-			getActivity().startActivity(intent);
+			getActivity().startActivity(getActivity().getIntent());
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

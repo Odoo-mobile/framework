@@ -29,7 +29,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.openerp.MainActivity;
-import com.openerp.orm.ORM;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -171,11 +170,11 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 
 			if (removalAllowed) {
 				String account_name = account.name;
-				ORM orm = new ORM(mConetext);
-				if (orm.cleanUserRecords(account_name)) {
+				//ORM orm = new ORM(mConetext);
+				//if (orm.cleanUserRecords(account_name)) {
 					// TODO: stuff on success of removing user data from
 					// database.
-				}
+				//}
 			}
 		}
 

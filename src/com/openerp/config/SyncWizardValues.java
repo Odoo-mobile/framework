@@ -24,7 +24,7 @@ import java.util.List;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 
-import com.openerp.providers.groups.UserGroupsProvider;
+import com.openerp.providers.groups.MailGroupProvider;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.providers.note.NoteProvider;
 import com.openerp.support.SyncValue;
@@ -40,7 +40,7 @@ public class SyncWizardValues implements SyncWizardHelper {
 		list.add(new SyncValue("Social"));
 		list.add(new SyncValue("Messages", MessageProvider.AUTHORITY,
 				SyncValue.Type.CHECKBOX));
-		list.add(new SyncValue("Groups", UserGroupsProvider.AUTHORITY,
+		list.add(new SyncValue("Groups", MailGroupProvider.AUTHORITY,
 				SyncValue.Type.CHECKBOX));
 
 		/* Contacts */

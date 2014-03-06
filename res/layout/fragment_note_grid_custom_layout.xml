@@ -43,6 +43,13 @@
                 android:textColor="#414141" />
 
             <com.openerp.util.controls.OETextView
+                android:id="@+id/txvNoteTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tags"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <com.openerp.util.controls.OETextView
                 android:id="@+id/txvNoteStage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -18,9 +18,6 @@
  */
 package com.openerp.services;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
@@ -32,30 +29,23 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.openerp.addons.note.NoteDBHelper;
-import com.openerp.addons.note.NoteDBHelper.NoteFollowers;
-import com.openerp.addons.note.NoteDBHelper.NoteTags;
+import com.openerp.addons.note.NoteDB;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
-import com.openerp.support.JSONDataHelper;
-import com.openerp.widget.Mobile_Widget;
 
 public class NoteSyncService extends Service {
-	/** The sync broadcast helper. */
-	public static final String TAG = "NoteSyncService";
+	public static final String TAG = "com.openerp.services.NoteSyncService";
 	private static SyncAdapterImpl sSyncAdapter = null;
 	static int i = 0;
-	Context context = null;
+	Context mContext = null;
 
 	public NoteSyncService() {
-		super();
-		this.context = this;
+		mContext = this;
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
-
 		IBinder ret = null;
 		ret = getSyncAdapter().getSyncAdapterBinder();
 		return ret;
@@ -76,36 +66,19 @@ public class NoteSyncService extends Service {
 		try {
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-			Intent update_widget = new Intent();
-			update_widget.setAction(Mobile_Widget.TAG);
+			// Intent update_widget = new Intent();
+			// update_widget.setAction(Mobile_Widget.TAG);
 
-			NoteDBHelper db = new NoteDBHelper(context);
-			OEHelper oe = new OEHelper(context,
-					OpenERPAccountManager.currentUser(context));
-
-			if (oe.syncWithServer(db)) {
-				// Sync Done, Next stuff....
-				NoteTags noteTags = db.new NoteTags(context);
-				if (oe.syncWithServer(noteTags)) {
-					// Syncing note followers
-					NoteFollowers noteFollowers = db.new NoteFollowers(context);
-					JSONObject noteFollowersDomain = new JSONObject();
-					noteFollowersDomain
-							.accumulate(
-									"domain",
-									new JSONArray("[[\"res_id\", \"in\", "
-											+ JSONDataHelper
-													.intArrayToJSONArray(
-															db.localIds(db))
-													.toString() + "]]"));
-					if (oe.syncWithServer(noteFollowers, noteFollowersDomain,
-							false, false)) {
-						context.sendBroadcast(intent);
-						context.sendBroadcast(update_widget);
-					}
-				}
+			NoteDB note = new NoteDB(context);
+			note.setAccountUser(OpenERPAccountManager.getAccountDetail(context,
+					account.name));
+			OEHelper oe = note.getOEInstance();
+			if (oe != null) {
+				oe.syncWithServer(true);
 			}
-
+			if (OpenERPAccountManager.currentUser(context).getAndroidName()
+					.equals(account.name))
+				context.sendBroadcast(intent);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -122,25 +95,16 @@ public class NoteSyncService extends Service {
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
-
-			if (OpenERPAccountManager.isAnyUser(mContext)) {
-				account = OpenERPAccountManager.getAccount(mContext,
-						OpenERPAccountManager.currentUser(mContext)
-								.getAndroidName());
-
-				Log.i("Sync Service Start", "Syncing Notes");
-
-				try {
-					if (account != null) {
-						new NoteSyncService().performSync(mContext, account,
-								bundle, str, providerClient, syncResult);
-					}
-				} catch (Exception e) {
-
+			Log.d(TAG, "Note sync service started");
+			try {
+				if (account != null) {
+					new NoteSyncService().performSync(mContext, account,
+							bundle, str, providerClient, syncResult);
 				}
-			} else {
-				return;
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+
 		}
 	}
 }

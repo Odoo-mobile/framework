@@ -18,20 +18,36 @@
  */
 package com.openerp.base.ir;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 
-import com.openerp.orm.BaseDBHelper;
 import com.openerp.orm.OEColumn;
-import com.openerp.orm.OETypes;
+import com.openerp.orm.OEDatabase;
+import com.openerp.orm.OEFields;
 
-public class Ir_model extends BaseDBHelper {
+public class Ir_model extends OEDatabase {
+
+	Context mContext = null;
 
 	public Ir_model(Context context) {
 		super(context);
-		name = "ir.model";
+		mContext = context;
 
-		columns.add(new OEColumn("model", "model name", OETypes.varchar(50)));
-		columns.add(new OEColumn("is_installed", "is installed", OETypes.varchar(6)));
+	}
 
+	@Override
+	public String getModelName() {
+		return "ir.model";
+	}
+
+	@Override
+	public List<OEColumn> getModelColumns() {
+		List<OEColumn> columns = new ArrayList<OEColumn>();
+		columns.add(new OEColumn("model", "model name", OEFields.varchar(50)));
+		columns.add(new OEColumn("is_installed", "is installed", OEFields
+				.varchar(6)));
+		return columns;
 	}
 }

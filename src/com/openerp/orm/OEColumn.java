@@ -1,133 +1,105 @@
-/*
- * OpenERP, Open Source Management Solution
- * Copyright (C) 2012-today OpenERP SA (<http://www.openerp.com>)
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
- * 
- */
 package com.openerp.orm;
 
+import com.openerp.orm.OEFieldsHelper.ValueWatcher;
 
 /**
- * The Class Fields.
+ * The Class OEColumn. Handle each database column with name, title, type
+ * (OEFields) and help.
  */
 public class OEColumn {
 
 	/** The name. */
-	private String name;
+	private String mName;
 
 	/** The title. */
-	private String title;
+	private String mTitle;
 
 	/** The type. */
-	private Object type;
+	private Object mType;
 
 	/** The help. */
-	private String help = "";
+	private String mHelp = "";
 
 	/** The can sync. */
-	private boolean canSync = true;
+	private boolean mCanSync = true;
 
 	/** The column domain */
-	OEColumnDomain columnDomain = null;
+	OEColumnDomain mColumnDomain = null;
+
+	ValueWatcher mValueWatcher = null;
 
 	/**
-	 * Instantiates a new fields.
+	 * Instantiates a new database column.
 	 * 
-	 * @param name
-	 *            the name
-	 * @param title
-	 *            the title
-	 * @param type
-	 *            the type
+	 * @param mName
+	 *            the m name
+	 * @param mTitle
+	 *            the m title
+	 * @param mType
+	 *            the m type
 	 */
-	public OEColumn(String name, String title, Object type) {
-		super();
-		this.name = name;
-		this.title = title;
-		this.type = type;
+	public OEColumn(String mName, String mTitle, Object mType) {
+		this.mName = mName;
+		this.mTitle = mTitle;
+		this.mType = mType;
+	}
+
+	public OEColumn(String mName, String mTitle, Object mType,
+			ValueWatcher valueWatcher) {
+		this.mName = mName;
+		this.mTitle = mTitle;
+		this.mType = mType;
+		this.mValueWatcher = valueWatcher;
 	}
 
 	/**
-	 * Instantiates a new fields.
+	 * Instantiates a new database column.
 	 * 
-	 * @param name
-	 *            the name
-	 * @param title
-	 *            the title
-	 * @param type
-	 *            the type
-	 * @param canSync
-	 *            the can sync
+	 * @param mName
+	 *            the m name
+	 * @param mTitle
+	 *            the m title
+	 * @param mType
+	 *            the m type
+	 * @param mCanSync
+	 *            the m can sync
 	 */
-	public OEColumn(String name, String title, Object type, boolean canSync) {
-		super();
-		this.name = name;
-		this.title = title;
-		this.type = type;
-		this.canSync = canSync;
+	public OEColumn(String mName, String mTitle, Object mType, boolean mCanSync) {
+		this.mName = mName;
+		this.mTitle = mTitle;
+		this.mType = mType;
+		this.mCanSync = mCanSync;
 	}
 
 	public OEColumn(String name, String title, Object type,
 			OEColumnDomain columnDomain) {
-		this.name = name;
-		this.title = title;
-		this.type = type;
-		this.columnDomain = columnDomain;
+		this.mName = name;
+		this.mTitle = title;
+		this.mType = type;
+		this.mColumnDomain = columnDomain;
 	}
 
 	/**
-	 * Instantiates a new fields.
+	 * Instantiates a new database column.
 	 * 
-	 * @param name
-	 *            the name
-	 * @param title
-	 *            the title
-	 * @param type
-	 *            the type
-	 * @param canSync
-	 *            the can sync
-	 * @param help
-	 *            the help
+	 * @param mName
+	 *            the m name
+	 * @param mTitle
+	 *            the m title
+	 * @param mType
+	 *            the m type
+	 * @param mHelp
+	 *            the m help
+	 * @param mCanSync
+	 *            the m can sync
 	 */
-	public OEColumn(String name, String title, Object type, boolean canSync,
-			String help) {
-		super();
-		this.name = name;
-		this.title = title;
-		this.type = type;
-		this.help = help;
-		this.canSync = canSync;
-	}
-
-	/**
-	 * Checks if is can sync.
-	 * 
-	 * @return true, if is can sync
-	 */
-	public boolean isCanSync() {
-		return canSync;
-	}
-
-	/**
-	 * Sets the can sync.
-	 * 
-	 * @param canSync
-	 *            the new can sync
-	 */
-	public void setCanSync(boolean canSync) {
-		this.canSync = canSync;
+	public OEColumn(String mName, String mTitle, Object mType, String mHelp,
+			boolean mCanSync) {
+		this.mName = mName;
+		this.mTitle = mTitle;
+		this.mType = mType;
+		this.mHelp = mHelp;
+		this.mCanSync = mCanSync;
 	}
 
 	/**
@@ -136,17 +108,17 @@ public class OEColumn {
 	 * @return the name
 	 */
 	public String getName() {
-		return name;
+		return mName;
 	}
 
 	/**
 	 * Sets the name.
 	 * 
-	 * @param name
+	 * @param mName
 	 *            the new name
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String mName) {
+		this.mName = mName;
 	}
 
 	/**
@@ -155,17 +127,17 @@ public class OEColumn {
 	 * @return the title
 	 */
 	public String getTitle() {
-		return title;
+		return mTitle;
 	}
 
 	/**
 	 * Sets the title.
 	 * 
-	 * @param title
+	 * @param mTitle
 	 *            the new title
 	 */
-	public void setTitle(String title) {
-		this.title = title;
+	public void setTitle(String mTitle) {
+		this.mTitle = mTitle;
 	}
 
 	/**
@@ -174,17 +146,17 @@ public class OEColumn {
 	 * @return the type
 	 */
 	public Object getType() {
-		return type;
+		return mType;
 	}
 
 	/**
 	 * Sets the type.
 	 * 
-	 * @param type
+	 * @param mType
 	 *            the new type
 	 */
-	public void setType(String type) {
-		this.type = type;
+	public void setType(Object mType) {
+		this.mType = mType;
 	}
 
 	/**
@@ -193,24 +165,52 @@ public class OEColumn {
 	 * @return the help
 	 */
 	public String getHelp() {
-		return help;
+		return mHelp;
 	}
 
 	/**
 	 * Sets the help.
 	 * 
-	 * @param help
+	 * @param mHelp
 	 *            the new help
 	 */
-	public void setHelp(String help) {
-		this.help = help;
+	public void setHelp(String mHelp) {
+		this.mHelp = mHelp;
+	}
+
+	/**
+	 * Can sync.
+	 * 
+	 * @return true, if successful
+	 */
+	public boolean canSync() {
+		return mCanSync;
+	}
+
+	/**
+	 * Sets the can sync.
+	 * 
+	 * @param mCanSync
+	 *            the new can sync
+	 */
+	public void setCanSync(boolean mCanSync) {
+		this.mCanSync = mCanSync;
 	}
 
 	public OEColumnDomain getColumnDomain() {
-		return columnDomain;
+		return mColumnDomain;
 	}
 
 	public void setColumnDomain(OEColumnDomain columnDomain) {
-		this.columnDomain = columnDomain;
+		mColumnDomain = columnDomain;
 	}
+
+	public ValueWatcher getmValueWatcher() {
+		return mValueWatcher;
+	}
+
+	public void setmValueWatcher(ValueWatcher mValueWatcher) {
+		this.mValueWatcher = mValueWatcher;
+	}
+
 }

@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="10dp"
-    android:paddingTop="10dp" >
+    android:padding="10dp" >
 
     <com.openerp.util.controls.OETextView
         android:id="@+id/txvMessageHeaderTitle"

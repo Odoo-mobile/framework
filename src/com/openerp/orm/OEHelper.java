@@ -20,10 +20,10 @@ package com.openerp.orm;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
+import openerp.OEArguments;
+import openerp.OEDomain;
 import openerp.OEVersionException;
 import openerp.OpenERP;
 
@@ -32,130 +32,77 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
-import android.preference.PreferenceManager;
-import android.widget.Toast;
+import android.util.Log;
 
-import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.ir.Ir_model;
-import com.openerp.support.JSONDataHelper;
-import com.openerp.support.OEArgsHelper;
+import com.openerp.orm.OEFieldsHelper.OERelationData;
 import com.openerp.support.OEUser;
-import com.openerp.support.OpenERPServerConnection;
-import com.openerp.support.listview.OEListViewRow;
 import com.openerp.util.OEDate;
+import com.openerp.util.PreferenceManager;
 
-/**
- * The Class OEHelper.
- */
 public class OEHelper extends OpenERP {
-
-	/** The user context. */
-	OEUser userContext = null;
-
-	/** The m context. */
+	public static final String TAG = "com.openerp.orm.OEHelper";
 	Context mContext = null;
+	OEDatabase mDatabase = null;
+	OEUser mUser = null;
+	PreferenceManager mPref = null;
+	int mAffectedRows = 0;
+	List<Long> mResultIds = new ArrayList<Long>();
+	List<OEDataRow> mRemovedRecordss = new ArrayList<OEDataRow>();
 
-	/** The list of columns with domain */
-	List<OEColumn> domainCols = new ArrayList<OEColumn>();
+	public OEHelper(SharedPreferences pref) {
+		super(pref);
+		init();
+	}
 
-	HashMap<String, List<OEDataRow>> deleted_rows = new HashMap<String, List<OEDataRow>>();
-
-	/**
-	 * Instantiates a new oE helper.
-	 * 
-	 * @param context
-	 *            the context
-	 * @param base_url
-	 *            the base_url
-	 * @throws ClientProtocolException
-	 *             the client protocol exception
-	 * @throws JSONException
-	 *             the jSON exception
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws OEVersionException
-	 */
-	public OEHelper(Context context, String base_url)
+	public OEHelper(Context context, String host)
 			throws ClientProtocolException, JSONException, IOException,
 			OEVersionException {
-		super(base_url);
-		this.mContext = context;
-
+		super(host);
+		mContext = context;
+		init();
 	}
 
-	/**
-	 * Instantiates a new oE helper.
-	 * 
-	 * @param context
-	 *            the context
-	 * @param data
-	 *            the data
-	 * @throws ClientProtocolException
-	 *             the client protocol exception
-	 * @throws JSONException
-	 *             the jSON exception
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws OEVersionException
-	 */
-	public OEHelper(Context context, OEUser data)
+	public OEHelper(Context context, OEUser data, OEDatabase oeDatabase)
 			throws ClientProtocolException, JSONException, IOException,
 			OEVersionException {
-		super(data.getHost(), OpenERPServerConnection
-				.isNetworkAvailable(context));
-		this.mContext = context;
-		this.userContext = this.login(data.getUsername(), data.getPassword(),
-				data.getDatabase(), data.getHost());
-
+		super(data.getHost());
+		Log.d(TAG, "OEHelper->OEHelper(Context, OEUser, OEDatabase)");
+		Log.d(TAG, "Called from OEDatabase->getOEInstance()");
+		mContext = context;
+		mDatabase = oeDatabase;
+		mUser = data;
+		init();
+		/*
+		 * Required to login with server.
+		 */
+		login(mUser.getUsername(), mUser.getPassword(), mUser.getDatabase(),
+				mUser.getHost());
 	}
 
-	/**
-	 * Gets the user context.
-	 * 
-	 * @return the user context
-	 */
-	public OEUser getUserContext() {
-		return this.userContext;
+	private void init() {
+		Log.d(TAG, "OEHelper->init()");
+		mPref = new PreferenceManager(mContext);
 	}
 
-	/**
-	 * Login.
-	 * 
-	 * @param username
-	 *            the username
-	 * @param password
-	 *            the password
-	 * @param database
-	 *            the database
-	 * @param serverURL
-	 *            the server url
-	 * @return the user object
-	 */
 	public OEUser login(String username, String password, String database,
 			String serverURL) {
 		OEUser userObj = null;
-		JSONObject domain = new JSONObject();
 		try {
 			JSONObject response = this.authenticate(username, password,
 					database);
 			int userId = 0;
-			if (response.getString("uid") != "false") {
+			if (response.get("uid") instanceof Integer) {
 				userId = response.getInt("uid");
 
-				JSONObject fields = new JSONObject();
-				fields.accumulate("fields", "partner_id");
-				fields.accumulate("fields", "tz");
-				fields.accumulate("fields", "image");
-				fields.accumulate("fields", "company_id");
-				domain.accumulate("domain", new JSONArray("[[\"id\",\"=\","
-						+ String.valueOf(userId) + "]]"));
-				JSONObject res = this
-						.search_read("res.users", fields, domain, 0, 0, null,
-								null).getJSONArray("records").getJSONObject(0);
+				OEFieldsHelper fields = new OEFieldsHelper(new String[] {
+						"partner_id", "tz", "image", "company_id" });
+				OEDomain domain = new OEDomain();
+				domain.add("id", "=", userId);
+				JSONObject res = search_read("res.users", fields.get(),
+						domain.get()).getJSONArray("records").getJSONObject(0);
 
 				userObj = new OEUser();
 				userObj.setAvatar(res.getString("image"));
@@ -163,12 +110,10 @@ public class OEHelper extends OpenERP {
 				userObj.setDatabase(database);
 				userObj.setHost(serverURL);
 				userObj.setIsactive(true);
-				userObj.setAndroidName(this.generateAndroidName(username,
-						database));
-				userObj.setPartner_id(res.getJSONArray("partner_id").getString(
-						0));
+				userObj.setAndroidName(androidName(username, database));
+				userObj.setPartner_id(res.getJSONArray("partner_id").getInt(0));
 				userObj.setTimezone(res.getString("tz"));
-				userObj.setUser_id(String.valueOf(userId));
+				userObj.setUser_id(userId);
 				userObj.setUsername(username);
 				userObj.setPassword(password);
 				String company_id = new JSONArray(res.getString("company_id"))
@@ -182,618 +127,328 @@ public class OEHelper extends OpenERP {
 		return userObj;
 	}
 
-	/**
-	 * Generate android name.
-	 * 
-	 * @param username
-	 *            the username
-	 * @param database
-	 *            the database
-	 * @return the string
-	 */
-	public String generateAndroidName(String username, String database) {
-		StringBuffer str = new StringBuffer();
-		str.append(username);
-		str.append("[");
-		str.append(database);
-		str.append("]");
-		return str.toString();
+	public OEUser getUser() {
+		return mUser;
 	}
 
-	/**
-	 * Gets the all ids.
-	 * 
-	 * @param db
-	 *            the db
-	 * @return the all ids
-	 */
-	public int[] getAllIds(BaseDBHelper db) {
-		int[] ids = db.localIds(db);
+	private String androidName(String username, String database) {
+		StringBuffer android_name = new StringBuffer();
+		android_name.append(username);
+		android_name.append("[");
+		android_name.append(database);
+		android_name.append("]");
+		return android_name.toString();
+	}
+
+	public boolean syncWithServer() {
+		return syncWithServer(false, null, null, false, false);
+	}
+
+	public boolean syncWithServer(boolean removeLocalIfNotExists) {
+		return syncWithServer(false, null, null, false, removeLocalIfNotExists);
+	}
+
+	public boolean syncWithServer(OEDomain domain,
+			boolean removeLocalIfNotExists) {
+		return syncWithServer(false, domain, null, false,
+				removeLocalIfNotExists);
+	}
+
+	public boolean syncWithServer(OEDomain domain) {
+		return syncWithServer(false, domain, null, false, false);
+	}
+
+	public boolean syncWithServer(boolean twoWay, OEDomain domain,
+			List<Object> ids) {
+		return syncWithServer(twoWay, domain, ids, false, false);
+	}
+
+	public int getAffectedRows() {
+		return mAffectedRows;
+	}
+
+	public List<OEDataRow> getRemovedRecords() {
+		return mRemovedRecordss;
+	}
+
+	public List<Integer> getAffectedIds() {
+		List<Integer> ids = new ArrayList<Integer>();
+		for (Long id : mResultIds) {
+			ids.add(Integer.parseInt(id.toString()));
+		}
 		return ids;
 	}
 
-	/**
-	 * Find all name.
-	 * 
-	 * @param dbHelper
-	 *            the db helper
-	 * @return the list
-	 * @throws NullPointerException
-	 *             the null pointer exception
-	 */
-	public List<String> findAllName(BaseDBHelper dbHelper)
-			throws NullPointerException {
-		List<String> names = new ArrayList<String>();
-		List<OEDataRow> result = dbHelper.search(dbHelper);
-
-		if (result.size() > 0) {
-			for (OEDataRow row : result) {
-				names.add(row.get("name").toString());
-			}
-		}
-		return names;
+	public boolean syncWithMethod(String method, OEArguments args) {
+		return syncWithMethod(method, args, false);
 	}
 
-	/**
-	 * Call server method.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param method
-	 *            the method
-	 * @param arguments
-	 *            the arguments
-	 * @param values
-	 *            the values
-	 * @param ids
-	 *            the ids
-	 * @return true, if successful
-	 */
-	public boolean callServerMethod(BaseDBHelper db, String method,
-			JSONArray arguments, ContentValues values, int[] ids) {
+	public boolean syncWithMethod(String method, OEArguments args,
+			boolean removeLocalIfNotExists) {
+		Log.d(TAG, "OEHelper->syncWithMethod()");
+		Log.d(TAG, "Model: " + mDatabase.getModelName());
+		Log.d(TAG, "User: " + mUser.getAndroidName());
+		Log.d(TAG, "Method: " + method);
+		boolean synced = false;
+		OEFieldsHelper fields = new OEFieldsHelper(
+				mDatabase.getDatabaseColumns());
+		try {
+			JSONObject result = call_kw(mDatabase.getModelName(), method,
+					args.getArray());
+			if (result.getJSONArray("result").length() > 0)
+				mAffectedRows = result.getJSONArray("result").length();
+			synced = handleResultArray(fields, result.getJSONArray("result"),
+					false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return synced;
+	}
+
+	public boolean syncWithServer(boolean twoWay, OEDomain domain,
+			List<Object> ids, boolean limitedData,
+			boolean removeLocalIfNotExists) {
+		boolean synced = false;
+		Log.d(TAG, "OEHelper->syncWithServer()");
+		Log.d(TAG, "Model: " + mDatabase.getModelName());
+		Log.d(TAG, "User: " + mUser.getAndroidName());
+		OEFieldsHelper fields = new OEFieldsHelper(
+				mDatabase.getDatabaseColumns());
+		try {
+			if (domain == null) {
+				domain = new OEDomain();
+			}
+			if (ids != null) {
+				domain.add("id", "in", ids);
+			}
+			if (limitedData) {
+				int data_limit = mPref.getInt("sync_data_limit", 60);
+				domain.add("create_date", ">=",
+						OEDate.getDateBefore(data_limit));
+			}
+			JSONObject result = search_read(mDatabase.getModelName(),
+					fields.get(), domain.get(), 0, 50, null, null);
+			mAffectedRows = result.getJSONArray("records").length();
+			synced = handleResultArray(fields, result.getJSONArray("records"),
+					removeLocalIfNotExists);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Log.d(TAG, mDatabase.getModelName() + " synced");
+		return synced;
+	}
+
+	private boolean handleResultArray(OEFieldsHelper fields, JSONArray results,
+			boolean removeLocalIfNotExists) {
 		boolean flag = false;
 		try {
-			call_kw(db.getModelName(), method, arguments);
-
-			for (int id : ids) {
-				flag = db.write(db, values, id);
+			fields.addAll(results);
+			// Handling many2many and many2one records
+			List<OERelationData> rel_models = fields.getRelationData();
+			for (OERelationData rel : rel_models) {
+				rel.getDb()
+						.getOEInstance()
+						.syncWithServer(false, null, rel.getIds(), false, false);
 			}
-
+			List<Long> result_ids = mDatabase.createORReplace(
+					fields.getValues(), removeLocalIfNotExists);
+			mResultIds.addAll(result_ids);
+			mRemovedRecordss.addAll(mDatabase.getRemovedRecords());
+			if (result_ids.size() > 0) {
+				flag = true;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return flag;
 	}
 
-	/**
-	 * Common method to Sync data with server.
-	 * 
-	 * It will take database helper and fetch data from server as given columns.
-	 * If any column with many2many relation found it will automatic sync
-	 * related table data.
-	 * 
-	 * @param db
-	 *            the BaseDBHelper instance
-	 * @return true, if successful
-	 */
-	public boolean syncWithServer(BaseDBHelper db) {
-		deleted_rows = new HashMap<String, List<OEDataRow>>();
-		boolean success = false;
+	public boolean isModelInstalled(String model) {
+		boolean installed = false;
+		Ir_model ir_model = new Ir_model(mContext);
 		try {
-			JSONObject result = getDataFromServer(db, null);
-			if (result != null) {
-				success = handleServerData(db, result);
+			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "model" });
+			OEDomain domain = new OEDomain();
+			domain.add("model", "=", model);
+			JSONObject result = search_read(ir_model.getModelName(),
+					fields.get(), domain.get());
+			if (result.getInt("length") > 0) {
+				installed = true;
+				JSONObject record = result.getJSONArray("records")
+						.getJSONObject(0);
+				OEValues values = new OEValues();
+				values.put("id", record.getInt("id"));
+				values.put("model", record.getString("model"));
+				values.put("is_installed", installed);
+				int count = ir_model.count("model = ?", new String[] { model });
+				if (count > 0)
+					ir_model.update(values, "model = ?", new String[] { model });
+				else
+					ir_model.create(values);
 			}
+
 		} catch (Exception e) {
+			Log.d(TAG, "OEHelper->isModuleInstalled()");
+			Log.e(TAG, e.getMessage() + ". No connection with OpenERP server");
 		}
-		return success;
+		return installed;
 	}
 
-	/**
-	 * Common method to Sync data with server.
-	 * 
-	 * It will take database helper and fetch data from server as given columns.
-	 * If any column with many2many relation found it will automatic sync
-	 * related table data.
-	 * 
-	 * @param db
-	 * @param domain
-	 * @return
-	 */
-	public boolean syncWithServer(BaseDBHelper db, JSONObject domain) {
-		deleted_rows = new HashMap<String, List<OEDataRow>>();
-		boolean success = false;
-		try {
-			JSONObject result = getDataFromServer(db, domain);
-			if (result != null) {
-				success = handleServerData(db, result);
-			}
-		} catch (Exception e) {
+	public List<OEDataRow> search_read_remain() {
+		Log.d(TAG, "OEHelper->search_read_remain()");
+		return search_read(true);
+	}
+
+	private OEDomain getLocalIdsDomain(String operator) {
+		OEDomain domain = new OEDomain();
+		JSONArray ids = new JSONArray();
+		for (OEDataRow row : mDatabase.select()) {
+			ids.put(row.getInt("id"));
 		}
-		return success;
+		domain.add("id", operator, ids);
+		return domain;
 	}
 
-	public boolean syncWithServer(BaseDBHelper db, JSONObject domain,
-			boolean delete, boolean syncLimitedData) {
-		deleted_rows = new HashMap<String, List<OEDataRow>>();
-		boolean success = false;
+	private List<OEDataRow> search_read(boolean getRemain) {
+		List<OEDataRow> rows = new ArrayList<OEDataRow>();
 		try {
-			JSONObject result = getDataFromServer(db, domain, syncLimitedData);
-			if (result != null) {
-				success = handleServerData(db, result, delete);
-			}
-		} catch (Exception e) {
-		}
-		return success;
-	}
-
-	/**
-	 * sync with server
-	 * 
-	 * 
-	 * @param db
-	 * @param domain
-	 * @param delete
-	 * @return
-	 */
-	public boolean syncWithServer(BaseDBHelper db, JSONObject domain,
-			boolean delete) {
-		deleted_rows = new HashMap<String, List<OEDataRow>>();
-		boolean success = false;
-		try {
-			JSONObject result = getDataFromServer(db, domain);
-			if (result != null) {
-				success = handleServerData(db, result, delete);
-			}
-		} catch (Exception e) {
-		}
-		return success;
-	}
-
-	/**
-	 * Handle server data.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param res
-	 *            the res
-	 * @return true, if successful
-	 */
-	private boolean handleServerData(BaseDBHelper db, JSONObject res) {
-		return handleServerData(db, res, true);
-	}
-
-	/**
-	 * Handle server data.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param res
-	 *            the res
-	 * @return true, if successful
-	 */
-	private boolean handleServerData(BaseDBHelper db, JSONObject res,
-			boolean delete) {
-		boolean success = false;
-		HashMap<String, Object> m2oCols = db.getMany2OneColumns();
-		HashMap<String, Object> m2mCols = db.getMany2ManyColumns();
-		HashMap<String, List<Integer>> m2oColsIds = new HashMap<String, List<Integer>>();
-		HashMap<String, List<Integer>> m2mColsIds = new HashMap<String, List<Integer>>();
-		List<String> serverIds = new ArrayList<String>();
-		try {
-			int total = res.getJSONArray("records").length();
-			for (int i = 0; i < total; i++) {
-				ContentValues values = new ContentValues();
-				JSONObject row = res.getJSONArray("records").getJSONObject(i);
-				int row_id = row.getInt("id");
-				serverIds.add(String.valueOf(row_id));
-				for (String key : db.columnListToStringArray(db.getColumns())) {
-					if (row.has(key)) {
-						// Handling many2one columns.
-						if (m2oCols.containsKey(key)) {
-							if (!row.getString(key).equals("false")) {
-								int m2oid = Integer.parseInt(db
-										.many2oneRecord(row.getJSONArray(key)));
-								if (m2oColsIds.containsKey(key)) {
-									m2oColsIds.get(key).add(m2oid);
-									m2oColsIds.put(key, m2oColsIds.get(key));
-								} else {
-									List<Integer> list = new ArrayList<Integer>();
-									list.add(m2oid);
-									m2oColsIds.put(key, list);
-								}
-								// m2oIds.add(db.many2oneRecord(row
-								// .getJSONArray(key)));
-							}
-						}
-						// Handling many2manycolumns
-						if (m2mCols.containsKey(key)) {
-							int[] ref_ids = JSONDataHelper
-									.jsonArrayTointArray(new JSONArray(row
-											.getString(key)));
-							m2mColsIds.put(key, intArrayToList(ref_ids));
-						}
-
-						values.put(key, row.getString(key));
-					}
-
+			OEFieldsHelper fields = new OEFieldsHelper(
+					mDatabase.getDatabaseServerColumns());
+			JSONObject domain = null;
+			if (getRemain)
+				domain = getLocalIdsDomain("not in").get();
+			JSONObject result = search_read(mDatabase.getModelName(),
+					fields.get(), domain, 0, 100, null, null);
+			for (int i = 0; i < result.getJSONArray("records").length(); i++) {
+				JSONObject record = result.getJSONArray("records")
+						.getJSONObject(i);
+				OEDataRow row = new OEDataRow();
+				row.put("id", record.getInt("id"));
+				for (OEColumn col : mDatabase.getDatabaseServerColumns()) {
+					row.put(col.getName(), record.get(col.getName()));
 				}
-				if (!db.hasRecord(db, row_id)) {
-					@SuppressWarnings("unused")
-					int newId = db.create(db, values);
-				} else {
-					// Updating data of row
-					db.write(db, values, row_id, true);
-				}
-
+				rows.add(row);
 			}
-
-			// Handling many2One reference table. :)
-			for (String key : m2oCols.keySet()) {
-				if (m2oColsIds.containsKey(key)) {
-					Many2One many2one = (Many2One) m2oCols.get(key);
-					if (many2one.isM2OObject()) {
-						BaseDBHelper m2oObj = (BaseDBHelper) many2one
-								.getM2OObject();
-						List<Integer> m2oIds = (ArrayList<Integer>) m2oColsIds
-								.get(key);
-						List<Integer> idsToSync = new ArrayList<Integer>();
-						for (int id : m2oIds) {
-							if (!m2oObj.hasRecord(m2oObj, id)) {
-								idsToSync.add(id);
-							}
-						}
-						if (idsToSync.size() > 0) {
-							syncReferenceTables(m2oObj, idsToSync);
-						}
-
-					}
-				}
-			}
-
-			// Handling many2many reference table. :)
-			for (String key : m2mCols.keySet()) {
-				if (m2mColsIds.containsKey(key)) {
-					Many2Many many2many = (Many2Many) m2mCols.get(key);
-					if (many2many.isM2MObject()) {
-						syncReferenceTables(
-								(BaseDBHelper) many2many.getM2mObject(),
-								m2mColsIds.get(key));
-					}
-				}
-			}
-
-			/**
-			 * Comparing server Ids with local id. If local id is not present in
-			 * server Ids than deleting local record.
-			 */
-			List<OEDataRow> del_rows = new ArrayList<OEDataRow>();
-			if (delete) {
-				if (total > 1) {
-					for (int id : db.localIds(db)) {
-						if (serverIds.size() > 0) {
-							if (!serverIds.contains(String.valueOf(id))) {
-								// Delete record with id.
-								List<OEDataRow> del_row = db.search(db,
-										new String[] { "id = ?" },
-										new String[] { String.valueOf(id) });
-
-								if (db.delete(db, id, true)) {
-									del_rows.add(del_row.get(0));
-								}
-
-							}
-						}
-					}
-				}
-			}
-
-			deleted_rows.put(db.getModelName(), del_rows);
-
-			success = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return success;
+		return rows;
 	}
 
-	public HashMap<String, List<OEDataRow>> getDeletedRows() {
-		return deleted_rows;
+	public List<OEDataRow> search_read() {
+		Log.d(TAG, "OEHelper->search_read()");
+		return search_read(false);
 	}
 
-	private JSONObject getDataFromServer(BaseDBHelper db, JSONObject domain,
-			boolean loadLimitedData) {
-		JSONObject fields = getFieldsFromCols(getSyncCols(db.getServerColumns()));
-		String model = db.getModelName();
+	public void delete(int id) {
+		Log.d(TAG, "OEHelper->delete()");
 		try {
-			if (loadLimitedData) {
-				JSONArray domainArgs = new JSONArray();
-				if (domain == null) {
-					domain = new JSONObject();
-				} else {
-					domainArgs = domain.getJSONArray("domain");
-				}
-				SharedPreferences pref = PreferenceManager
-						.getDefaultSharedPreferences(mContext);
-				int data_limit = Integer.parseInt(pref.getString(
-						"sync_data_limit", "60"));
-				domainArgs.put(new JSONArray("[\"create_date\", \">=\", \""
-						+ OEDate.getDateBefore(data_limit) + "\"]"));
-				domain.put("domain", domainArgs);
-			}
+			unlink(mDatabase.getModelName(), id);
+			mDatabase.delete(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-			List<OEColumn> domainCols = getColumnsWithDomain();
-			if (domainCols.size() > 0) {
-				for (OEColumn col : domainCols) {
-					JSONArray domainArgs = new JSONArray();
-					if (domain == null) {
-						domain = new JSONObject();
-					} else {
-						domainArgs = domain.getJSONArray("domain");
-					}
-					JSONArray domainColsVals = new JSONArray();
-					domainColsVals.put(col.getName());
-					domainColsVals.put(col.getColumnDomain().getOperator());
-					domainColsVals.put(col.getColumnDomain().getValue());
-					domainArgs.put(new JSONArray(domainColsVals.toString()));
-					domain.put("domain", domainArgs);
-				}
+	public Object call_kw(String method, OEArguments arguments) {
+		return call_kw(method, arguments, new JSONObject());
+	}
+
+	public Object call_kw(String method, OEArguments arguments,
+			JSONObject context) {
+		return call_kw(null, method, arguments, context);
+	}
+
+	public Object call_kw(String model, String method, OEArguments arguments,
+			JSONObject context) {
+		Log.d(TAG, "OEHelper->call_kw()");
+		JSONObject result = null;
+		if (model == null) {
+			model = mDatabase.getModelName();
+		}
+		try {
+			if (context != null) {
+				arguments.add(updateContext(context));
 			}
-			return search_read(model, fields, domain, 0, 50, null, null);
+			result = call_kw(model, method, arguments.getArray());
+			return result.get("result");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	/**
-	 * Gets the data from server.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param domain
-	 *            the domain
-	 * @return the data from server
-	 */
-	private JSONObject getDataFromServer(BaseDBHelper db, JSONObject domain) {
-		return getDataFromServer(db, domain, true);
-	}
-
-	/**
-	 * Gets the fields from cols.
-	 * 
-	 * @param cols
-	 *            the cols
-	 * @return the fields from cols
-	 */
-	private JSONObject getFieldsFromCols(String[] cols) {
-		JSONObject fields = new JSONObject();
-		for (String col : cols) {
-			try {
-				fields.accumulate("fields", col);
-			} catch (Exception e) {
-			}
-		}
-		return fields;
-	}
-
-	/**
-	 * Gets the sync cols.
-	 * 
-	 * @param columns
-	 *            the columns
-	 * @return the sync cols
-	 */
-	private String[] getSyncCols(List<OEColumn> columns) {
-		domainCols = new ArrayList<OEColumn>();
-		String[] fields = new String[columns.size()];
-		int i = 0;
-		for (OEColumn col : columns) {
-			fields[i] = col.getName();
-			i++;
-			if (col.getColumnDomain() != null) {
-				domainCols.add(col);
-			}
-		}
-		return fields;
-	}
-
-	private List<OEColumn> getColumnsWithDomain() {
-		return domainCols;
-	}
-
-	/**
-	 * Sync reference tables.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param list
-	 *            the list
-	 * @return true, if successful
-	 */
-	public boolean syncReferenceTables(BaseDBHelper db, List<Integer> list) {
-		return syncReferenceTables(db, list, true);
-	}
-
-	/**
-	 * Sync reference tables.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param list
-	 *            the list
-	 * @param can_delete
-	 *            can delete
-	 * @return true, if successful
-	 */
-	public boolean syncReferenceTables(BaseDBHelper db, List<Integer> list,
-			boolean can_delete) {
-		boolean success = false;
+	public Integer create(OEValues values) {
+		Log.d(TAG, "OEHelper->create()");
+		Integer newId = null;
 		try {
-			OEArgsHelper ids = new OEArgsHelper();
-			for (int id : list) {
-				ids.addArg(id);
-			}
-
-			OEArgsHelper args = new OEArgsHelper();
-			args.addArgCondition("id", "in", ids.getArgs());
-
-			JSONObject domain = new JSONObject();
-			domain.accumulate("domain", new JSONArray().put(args.getArgs()));
-
-			JSONObject result = getDataFromServer(db, domain, false);
-			if (result != null) {
-				success = handleServerData(db, result, can_delete);
-			}
+			JSONObject result = createNew(mDatabase.getModelName(),
+					generateArguments(values));
+			newId = result.getInt("result");
+			values.put("id", newId);
+			mDatabase.create(values);
+			return newId;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return success;
+		return newId;
 	}
 
-	/**
-	 * Int array to list.
-	 * 
-	 * @param ids
-	 *            the ids
-	 * @return the list
-	 */
-	private List<Integer> intArrayToList(int[] ids) {
-		List<Integer> list = new ArrayList<Integer>();
-		for (int id : ids) {
-			list.add(id);
-		}
-		return list;
-	}
-
-	/**
-	 * Search_data from server.
-	 * 
-	 * @param db
-	 *            the db
-	 * @param domain
-	 *            the domain
-	 * @param offset
-	 *            the offset
-	 * @param limit
-	 *            the limit
-	 * @return the list
-	 */
-	public List<OEListViewRow> search_data(BaseDBHelper db, JSONObject domain,
-			int offset, int limit) {
-		List<OEListViewRow> record_lists = new ArrayList<OEListViewRow>();
+	public Boolean update(OEValues values, Integer id) {
+		Log.d(TAG, "OEHelper->update()");
+		Boolean flag = false;
 		try {
-			JSONObject fields = fieldsToOEFields(db.getServerColumns());
-			JSONObject result = search_read(db.getModelName(), fields, domain,
-					offset, limit, null, null);
-			if (result.getJSONArray("records").length() > 0) {
-				for (int i = 0; i < result.getJSONArray("records").length(); i++) {
-					JSONObject row = result.getJSONArray("records")
-							.getJSONObject(i);
-					OEDataRow oe_datarow = jsonDataToMap(row);
-					int row_id = row.getInt("id");
+			flag = updateValues(mDatabase.getModelName(),
+					generateArguments(values), id);
+			if (flag)
+				mDatabase.update(values, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return flag;
+	}
 
-					OEListViewRow oe_row = new OEListViewRow(row_id, oe_datarow);
-					record_lists.add(oe_row);
+	private JSONObject generateArguments(OEValues values) {
+		Log.d(TAG, "OEHelper->generateArguments()");
+		JSONObject arguments = new JSONObject();
+		try {
+			for (String key : values.keys()) {
+				if (values.get(key) instanceof OEM2MIds) {
+					OEM2MIds m2mIds = (OEM2MIds) values.get(key);
+					JSONArray m2mArray = new JSONArray();
+					m2mArray.put(6);
+					m2mArray.put(false);
+					m2mArray.put(m2mIds.getJSONIds());
+					arguments.put(key, new JSONArray("[" + m2mArray.toString()
+							+ "]"));
+				} else {
+					arguments.put(key, values.get(key));
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return record_lists;
+		return arguments;
 	}
 
-	/**
-	 * Json data to hasmap object.
-	 * 
-	 * @param data
-	 *            the data
-	 * @return the hash map
-	 */
-	public OEDataRow jsonDataToMap(JSONObject data) {
-		OEDataRow map_data = new OEDataRow();
-		@SuppressWarnings("unchecked")
-		Iterator<String> keys = data.keys();
-		try {
-			while (keys.hasNext()) {
-				String key = keys.next();
-				map_data.put(key, data.get(key));
-			}
-		} catch (Exception e) {
-		}
-
-		return map_data;
-	}
-
-	/**
-	 * Fields to JSONObject fields Accumulates fields.
-	 * 
-	 * @param fields
-	 *            the fields
-	 * @return the jSON object
-	 */
-	public JSONObject fieldsToOEFields(List<OEColumn> fields) {
-		JSONObject oeFields = new JSONObject();
-		try {
-			for (OEColumn field : fields) {
-				oeFields.accumulate("fields", field.getName());
-			}
-		} catch (Exception e) {
-		}
-		return oeFields;
-	}
-
-	public boolean isInstalled(String modelname) {
-		String oea_name = OpenERPAccountManager.currentUser(mContext)
-				.getAndroidName();
-		Ir_model modelObj = new Ir_model(mContext);
+	public boolean moduleExists(String name) {
+		Log.d(TAG, "OEHelper->moduleExists()");
 		boolean flag = false;
 		try {
-			JSONObject fields = new JSONObject();
-			fields.accumulate("fields", "model");
-			JSONObject domain = new JSONObject();
-			JSONArray domainArgs = new JSONArray();
-			domainArgs.put(new JSONArray("[\"model\",\"=\",\"" + modelname
-					+ "\"]"));
-			domain.put("domain", domainArgs);
-			JSONObject res = search_read("ir.model", fields, domain, 0, 0,
-					null, null);
-			if (res.getInt("length") > 0) {
+			OEDomain domain = new OEDomain();
+			domain.add("name", "ilike", name);
+			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "state" });
+			JSONObject result = search_read("ir.module.module", fields.get(),
+					domain.get());
+			JSONArray records = result.getJSONArray("records");
+			if (records.length() > 0
+					&& records.getJSONObject(0).getString("state")
+							.equalsIgnoreCase("installed")) {
 				flag = true;
-			} else {
-				flag = false;
 			}
 		} catch (Exception e) {
-			List<OEDataRow> records = modelObj.search(modelObj,
-					new String[] { "is_installed" }, new String[] {
-							"model = ?", " AND ", "oea_name = ?" },
-					new String[] { modelname, oea_name });
-			if (records.size() > 0) {
-				flag = Boolean.parseBoolean(records.get(0).get("is_installed")
-						.toString());
-			} else {
-				flag = false;
-			}
-		}
-		/* updating user install module info */
-		int records = modelObj
-				.count(modelObj, new String[] { "model = ?", " AND ",
-						"oea_name = ?" }, new String[] { modelname, oea_name });
-		if (records > 0) {
-			// updating
-			SQLiteDatabase db = modelObj.getWritableDatabase();
-			db.execSQL(
-					"update ir_model set is_installed = ? where model = ? and oea_name = ?",
-					new String[] { String.valueOf(flag), modelname, oea_name });
-			db.close();
-		} else {
-			ContentValues data_values = new ContentValues();
-			data_values.put("id", 0);
-			data_values.put("model", modelname);
-			data_values.put("is_installed", String.valueOf(flag));
-			modelObj.create(modelObj, data_values);
+			e.printStackTrace();
 		}
 		return flag;
 	}

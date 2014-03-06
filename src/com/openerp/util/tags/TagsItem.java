@@ -68,7 +68,7 @@ public class TagsItem implements Serializable {
 
 	@Override
 	public String toString() {
-		return this.subject;
+		return this.subject + " " + this.sub_subject + " " + this.id;
 	}
 
 	public String getImage() {
@@ -78,5 +78,5 @@ public class TagsItem implements Serializable {
 	public void setImage(String image) {
 		this.image = image;
 	}
-	
+
 }

@@ -57,10 +57,10 @@ public class Res_PartnerSyncHelper {
 				.current(mContext).getAndroidName());
 		try {
 			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(mContext);
-			List<OEDataRow> res = dbHelper.search(dbHelper, new String[] {
-					"(phone != ? ", "OR", "mobile != ? ", "OR",
-					"email != ? ) ", "AND", "id = ? " }, new String[] {
-					"false", "false", "false", partner_id + "" });
+			List<OEDataRow> res = dbHelper
+					.select("(phone != ? OR mobile != ? OR email != ? )  AND id = ? ",
+							new String[] { "false", "false", "false",
+									partner_id + "" }, null, null, null);
 			// checking if records exist?
 			int total = res.size();
 
@@ -346,8 +346,8 @@ public class Res_PartnerSyncHelper {
 	public void syncContacts(Context context, Account account) {
 		HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 		mContentResolver = context.getContentResolver();
-		int company_id = Integer.parseInt(OpenERPAccountManager.currentUser(
-				context).getCompany_id());
+		int company_id = Integer.parseInt(OEUser.current(context)
+				.getCompany_id());
 
 		RawContacts.CONTENT_URI
 				.buildUpon()
@@ -372,9 +372,9 @@ public class Res_PartnerSyncHelper {
 
 		try {
 			Res_PartnerDBHelper dbHelper = new Res_PartnerDBHelper(context);
-			List<OEDataRow> res = dbHelper.search(dbHelper, new String[] {
-					"phone != ? ", "OR", "mobile != ? ", "OR", "email != ?" },
-					new String[] { "false", "false", "false" });
+			List<OEDataRow> res = dbHelper.select(
+					"phone != ? OR mobile != ?  OR email != ?", new String[] {
+							"false", "false", "false" });
 			// checking if records exist?
 			int total = res.size();
 

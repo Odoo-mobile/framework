@@ -26,7 +26,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +35,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
@@ -43,16 +44,16 @@ import com.openerp.orm.OEDataRow;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
-import com.openerp.support.listview.OEListViewAdapter;
-import com.openerp.support.listview.OEListViewOnCreateListener;
-import com.openerp.support.listview.OEListViewRow;
+import com.openerp.support.fragment.FragmentListener;
+import com.openerp.support.listview.OEListAdapter;
+import com.openerp.util.Base64Helper;
 import com.openerp.util.drawer.DrawerItem;
 
 public class AccountsDetail extends BaseFragment {
 	View rootView = null;
 	GridView gridAccounts = null;
-	OEListViewAdapter adapter = null;
-	List<OEListViewRow> accounts = new ArrayList<OEListViewRow>();
+	OEListAdapter mAdapter = null;
+	List<Object> mAccounts = new ArrayList<Object>();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,35 +69,43 @@ public class AccountsDetail extends BaseFragment {
 
 	private void setupGrid() {
 		gridAccounts = (GridView) rootView.findViewById(R.id.gridAccounts);
-		String[] from = new String[] { "image", "name", "host" };
-		int[] to = new int[] { R.id.imgAccountPic, R.id.txvAccountName,
-				R.id.txvAccountHost };
-		adapter = new OEListViewAdapter(scope.context(),
-				R.layout.fragment_account_detail_item, getAccounts(), from, to,
-				null);
-		adapter.addViewListener(new OEListViewOnCreateListener() {
-
+		mAccounts = new ArrayList<Object>(getAccounts());
+		mAdapter = new OEListAdapter(getActivity(),
+				R.layout.fragment_account_detail_item, mAccounts) {
 			@Override
-			public View listViewOnCreateListener(int position, View row_view,
-					final OEListViewRow row_data) {
-				View newView = row_view;
-				Button btnLogin = (Button) newView.findViewById(R.id.btnLogin);
-				Button btnLogout = (Button) newView
-						.findViewById(R.id.btnLogout);
-				Button btnDelete = (Button) newView
-						.findViewById(R.id.btnDelete);
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View mView = convertView;
+				if (mView == null) {
+					mView = getActivity().getLayoutInflater().inflate(
+							getResource(), parent, false);
+				}
+				TextView txvName, txvHost;
+				txvName = (TextView) mView.findViewById(R.id.txvAccountName);
+				txvHost = (TextView) mView.findViewById(R.id.txvAccountHost);
+				ImageView imgUserPic = (ImageView) mView
+						.findViewById(R.id.imgAccountPic);
+
+				final OEDataRow row_data = (OEDataRow) mAccounts.get(position);
+				txvName.setText(row_data.getString("name"));
+				txvHost.setText(row_data.getString("host"));
+				if (!row_data.getString("image").equals("false"))
+					imgUserPic.setImageBitmap(Base64Helper.getBitmapImage(
+							getActivity(), row_data.getString("image")));
+				Button btnLogin = (Button) mView.findViewById(R.id.btnLogin);
+				Button btnLogout = (Button) mView.findViewById(R.id.btnLogout);
+				Button btnDelete = (Button) mView.findViewById(R.id.btnDelete);
 				btnDelete.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
-						String accountName = row_data.getRow_data().get("name")
+						String accountName = row_data.getString("name")
 								.toString();
 						Dialog deleteAccount = deleteAccount(accountName);
 						deleteAccount.show();
 
 					}
 				});
-				if ((Boolean) row_data.getRow_data().get("is_active")) {
+				if (row_data.getBoolean("is_active")) {
 					btnLogout.setVisibility(View.VISIBLE);
 					btnLogin.setVisibility(View.GONE);
 					btnLogout.setOnClickListener(new OnClickListener() {
@@ -115,24 +124,22 @@ public class AccountsDetail extends BaseFragment {
 						@Override
 						public void onClick(View view) {
 							OpenERPAccountManager.loginUser(scope.context(),
-									row_data.getRow_data().get("name")
-											.toString());
+									row_data.getString("name"));
 							scope.main().finish();
-							scope.main().startActivity(
-									scope.main().getIntent());
+							scope.main()
+									.startActivity(scope.main().getIntent());
 						}
 					});
 				}
-				return newView;
+				return mView;
 			}
-		});
-		adapter.addImageColumn("image");
-		gridAccounts.setAdapter(adapter);
+		};
+		gridAccounts.setAdapter(mAdapter);
 
 	}
 
-	private List<OEListViewRow> getAccounts() {
-		List<OEListViewRow> list = new ArrayList<OEListViewRow>();
+	private List<Object> getAccounts() {
+		List<Object> list = new ArrayList<Object>();
 		for (OEUser account : OpenERPAccountManager.fetchAllAccounts(scope
 				.context())) {
 			OEDataRow row_data = new OEDataRow();
@@ -141,16 +148,9 @@ public class AccountsDetail extends BaseFragment {
 			row_data.put("image", account.getAvatar());
 			row_data.put("host", account.getHost());
 			row_data.put("is_active", account.isIsactive());
-			OEListViewRow row = new OEListViewRow(Integer.parseInt(account
-					.getUser_id()), row_data);
-			list.add(row);
+			list.add(row_data);
 		}
 		return list;
-	}
-
-	@Override
-	public Object databaseHelper(Context context) {
-		return null;
 	}
 
 	@Override
@@ -162,9 +162,9 @@ public class AccountsDetail extends BaseFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_add_new_account:
-			Fragment fragment = new AccountFragment();
-			scope.main().fragmentHandler.setBackStack(true, null);
-			scope.main().fragmentHandler.replaceFragmnet(fragment);
+			AccountFragment fragment = new AccountFragment();
+			FragmentListener mFragment = (FragmentListener) getActivity();
+			mFragment.startMainFragment(fragment, true);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -240,6 +240,11 @@ public class AccountsDetail extends BaseFragment {
 						});
 
 		return builder.create();
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

@@ -29,27 +29,31 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.Toast;
 
-import com.openerp.MainActivity;
 import com.openerp.R;
-import com.openerp.orm.BaseDBHelper;
+import com.openerp.orm.OEDatabase;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.OpenERPServerConnection;
 
 public class OEBinaryDownloadHelper {
+	public static final String TAG = "com.openerp.util.OEBinaryDownloadHelper";
 	ProgressDialog mProgressDialog;
 	DownloadTask downloadTask = null;
+	Context mContext = null;
 
-	public void downloadBinary(int id, BaseDBHelper db) {
+	public void downloadBinary(int id, OEDatabase db, Context context) {
+		Log.d(TAG, "OEBinaryDownloadHelper->downloadBinary()");
+		mContext = context;
 		try {
-			if (OpenERPServerConnection
-					.isNetworkAvailable(MainActivity.context)) {
-				mProgressDialog = new ProgressDialog(MainActivity.context);
+			if (OpenERPServerConnection.isNetworkAvailable(mContext)) {
+				mProgressDialog = new ProgressDialog(mContext);
 				mProgressDialog.setMessage("Downloading...");
 				mProgressDialog.setIndeterminate(true);
 				mProgressDialog
@@ -59,21 +63,22 @@ public class OEBinaryDownloadHelper {
 				downloadTask = new DownloadTask(db);
 				downloadTask.execute(id);
 			} else {
-				Toast.makeText(MainActivity.context,
-						"Unable to connect server !", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, "Unable to connect server !",
+						Toast.LENGTH_LONG).show();
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	private class DownloadTask extends AsyncTask<Integer, Integer, Boolean> {
 
 		int attachment_id = 0;
-		BaseDBHelper db = null;
+		OEDatabase db = null;
 		String downloadPath = "";
 		String downloadFileName = "";
 
-		public DownloadTask(BaseDBHelper db) {
+		public DownloadTask(OEDatabase db) {
 			this.db = db;
 		}
 
@@ -85,7 +90,6 @@ public class OEBinaryDownloadHelper {
 
 		@Override
 		protected void onProgressUpdate(Integer... values) {
-			// TODO Auto-generated method stub
 			super.onProgressUpdate(values);
 			mProgressDialog.setIndeterminate(false);
 			mProgressDialog.setMax(100);
@@ -146,12 +150,12 @@ public class OEBinaryDownloadHelper {
 		protected void onPostExecute(Boolean result) {
 			mProgressDialog.dismiss();
 			if (!result) {
-				Toast.makeText(MainActivity.context,
+				Toast.makeText(mContext,
 						"Server not responding. Try again later.",
 						Toast.LENGTH_LONG).show();
 			} else {
-				Toast.makeText(MainActivity.context, "File downloaded",
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext, "File downloaded", Toast.LENGTH_SHORT)
+						.show();
 				OENotificationHelper notification = new OENotificationHelper();
 				Intent intent = new Intent(Intent.ACTION_VIEW);
 				File fl = new File(downloadPath);
@@ -159,10 +163,10 @@ public class OEBinaryDownloadHelper {
 				Uri uri = Uri.fromFile(fl);
 				String mimeType = mime.getContentTypeFor(uri.getPath());
 				intent.setDataAndType(uri, mimeType);
-				notification.setResultIntent(intent, MainActivity.context);
-				notification.showNotification(MainActivity.context,
-						downloadFileName + " Download complete", downloadPath,
-						"", R.drawable.ic_stat_av_download);
+				notification.setResultIntent(intent, mContext);
+				notification.showNotification(mContext, downloadFileName
+						+ " Download complete", downloadPath, "",
+						R.drawable.ic_stat_av_download);
 
 			}
 		}

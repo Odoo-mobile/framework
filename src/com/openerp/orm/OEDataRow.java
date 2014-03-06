@@ -18,7 +18,9 @@
  */
 package com.openerp.orm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 
@@ -37,8 +39,15 @@ public class OEDataRow {
 		return Integer.parseInt(_data.get(key).toString());
 	}
 
+	public Float getFloat(String key) {
+		return Float.parseFloat(_data.get(key).toString());
+	}
+
 	public String getString(String key) {
-		return _data.get(key).toString();
+		if (_data.containsKey(key) && _data.get(key) != null)
+			return _data.get(key).toString();
+		else
+			return "false";
 	}
 
 	public Boolean getBoolean(String key) {
@@ -64,6 +73,20 @@ public class OEDataRow {
 		} catch (Exception e) {
 		}
 		return val;
+	}
+
+	public OEM2ORecord getM2ORecord(String key) {
+		return (OEM2ORecord) _data.get(key);
+	}
+
+	public OEM2MRecord getM2MRecord(String key) {
+		return (OEM2MRecord) _data.get(key);
+	}
+
+	public List<String> keys() {
+		List<String> list = new ArrayList<String>();
+		list.addAll(_data.keySet());
+		return list;
 	}
 
 	@Override

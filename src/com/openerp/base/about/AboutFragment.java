@@ -79,11 +79,6 @@ public class AboutFragment extends BaseFragment {
 	}
 
 	@Override
-	public Object databaseHelper(Context context) {
-		return null;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
@@ -100,6 +95,11 @@ public class AboutFragment extends BaseFragment {
 		super.onDestroy();
 		scope.main().getActionBar().setDisplayHomeAsUpEnabled(true);
 		scope.main().getActionBar().setHomeButtonEnabled(true);
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return null;
 	}
 
 	@Override

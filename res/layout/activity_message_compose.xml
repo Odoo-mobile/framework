@@ -42,11 +42,7 @@
             android:hint="Body"
             android:inputType="textMultiLine" />
 
-        <ListView
-            android:id="@+id/lstAttachments"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-        </ListView>
+        <include layout="@layout/activity_message_compose_attachment_grid" />
     </LinearLayout>
 
 </ScrollView>
