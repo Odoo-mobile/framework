@@ -96,7 +96,13 @@ public class OEFieldsHelper {
 		Log.d(TAG, "OEFieldsHelper->getIdsList()");
 		List<Integer> ids = new ArrayList<Integer>();
 		try {
-			for (int i = 0; i < array.length(); i++) {
+			int length = array.length();
+			if (length > 50) {
+				Log.i(TAG,
+						"Many2Many records more than 50... - Limiting to 50 records only");
+				length = 50;
+			}
+			for (int i = 0; i < length; i++) {
 				if (array.get(i) instanceof JSONArray)
 					ids.add(array.getJSONArray(i).getInt(0));
 				else if (array.get(i) instanceof JSONObject) {

@@ -118,11 +118,13 @@ public class MessageDetail extends BaseFragment implements OnClickListener {
 
 		String author = row.getString("email_from");
 		String email = author;
-		OEDataRow mAuthor = null;
+		OEDataRow author_id = null;
 		if (author.equals("false")) {
-			mAuthor = row.getM2ORecord("author_id").browse();
-			author = mAuthor.getString("name");
-			email = mAuthor.getString("email");
+			author_id = row.getM2ORecord("author_id").browse();
+			if (author_id != null) {
+				author = author_id.getString("name");
+				email = author_id.getString("email");
+			}
 		}
 		txvAuthor.setText(author);
 		txvEmail.setText(email);
@@ -197,10 +199,10 @@ public class MessageDetail extends BaseFragment implements OnClickListener {
 			}
 		});
 
-		if (mAuthor != null
-				&& !mAuthor.getString("image_small").equals("false")) {
+		if (author_id != null
+				&& !author_id.getString("image_small").equals("false")) {
 			imgUserPicture.setImageBitmap(Base64Helper.getBitmapImage(
-					getActivity(), mAuthor.getString("image_small")));
+					getActivity(), author_id.getString("image_small")));
 		}
 
 		// Handling reply button click event
@@ -210,8 +212,8 @@ public class MessageDetail extends BaseFragment implements OnClickListener {
 		OEContactView oe_contactView = (OEContactView) mView
 				.findViewById(R.id.imgUserPicture);
 		int partner_id = 0;
-		if (mAuthor != null)
-			partner_id = mAuthor.getInt("id");
+		if (author_id != null)
+			partner_id = author_id.getInt("id");
 		oe_contactView.assignPartnerId(partner_id);
 
 		return mView;
@@ -316,11 +318,10 @@ public class MessageDetail extends BaseFragment implements OnClickListener {
 					.findViewById(R.id.txvMessageTitle);
 			String title = mMessageData.getString("subject");
 			if (title.equals("false")) {
-				if (title.equals("false"))
-					title = mMessageData.getString("type");
+				title = mMessageData.getString("type");
 			}
 			if (!mMessageData.getString("record_name").equals("false"))
-				title += " : " + mMessageData.getString("record_name");
+				title = mMessageData.getString("record_name");
 
 			txvTitle.setText(title);
 		}

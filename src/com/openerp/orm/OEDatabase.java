@@ -544,7 +544,8 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	public List<OEColumn> getDefaultCols() {
 		List<OEColumn> cols = new ArrayList<OEColumn>();
 		cols.add(new OEColumn("id", "id", OEFields.integer()));
-		cols.add(new OEColumn("oea_name", "android name", OEFields.varchar(50)));
+		cols.add(new OEColumn("oea_name", "android name", OEFields.varchar(50),
+				false));
 		return cols;
 	}
 

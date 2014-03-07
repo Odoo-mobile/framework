@@ -141,26 +141,27 @@ public class OEHelper extends OpenERP {
 	}
 
 	public boolean syncWithServer() {
-		return syncWithServer(false, null, null, false, false);
+		return syncWithServer(false, null, null, false, -1, false);
 	}
 
 	public boolean syncWithServer(boolean removeLocalIfNotExists) {
-		return syncWithServer(false, null, null, false, removeLocalIfNotExists);
+		return syncWithServer(false, null, null, false, -1,
+				removeLocalIfNotExists);
 	}
 
 	public boolean syncWithServer(OEDomain domain,
 			boolean removeLocalIfNotExists) {
-		return syncWithServer(false, domain, null, false,
+		return syncWithServer(false, domain, null, false, -1,
 				removeLocalIfNotExists);
 	}
 
 	public boolean syncWithServer(OEDomain domain) {
-		return syncWithServer(false, domain, null, false, false);
+		return syncWithServer(false, domain, null, false, -1, false);
 	}
 
 	public boolean syncWithServer(boolean twoWay, OEDomain domain,
 			List<Object> ids) {
-		return syncWithServer(twoWay, domain, ids, false, false);
+		return syncWithServer(twoWay, domain, ids, false, -1, false);
 	}
 
 	public int getAffectedRows() {
@@ -206,7 +207,7 @@ public class OEHelper extends OpenERP {
 	}
 
 	public boolean syncWithServer(boolean twoWay, OEDomain domain,
-			List<Object> ids, boolean limitedData,
+			List<Object> ids, boolean limitedData, int limits,
 			boolean removeLocalIfNotExists) {
 		boolean synced = false;
 		Log.d(TAG, "OEHelper->syncWithServer()");
@@ -226,8 +227,12 @@ public class OEHelper extends OpenERP {
 				domain.add("create_date", ">=",
 						OEDate.getDateBefore(data_limit));
 			}
+
+			if (limits == -1) {
+				limits = 50;
+			}
 			JSONObject result = search_read(mDatabase.getModelName(),
-					fields.get(), domain.get(), 0, 50, null, null);
+					fields.get(), domain.get(), 0, limits, null, null);
 			mAffectedRows = result.getJSONArray("records").length();
 			synced = handleResultArray(fields, result.getJSONArray("records"),
 					removeLocalIfNotExists);
@@ -247,9 +252,8 @@ public class OEHelper extends OpenERP {
 			// Handling many2many and many2one records
 			List<OERelationData> rel_models = fields.getRelationData();
 			for (OERelationData rel : rel_models) {
-				rel.getDb()
-						.getOEInstance()
-						.syncWithServer(false, null, rel.getIds(), false, false);
+				OEHelper oe = rel.getDb().getOEInstance();
+				oe.syncWithServer(false, null, rel.getIds(), false, 0, false);
 			}
 			List<Long> result_ids = mDatabase.createORReplace(
 					fields.getValues(), removeLocalIfNotExists);

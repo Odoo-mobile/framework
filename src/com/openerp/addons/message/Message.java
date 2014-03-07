@@ -237,7 +237,7 @@ public class Message extends BaseFragment implements
 			subject = row.getString("type");
 		}
 		if (!row.getString("record_name").equals("false"))
-			subject += " : " + row.getString("record_name");
+			subject = row.getString("record_name");
 		txvSubject.setText(subject);
 		if (row.getInt("childs") > 0) {
 			txvchilds.setVisibility(View.VISIBLE);
