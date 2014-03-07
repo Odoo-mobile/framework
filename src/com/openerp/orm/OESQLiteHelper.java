@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
 import com.openerp.base.ir.Ir_model;
@@ -18,10 +20,13 @@ import com.openerp.support.fragment.FragmentHelper;
 
 public class OESQLiteHelper extends SQLiteOpenHelper {
 
-	public static String DATABASE_NAME = "OpenERPSQLite";
-	public static int DATABASE_VERSION = 1;
+	public static final String TAG = OESQLiteHelper.class.getSimpleName();
+
+	public static final String DATABASE_NAME = "OpenERPSQLite.db";
+	public static final int DATABASE_VERSION = 1;
 	Context mContext = null;
 	ModulesConfig mModuleConfig = null;
+	List<String> mDBTables = new ArrayList<String>();
 
 	public OESQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -71,4 +76,44 @@ public class OESQLiteHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	private void setDBTables() {
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cr = db.query("sqlite_master", new String[] { "name" },
+				"type = ?", new String[] { "table" }, null, null, null);
+		if (cr.moveToFirst()) {
+			do {
+				String table = cr.getString(0);
+				if (!table.equals("android_metadata")
+						&& !table.equals("sqlite_sequence")) {
+					mDBTables.add(table);
+				}
+			} while (cr.moveToNext());
+		}
+		cr.close();
+		db.close();
+	}
+
+	public boolean hasTable(String table_or_model) {
+		if (mDBTables.size() == 0)
+			setDBTables();
+		String table = table_or_model;
+		if (table_or_model.contains(".")) {
+			table = table_or_model.replaceAll("\\.", "_");
+		}
+		if (mDBTables.contains(table)) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean cleanUserRecords(String account_name) {
+		Log.d(TAG, "cleanUserRecords()");
+		SQLiteDatabase db = getWritableDatabase();
+		for (String table : mDBTables) {
+			db.delete(table, "oea_name = ?", new String[] { account_name });
+		}
+		db.close();
+		Log.i(TAG, account_name + " records cleaned");
+		return true;
+	}
 }

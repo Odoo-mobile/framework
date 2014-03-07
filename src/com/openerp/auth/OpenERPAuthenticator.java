@@ -29,15 +29,15 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.openerp.MainActivity;
+import com.openerp.orm.OESQLiteHelper;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class OpenERPAuthenticator.
  */
 public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 
 	/** The m conetext. */
-	private Context mConetext;
+	private Context mContext;
 
 	/**
 	 * Instantiates a new open erp authenticator.
@@ -47,8 +47,7 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 	 */
 	public OpenERPAuthenticator(Context context) {
 		super(context);
-		mConetext = context;
-		// TODO Auto-generated constructor stub
+		mContext = context;
 	}
 
 	/*
@@ -64,12 +63,11 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 			String accountType, String authTokenType,
 			String[] requiredFeatures, Bundle options)
 			throws NetworkErrorException {
-		// TODO Auto-generated method stub
 
 		final Bundle result;
 		final Intent intent;
 
-		intent = new Intent(this.mConetext, MainActivity.class);
+		intent = new Intent(mContext, MainActivity.class);
 		result = new Bundle();
 		intent.putExtra("create_new_account", true);
 		result.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -88,7 +86,6 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 	@Override
 	public Bundle confirmCredentials(AccountAuthenticatorResponse response,
 			Account account, Bundle options) throws NetworkErrorException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -102,7 +99,6 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 	@Override
 	public Bundle editProperties(AccountAuthenticatorResponse response,
 			String accountType) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -118,7 +114,6 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 	public Bundle getAuthToken(AccountAuthenticatorResponse response,
 			Account account, String authTokenType, Bundle options)
 			throws NetworkErrorException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -131,7 +126,6 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 	 */
 	@Override
 	public String getAuthTokenLabel(String authTokenType) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -146,7 +140,6 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 	@Override
 	public Bundle hasFeatures(AccountAuthenticatorResponse response,
 			Account account, String[] features) throws NetworkErrorException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -169,12 +162,11 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 					.getBoolean(AccountManager.KEY_BOOLEAN_RESULT);
 
 			if (removalAllowed) {
-				String account_name = account.name;
-				//ORM orm = new ORM(mConetext);
-				//if (orm.cleanUserRecords(account_name)) {
-					// TODO: stuff on success of removing user data from
-					// database.
-				//}
+				OESQLiteHelper sqlite = new OESQLiteHelper(mContext);
+				if (sqlite.cleanUserRecords(account.name)) {
+					// TODO: next task after cleaning all record reletated to
+					// user.
+				}
 			}
 		}
 
@@ -193,7 +185,6 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 	public Bundle updateCredentials(AccountAuthenticatorResponse response,
 			Account account, String authTokenType, Bundle options)
 			throws NetworkErrorException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
