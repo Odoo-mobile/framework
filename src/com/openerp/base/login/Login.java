@@ -26,14 +26,18 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.openerp.R;
@@ -110,6 +114,20 @@ public class Login extends BaseFragment {
 		getActivity().setTitle("Login");
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		getActivity().getActionBar().setHomeButtonEnabled(false);
+		edtUsername = (OEEditText) rootView.findViewById(R.id.edtUsername);
+		edtPassword = (OEEditText) rootView.findViewById(R.id.edtPassword);
+		edtPassword.setOnEditorActionListener(new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+						|| (actionId == EditorInfo.IME_ACTION_DONE)) {
+					goNext();
+				}
+				return false;
+			}
+		});
 		return rootView;
 	}
 
@@ -174,25 +192,26 @@ public class Login extends BaseFragment {
 		switch (item.getItemId()) {
 		case R.id.menu_login_account:
 			Log.d("LoginFragment()->ActionBarMenuClicked", "menu_login_account");
-			edtUsername = (OEEditText) rootView.findViewById(R.id.edtUsername);
-			edtPassword = (OEEditText) rootView.findViewById(R.id.edtPassword);
-			edtUsername.setError(null);
-			edtPassword.setError(null);
-			if (TextUtils.isEmpty(edtUsername.getText())) {
-				edtUsername.setError("Provide Username");
-			} else if (TextUtils.isEmpty(edtPassword.getText())) {
-				edtPassword.setError("Provide Password");
-			} else if (dbListSpinner.getSelectedItemPosition() == 0) {
-				Toast.makeText(getActivity(), "Please select database",
-						Toast.LENGTH_LONG).show();
-			} else {
-				loginUserASync = new LoginUser();
-				loginUserASync.execute((Void) null);
-			}
-
+			goNext();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void goNext() {
+		edtUsername.setError(null);
+		edtPassword.setError(null);
+		if (TextUtils.isEmpty(edtUsername.getText())) {
+			edtUsername.setError("Provide Username");
+		} else if (TextUtils.isEmpty(edtPassword.getText())) {
+			edtPassword.setError("Provide Password");
+		} else if (dbListSpinner.getSelectedItemPosition() == 0) {
+			Toast.makeText(getActivity(), "Please select database",
+					Toast.LENGTH_LONG).show();
+		} else {
+			loginUserASync = new LoginUser();
+			loginUserASync.execute((Void) null);
 		}
 	}
 

@@ -108,9 +108,14 @@ public class OESQLiteHelper extends SQLiteOpenHelper {
 
 	public boolean cleanUserRecords(String account_name) {
 		Log.d(TAG, "cleanUserRecords()");
+		if (mDBTables.size() == 0)
+			setDBTables();
 		SQLiteDatabase db = getWritableDatabase();
 		for (String table : mDBTables) {
-			db.delete(table, "oea_name = ?", new String[] { account_name });
+			int total = 0;
+			total = db.delete(table, "oea_name = ?",
+					new String[] { account_name });
+			Log.v(TAG, total + " cleaned from " + table);
 		}
 		db.close();
 		Log.i(TAG, account_name + " records cleaned");

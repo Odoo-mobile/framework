@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,7 +34,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.openerp.R;
@@ -97,20 +101,35 @@ public class AccountFragment extends BaseFragment {
 		getActivity().setTitle("Setup Account");
 		chkSecureConnection = (CheckBox) rootView
 				.findViewById(R.id.chkIsSecureConnection);
-		final OEEditText edtUrl = (OEEditText) rootView
-				.findViewById(R.id.edtServerURL);
+		edtServerUrl = (OEEditText) rootView.findViewById(R.id.edtServerURL);
 		chkSecureConnection.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				String serverUrl = edtUrl.getText().toString().toLowerCase();
+				String serverUrl = edtServerUrl.getText().toString()
+						.toLowerCase();
 				if (chkSecureConnection.isChecked()) {
 					serverUrl = serverUrl.replace("http://", "");
+					serverUrl = serverUrl.replace("https://", "");
 					serverUrl = "https://" + serverUrl;
 				} else {
 					serverUrl = serverUrl.replace("https://", "");
+					serverUrl = serverUrl.replace("http://", "");
 				}
-				edtUrl.setText(serverUrl);
-				edtUrl.setSelection(edtUrl.length());
+				edtServerUrl.setText(serverUrl);
+				edtServerUrl.setSelection(edtServerUrl.length());
+			}
+		});
+
+		edtServerUrl.setOnEditorActionListener(new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+						|| (actionId == EditorInfo.IME_ACTION_DONE)) {
+					goNext();
+				}
+				return false;
 			}
 		});
 		return rootView;
@@ -141,33 +160,34 @@ public class AccountFragment extends BaseFragment {
 
 		switch (item.getItemId()) {
 		case R.id.menu_account_next:
-			StringBuffer serverURL = new StringBuffer();
-			edtServerUrl = (OEEditText) rootView
-					.findViewById(R.id.edtServerURL);
-			edtServerUrl.setError(null);
-			if (TextUtils.isEmpty(edtServerUrl.getText())) {
-				edtServerUrl.setError("Provide Server URL");
-			} else {
-
-				if (!edtServerUrl.getText().toString().contains("http://")
-						&& !edtServerUrl.getText().toString()
-								.contains("https://")) {
-					String http_https = "http://";
-					if (chkSecureConnection.isChecked()) {
-						http_https = "https://";
-					}
-					serverURL.append(http_https);
-				}
-
-				serverURL.append(edtServerUrl.getText());
-				this.openERPServerURL = serverURL.toString();
-				serverConnectASync = new ConnectToServer();
-				serverConnectASync.execute((Void) null);
-
-			}
+			goNext();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void goNext() {
+		StringBuffer serverURL = new StringBuffer();
+		edtServerUrl.setError(null);
+		if (TextUtils.isEmpty(edtServerUrl.getText())) {
+			edtServerUrl.setError("Provide Server URL");
+		} else {
+
+			if (!edtServerUrl.getText().toString().contains("http://")
+					&& !edtServerUrl.getText().toString().contains("https://")) {
+				String http_https = "http://";
+				if (chkSecureConnection.isChecked()) {
+					http_https = "https://";
+				}
+				serverURL.append(http_https);
+			}
+
+			serverURL.append(edtServerUrl.getText());
+			this.openERPServerURL = serverURL.toString();
+			serverConnectASync = new ConnectToServer();
+			serverConnectASync.execute((Void) null);
+
 		}
 	}
 
