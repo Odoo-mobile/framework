@@ -43,7 +43,6 @@ import com.openerp.config.SyncWizardValues;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.SyncValue;
-import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.controls.OECheckBox;
 import com.openerp.util.controls.OERadioButton;
 import com.openerp.util.controls.OETextView;

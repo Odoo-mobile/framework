@@ -35,7 +35,7 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 	public AppScope scope;
 	private OEDatabase mDb = null;
 	/** The list search adapter. */
-	private ArrayAdapter listSearchAdapter;
+	private ArrayAdapter<Object> listSearchAdapter;
 
 	/**
 	 * Gets the query listener.
@@ -44,14 +44,10 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 	 *            the list adapter
 	 * @return the query listener
 	 */
-	public OnQueryTextListener getQueryListener(ArrayAdapter listAdapter) {
+	public OnQueryTextListener getQueryListener(ArrayAdapter<Object> listAdapter) {
 		listSearchAdapter = listAdapter;
 		return queryListener;
 	}
-
-	/* list search handler */
-	/** The grid_current query. */
-	private String grid_currentQuery = null; // holds the current query...
 
 	/** The query listener. */
 	final public OnQueryTextListener queryListener = new OnQueryTextListener() {
@@ -62,7 +58,6 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 		public boolean onQueryTextChange(String newText) {
 
 			if (TextUtils.isEmpty(newText)) {
-				grid_currentQuery = null;
 				newText = "";
 				if (isSearched && listSearchAdapter != null) {
 					listSearchAdapter.getFilter().filter(null);
@@ -70,7 +65,6 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 
 			} else {
 				isSearched = true;
-				grid_currentQuery = newText;
 				listSearchAdapter.getFilter().filter(newText);
 			}
 

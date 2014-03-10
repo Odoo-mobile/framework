@@ -57,7 +57,7 @@ import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
 import com.openerp.base.account.AccountsDetail;
 import com.openerp.base.account.UserProfile;
-import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.base.res.ResPartnerDB;
 import com.openerp.orm.OEDataRow;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
@@ -192,7 +192,7 @@ public class MainActivity extends FragmentActivity implements
 		if (OEUser.current(mContext) != null) {
 			mDrawerTitle = OEUser.current(mContext).getUsername();
 			mDrawerSubtitle = OEUser.current(mContext).getHost();
-			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(mContext);
+			ResPartnerDB partner = new ResPartnerDB(mContext);
 			OEDataRow partnerInfo = partner.select(OEUser.current(mContext)
 					.getPartner_id());
 			if (partnerInfo != null) {

@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 public class OENotificationHelper {
-	private static final String TAG = "OENotificationHelper";
 	NotificationCompat.Builder mBuilder;
 	NotificationManager mNotifyManager;
 	Notification notification;
@@ -34,6 +33,7 @@ public class OENotificationHelper {
 	Intent notificationIntent = null;
 	PendingIntent pendingIntent = null;
 
+	@SuppressWarnings("deprecation")
 	public void showNotification(Context context, String title,
 			String subtitle, String authority, int icon) {
 		mNotifyManager = (NotificationManager) context

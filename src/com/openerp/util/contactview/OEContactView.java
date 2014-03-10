@@ -28,54 +28,65 @@ import android.view.View;
 import android.widget.QuickContactBadge;
 import android.widget.Toast;
 
-import com.openerp.base.res.Res_PartnerSyncHelper;
+import com.openerp.base.res.ResPartnerDB;
+import com.openerp.orm.OEDataRow;
+import com.openerp.support.OEUser;
+import com.openerp.support.contact.OEContact;
 
 public class OEContactView extends QuickContactBadge {
 
-	int partner_id = 0;
-	Uri contact_uri = null;
-	Res_PartnerSyncHelper partner_helper = null;
+	public static final String TAG = "com.openerp.util.contactview.OEContactView";
+
+	int mPartner_id = 0;
+	Uri mContactUri = null;
+	OEContact mContact = null;
 	Context mContext = null;
+	OEUser mUser = null;
 
 	public OEContactView(Context context) {
 		super(context);
 		mContext = context;
-		partner_helper = new Res_PartnerSyncHelper(context);
+		init();
 	}
 
 	public OEContactView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		mContext = context;
-		partner_helper = new Res_PartnerSyncHelper(context);
+		init();
 	}
 
 	public OEContactView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		mContext = context;
-		partner_helper = new Res_PartnerSyncHelper(context);
+		init();
+	}
+
+	private void init() {
+		mUser = OEUser.current(mContext);
+		mContact = new OEContact(mContext, mUser);
 	}
 
 	@Override
 	public void onClick(View v) {
-		if (hasUri(partner_id)) {
+		if (hasUri(mPartner_id)) {
 			super.onClick(v);
 		} else {
-			createContact(partner_id);
+			createContact(mPartner_id);
 		}
 	}
 
 	public boolean hasUri(int id) {
-		if (contact_uri != null) {
+		if (mContactUri != null) {
 			return true;
 		}
 		return false;
 	}
 
 	public void assignPartnerId(int id) {
-		partner_id = id;
-		contact_uri = partner_helper.getPartnerUri(id);
-		if (contact_uri != null) {
-			assignContactUri(contact_uri);
+		mPartner_id = id;
+		mContactUri = mContact.contactUri(id);
+		if (mContactUri != null) {
+			assignContactUri(mContactUri);
 		}
 	}
 
@@ -85,34 +96,24 @@ public class OEContactView extends QuickContactBadge {
 
 	private Dialog contactAddConfirmation(final int partner_id) {
 
-		// Initialize the Alert Dialog
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-		// Source of the data in the DIalog
 
-		// Set the dialog title
 		builder.setTitle("Add Contact")
 				.setMessage("Add this partner to your contact.")
 
-				// Set the action buttons
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
-								if (partner_helper.createNewContact(partner_id)) {
+								OEDataRow partner = new ResPartnerDB(mContext)
+										.select(partner_id);
+								if (mContact.createContact(partner)) {
 									Toast.makeText(mContext, "Contact Saved.",
 											Toast.LENGTH_LONG).show();
 									assignPartnerId(partner_id);
 								}
 							}
-						})
-				.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								return;
-							}
-						});
+						}).setNegativeButton("Cancel", null);
 
 		return builder.create();
 	}

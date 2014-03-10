@@ -26,7 +26,7 @@ import android.view.animation.Transformation;
 public class OEViewHandler {
 	public static void expand(final View v) {
 
-		v.measure(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+		v.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		final int targtetHeight = v.getMeasuredHeight();
 
 		v.getLayoutParams().height = 0;
