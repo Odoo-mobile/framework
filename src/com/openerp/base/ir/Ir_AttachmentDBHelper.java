@@ -24,7 +24,7 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.openerp.base.res.Res_Company;
+import com.openerp.base.res.ResCompanyDB;
 import com.openerp.orm.OEColumn;
 import com.openerp.orm.OEDatabase;
 import com.openerp.orm.OEFields;
@@ -55,7 +55,7 @@ public class Ir_AttachmentDBHelper extends OEDatabase {
 		columns.add(new OEColumn("file_size", "File Size", OEFields.integer()));
 		columns.add(new OEColumn("res_model", "Model", OEFields.varchar(100)));
 		columns.add(new OEColumn("company_id", "company id", OEFields
-				.manyToOne(new Res_Company(mContext))));
+				.manyToOne(new ResCompanyDB(mContext))));
 		columns.add(new OEColumn("res_id", "resource id", OEFields.integer()));
 		return columns;
 	}

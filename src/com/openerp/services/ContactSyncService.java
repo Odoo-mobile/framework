@@ -18,9 +18,7 @@
  */
 package com.openerp.services;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import openerp.OEDomain;
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
@@ -35,26 +33,20 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.base.res.Res_PartnerDBHelper;
-import com.openerp.base.res.Res_PartnerSyncHelper;
+import com.openerp.base.res.ResPartnerDB;
 import com.openerp.orm.OEHelper;
-import com.openerp.receivers.SyncFinishReceiver;
+import com.openerp.support.OEUser;
+import com.openerp.support.contact.OEContact;
 
 public class ContactSyncService extends Service {
-	int mStartMode; // indicates how to behave if the service is killed
-	IBinder mBinder; // interface for clients that bind
-	boolean mAllowRebind; // indicates whether onRebind should be used
 
-	/** The sync broadcast helper. */
-	// SyncBroadcastHelper sync_helper = new SyncBroadcastHelper();
-	public static final String TAG = "ContactSyncService";
+	public static final String TAG = "com.openerp.services.ContactSyncService";
+
 	private static SyncAdapterImpl sSyncAdapter = null;
-	static int i = 0;
-	Context context = null;
+	Context mContext = null;
 
 	public ContactSyncService() {
-		super();
-		this.context = this;
+		this.mContext = this;
 	}
 
 	@Override
@@ -75,40 +67,33 @@ public class ContactSyncService extends Service {
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		try {
-			Intent intent = new Intent();
-			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-
+			OEUser user = OpenERPAccountManager.getAccountDetail(context,
+					account.name);
 			String saasURL1 = "https://openerp.my.openerp.com";
 			String saasURL2 = "https://accounts.openerp.com";
-			Res_PartnerDBHelper db = new Res_PartnerDBHelper(context);
+
+			ResPartnerDB db = new ResPartnerDB(context);
 			OEHelper oe = db.getOEInstance();
-			Res_PartnerSyncHelper helper = new Res_PartnerSyncHelper(context);
+
+			OEContact contact = new OEContact(context, user);
 
 			SharedPreferences settings = PreferenceManager
 					.getDefaultSharedPreferences(context);
 			boolean syncServerContacts = settings.getBoolean(
 					"server_contact_sync", false);
 
-			if (OpenERPAccountManager.currentUser(context).getHost().toString()
-					.contains(saasURL1)
-					|| OpenERPAccountManager.currentUser(context).getHost()
-							.toString().contains(saasURL2)) {
-				helper.syncContacts(context, account);
-
+			if (user.getHost().toString().contains(saasURL1)
+					|| user.getHost().toString().contains(saasURL2)) {
+				contact.createContacts(db.select());
 			} else {
-				if (syncServerContacts) {
-					int company_id = Integer.parseInt(OpenERPAccountManager
-							.currentUser(context).getCompany_id());
-
-					JSONObject domain = new JSONObject();
-					domain.accumulate("domain", new JSONArray(
-							"[[\"company_id\", \"=\", " + company_id + "]]"));
-//					if (oe.syncWithServer(db, domain, false)) {
-//						helper.syncContacts(context, account);
-//					}
-				} else {
-					helper.syncContacts(context, account);
+				if (syncServerContacts && oe != null) {
+					Log.v(TAG, "Contact sync with server");
+					int company_id = Integer.parseInt(user.getCompany_id());
+					OEDomain domain = new OEDomain();
+					domain.add("company_id", "=", company_id);
+					oe.syncWithServer(domain, false);
 				}
+				contact.createContacts(db.select());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -127,22 +112,9 @@ public class ContactSyncService extends Service {
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
 
-			if (OpenERPAccountManager.isAnyUser(mContext)) {
-				account = OpenERPAccountManager.getAccount(mContext,
-						OpenERPAccountManager.currentUser(mContext)
-								.getAndroidName());
-				Log.i("Sync Service Start", "Syncing Contacts");
-				try {
-					if (account != null) {
-						new ContactSyncService().performSync(mContext, account,
-								bundle, str, providerClient, syncResult);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				return;
-			}
+			new ContactSyncService().performSync(mContext, account, bundle,
+					str, providerClient, syncResult);
+
 		}
 	}
 }

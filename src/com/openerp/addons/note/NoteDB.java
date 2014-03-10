@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.base.res.ResPartnerDB;
 import com.openerp.orm.OEColumn;
 import com.openerp.orm.OEDatabase;
 import com.openerp.orm.OEFields;
@@ -35,10 +35,10 @@ public class NoteDB extends OEDatabase {
 		cols.add(new OEColumn("tag_ids", "NoteTags", OEFields
 				.manyToMany(new NoteTags(mContext))));
 		cols.add(new OEColumn("current_partner_id", "Res_Partner", OEFields
-				.manyToOne(new Res_PartnerDBHelper(mContext))));
+				.manyToOne(new ResPartnerDB(mContext))));
 		cols.add(new OEColumn("note_pad_url", "URL", OEFields.text()));
 		cols.add(new OEColumn("message_follower_ids", "Followers", OEFields
-				.manyToMany(new Res_PartnerDBHelper(mContext))));
+				.manyToMany(new ResPartnerDB(mContext))));
 		return cols;
 	}
 

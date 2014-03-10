@@ -166,6 +166,23 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_meetings" />
         </service>
+
+        <!-- Contact service -->
+        <service
+            android:name="com.openerp.services.ContactSyncService"
+            android:exported="true"
+            android:process=":contacts" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_contacts" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
     </application>
 
 </manifest>

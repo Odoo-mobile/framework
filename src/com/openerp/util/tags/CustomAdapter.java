@@ -21,6 +21,7 @@ package com.openerp.util.tags;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -30,8 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-public class CustomAdapter extends ArrayAdapter<TagsItem> implements
-		Filterable {
+public class CustomAdapter extends ArrayAdapter<TagsItem> implements Filterable {
 	private final Object mLock = new Object();
 	List<TagsItem> lists = null;
 	List<TagsItem> listsArray = null;
@@ -49,19 +49,11 @@ public class CustomAdapter extends ArrayAdapter<TagsItem> implements
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		// return super.getView(position, convertView, parent);
 		rootView = convertView;
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
 		if (rootView == null) {
 			rootView = inflater.inflate(this.resource_id, parent, false);
 		}
-//		TagsItems item = lists.get(position);
-//		TextView txvSubject = (TextView) rootView.findViewById(R.id.txvSubject);
-//		TextView txvSubSubject = (TextView) rootView
-//				.findViewById(R.id.txvSubSubject);
-//		txvSubject.setText(item.getSubject());
-//		txvSubSubject.setText(item.getSub_subject());
-
 		return rootView;
 	}
 
@@ -78,6 +70,7 @@ public class CustomAdapter extends ArrayAdapter<TagsItem> implements
 	/**
 	 * The Class ItemFilter.
 	 */
+	@SuppressLint("DefaultLocale")
 	class ItemFilter extends Filter {
 
 		@Override
@@ -121,6 +114,7 @@ public class CustomAdapter extends ArrayAdapter<TagsItem> implements
 			return result;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void publishResults(CharSequence constraint,
 				FilterResults results) {

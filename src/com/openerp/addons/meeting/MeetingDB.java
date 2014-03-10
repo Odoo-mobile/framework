@@ -6,7 +6,7 @@ import java.util.List;
 import openerp.OpenERP.OEVersion;
 import android.content.Context;
 
-import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.base.res.ResPartnerDB;
 import com.openerp.orm.OEColumn;
 import com.openerp.orm.OEDatabase;
 import com.openerp.orm.OEFields;
@@ -48,7 +48,7 @@ public class MeetingDB extends OEDatabase {
 		columns.add(new OEColumn("location", "Location", OEFields.text()));
 		columns.add(new OEColumn("date_deadline", "Dead_line", OEFields.text()));
 		columns.add(new OEColumn("partner_ids", "Partner_ids", OEFields
-				.manyToMany(new Res_PartnerDBHelper(mContext))));
+				.manyToMany(new ResPartnerDB(mContext))));
 
 		// Event id of OpenERP Mobile Calendar for meeting
 		columns.add(new OEColumn("calendar_event_id", "Calendar_event_id",

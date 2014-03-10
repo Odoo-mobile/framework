@@ -57,6 +57,7 @@ public class TextViewTags {
 		return tv;
 	}
 
+	@SuppressWarnings("deprecation")
 	private Object convertViewToDrawable(OETextView view) {
 		view.setBackgroundColor(Color.parseColor(mColor));
 		view.setTextColor(Color.parseColor(mTextColor));

@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.R;
-import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.base.res.ResPartnerDB;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.orm.OEM2MIds.Operation;
@@ -279,7 +279,7 @@ public class NoteFollowers extends BaseFragment implements TokenListener,
 
 		@Override
 		protected void onPostExecute(Void result) {
-			Res_PartnerDBHelper partner = new Res_PartnerDBHelper(getActivity());
+			ResPartnerDB partner = new ResPartnerDB(getActivity());
 			for (int id : mPartnerIds) {
 				mFollowerList.add(partner.select(id));
 			}
@@ -291,12 +291,12 @@ public class NoteFollowers extends BaseFragment implements TokenListener,
 
 	class PartnerLoader extends AsyncTask<Void, Void, Void> {
 
-		Res_PartnerDBHelper mPartner = null;
+		ResPartnerDB mPartner = null;
 		FragmentActivity mActivity = null;
 		OEHelper mOpenERP = null;
 
 		public PartnerLoader(FragmentActivity activity) {
-			mPartner = new Res_PartnerDBHelper(activity);
+			mPartner = new ResPartnerDB(activity);
 			mActivity = activity;
 			mOpenERP = mPartner.getOEInstance();
 		}
@@ -362,7 +362,7 @@ public class NoteFollowers extends BaseFragment implements TokenListener,
 	public void onClick(View v) {
 		List<Integer> ids = new ArrayList<Integer>();
 		List<Object> mIds = new ArrayList<Object>();
-		Res_PartnerDBHelper partner = new Res_PartnerDBHelper(getActivity());
+		ResPartnerDB partner = new ResPartnerDB(getActivity());
 		for (String key : mSelectedPartners.keySet()) {
 			TagsItem item = mSelectedPartners.get(key);
 			ids.add(item.getId());

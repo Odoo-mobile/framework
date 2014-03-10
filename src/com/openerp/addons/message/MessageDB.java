@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import android.content.Context;
 
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
-import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.base.res.ResPartnerDB;
 import com.openerp.orm.OEColumn;
 import com.openerp.orm.OEDatabase;
 import com.openerp.orm.OEFields;
@@ -33,7 +33,7 @@ public class MessageDB extends OEDatabase {
 	public List<OEColumn> getModelColumns() {
 		List<OEColumn> columns = new ArrayList<OEColumn>();
 		columns.add(new OEColumn("partner_ids", "Partners", OEFields
-				.manyToMany(new Res_PartnerDBHelper(mContext))));
+				.manyToMany(new ResPartnerDB(mContext))));
 		columns.add(new OEColumn("subject", "Subject", OEFields.text()));
 		columns.add(new OEColumn("type", "Type", OEFields.varchar(30)));
 		columns.add(new OEColumn("body", "Body", OEFields.text()));
@@ -67,7 +67,7 @@ public class MessageDB extends OEDatabase {
 
 		};
 		columns.add(new OEColumn("author_id", "author", OEFields
-				.manyToOne(new Res_PartnerDBHelper(mContext)), mValueWatcher));
+				.manyToOne(new ResPartnerDB(mContext)), mValueWatcher));
 		columns.add(new OEColumn("model", "Model", OEFields.varchar(50)));
 		columns.add(new OEColumn("res_id", "Resouce Reference", OEFields.text()));
 		columns.add(new OEColumn("date", "Date", OEFields.varchar(20)));

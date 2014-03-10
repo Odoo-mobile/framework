@@ -35,7 +35,7 @@ import android.widget.Toast;
 
 import com.openerp.R;
 import com.openerp.base.ir.Ir_AttachmentDBHelper;
-import com.openerp.base.res.Res_PartnerDBHelper;
+import com.openerp.base.res.ResPartnerDB;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.orm.OEM2MIds;
@@ -68,7 +68,7 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 	/**
 	 * DBs
 	 */
-	Res_PartnerDBHelper mPartnerDB = null;
+	ResPartnerDB mPartnerDB = null;
 	MessageDB mMessageDB = null;
 	PartnerLoader mPartnerLoader = null;
 
@@ -223,7 +223,7 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 	}
 
 	private void initDBs() {
-		mPartnerDB = new Res_PartnerDBHelper(mContext);
+		mPartnerDB = new ResPartnerDB(mContext);
 		mMessageDB = new MessageDB(mContext);
 	}
 
@@ -359,7 +359,7 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 					}
 				}
 				try {
-					OEDataRow user = new Res_PartnerDBHelper(mContext)
+					OEDataRow user = new ResPartnerDB(mContext)
 							.select(OEUser.current(mContext).getPartner_id());
 					OEArguments args = new OEArguments();
 
