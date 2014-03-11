@@ -44,24 +44,22 @@
                     android:gravity="left|top"
                     android:orientation="vertical" >
 
-                    <com.openerp.util.controls.OETextView
+                    <TextView
                         android:id="@+id/txvMessageAuthor"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
                         android:singleLine="true"
-                        android:text="FirstName LastName"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="#414141"
                         android:textStyle="bold" />
 
-                    <com.openerp.util.controls.OETextView
+                    <TextView
                         android:id="@+id/txvAuthorEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
                         android:singleLine="true"
-                        android:text="email@email.com"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="#414141" />
                 </LinearLayout>
@@ -95,6 +93,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:padding="5dp"
             android:weightSum="2" >
@@ -115,7 +114,7 @@
                     android:background="#ffffff"
                     android:orientation="horizontal" >
 
-                    <com.openerp.util.controls.OETextView
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:singleLine="true"
@@ -123,24 +122,22 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="#414141" />
 
-                    <com.openerp.util.controls.OETextView
+                    <TextView
                         android:id="@+id/txvTo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:singleLine="true"
-                        android:text="Admin"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="#414141" />
                 </LinearLayout>
 
-                <com.openerp.util.controls.OETextView
+                <TextView
                     android:id="@+id/txvTime"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="right|center_horizontal"
                     android:singleLine="true"
-                    android:text="3:45 PM"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="#414141"
                     android:typeface="sans" />
@@ -154,7 +151,7 @@
                 android:orientation="horizontal"
                 android:paddingRight="5dp" >
 
-                <com.openerp.util.controls.OETextView
+                <TextView
                     android:id="@+id/txvmessageVotenb"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
@@ -167,7 +164,6 @@
                     android:paddingLeft="3dp"
                     android:paddingRight="5dp"
                     android:paddingTop="5dp"
-                    android:text="5"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#838383" />
             </LinearLayout>
@@ -199,7 +195,7 @@
             android:orientation="vertical"
             android:padding="8dp" >
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="left"

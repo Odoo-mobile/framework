@@ -29,29 +29,27 @@
             android:gravity="top"
             android:orientation="vertical" >
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvAttachmentId"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:visibility="gone" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvFileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:singleLine="true"
-                android:text="Medium Text"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#414141" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvFileSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:singleLine="true"
-                android:text="Medium Text"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#999999" />
         </LinearLayout>

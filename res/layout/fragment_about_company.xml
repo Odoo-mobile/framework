@@ -55,6 +55,7 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line1"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/white" />
 
             <com.openerp.util.controls.OETextView
@@ -66,6 +67,7 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line2"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/white" />
 
             <com.openerp.util.controls.OETextView
@@ -77,6 +79,7 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line3"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/white" />
 
             <com.openerp.util.controls.OETextView
@@ -88,6 +91,7 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line4"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/white" />
         </RelativeLayout>
     </RelativeLayout>

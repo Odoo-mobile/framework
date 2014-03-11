@@ -41,7 +41,6 @@ import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.SyncFinishReceiver;
-import com.openerp.util.logger.OELog;
 
 public class MailGroupSyncService extends Service {
 	public static final String TAG = "com.openerp.services.MailGroupSyncService";
@@ -97,7 +96,6 @@ public class MailGroupSyncService extends Service {
 						group_ids.put(grp.getInt("res_id"));
 					}
 					Bundle messageBundle = new Bundle();
-					OELog.log("GroupIds: " + group_ids.toString());
 					messageBundle.putString("group_ids", group_ids.toString());
 					messageBundle.putBoolean(
 							ContentResolver.SYNC_EXTRAS_MANUAL, true);

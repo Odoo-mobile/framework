@@ -29,15 +29,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SyncAdapterType;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -64,7 +61,7 @@ import com.openerp.support.OEUser;
 import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.Base64Helper;
 import com.openerp.util.OnBackButtonPressedListener;
-import com.openerp.util.actionbar.ActionbarHandler;
+import com.openerp.util.PreferenceManager;
 import com.openerp.util.drawer.DrawerAdatper;
 import com.openerp.util.drawer.DrawerHelper;
 import com.openerp.util.drawer.DrawerItem;
@@ -94,7 +91,7 @@ public class MainActivity extends FragmentActivity implements
 	FragmentManager mFragment = null;
 
 	public enum SettingKeys {
-		GLOBAL_SETTING, PROFILE, LOGOUT, ACCOUNTS, ADD_ACCOUNT, ABOUT_US
+		GLOBAL_SETTING, PROFILE, ACCOUNTS, ABOUT_US
 	}
 
 	private CharSequence mTitle;
@@ -204,11 +201,6 @@ public class MainActivity extends FragmentActivity implements
 	private void initDrawer() {
 		setDrawerItems();
 		Log.d(TAG, "MainActivity->initDrawer()");
-		ActionbarHandler actionbarHandler = new ActionbarHandler(this,
-				getActionBar());
-		actionbarHandler.applyCustomFonts(Typeface.createFromAsset(
-				getResources().getAssets(), "fonts/RobotoSlab-Regular.ttf"));
-
 		mDrawerListView.setOnItemClickListener(this);
 		int position = -1;
 		if (mDrawerListItems.size() > 0) {
@@ -342,22 +334,6 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	private Dialog logoutConfirmDialog() {
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Confirm").setMessage("Are you sure want to logout?")
-
-		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int id) {
-				OpenERPAccountManager.logoutUser(mContext,
-						OEUser.current(mContext).getAndroidName());
-				finish();
-			}
-		}).setNegativeButton("Cancel", null);
-		return builder.create();
-	}
-
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
@@ -385,23 +361,12 @@ public class MainActivity extends FragmentActivity implements
 			Intent i = new Intent(this, AppSettingsActivity.class);
 			startActivityForResult(i, RESULT_SETTINGS);
 			return true;
-		case LOGOUT:
-			Dialog logoutConfirm = this.logoutConfirmDialog();
-			logoutConfirm.show();
-			return true;
 		case ABOUT_US:
 			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
 			AboutFragment about = new AboutFragment();
 			startMainFragment(about, true);
-			return true;
-		case ADD_ACCOUNT:
-			set_setting_menu = true;
-			getActionBar().setDisplayHomeAsUpEnabled(false);
-			getActionBar().setHomeButtonEnabled(false);
-			AccountFragment fragment = new AccountFragment();
-			startMainFragment(fragment, true);
 			return true;
 		case ACCOUNTS:
 			set_setting_menu = true;
@@ -425,10 +390,40 @@ public class MainActivity extends FragmentActivity implements
 
 		switch (requestCode) {
 		case RESULT_SETTINGS:
-			handleSyncProvider();
+			updateSyncSettings();
 			break;
 		}
 
+	}
+
+	private void updateSyncSettings() {
+		Log.d(TAG, "MainActivity->updateSyncSettings()");
+
+		PreferenceManager mPref = new PreferenceManager(mContext);
+		int sync_interval = mPref.getInt("sync_interval", 1440);
+
+		List<String> default_authorities = new ArrayList<String>();
+		default_authorities.add("com.android.calendar");
+		default_authorities.add("com.android.contacts");
+
+		SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
+
+		Account mAccount = OpenERPAccountManager.getAccount(mContext, OEUser
+				.current(mContext).getAndroidName());
+
+		for (SyncAdapterType lst : list) {
+			if (lst.authority.contains("com.openerp.providers")) {
+				default_authorities.add(lst.authority);
+			}
+		}
+		for (String authority : default_authorities) {
+			boolean isSyncActive = ContentResolver.getSyncAutomatically(
+					mAccount, authority);
+			if (isSyncActive) {
+				setSyncPeriodic(authority, sync_interval, 1, 1);
+			}
+		}
+		Toast.makeText(this, "Setting saved.", Toast.LENGTH_LONG).show();
 	}
 
 	/* Called whenever we call invalidateOptionsMenu() */
@@ -554,37 +549,6 @@ public class MainActivity extends FragmentActivity implements
 		ContentResolver.cancelSync(account, authority);
 	}
 
-	/**
-	 * Handle sync provider. Depend on user settings
-	 */
-	public void handleSyncProvider() {
-
-		SharedPreferences sharedPrefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		boolean sync_enable = sharedPrefs.getBoolean("perform_sync", false);
-		int sync_interval = Integer.parseInt(sharedPrefs.getString(
-				"sync_interval", "1440"));
-
-		List<String> default_authorities = new ArrayList<String>();
-		default_authorities.add("com.android.calendar");
-		default_authorities.add("com.android.contacts");
-		SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
-		for (SyncAdapterType lst : list) {
-			if (lst.authority.contains("com.openerp.providers")) {
-				default_authorities.add(lst.authority);
-			}
-		}
-		for (String authority : default_authorities) {
-			if (sync_enable) {
-				setSyncPeriodic(authority, sync_interval, 1, 1);
-			} else {
-				cancelSync(authority);
-				setAutoSync(authority, false);
-			}
-		}
-		Toast.makeText(this, "Setting saved.", Toast.LENGTH_LONG).show();
-	}
-
 	@Override
 	public void onBackPressed() {
 		if (backPressed != null) {
@@ -658,22 +622,15 @@ public class MainActivity extends FragmentActivity implements
 		sys.add(new DrawerItem(key, "Profile", 0, R.drawable.ic_action_user,
 				getFragBundle(new Fragment(), "settings", SettingKeys.PROFILE)));
 
-		sys.add(new DrawerItem(key, "Settings", 0,
+		sys.add(new DrawerItem(key, "General Settings", 0,
 				R.drawable.ic_action_settings, getFragBundle(new Fragment(),
 						"settings", SettingKeys.GLOBAL_SETTING)));
 
 		sys.add(new DrawerItem(key, "Accounts", 0,
 				R.drawable.ic_action_accounts, getFragBundle(new Fragment(),
 						"settings", SettingKeys.ACCOUNTS)));
-
-		sys.add(new DrawerItem(key, "Add Account", 0,
-				R.drawable.ic_action_add_account, getFragBundle(new Fragment(),
-						"settings", SettingKeys.ADD_ACCOUNT)));
 		sys.add(new DrawerItem(key, "About Us", 0, R.drawable.ic_action_about,
 				getFragBundle(new Fragment(), "settings", SettingKeys.ABOUT_US)));
-		sys.add(new DrawerItem(key, "Logout", 0, R.drawable.ic_action_logout,
-				getFragBundle(new Fragment(), "settings", SettingKeys.LOGOUT)));
-
 		return sys;
 	}
 

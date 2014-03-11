@@ -54,7 +54,6 @@ import com.openerp.support.listview.OEListAdapter;
 import com.openerp.util.HTMLHelper;
 import com.openerp.util.OEDate;
 import com.openerp.util.StringHelper;
-import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.drawer.DrawerListener;
 
@@ -576,7 +575,7 @@ public class Message extends BaseFragment implements
 
 				mView.findViewById(R.id.waitingForSyncToStart).setVisibility(
 						View.GONE);
-				OETextView txvMsg = (OETextView) mView
+				TextView txvMsg = (TextView) mView
 						.findViewById(R.id.txvMessageAllReadMessage);
 				txvMsg.setVisibility(View.VISIBLE);
 				txvMsg.setText(getStatusMessage(mType));
@@ -759,7 +758,7 @@ public class Message extends BaseFragment implements
 				}
 				mListViewAdapter.notifiyDataChange(mMessageObjects);
 				if (mMessageObjects.size() == 0) {
-					OETextView txvMsg = (OETextView) mView
+					TextView txvMsg = (TextView) mView
 							.findViewById(R.id.txvMessageAllReadMessage);
 					txvMsg.setVisibility(View.VISIBLE);
 					txvMsg.setText(getStatusMessage(mType));
