@@ -1,0 +1,102 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/widget_margin" >
+
+    <LinearLayout
+        android:id="@+id/widgetMessageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#bbDEDFDE"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/widgetLayoutMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#aaDEDFDE"
+            android:orientation="horizontal"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" >
+
+            <ImageView
+                android:id="@+id/widgetImgLauncher"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_launcher" />
+
+            <LinearLayout
+                android:id="@+id/widgetTopBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingLeft="8dp"
+                android:paddingTop="5dp" >
+
+                <TextView
+                    android:id="@+id/widgetTxvWidgetTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#4B4B4D"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txvWidgetUserName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#4B4B4D" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/imgBtnWidgetCompose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:src="@drawable/ic_action_mail_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#aaa" />
+
+        <ListView
+            android:id="@+id/widgetMessageList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widgetMessageNoUserView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#55ffffff"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:visibility="gone" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="15dp"
+            android:src="@drawable/openerp_logo" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="No Account Found"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</FrameLayout>

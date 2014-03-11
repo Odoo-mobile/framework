@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="com.openerp.widgets.message.MessageWidgetConfigure"
+    android:initialLayout="@layout/widget_message_layout"
+    android:minHeight="150dip"
+    android:minResizeHeight="110dip"
+    android:minResizeWidth="150dip"
+    android:minWidth="204dip"
+    android:previewImage="@drawable/message_widget_preview"
+    android:resizeMode="vertical|horizontal"
+    android:updatePeriodMillis="1800000"
+    android:widgetCategory="keyguard|home_screen" >
+
+</appwidget-provider>

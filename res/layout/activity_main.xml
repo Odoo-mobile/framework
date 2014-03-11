@@ -17,6 +17,7 @@
         android:background="#ffffff"
         android:choiceMode="singleChoice"
         android:divider="#E3E9E3"
-        android:dividerHeight="1dp" />
+        android:dividerHeight="1dp"
+        android:smoothScrollbar="true" />
 
 </android.support.v4.widget.DrawerLayout>
