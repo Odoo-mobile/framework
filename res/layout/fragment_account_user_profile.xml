@@ -6,22 +6,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ffffff"
-        android:orientation="vertical"
-        android:weightSum="10" >
+        android:orientation="vertical" >
 
         <ImageView
             android:id="@+id/imgUserProfilePic"
-            android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
             android:background="#ebebeb"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_action_user" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="7"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="10dp" >
 
@@ -32,6 +29,7 @@
                 android:paddingRight="5dp"
                 android:text="User Login"
                 android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#0099CC"
                 android:textStyle="bold" />
 
@@ -49,7 +47,8 @@
                 android:layout_marginBottom="10dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="User Name" />
+                android:text="User Name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <com.openerp.util.controls.OETextView
                 android:layout_width="wrap_content"
@@ -58,6 +57,7 @@
                 android:paddingRight="5dp"
                 android:text="User name"
                 android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#0099CC"
                 android:textStyle="bold" />
 
@@ -75,7 +75,8 @@
                 android:layout_marginBottom="10dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="Login Name" />
+                android:text="Login Name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <com.openerp.util.controls.OETextView
                 android:layout_width="wrap_content"
@@ -84,6 +85,7 @@
                 android:paddingRight="5dp"
                 android:text="Server URL"
                 android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#0099CC"
                 android:textStyle="bold" />
 
@@ -101,7 +103,8 @@
                 android:layout_marginBottom="10dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="Login Name" />
+                android:text="Login Name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <com.openerp.util.controls.OETextView
                 android:layout_width="wrap_content"
@@ -110,6 +113,7 @@
                 android:paddingRight="5dp"
                 android:text="Database"
                 android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#0099CC"
                 android:textStyle="bold" />
 
@@ -127,7 +131,8 @@
                 android:layout_marginBottom="10dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="Login Name" />
+                android:text="Login Name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <com.openerp.util.controls.OETextView
                 android:layout_width="wrap_content"
@@ -136,6 +141,7 @@
                 android:paddingRight="5dp"
                 android:text="TimeZone"
                 android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#0099CC"
                 android:textStyle="bold" />
 
@@ -153,7 +159,8 @@
                 android:layout_marginBottom="10dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="Login Name" />
+                android:text="Login Name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
     </LinearLayout>
 

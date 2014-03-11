@@ -43,7 +43,6 @@ import com.openerp.util.OEBinaryDownloadHelper;
 import com.openerp.util.OEDate;
 import com.openerp.util.OEFileSizeHelper;
 import com.openerp.util.contactview.OEContactView;
-import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.drawer.DrawerListener;
 
@@ -230,11 +229,11 @@ public class MessageDetail extends BaseFragment implements OnClickListener {
 				View attachmentView = inflater.inflate(
 						R.layout.fragment_message_detail_attachment_grid_item,
 						null, false);
-				OETextView txvAttachmentName = (OETextView) attachmentView
+				TextView txvAttachmentName = (TextView) attachmentView
 						.findViewById(R.id.txvFileName);
 
 				txvAttachmentName.setText(attachment.get("name").toString());
-				OETextView txvAttachmentSize = (OETextView) attachmentView
+				TextView txvAttachmentSize = (TextView) attachmentView
 						.findViewById(R.id.txvFileSize);
 				long fileSize = Long.parseLong(attachment
 						.getString("file_size"));
@@ -242,7 +241,7 @@ public class MessageDetail extends BaseFragment implements OnClickListener {
 				txvAttachmentSize.setText((file_size.equals("0")) ? " "
 						: file_size);
 
-				OETextView txvAttachmentId = (OETextView) attachmentView
+				TextView txvAttachmentId = (TextView) attachmentView
 						.findViewById(R.id.txvAttachmentId);
 				txvAttachmentId.setText(attachment.getString("id"));
 
@@ -314,7 +313,7 @@ public class MessageDetail extends BaseFragment implements OnClickListener {
 		protected void onPostExecute(Void result) {
 			mView.findViewById(R.id.loadingProgress).setVisibility(View.GONE);
 			mMessageListAdapter.notifiyDataChange(mMessageObjects);
-			OETextView txvTitle = (OETextView) mView
+			TextView txvTitle = (TextView) mView
 					.findViewById(R.id.txvMessageTitle);
 			String title = mMessageData.getString("subject");
 			if (title.equals("false")) {
@@ -335,7 +334,7 @@ public class MessageDetail extends BaseFragment implements OnClickListener {
 	public void onClick(View v) {
 		if (v.findViewById(R.id.txvAttachmentId) != null) {
 			// when click on attachment download
-			int attachment_id = Integer.parseInt(((OETextView) v
+			int attachment_id = Integer.parseInt(((TextView) v
 					.findViewById(R.id.txvAttachmentId)).getText().toString());
 			OEBinaryDownloadHelper binaryDownload = new OEBinaryDownloadHelper();
 			binaryDownload.downloadBinary(attachment_id, db(), getActivity());

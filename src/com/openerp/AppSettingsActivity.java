@@ -28,6 +28,8 @@ import android.view.MenuItem;
  */
 public class AppSettingsActivity extends PreferenceActivity {
 
+	public static final String ACTION_ACCOUNT_CONFIG = "com.openerp.ACTION_ACCOUNT_CONFIG";
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -44,7 +46,7 @@ public class AppSettingsActivity extends PreferenceActivity {
 
 		getActionBar().setIcon(R.drawable.ic_action_settings);
 
-		addPreferencesFromResource(R.xml.app_settings);
+		addPreferencesFromResource(R.xml.account_preferences);
 
 	}
 

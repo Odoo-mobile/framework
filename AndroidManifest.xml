@@ -55,7 +55,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.openerp.AppSettingsActivity" />
+        <activity android:name="com.openerp.AppSettingsActivity" >
+            <intent-filter>
+                <action android:name="com.openerp.ACTION_ACCOUNT_CONFIG" />
+            </intent-filter>
+        </activity>
         <activity android:name="com.openerp.addons.note.NoteComposeActivity" />
         <activity android:name="com.openerp.addons.message.MessageComposeActivity" >
             <intent-filter>

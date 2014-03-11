@@ -2,17 +2,20 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory
+        android:key="account_sync_settings"
+        android:title="Sync Settings" >
+        <PreferenceScreen
+            android:key="account_settings"
+            android:summary="Enable or disable data synchronization"
+            android:title="Sync Settings" >
+            <intent android:action="android.settings.SYNC_SETTINGS" />
+        </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory
         android:key="sync_interval_settings"
         android:title="Sync interval" >
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="perform_sync"
-            android:summary="Enable or disable data synchronization"
-            android:title="Enable Sync" />
-
         <ListPreference
             android:defaultValue="1440"
-            android:dependency="perform_sync"
             android:entries="@array/syncInterval"
             android:entryValues="@array/syncIntervalValues"
             android:key="sync_interval"
@@ -33,11 +36,6 @@
     <PreferenceCategory
         android:key="contact_sync_setting"
         android:title="Contact Sync" >
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="local_contact_sync"
-            android:summary="Enable or disable local partner synchronization"
-            android:title="Sync local partners" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="server_contact_sync"
