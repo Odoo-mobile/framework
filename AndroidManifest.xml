@@ -187,6 +187,27 @@
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
         </service>
+
+        <!-- Message Widget -->
+        <receiver android:name="com.openerp.widgets.message.MessageWidget" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_message" />
+        </receiver>
+        <!-- Message widget remote view service -->
+        <service
+            android:name="com.openerp.widgets.message.MessageRemoteViewService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+        <!-- Message widget configuration -->
+        <activity android:name="com.openerp.widgets.message.MessageWidgetConfigure" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

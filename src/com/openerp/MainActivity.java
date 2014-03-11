@@ -49,6 +49,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.openerp.addons.message.MessageDetail;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
@@ -66,6 +67,7 @@ import com.openerp.util.drawer.DrawerAdatper;
 import com.openerp.util.drawer.DrawerHelper;
 import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.drawer.DrawerListener;
+import com.openerp.widgets.WidgetHelper;
 
 /**
  * The Class MainActivity.
@@ -237,6 +239,27 @@ public class MainActivity extends FragmentActivity implements
 						loadFragment(mDrawerAdatper.getItem(i + 1));
 						break;
 					}
+				}
+			}
+
+			/**
+			 * Handling widget fragment requests.
+			 */
+			if (getIntent().getAction().equals(WidgetHelper.ACTION_WIDGET_CALL)) {
+				Log.d(TAG, "MainActivity->ACTION_WIDGET_CALL");
+				String key = getIntent().getExtras().getString(
+						WidgetHelper.EXTRA_WIDGET_ITEM_KEY);
+
+				// Message widget call
+				if (key.equals("message_detail")) {
+					MessageDetail message = new MessageDetail();
+					Bundle args = new Bundle();
+					args.putInt(
+							"message_id",
+							getIntent().getExtras().getInt(
+									WidgetHelper.EXTRA_WIDGET_DATA_VALUE));
+					message.setArguments(args);
+					loadFragment(message);
 				}
 			}
 		} else {
@@ -581,7 +604,19 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void loadFragment(DrawerItem item) {
-		Object instance = item.getFragmentInstace();
+
+		Fragment fragment = (Fragment) item.getFragmentInstace();
+		;
+		if (item.getTagColor() != null
+				&& !fragment.getArguments().containsKey("tag_color")) {
+			Bundle tagcolor = fragment.getArguments();
+			tagcolor.putInt("tag_color", Color.parseColor(item.getTagColor()));
+			fragment.setArguments(tagcolor);
+		}
+		loadFragment(fragment);
+	}
+
+	private void loadFragment(Object instance) {
 		if (instance instanceof Intent) {
 			startActivity((Intent) instance);
 		} else {
@@ -590,14 +625,6 @@ public class MainActivity extends FragmentActivity implements
 					&& fragment.getArguments().containsKey("settings")) {
 				onSettingItemSelected(SettingKeys.valueOf(fragment
 						.getArguments().get("settings").toString()));
-			} else {
-				if (item.getTagColor() != null
-						&& !fragment.getArguments().containsKey("tag_color")) {
-					Bundle tagcolor = fragment.getArguments();
-					tagcolor.putInt("tag_color",
-							Color.parseColor(item.getTagColor()));
-					fragment.setArguments(tagcolor);
-				}
 			}
 			if (fragment != null
 					&& !fragment.getArguments().containsKey("settings")) {

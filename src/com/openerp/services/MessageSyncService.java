@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import android.accounts.Account;
 import android.app.ActivityManager;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ComponentName;
 import android.content.ContentProviderClient;
@@ -52,6 +53,7 @@ import com.openerp.support.OEUser;
 import com.openerp.util.OEDate;
 import com.openerp.util.OENotificationHelper;
 import com.openerp.util.PreferenceManager;
+import com.openerp.widgets.message.MessageWidget;
 
 /**
  * The Class MessageSyncService.
@@ -122,8 +124,10 @@ public class MessageSyncService extends Service {
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		Intent intent = new Intent();
-		// Intent update_widget = new Intent();
-		// update_widget.setAction(Mobile_Widget.TAG);
+		Intent updateWidgetIntent = new Intent();
+		updateWidgetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+		updateWidgetIntent.putExtra(MessageWidget.ACTION_MESSAGE_WIDGET_UPDATE,
+				true);
 		intent.setAction(SyncFinishReceiver.SYNC_FINISH);
 		OEUser user = OpenERPAccountManager.getAccountDetail(context,
 				account.name);
@@ -231,8 +235,10 @@ public class MessageSyncService extends Service {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (user.getAndroidName().equals(account.name))
+		if (user.getAndroidName().equals(account.name)) {
 			context.sendBroadcast(intent);
+			context.sendBroadcast(updateWidgetIntent);
+		}
 	}
 
 	private List<Integer> updateOldMessages(MessageDB db, OEHelper oe,
