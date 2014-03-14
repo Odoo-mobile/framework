@@ -80,17 +80,12 @@ public class Note extends BaseFragment implements
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		mView = inflater.inflate(R.layout.fragment_note, container, false);
-		return mView;
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
 		Bundle bundle = getArguments();
 		if (bundle != null) {
 			mStageId = bundle.getInt("stage_id");
 		}
 		init();
+		return mView;
 	}
 
 	private void init() {
@@ -226,6 +221,7 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		Log.e(TAG, "Note->onCreateOptionsMenu()");
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 		mSearchView = (SearchView) menu.findItem(R.id.menu_note_search)
 				.getActionView();

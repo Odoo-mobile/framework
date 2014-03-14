@@ -3,6 +3,7 @@ package com.openerp.widgets.message;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -25,6 +26,8 @@ public class MessageWidget extends AppWidgetProvider {
 
 	public static final String TAG = "com.openerp.widgets.MessageWidget";
 	public static final String ACTION_MESSAGE_WIDGET_UPDATE = "com.openerp.widgets.ACTION_MESSAGE_WIDGET_UPDATE";
+	public static final String ACTION_MESSAGE_WIDGET_CALL = "com.openerp.widgets.ACTION_MESSAGE_WIDGET_CALL";
+	public static final int REQUEST_CODE = 112;
 
 	// ListView setup
 	ListView mMessageListView = null;
@@ -33,9 +36,10 @@ public class MessageWidget extends AppWidgetProvider {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if (intent.getAction().equals(WidgetHelper.ACTION_WIDGET_CALL)) {
+		Log.d(TAG, "MessageWidget->onReceive()");
+		if (intent.getAction().equals(ACTION_MESSAGE_WIDGET_CALL)) {
 			Intent intentMain = new Intent(context, MainActivity.class);
-			intentMain.setAction(WidgetHelper.ACTION_WIDGET_CALL);
+			intentMain.setAction(ACTION_MESSAGE_WIDGET_CALL);
 			intentMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			intentMain.putExtras(intent.getExtras());
 			intentMain.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
@@ -62,12 +66,13 @@ public class MessageWidget extends AppWidgetProvider {
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager,
 			int[] appWidgetIds) {
 		Log.d(TAG, "MessageWidget->onUpdate()");
-		updateWidget(context, appWidgetManager, appWidgetIds);
+		updateMessageWidget(context, appWidgetManager, appWidgetIds);
 
 	}
 
-	@SuppressWarnings("deprecation")
-	private static RemoteViews initWidgetListView(Context context, int widgetId) {
+	@SuppressLint("InlinedApi")
+	private static RemoteViews initMessageWidgetListView(Context context,
+			int widgetId) {
 		Log.d(TAG, "MessageWidget->initWidgetListView()");
 		RemoteViews mView = new RemoteViews(context.getPackageName(),
 				R.layout.widget_message_layout);
@@ -78,11 +83,11 @@ public class MessageWidget extends AppWidgetProvider {
 		svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_OPTIONS, filter
 				.toString().toLowerCase());
 		svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
-		mView.setRemoteAdapter(widgetId, R.id.widgetMessageList, svcIntent);
+		mView.setRemoteAdapter(R.id.widgetMessageList, svcIntent);
 		return mView;
 	}
 
-	static void updateWidget(Context context, AppWidgetManager manager,
+	static void updateMessageWidget(Context context, AppWidgetManager manager,
 			int[] widgetIds) {
 		if (OEUser.current(context) == null)
 			return;
@@ -92,30 +97,33 @@ public class MessageWidget extends AppWidgetProvider {
 			String filter = MessageWidgetConfigure.getPref(context, widget,
 					"message_filter");
 
-			RemoteViews mView = initWidgetListView(context, widget);
+			RemoteViews mView = initMessageWidgetListView(context, widget);
 
 			final Intent onItemClick = new Intent(context, MessageWidget.class);
-			onItemClick.setAction(WidgetHelper.ACTION_WIDGET_CALL);
+			onItemClick.setAction(ACTION_MESSAGE_WIDGET_CALL);
 			onItemClick.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widget);
 			onItemClick.setData(Uri.parse(onItemClick
 					.toUri(Intent.URI_INTENT_SCHEME)));
 			final PendingIntent onClickPendingIntent = PendingIntent
-					.getBroadcast(context, 0, onItemClick,
+					.getBroadcast(context, 1, onItemClick,
 							PendingIntent.FLAG_UPDATE_CURRENT);
 			mView.setPendingIntentTemplate(R.id.widgetMessageList,
 					onClickPendingIntent);
 
 			// widget icon and main row click
-			Intent mIntent = new Intent(context, MainActivity.class);
-			PendingIntent mPIntent = PendingIntent.getActivity(context, 0,
-					mIntent, 0);
-			mView.setOnClickPendingIntent(R.id.widgetImgLauncher, mPIntent);
-			mView.setOnClickPendingIntent(R.id.widgetTopBar, mPIntent);
+			Intent messageIntent = new Intent(context, MainActivity.class);
+			messageIntent.setAction(ACTION_MESSAGE_WIDGET_CALL);
+			messageIntent.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
+					"message_main");
+			PendingIntent mPedingIntent = PendingIntent.getActivity(context,
+					REQUEST_CODE, messageIntent, 0);
+			mView.setOnClickPendingIntent(R.id.widgetImgLauncher, mPedingIntent);
+			mView.setOnClickPendingIntent(R.id.widgetTopBar, mPedingIntent);
 
 			// compose message
 			Intent intent = new Intent(context, MessageComposeActivity.class);
-			PendingIntent pIntent = PendingIntent.getActivity(context, 0,
-					intent, 0);
+			PendingIntent pIntent = PendingIntent.getActivity(context,
+					REQUEST_CODE, intent, 0);
 			mView.setOnClickPendingIntent(R.id.imgBtnWidgetCompose, pIntent);
 
 			// setting current user

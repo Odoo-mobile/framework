@@ -189,7 +189,9 @@
         </service>
 
         <!-- Message Widget -->
-        <receiver android:name="com.openerp.widgets.message.MessageWidget" >
+        <receiver
+            android:name="com.openerp.widgets.message.MessageWidget"
+            android:label="OpenERP Messaging" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -202,8 +204,32 @@
         <service
             android:name="com.openerp.widgets.message.MessageRemoteViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
         <!-- Message widget configuration -->
         <activity android:name="com.openerp.widgets.message.MessageWidgetConfigure" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- Note Widget -->
+        <receiver
+            android:name="com.openerp.widgets.note.NoteWidget"
+            android:label="OpenERP Notes" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_note" />
+        </receiver>
+        <!-- Note widget remote view service -->
+        <service
+            android:name="com.openerp.widgets.note.NoteRemoteViewService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+        <!-- Note widget configuration -->
+        <activity android:name="com.openerp.widgets.note.NoteWidgetConfigure" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
