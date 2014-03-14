@@ -6,7 +6,7 @@
     android:minResizeHeight="110dip"
     android:minResizeWidth="150dip"
     android:minWidth="204dip"
-    android:previewImage="@drawable/message_widget_preview"
+    android:previewImage="@drawable/widget_message_preview"
     android:resizeMode="vertical|horizontal"
     android:updatePeriodMillis="1800000"
     android:widgetCategory="keyguard|home_screen" >

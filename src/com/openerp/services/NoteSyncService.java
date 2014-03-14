@@ -20,6 +20,7 @@ package com.openerp.services;
 
 import android.accounts.Account;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
@@ -33,6 +34,8 @@ import com.openerp.addons.note.NoteDB;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
+import com.openerp.widgets.message.MessageWidget;
+import com.openerp.widgets.note.NoteWidget;
 
 public class NoteSyncService extends Service {
 	public static final String TAG = "com.openerp.services.NoteSyncService";
@@ -66,8 +69,11 @@ public class NoteSyncService extends Service {
 		try {
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-			// Intent update_widget = new Intent();
-			// update_widget.setAction(Mobile_Widget.TAG);
+			Intent updateWidgetIntent = new Intent();
+			updateWidgetIntent
+					.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+			updateWidgetIntent.putExtra(NoteWidget.ACTION_NOTE_WIDGET_UPDATE,
+					true);
 
 			NoteDB note = new NoteDB(context);
 			note.setAccountUser(OpenERPAccountManager.getAccountDetail(context,
@@ -77,8 +83,10 @@ public class NoteSyncService extends Service {
 				oe.syncWithServer(true);
 			}
 			if (OpenERPAccountManager.currentUser(context).getAndroidName()
-					.equals(account.name))
+					.equals(account.name)) {
 				context.sendBroadcast(intent);
+				context.sendBroadcast(updateWidgetIntent);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

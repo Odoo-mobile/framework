@@ -64,7 +64,7 @@ public class MessageRemoteViewFactory implements RemoteViewsFactory {
 	public RemoteViews getViewAt(int position) {
 		Log.d(TAG, "getViewAt()");
 		RemoteViews mView = new RemoteViews(mContext.getPackageName(),
-				R.layout.fragment_message_listview_items);
+				R.layout.widget_message_item_layout);
 		OEDataRow row = (OEDataRow) mMessageListItems.get(position);
 
 		boolean to_read = row.getBoolean("to_read");
@@ -115,7 +115,7 @@ public class MessageRemoteViewFactory implements RemoteViewsFactory {
 		mView.setViewVisibility(R.id.txvMessageTag, View.GONE);
 
 		final Intent fillInIntent = new Intent();
-		fillInIntent.setAction(WidgetHelper.ACTION_WIDGET_CALL);
+		fillInIntent.setAction(MessageWidget.ACTION_MESSAGE_WIDGET_CALL);
 		final Bundle bundle = new Bundle();
 		bundle.putInt(WidgetHelper.EXTRA_WIDGET_DATA_VALUE, row.getInt("id"));
 		fillInIntent.putExtras(bundle);

@@ -1,0 +1,106 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#00ffffff"
+    android:orientation="horizontal"
+    android:paddingBottom="0dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:weightSum="4" >
+
+    <LinearLayout
+        android:id="@+id/messageListViewItem"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="2dp"
+        android:background="#fff"
+        android:orientation="vertical"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|top"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/txvMessageSubject"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:singleLine="true"
+                android:text="Message Subject"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#414141"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txvMessageDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:paddingRight="5dp"
+                android:singleLine="true"
+                android:text="Jun 3"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|top"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/txvMessageBody"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:ellipsize="end"
+                android:lines="2"
+                android:text="Message Body"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#414141" />
+
+            <ImageView
+                android:id="@+id/imgMessageStarred"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|top"
+            android:orientation="horizontal"
+            android:weightSum="2" >
+
+            <TextView
+                android:id="@+id/txvMessageFrom"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:ellipsize="end"
+                android:lines="1"
+                android:text="Administrator"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#414141"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txvChilds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:lines="1"
+                android:text="5"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#414141" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

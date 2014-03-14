@@ -378,6 +378,7 @@ public class Message extends BaseFragment implements
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		Log.e(TAG, "Message->onCreateOptionsMenu()");
 		inflater.inflate(R.menu.menu_fragment_message, menu);
 		mSearchView = (SearchView) menu.findItem(R.id.menu_message_search)
 				.getActionView();
