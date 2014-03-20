@@ -34,7 +34,6 @@ import com.openerp.addons.note.NoteDB;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.receivers.SyncFinishReceiver;
-import com.openerp.widgets.message.MessageWidget;
 import com.openerp.widgets.note.NoteWidget;
 
 public class NoteSyncService extends Service {

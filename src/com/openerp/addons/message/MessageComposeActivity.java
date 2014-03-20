@@ -359,8 +359,8 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 					}
 				}
 				try {
-					OEDataRow user = new ResPartnerDB(mContext)
-							.select(OEUser.current(mContext).getPartner_id());
+					OEDataRow user = new ResPartnerDB(mContext).select(OEUser
+							.current(mContext).getPartner_id());
 					OEArguments args = new OEArguments();
 
 					// Partners
@@ -421,23 +421,21 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 						JSONObject kwargs = new JSONObject();
 						kwargs.put("context",
 								mOE.updateContext(new JSONObject()));
-						mOE.updateKWargs(kwargs);
 
 						args.add(arguments);
 						String model = "mail.compose.message";
 
 						// Creating compose message
 						int id = (Integer) mOE.call_kw(model, "create", args,
-								null);
+								null, kwargs);
 
 						// Resetting kwargs
-						mOE.updateKWargs(null);
 						args = new OEArguments();
 						args.add(new JSONArray().put(id));
 						args.add(mOE.updateContext(new JSONObject()));
 
 						// Sending mail
-						mOE.call_kw(model, "send_mail", args, null);
+						mOE.call_kw(model, "send_mail", args, null, null);
 						mOE.syncWithServer();
 					} else {
 						mToast = "Message reply sent.";
@@ -469,9 +467,8 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 									+ partner_ids.toString() + "]"));
 						else
 							kwargs.put("partner_ids", new JSONArray());
-						mOE.updateKWargs(kwargs);
 						newMessageId = (Integer) mOE.call_kw(model, method,
-								args, null);
+								args, null, kwargs);
 
 						// Creating local entry
 						OEValues values = new OEValues();

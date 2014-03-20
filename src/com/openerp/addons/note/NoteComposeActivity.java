@@ -204,10 +204,9 @@ public class NoteComposeActivity extends Activity implements
 					if (note_id != null)
 						newContext.put("object_id", note_id);
 					kwargs.accumulate("context", newContext);
-					mOpenERP.updateKWargs(kwargs);
 					OEArguments arguments = new OEArguments();
 					JSONObject result = (JSONObject) mOpenERP.call_kw(
-							"pad_generate_url", arguments, null);
+							"pad_generate_url", arguments, kwargs);
 					mPadURL = result.getString("url");
 				}
 

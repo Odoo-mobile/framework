@@ -26,12 +26,16 @@ public class MeetingDB extends OEDatabase {
 		String name = "crm.meeting";
 		OEHelper oe = getOEInstance();
 		if (oe != null) {
-			OEVersion version = oe.getOEVersion();
-			if ((version.getVersion_number() == 7
-					&& version.getVersion_type().equals("saas") && version
-					.getVersion_type_number() == 3)
-					|| (version.getVersion_number() >= 8)) {
-				name = "calendar.event";
+			try {
+				OEVersion version = oe.getOEVersion();
+				if ((version.getVersion_number() == 7
+						&& version.getVersion_type().equals("saas") && version
+						.getVersion_type_number() == 3)
+						|| (version.getVersion_number() >= 8)) {
+					name = "calendar.event";
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return name;

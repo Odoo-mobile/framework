@@ -259,10 +259,9 @@ public class NoteFollowers extends BaseFragment implements TokenListener,
 					JSONObject context = new JSONObject();
 					context.put("default_res_model", "note.note");
 					context.put("default_res_id", mNoteID);
-					oe.debugMode(true);
 					JSONObject res = (JSONObject) oe.call_kw(
 							"mail.wizard.invite", "add_followers", arguments,
-							context);
+							context, null);
 					if (res != null) {
 						db().updateManyToManyRecords("message_follower_ids",
 								Operation.APPEND, mNoteID, mPartnerIds);

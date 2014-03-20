@@ -131,6 +131,7 @@ public class Note extends BaseFragment implements
 				List<String> tags = new ArrayList<String>();
 				List<OEDataRow> notetags = row.getM2MRecord("tag_ids")
 						.browseEach();
+
 				for (OEDataRow tag : notetags) {
 					tags.add(tag.getString("name"));
 				}
@@ -221,7 +222,6 @@ public class Note extends BaseFragment implements
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		Log.e(TAG, "Note->onCreateOptionsMenu()");
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 		mSearchView = (SearchView) menu.findItem(R.id.menu_note_search)
 				.getActionView();

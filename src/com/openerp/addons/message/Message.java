@@ -122,10 +122,6 @@ public class Message extends BaseFragment implements
 	private void init() {
 		Log.d(TAG, "Message->init()");
 		mListView = (ListView) mView.findViewById(R.id.lstMessages);
-		mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-		mListView.setOnItemLongClickListener(this);
-		mListView.setOnItemClickListener(this);
-		mListView.setMultiChoiceModeListener(mMessageViewMultiChoiceListener);
 		mListViewAdapter = new OEListAdapter(getActivity(),
 				R.layout.fragment_message_listview_items, mMessageObjects) {
 			@Override
@@ -139,6 +135,10 @@ public class Message extends BaseFragment implements
 			}
 		};
 		mListView.setAdapter(mListViewAdapter);
+		mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		mListView.setOnItemLongClickListener(this);
+		mListView.setOnItemClickListener(this);
+		mListView.setMultiChoiceModeListener(mMessageViewMultiChoiceListener);
 		mTouchAttacher = scope.main().getTouchAttacher();
 		mTouchAttacher.setPullableView(mListView, this);
 		initData();
@@ -378,7 +378,6 @@ public class Message extends BaseFragment implements
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		Log.e(TAG, "Message->onCreateOptionsMenu()");
 		inflater.inflate(R.menu.menu_fragment_message, menu);
 		mSearchView = (SearchView) menu.findItem(R.id.menu_message_search)
 				.getActionView();
@@ -491,6 +490,7 @@ public class Message extends BaseFragment implements
 
 		@Override
 		protected Boolean doInBackground(Void... arg0) {
+			mMessageObjects.clear();
 			HashMap<String, Object> map = getWhere(messageType);
 			String where = (String) map.get("where");
 			String whereArgs[] = (String[]) map.get("whereArgs");
@@ -498,7 +498,6 @@ public class Message extends BaseFragment implements
 			List<OEDataRow> result = db().select(where, whereArgs, null, null,
 					"date DESC");
 			HashMap<String, OEDataRow> parent_list_details = new HashMap<String, OEDataRow>();
-			mMessageObjects.clear();
 			if (result.size() > 0) {
 				int i = 0;
 				for (OEDataRow row : result) {

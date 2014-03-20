@@ -52,7 +52,8 @@ public class OEHelper extends OpenERP {
 	List<Long> mResultIds = new ArrayList<Long>();
 	List<OEDataRow> mRemovedRecordss = new ArrayList<OEDataRow>();
 
-	public OEHelper(SharedPreferences pref) {
+	public OEHelper(SharedPreferences pref) throws ClientProtocolException,
+			JSONException, IOException, OEVersionException {
 		super(pref);
 		init();
 	}
@@ -361,11 +362,16 @@ public class OEHelper extends OpenERP {
 
 	public Object call_kw(String method, OEArguments arguments,
 			JSONObject context) {
-		return call_kw(null, method, arguments, context);
+		return call_kw(null, method, arguments, context, null);
+	}
+
+	public Object call_kw(String method, OEArguments arguments,
+			JSONObject context, JSONObject kwargs) {
+		return call_kw(null, method, arguments, context, kwargs);
 	}
 
 	public Object call_kw(String model, String method, OEArguments arguments,
-			JSONObject context) {
+			JSONObject context, JSONObject kwargs) {
 		Log.d(TAG, "OEHelper->call_kw()");
 		JSONObject result = null;
 		if (model == null) {
@@ -375,7 +381,10 @@ public class OEHelper extends OpenERP {
 			if (context != null) {
 				arguments.add(updateContext(context));
 			}
-			result = call_kw(model, method, arguments.getArray());
+			if (kwargs == null)
+				result = call_kw(model, method, arguments.getArray());
+			else
+				result = call_kw(model, method, arguments.getArray(), kwargs);
 			return result.get("result");
 		} catch (Exception e) {
 			e.printStackTrace();
