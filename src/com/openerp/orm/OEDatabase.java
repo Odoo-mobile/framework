@@ -41,6 +41,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	OEDBHelper mDBHelper = null;
 	OEUser mUser = null;
 	List<OEDataRow> mRemovedRecords = new ArrayList<OEDataRow>();
+	OEHelper mOEHelper = null;
 
 	public OEDatabase(Context context) {
 		super(context);
@@ -496,14 +497,16 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	}
 
 	public OEHelper getOEInstance() {
-		OEHelper openerp = null;
-		try {
-			openerp = new OEHelper(mContext, mUser, this);
-		} catch (Exception e) {
-			Log.d(TAG, "OEDatabase->getOEInstance()");
-			Log.e(TAG, e.getMessage() + ". No connection with OpenERP server");
+		if (mOEHelper == null) {
+			try {
+				mOEHelper = new OEHelper(mContext, mUser, this);
+			} catch (Exception e) {
+				Log.d(TAG, "OEDatabase->getOEInstance()");
+				Log.e(TAG, e.getMessage()
+						+ ". No connection with OpenERP server");
+			}
 		}
-		return openerp;
+		return mOEHelper;
 	}
 
 	public boolean isInstalledOnServer() {

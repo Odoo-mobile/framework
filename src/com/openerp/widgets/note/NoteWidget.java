@@ -98,6 +98,8 @@ public class NoteWidget extends AppWidgetProvider {
 
 	static void updateNoteWidget(Context context, AppWidgetManager manager,
 			int[] widgetIds) {
+		if (OEUser.current(context) == null)
+			return;
 		for (int widgetId : widgetIds) {
 			RemoteViews mView = initWidgetListView(context, widgetId);
 
