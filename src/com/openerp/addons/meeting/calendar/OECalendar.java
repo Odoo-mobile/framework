@@ -263,7 +263,8 @@ public class OECalendar {
 		List<OEValues> events = new ArrayList<OEValues>();
 
 		Cursor cr = mContentResolver.query(Events.CONTENT_URI,
-				mEventsProjection, null, null, null);
+				mEventsProjection, CalendarContract.Events.CALENDAR_ID
+						+ " = ? ", new String[] { mCalendarId + "" }, null);
 		if (cr.moveToFirst()) {
 			do {
 				OEValues event = new OEValues();
