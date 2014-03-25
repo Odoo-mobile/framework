@@ -95,4 +95,15 @@ public class OEFields {
 		return new OEManyToOne((OEDBHelper) db);
 	}
 
+	/**
+	 * One to many.
+	 * 
+	 * @param db
+	 *            the db
+	 * @return the one to many object
+	 */
+	public static OEOneToMany oneToMany(Object db) {
+		return new OEOneToMany((OEDBHelper) db);
+	}
+
 }

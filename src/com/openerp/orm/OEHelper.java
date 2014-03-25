@@ -55,7 +55,6 @@ public class OEHelper extends OpenERP {
 	public OEHelper(SharedPreferences pref) throws ClientProtocolException,
 			JSONException, IOException, OEVersionException {
 		super(pref);
-		init();
 	}
 
 	public OEHelper(Context context, String host)
@@ -63,7 +62,6 @@ public class OEHelper extends OpenERP {
 			OEVersionException {
 		super(host);
 		mContext = context;
-		init();
 	}
 
 	public OEHelper(Context context, OEUser data, OEDatabase oeDatabase)
@@ -75,7 +73,6 @@ public class OEHelper extends OpenERP {
 		mContext = context;
 		mDatabase = oeDatabase;
 		mUser = data;
-		init();
 		/*
 		 * Required to login with server.
 		 */
@@ -83,44 +80,45 @@ public class OEHelper extends OpenERP {
 				mUser.getHost());
 	}
 
-	private void init() {
-		Log.d(TAG, "OEHelper->init()");
-		mPref = new PreferenceManager(mContext);
-	}
-
 	public OEUser login(String username, String password, String database,
 			String serverURL) {
+		Log.d(TAG, "OEHelper->login()");
 		OEUser userObj = null;
 		try {
 			JSONObject response = this.authenticate(username, password,
 					database);
 			int userId = 0;
 			if (response.get("uid") instanceof Integer) {
-				userId = response.getInt("uid");
+				if (OEUser.current(mContext) == null) {
+					userId = response.getInt("uid");
 
-				OEFieldsHelper fields = new OEFieldsHelper(new String[] {
-						"partner_id", "tz", "image", "company_id" });
-				OEDomain domain = new OEDomain();
-				domain.add("id", "=", userId);
-				JSONObject res = search_read("res.users", fields.get(),
-						domain.get()).getJSONArray("records").getJSONObject(0);
+					OEFieldsHelper fields = new OEFieldsHelper(new String[] {
+							"partner_id", "tz", "image", "company_id" });
+					OEDomain domain = new OEDomain();
+					domain.add("id", "=", userId);
+					JSONObject res = search_read("res.users", fields.get(),
+							domain.get()).getJSONArray("records")
+							.getJSONObject(0);
 
-				userObj = new OEUser();
-				userObj.setAvatar(res.getString("image"));
+					userObj = new OEUser();
+					userObj.setAvatar(res.getString("image"));
 
-				userObj.setDatabase(database);
-				userObj.setHost(serverURL);
-				userObj.setIsactive(true);
-				userObj.setAndroidName(androidName(username, database));
-				userObj.setPartner_id(res.getJSONArray("partner_id").getInt(0));
-				userObj.setTimezone(res.getString("tz"));
-				userObj.setUser_id(userId);
-				userObj.setUsername(username);
-				userObj.setPassword(password);
-				String company_id = new JSONArray(res.getString("company_id"))
-						.getString(0);
-				userObj.setCompany_id(company_id);
-
+					userObj.setDatabase(database);
+					userObj.setHost(serverURL);
+					userObj.setIsactive(true);
+					userObj.setAndroidName(androidName(username, database));
+					userObj.setPartner_id(res.getJSONArray("partner_id")
+							.getInt(0));
+					userObj.setTimezone(res.getString("tz"));
+					userObj.setUser_id(userId);
+					userObj.setUsername(username);
+					userObj.setPassword(password);
+					String company_id = new JSONArray(
+							res.getString("company_id")).getString(0);
+					userObj.setCompany_id(company_id);
+				} else {
+					userObj = OEUser.current(mContext);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -224,6 +222,7 @@ public class OEHelper extends OpenERP {
 				domain.add("id", "in", ids);
 			}
 			if (limitedData) {
+				mPref = new PreferenceManager(mContext);
 				int data_limit = mPref.getInt("sync_data_limit", 60);
 				domain.add("create_date", ">=",
 						OEDate.getDateBefore(data_limit));

@@ -83,6 +83,10 @@ public class OEDataRow {
 		return (OEM2MRecord) _data.get(key);
 	}
 
+	public OEO2MRecord getO2MRecord(String key) {
+		return (OEO2MRecord) _data.get(key);
+	}
+
 	public List<String> keys() {
 		List<String> list = new ArrayList<String>();
 		list.addAll(_data.keySet());

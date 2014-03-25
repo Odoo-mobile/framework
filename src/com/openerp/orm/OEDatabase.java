@@ -480,6 +480,11 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			return new OEM2MRecord(this, col,
 					cr.getInt(cr.getColumnIndex("id")));
 		}
+
+		if (col.getType() instanceof OEOneToMany) {
+			return new OEO2MRecord(this, col,
+					cr.getInt(cr.getColumnIndex("id")));
+		}
 		return null;
 	}
 

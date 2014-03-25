@@ -122,7 +122,32 @@ public class IdeaDBHelper extends OEDatabase {
 				.manyToOne(new IdeaCategory(mContext))));
 		columns.add(new OEColumn("user_ids", "Idea Users", OEFields
 				.manyToMany(new IdeaUsers(mContext))));
+		columns.add(new OEColumn("idea_files", "idea_files", OEFields
+				.oneToMany(new IdeaFiles(mContext))));
 		return columns;
 	}
 
+	class IdeaFiles extends OEDatabase {
+		Context mContext = null;
+
+		public IdeaFiles(Context context) {
+			super(context);
+			mContext = context;
+		}
+
+		@Override
+		public String getModelName() {
+			return "idea.files";
+		}
+
+		@Override
+		public List<OEColumn> getModelColumns() {
+			List<OEColumn> cols = new ArrayList<OEColumn>();
+			cols.add(new OEColumn("name", "name", OEFields.varchar(55)));
+			cols.add(new OEColumn("idea_idea_id", "idea id", OEFields
+					.manyToOne(new IdeaDBHelper(mContext))));
+			return cols;
+		}
+
+	}
 }

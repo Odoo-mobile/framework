@@ -25,7 +25,14 @@ import android.util.Log;
 
 public class SQLHelper {
 
+	public static final String TAG = SQLHelper.class.getSimpleName();
+
 	public List<String> createTable(OEDBHelper db) {
+		return createTable(db, false);
+	}
+
+	public List<String> createTable(OEDBHelper db, boolean isOneToMany) {
+		Log.d(TAG, "SQLHelper->createTable()");
 		List<String> queries = new ArrayList<String>();
 		StringBuffer sql = new StringBuffer();
 		sql.append("CREATE TABLE IF NOT EXISTS ");
@@ -42,16 +49,27 @@ public class SQLHelper {
 				sql.append(", ");
 			}
 			if (col.getType() instanceof OEManyToOne) {
-				OEManyToOne manyToOne = (OEManyToOne) col.getType();
-				List<String> many2one = createTable(manyToOne.getDBHelper());
-				for (String query : many2one) {
-					queries.add(query);
+				if (!isOneToMany) {
+					OEManyToOne manyToOne = (OEManyToOne) col.getType();
+					List<String> many2one = createTable(manyToOne.getDBHelper());
+					for (String query : many2one) {
+						queries.add(query);
+					}
 				}
 				sql.append(col.getName());
 				sql.append(" ");
 				sql.append(OEFields.integer());
 				sql.append(", ");
 
+			}
+			if (col.getType() instanceof OEOneToMany) {
+				OEOneToMany oneToMany = (OEOneToMany) col.getType();
+				List<String> one2many = createTable(oneToMany.getDBHelper(),
+						true);
+				for (String query : one2many) {
+					queries.add(query);
+				}
+				continue;
 			}
 			if (col.getType() instanceof OEManyToMany) {
 				OEManyToMany manyTomany = (OEManyToMany) col.getType();
@@ -67,7 +85,10 @@ public class SQLHelper {
 		sql.deleteCharAt(sql.lastIndexOf(","));
 		sql.append(");");
 		queries.add(sql.toString());
-		Log.d("SQLHelper", "Table created : " + modelToTable(db.getModelName()));
+
+		String table = modelToTable(db.getModelName());
+		Log.d("SQLHelper", "Table created : " + table);
+
 		return queries;
 	}
 
