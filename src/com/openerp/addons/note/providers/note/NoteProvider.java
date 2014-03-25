@@ -1,4 +1,4 @@
-/**
+/*
  * OpenERP, Open Source Management Solution
  * Copyright (C) 2012-today OpenERP SA (<http://www.openerp.com>)
  * 
@@ -16,18 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.widgets.note;
 
-import android.content.Intent;
-import android.widget.RemoteViewsService;
+package com.openerp.addons.note.providers.note;
 
-public class NoteRemoteViewService extends RemoteViewsService {
+import com.openerp.support.provider.OEContentProvider;
+
+/**
+ * The Class NoteProvider.
+ */
+public class NoteProvider extends OEContentProvider {
+
+	/** The contenturi. */
+	public static String CONTENTURI = "com.openerp.addons.note.providers.note.NoteProvider";
+
+	/** The authority. */
+	public static String AUTHORITY = "com.openerp.addons.note.providers.note";
 
 	@Override
-	public RemoteViewsFactory onGetViewFactory(Intent intent) {
-		NoteRemoteViewFactory mRemoteViewFactory = new NoteRemoteViewFactory(
-				getApplicationContext(), intent);
-		return mRemoteViewFactory;
+	public String authority() {
+		return AUTHORITY;
+	}
+
+	@Override
+	public String contentUri() {
+		return CONTENTURI;
 	}
 
 }

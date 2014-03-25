@@ -59,10 +59,10 @@ import android.widget.Toast;
 
 import com.openerp.OETouchListener;
 import com.openerp.R;
+import com.openerp.addons.message.providers.message.MessageProvider;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
 import com.openerp.orm.OEValues;
-import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.DataSetChangeReceiver;
 import com.openerp.receivers.SyncFinishReceiver;
 import com.openerp.support.AppScope;

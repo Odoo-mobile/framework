@@ -16,17 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.services;
-
-import openerp.OEDomain;
-
-import org.json.JSONArray;
+package com.openerp.addons.note.services;
 
 import android.accounts.Account;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
@@ -34,21 +30,19 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.openerp.addons.message.MailGroupDB;
+import com.openerp.addons.note.NoteDB;
+import com.openerp.addons.note.widgets.NoteWidget;
 import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.base.mail.MailFollowers;
-import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
-import com.openerp.providers.message.MessageProvider;
 import com.openerp.receivers.SyncFinishReceiver;
 
-public class MailGroupSyncService extends Service {
-	public static final String TAG = "com.openerp.services.MailGroupSyncService";
+public class NoteSyncService extends Service {
+	public static final String TAG = "com.openerp.addons.note.services.NoteSyncService";
 	private static SyncAdapterImpl sSyncAdapter = null;
 	static int i = 0;
 	Context mContext = null;
 
-	public MailGroupSyncService() {
+	public NoteSyncService() {
 		mContext = this;
 	}
 
@@ -74,42 +68,24 @@ public class MailGroupSyncService extends Service {
 		try {
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
+			Intent updateWidgetIntent = new Intent();
+			updateWidgetIntent
+					.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+			updateWidgetIntent.putExtra(NoteWidget.ACTION_NOTE_WIDGET_UPDATE,
+					true);
 
-			MailGroupDB db = new MailGroupDB(context);
-			db.setAccountUser(OpenERPAccountManager.getAccountDetail(context,
+			NoteDB note = new NoteDB(context);
+			note.setAccountUser(OpenERPAccountManager.getAccountDetail(context,
 					account.name));
-			OEHelper oe = db.getOEInstance();
-			if (oe != null && oe.syncWithServer(true)) {
-				MailFollowers followers = new MailFollowers(context);
-
-				OEDomain domain = new OEDomain();
-				domain.add("partner_id", "=", oe.getUser().getPartner_id());
-				domain.add("res_model", "=", db.getModelName());
-
-				if (followers.getOEInstance().syncWithServer(domain, true)) {
-					// syncing group messages
-					JSONArray group_ids = new JSONArray();
-					for (OEDataRow grp : followers.select(
-							"res_model = ? AND partner_id = ?", new String[] {
-									db.getModelName(),
-									oe.getUser().getPartner_id() + "" })) {
-						group_ids.put(grp.getInt("res_id"));
-					}
-					Bundle messageBundle = new Bundle();
-					messageBundle.putString("group_ids", group_ids.toString());
-					messageBundle.putBoolean(
-							ContentResolver.SYNC_EXTRAS_MANUAL, true);
-					messageBundle.putBoolean(
-							ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-					ContentResolver.requestSync(account,
-							MessageProvider.AUTHORITY, messageBundle);
-
-				}
+			OEHelper oe = note.getOEInstance();
+			if (oe != null) {
+				oe.syncWithServer(true);
 			}
 			if (OpenERPAccountManager.currentUser(context).getAndroidName()
-					.equals(account.name))
+					.equals(account.name)) {
 				context.sendBroadcast(intent);
-
+				context.sendBroadcast(updateWidgetIntent);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -126,10 +102,10 @@ public class MailGroupSyncService extends Service {
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
-			Log.d(TAG, "Mail Group sync service started");
+			Log.d(TAG, "Note sync service started");
 			try {
 				if (account != null) {
-					new MailGroupSyncService().performSync(mContext, account,
+					new NoteSyncService().performSync(mContext, account,
 							bundle, str, providerClient, syncResult);
 				}
 			} catch (Exception e) {

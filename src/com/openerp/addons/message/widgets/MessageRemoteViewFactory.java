@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.widgets.message;
+package com.openerp.addons.message.widgets;
 
 import java.util.ArrayList;
 import java.util.HashMap;

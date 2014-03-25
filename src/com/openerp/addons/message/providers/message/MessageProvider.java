@@ -1,4 +1,4 @@
-/**
+/*
  * OpenERP, Open Source Management Solution
  * Copyright (C) 2012-today OpenERP SA (<http://www.openerp.com>)
  * 
@@ -16,22 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.widgets.message;
 
-import android.content.Intent;
-import android.util.Log;
-import android.widget.RemoteViewsService;
+package com.openerp.addons.message.providers.message;
 
-public class MessageRemoteViewService extends RemoteViewsService {
+import com.openerp.support.provider.OEContentProvider;
 
-	public static final String TAG = "com.openerp.widgets.message.MessageRemoteViewService";
+/**
+ * The Class MessageProvider.
+ */
+public class MessageProvider extends OEContentProvider {
+	public static String CONTENTURI = "com.openerp.addons.message.providers.message.MessageProvider";
+	public static String AUTHORITY = "com.openerp.addons.message.providers.message";
 
 	@Override
-	public RemoteViewsFactory onGetViewFactory(Intent intent) {
-		Log.d(TAG, "MessageRemoteViewService->onGetViewFactory()");
-		MessageRemoteViewFactory rvFactory = new MessageRemoteViewFactory(
-				this.getApplicationContext(), intent);
-		return rvFactory;
+	public String authority() {
+		return AUTHORITY;
+	}
+
+	@Override
+	public String contentUri() {
+		return CONTENTURI;
 	}
 
 }

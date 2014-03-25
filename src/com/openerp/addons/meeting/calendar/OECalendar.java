@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.support.calendar;
+package com.openerp.addons.meeting.calendar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ import com.openerp.util.OEDate;
 
 public class OECalendar {
 
-	public static final String TAG = "com.openerp.support.calendar.OECalendar";
+	public static final String TAG = "com.openerp.addons.meeting.calendar.OECalendar";
 
 	Context mContext = null;
 	ContentResolver mContentResolver = null;

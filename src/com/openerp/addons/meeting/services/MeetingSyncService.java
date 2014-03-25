@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.services;
+package com.openerp.addons.meeting.services;
 
 import openerp.OEDomain;
 import android.accounts.Account;
@@ -25,28 +25,24 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.openerp.addons.meeting.MeetingDB;
+import com.openerp.addons.meeting.calendar.OECalendar;
 import com.openerp.auth.OpenERPAccountManager;
-import com.openerp.base.res.ResPartnerDB;
 import com.openerp.orm.OEHelper;
-import com.openerp.support.OEUser;
-import com.openerp.support.contact.OEContact;
 
-public class ContactSyncService extends Service {
-
-	public static final String TAG = "com.openerp.services.ContactSyncService";
-
+public class MeetingSyncService extends Service {
+	public static final String TAG = "com.openerp.addons.meeting.services.MeetingSyncService";
 	private static SyncAdapterImpl sSyncAdapter = null;
+	static int i = 0;
 	Context mContext = null;
 
-	public ContactSyncService() {
-		this.mContext = this;
+	public MeetingSyncService() {
+		mContext = this;
 	}
 
 	@Override
@@ -57,6 +53,7 @@ public class ContactSyncService extends Service {
 	}
 
 	public SyncAdapterImpl getSyncAdapter() {
+
 		if (sSyncAdapter == null) {
 			sSyncAdapter = new SyncAdapterImpl(this);
 		}
@@ -66,34 +63,21 @@ public class ContactSyncService extends Service {
 	public void performSync(Context context, Account account, Bundle extras,
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
+
 		try {
-			OEUser user = OpenERPAccountManager.getAccountDetail(context,
-					account.name);
-			String saasURL1 = "https://openerp.my.openerp.com";
-			String saasURL2 = "https://accounts.openerp.com";
 
-			ResPartnerDB db = new ResPartnerDB(context);
-			OEHelper oe = db.getOEInstance();
-
-			OEContact contact = new OEContact(context, user);
-
-			SharedPreferences settings = PreferenceManager
-					.getDefaultSharedPreferences(context);
-			boolean syncServerContacts = settings.getBoolean(
-					"server_contact_sync", false);
-
-			if (user.getHost().toString().contains(saasURL1)
-					|| user.getHost().toString().contains(saasURL2)) {
-				contact.createContacts(db.select());
-			} else {
-				if (syncServerContacts && oe != null) {
-					Log.v(TAG, "Contact sync with server");
-					int company_id = Integer.parseInt(user.getCompany_id());
-					OEDomain domain = new OEDomain();
-					domain.add("company_id", "=", company_id);
-					oe.syncWithServer(domain, false);
+			MeetingDB meeting = new MeetingDB(context);
+			meeting.setAccountUser(OpenERPAccountManager.getAccountDetail(
+					context, account.name));
+			OEHelper oe = meeting.getOEInstance();
+			if (oe != null) {
+				OEDomain domain = new OEDomain();
+				domain.add("user_id", "=", oe.getUser().getUser_id());
+				if (oe.syncWithServer(domain, true)) {
+					OECalendar calendar = new OECalendar(context);
+					calendar.removeEvents(oe.getRemovedRecords());
+					calendar.syncCalendar();
 				}
-				contact.createContacts(db.select());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -111,9 +95,15 @@ public class ContactSyncService extends Service {
 		@Override
 		public void onPerformSync(Account account, Bundle bundle, String str,
 				ContentProviderClient providerClient, SyncResult syncResult) {
-
-			new ContactSyncService().performSync(mContext, account, bundle,
-					str, providerClient, syncResult);
+			Log.d(TAG, "Meeting sync service started");
+			try {
+				if (account != null) {
+					new MeetingSyncService().performSync(mContext, account,
+							bundle, str, providerClient, syncResult);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
 		}
 	}

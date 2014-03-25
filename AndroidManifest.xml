@@ -96,15 +96,15 @@
 
         <!-- Message provider -->
         <provider
-            android:name="com.openerp.providers.message.MessageProvider"
-            android:authorities="com.openerp.providers.message"
+            android:name="com.openerp.addons.message.providers.message.MessageProvider"
+            android:authorities="com.openerp.addons.message.providers.message"
             android:enabled="true"
             android:exported="true"
             android:label="Messages"
             android:syncable="true" />
         <!-- Message provider service -->
         <service
-            android:name="com.openerp.services.MessageSyncService"
+            android:name="com.openerp.addons.message.services.MessageSyncService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -117,15 +117,15 @@
 
         <!-- Note provider -->
         <provider
-            android:name="com.openerp.providers.note.NoteProvider"
-            android:authorities="com.openerp.providers.note"
+            android:name="com.openerp.addons.note.providers.note.NoteProvider"
+            android:authorities="com.openerp.addons.note.providers.note"
             android:enabled="true"
             android:exported="true"
             android:label="Notes"
             android:syncable="true" />
         <!-- Note provider service -->
         <service
-            android:name="com.openerp.services.NoteSyncService"
+            android:name="com.openerp.addons.note.services.NoteSyncService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -138,8 +138,8 @@
 
         <!-- Mail Group provider -->
         <provider
-            android:name="com.openerp.providers.groups.MailGroupProvider"
-            android:authorities="com.openerp.providers.groups"
+            android:name="com.openerp.addons.message.providers.groups.MailGroupProvider"
+            android:authorities="com.openerp.addons.message.providers.groups"
             android:enabled="true"
             android:exported="true"
             android:label="Groups"
@@ -147,7 +147,7 @@
 
         <!-- Mail Group provider service -->
         <service
-            android:name="com.openerp.services.MailGroupSyncService"
+            android:name="com.openerp.addons.message.services.MailGroupSyncService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -160,7 +160,7 @@
 
         <!-- Meeting service -->
         <service
-            android:name="com.openerp.services.MeetingSyncService"
+            android:name="com.openerp.addons.meeting.services.MeetingSyncService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -173,7 +173,7 @@
 
         <!-- Contact service -->
         <service
-            android:name="com.openerp.services.ContactSyncService"
+            android:name="com.openerp.base.res.services.ContactSyncService"
             android:exported="true"
             android:process=":contacts" >
             <intent-filter>
@@ -190,7 +190,7 @@
 
         <!-- Message Widget -->
         <receiver
-            android:name="com.openerp.widgets.message.MessageWidget"
+            android:name="com.openerp.addons.message.widgets.MessageWidget"
             android:label="OpenERP Messaging" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -202,11 +202,11 @@
         </receiver>
         <!-- Message widget remote view service -->
         <service
-            android:name="com.openerp.widgets.message.MessageRemoteViewService"
+            android:name="com.openerp.addons.message.widgets.MessageRemoteViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <!-- Message widget configuration -->
-        <activity android:name="com.openerp.widgets.message.MessageWidgetConfigure" >
+        <activity android:name="com.openerp.addons.message.widgets.MessageWidgetConfigure" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
@@ -214,7 +214,7 @@
 
         <!-- Note Widget -->
         <receiver
-            android:name="com.openerp.widgets.note.NoteWidget"
+            android:name="com.openerp.addons.note.widgets.NoteWidget"
             android:label="OpenERP Notes" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -226,10 +226,10 @@
         </receiver>
         <!-- Note widget remote view service -->
         <service
-            android:name="com.openerp.widgets.note.NoteRemoteViewService"
+            android:name="com.openerp.addons.note.widgets.NoteRemoteViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
         <!-- Note widget configuration -->
-        <activity android:name="com.openerp.widgets.note.NoteWidgetConfigure" >
+        <activity android:name="com.openerp.addons.note.widgets.NoteWidgetConfigure" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>

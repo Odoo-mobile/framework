@@ -24,9 +24,9 @@ import java.util.List;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 
-import com.openerp.providers.groups.MailGroupProvider;
-import com.openerp.providers.message.MessageProvider;
-import com.openerp.providers.note.NoteProvider;
+import com.openerp.addons.message.providers.groups.MailGroupProvider;
+import com.openerp.addons.message.providers.message.MessageProvider;
+import com.openerp.addons.note.providers.note.NoteProvider;
 import com.openerp.support.SyncValue;
 import com.openerp.support.SyncWizardHelper;
 

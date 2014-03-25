@@ -17,26 +17,36 @@
  * 
  */
 
-package com.openerp.providers.note;
+package com.openerp.addons.message.providers.groups;
 
 import com.openerp.support.provider.OEContentProvider;
 
 /**
- * The Class NoteProvider.
+ * The Class MailGroupProvider.
  */
-public class NoteProvider extends OEContentProvider {
+public class MailGroupProvider extends OEContentProvider {
 
 	/** The contenturi. */
-	public static String CONTENTURI = "com.openerp.providers.note.NoteProvider";
+	public static String CONTENTURI = "com.openerp.addons.message.providers.groups.MailGroupProvider";
 
 	/** The authority. */
-	public static String AUTHORITY = "com.openerp.providers.note";
+	public static String AUTHORITY = "com.openerp.addons.message.providers.groups";
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.openerp.support.provider.OEContentProviderHelper#authority()
+	 */
 	@Override
 	public String authority() {
 		return AUTHORITY;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.openerp.support.provider.OEContentProviderHelper#contentUri()
+	 */
 	@Override
 	public String contentUri() {
 		return CONTENTURI;

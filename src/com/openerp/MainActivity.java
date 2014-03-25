@@ -51,8 +51,10 @@ import android.widget.Toast;
 
 import com.openerp.addons.message.Message;
 import com.openerp.addons.message.MessageDetail;
+import com.openerp.addons.message.widgets.MessageWidget;
 import com.openerp.addons.note.Note;
 import com.openerp.addons.note.NoteDetail;
+import com.openerp.addons.note.widgets.NoteWidget;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
@@ -71,8 +73,6 @@ import com.openerp.util.drawer.DrawerHelper;
 import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.drawer.DrawerListener;
 import com.openerp.widgets.WidgetHelper;
-import com.openerp.widgets.message.MessageWidget;
-import com.openerp.widgets.note.NoteWidget;
 
 /**
  * The Class MainActivity.

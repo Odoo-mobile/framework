@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.services;
+package com.openerp.addons.message.services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +44,7 @@ import android.util.Log;
 import com.openerp.MainActivity;
 import com.openerp.R;
 import com.openerp.addons.message.MessageDB;
+import com.openerp.addons.message.widgets.MessageWidget;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEHelper;
@@ -53,7 +54,6 @@ import com.openerp.support.OEUser;
 import com.openerp.util.OEDate;
 import com.openerp.util.OENotificationHelper;
 import com.openerp.util.PreferenceManager;
-import com.openerp.widgets.message.MessageWidget;
 
 /**
  * The Class MessageSyncService.
@@ -61,7 +61,7 @@ import com.openerp.widgets.message.MessageWidget;
 public class MessageSyncService extends Service {
 
 	/** The Constant TAG. */
-	public static final String TAG = "com.openerp.services.MessageSyncService";
+	public static final String TAG = "com.openerp.addons.message.services.MessageSyncService";
 
 	/** The s sync adapter. */
 	private static SyncAdapterImpl sSyncAdapter = null;

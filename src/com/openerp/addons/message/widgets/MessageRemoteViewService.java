@@ -1,4 +1,4 @@
-/*
+/**
  * OpenERP, Open Source Management Solution
  * Copyright (C) 2012-today OpenERP SA (<http://www.openerp.com>)
  * 
@@ -16,40 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
+package com.openerp.addons.message.widgets;
 
-package com.openerp.providers.groups;
+import android.content.Intent;
+import android.util.Log;
+import android.widget.RemoteViewsService;
 
-import com.openerp.support.provider.OEContentProvider;
+public class MessageRemoteViewService extends RemoteViewsService {
 
-/**
- * The Class MailGroupProvider.
- */
-public class MailGroupProvider extends OEContentProvider {
+	public static final String TAG = "com.openerp.widgets.message.MessageRemoteViewService";
 
-	/** The contenturi. */
-	public static String CONTENTURI = "com.openerp.providers.groups.MailGroupProvider";
-
-	/** The authority. */
-	public static String AUTHORITY = "com.openerp.providers.groups";
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.openerp.support.provider.OEContentProviderHelper#authority()
-	 */
 	@Override
-	public String authority() {
-		return AUTHORITY;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.openerp.support.provider.OEContentProviderHelper#contentUri()
-	 */
-	@Override
-	public String contentUri() {
-		return CONTENTURI;
+	public RemoteViewsFactory onGetViewFactory(Intent intent) {
+		Log.d(TAG, "MessageRemoteViewService->onGetViewFactory()");
+		MessageRemoteViewFactory rvFactory = new MessageRemoteViewFactory(
+				this.getApplicationContext(), intent);
+		return rvFactory;
 	}
 
 }
