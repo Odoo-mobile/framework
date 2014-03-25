@@ -25,6 +25,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -43,21 +44,17 @@ import com.openerp.orm.OEHelper;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.HTMLHelper;
+import com.openerp.util.TextViewTags;
 import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.tags.MultiTagsTextView.TokenListener;
-import com.openerp.util.tags.TagsItem;
-import com.openerp.util.tags.TagsView;
 
-public class NoteDetail extends BaseFragment implements TokenListener {
+public class NoteDetail extends BaseFragment {
 
 	public static final String TAG = "com.openerp.addons.note.NoteDetail";
 	View mView = null;
 	Bundle mArgument = null;
-	OETextView mNoteDetailTitle;
-	OETextView mNoteDetailMemo;
-	TagsView mNoteTags = null;
-	int mStageColor = 0;
+	OETextView mNoteDetailTitle, mNoteDetailMemo, mNoteTags = null;
+	int mStageColor = Color.parseColor("#414141");
 	String mPadURL = "";
 	String mNoteMemo = "";
 	String mMessageBody = "";
@@ -91,45 +88,23 @@ public class NoteDetail extends BaseFragment implements TokenListener {
 				.findViewById(R.id.txvNoteDetailTitle);
 		mNoteDetailMemo = (OETextView) mView
 				.findViewById(R.id.txvNoteDetailMemo);
-		mNoteTags = (TagsView) mView.findViewById(R.id.edtNoteTagsView);
-		mNoteTags.setTokenListener(this);
-		mNoteTags.setCustomTagView(new TagsView.CustomTagViewListener() {
+		mNoteTags = (OETextView) mView.findViewById(R.id.edtNoteTagsView);
 
-			@Override
-			public View getViewForTags(LayoutInflater layoutInflater,
-					Object object, ViewGroup tagsViewGroup) {
-				View view = (View) layoutInflater.inflate(
-						R.layout.custom_note_tagsview_item, tagsViewGroup,
-						false);
-				TagsItem item = (TagsItem) object;
-				OETextView txvTitle = (OETextView) view
-						.findViewById(R.id.txvCustomNoteTagsViewItem);
-				txvTitle.setText(item.getSubject());
-				txvTitle.setBackgroundColor(mStageColor);
-				return view;
-			}
-		});
-		for (Object tag : mNoteTags.getObjects()) {
-			mNoteTags.removeObject(tag);
-		}
-		mNoteTags.allowDuplicates(false);
 		mNoteDetailMemo.setMovementMethod(new ScrollingMovementMethod());
 		OEDataRow result = db().select(note_id);
 		if (!result.getString("note_pad_url").equals("false")) {
 			mPadURL = result.getString("note_pad_url");
 		}
 		mNoteMemo = result.getString("memo");
-		List<TagsItem> noteTags = new ArrayList<TagsItem>();
-		mNoteTags.showImage(false);
+
+		List<String> mNoteTagsItems = new ArrayList<String>();
 		for (OEDataRow tag : result.getM2MRecord("tag_ids").browseEach()) {
-			TagsItem tag_item = new TagsItem(tag.getInt("id"),
-					tag.getString("name"), null);
-			noteTags.add(tag_item);
-			mNoteTags.addObject(tag_item);
+			mNoteTagsItems.add(tag.getString("name"));
 		}
-		if (noteTags.size() == 0) {
-			mNoteTags.setVisibility(View.GONE);
-		}
+		TextViewTags tags = new TextViewTags(getActivity(), mNoteTagsItems,
+				mStageColor, "#ffffff", 25);
+		mNoteTags.setText(tags.generate());
+
 		mMessageBody = result.getString("memo");
 		mNoteDetailTitle.setText(result.getString("name"));
 		mNoteDetailMemo.setText(HTMLHelper.stringToHtml(result
@@ -255,22 +230,6 @@ public class NoteDetail extends BaseFragment implements TokenListener {
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
-	}
-
-	@Override
-	public void onTokenAdded(Object token, View view) {
-
-	}
-
-	@Override
-	public void onTokenSelected(Object token, View view) {
-
-	}
-
-	@Override
-	public void onTokenRemoved(Object token) {
-		mNoteTags.addObject(token);
-
 	}
 
 }

@@ -149,15 +149,18 @@ public class NoteComposeActivity extends Activity implements
 			OEDataRow stage = mNoteRow.getM2ORecord("stage_id").browse();
 			if (stage != null) {
 				mStageId = stage.getInt("id");
-				mActionbar
-						.setSelectedNavigationItem(mActionbarSpinnerItemsPositions
-								.get("key_" + mStageId));
 			}
 
 		}
+		if (intent.hasExtra("stage_id")) {
+			mStageId = intent.getIntExtra("stage_id", 0);
+		}
+		mActionbar.setSelectedNavigationItem(mActionbarSpinnerItemsPositions
+				.get("key_" + mStageId));
 		if (intent.hasExtra("note_title")) {
 			edtNoteTitle.setText(intent.getStringExtra("note_title"));
 		}
+
 		if (mPadInstalled) {
 			edtNoteDescription.setVisibility(View.GONE);
 			mWebViewPad.setVisibility(View.VISIBLE);
@@ -339,13 +342,11 @@ public class NoteComposeActivity extends Activity implements
 			return true;
 
 		case R.id.menu_note_write:
-			String mToast = "Creating note...";
 			if (mEditMode) {
 				saveNote(mNoteId);
 			} else {
 				saveNote(null);
 			}
-			Toast.makeText(this, mToast, Toast.LENGTH_LONG).show();
 			return true;
 
 		case R.id.menu_note_cancel:
@@ -372,7 +373,7 @@ public class NoteComposeActivity extends Activity implements
 	private void saveNote(Integer mNoteId) {
 		if (mOpenERP != null) {
 			OEValues values = new OEValues();
-			String name = "";
+			String name = edtNoteTitle.getText().toString();
 			String memo = "";
 			if (mStageId == null) {
 				Toast.makeText(mContext, "Please select stage",
@@ -393,7 +394,7 @@ public class NoteComposeActivity extends Activity implements
 			} else {
 				memo = edtNoteDescription.getText().toString();
 			}
-			name = noteName(memo);
+			name = noteName(name + "\n" + memo);
 			List<Integer> tag_ids = new ArrayList<Integer>();
 			for (String key : mSelectedTagsIds.keySet())
 				tag_ids.add(mSelectedTagsIds.get(key));
@@ -407,15 +408,22 @@ public class NoteComposeActivity extends Activity implements
 			values.put("current_partner_id", OEUser.current(mContext)
 					.getPartner_id());
 			String mToast = "Note Created";
+			int id = (mNoteId == null) ? 0 : mNoteId;
+			boolean is_new = true;
 			if (mNoteId != null) {
 				// Updating
 				mToast = "Note Updated";
 				mOpenERP.update(values, mNoteId);
+				is_new = false;
 			} else {
 				// Creating
-				mOpenERP.create(values);
+				id = mOpenERP.create(values);
 			}
 			Toast.makeText(mContext, mToast, Toast.LENGTH_LONG).show();
+			Intent data = new Intent();
+			data.putExtra("result", id);
+			data.putExtra("is_new", is_new);
+			setResult(RESULT_OK, data);
 			finish();
 		} else {
 			Toast.makeText(mContext, "No Connection", Toast.LENGTH_LONG).show();

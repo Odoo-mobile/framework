@@ -199,7 +199,8 @@ public class Note extends BaseFragment implements
 				whereArgs = new String[] { "true", mStageId + "" };
 				break;
 			}
-			List<OEDataRow> records = db().select(where, whereArgs);
+			List<OEDataRow> records = db().select(where, whereArgs, null, null,
+					"id DESC");
 			mNotesList.addAll(records);
 			return null;
 		}
@@ -233,6 +234,7 @@ public class Note extends BaseFragment implements
 				txvMsg.setVisibility(View.VISIBLE);
 			}
 		} else {
+			mView.findViewById(R.id.txvNoteAllArchive).setVisibility(View.GONE);
 			mView.findViewById(R.id.waitingForSyncToStart).setVisibility(
 					View.GONE);
 		}
@@ -427,6 +429,7 @@ public class Note extends BaseFragment implements
 		OEEditText edtTitle = (OEEditText) mView
 				.findViewById(R.id.edtNoteQuickTitle);
 		composeNote.putExtra("note_title", edtTitle.getText().toString());
+		composeNote.putExtra("stage_id", mStageId);
 		startActivityForResult(composeNote, KEY_NOTE);
 		edtTitle.setText(null);
 	}
@@ -437,9 +440,13 @@ public class Note extends BaseFragment implements
 		case KEY_NOTE:
 			if (resultCode == Activity.RESULT_OK) {
 				int new_id = data.getExtras().getInt("result");
-				OEDataRow row = db().select(new_id);
-				mNotesList.add(row);
-				mNoteListAdapter.notifiyDataChange(mNotesList);
+				boolean is_new = data.getExtras().getBoolean("is_new");
+				if (is_new) {
+					OEDataRow row = db().select(new_id);
+					mNotesList.add(0, row);
+					mNoteListAdapter.notifiyDataChange(mNotesList);
+				}
+				checkStatus();
 			}
 			break;
 		}

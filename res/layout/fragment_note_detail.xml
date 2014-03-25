@@ -18,14 +18,12 @@
         android:orientation="vertical"
         android:padding="10dp" >
 
-        <com.openerp.util.tags.TagsView
+        <com.openerp.util.controls.OETextView
             android:id="@+id/edtNoteTagsView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="2dp"
-            android:background="#f5f5f5"
-            android:inputType="none"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingTop="5dp" />

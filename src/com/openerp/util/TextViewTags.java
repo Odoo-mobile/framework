@@ -36,7 +36,7 @@ import com.openerp.util.controls.OETextView;
 
 public class TextViewTags {
 
-	String mColor = null;
+	int mColor = 0;
 	String mTextColor = null;
 	Context mContext;
 	List<String> mTokens = null;
@@ -44,6 +44,15 @@ public class TextViewTags {
 
 	public TextViewTags(Context context, List<String> tokens,
 			String backgroundHexColor, String textColor, int textSize) {
+		mContext = context;
+		mColor = Color.parseColor(backgroundHexColor);
+		mTextColor = textColor;
+		mTokens = tokens;
+		mTextSize = textSize;
+	}
+
+	public TextViewTags(Context context, List<String> tokens,
+			int backgroundHexColor, String textColor, int textSize) {
 		mContext = context;
 		mColor = backgroundHexColor;
 		mTextColor = textColor;
@@ -72,12 +81,13 @@ public class TextViewTags {
 		OETextView tv = new OETextView(mContext);
 		tv.setText(text);
 		tv.setTextSize(mTextSize);
+		tv.setPadding(3, 3, 3, 3);
 		return tv;
 	}
 
 	@SuppressWarnings("deprecation")
 	private Object convertViewToDrawable(OETextView view) {
-		view.setBackgroundColor(Color.parseColor(mColor));
+		view.setBackgroundColor(mColor);
 		view.setTextColor(Color.parseColor(mTextColor));
 		view.setPadding(2, 2, 2, 2);
 		int spec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
