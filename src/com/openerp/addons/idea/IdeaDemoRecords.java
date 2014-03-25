@@ -44,6 +44,7 @@ public class IdeaDemoRecords {
 		createIdeaUsers();
 		createIdeaCategory();
 		createIdea();
+		createIdeaFiles();
 		int count = updateRecords();
 		OELog.log("Row updated : " + count);
 	}
@@ -105,6 +106,18 @@ public class IdeaDemoRecords {
 		}
 	}
 
+	private void createIdeaFiles() {
+		IdeaDBHelper.IdeaFiles ideaFiles = ideaDb.new IdeaFiles(mContext);
+		for (int i = 1; i <= 2; i++) {
+			OEValues vals = new OEValues();
+			vals.put("id", i);
+			vals.put("idea_idea_id", i + 1);
+			vals.put("name", "idea file " + i);
+			long newId = ideaFiles.create(vals);
+			Log.d("IdeaDemoRecords", newId + " Record created for idea.files");
+		}
+	}
+
 	public void selectAll() {
 		for (OEDataRow row : ideaDb.select()) {
 			OELog.log("RECORD :::::::::::::::::::::::: " + row.getString("id"));
@@ -116,6 +129,10 @@ public class IdeaDemoRecords {
 					+ row.getM2MRecord("user_ids").browseEach().get(0)
 							.getM2ORecord("user_type").browse()
 							.getString("type"));
+			for (OEDataRow file : row.getO2MRecord("idea_files").browseEach()) {
+				OELog.log("idea_files:" + file.getString("name"));
+				OELog.log("idea_idea_id:" + file.getM2ORecord("idea_idea_id").browse().getString("id"));
+			}
 		}
 	}
 

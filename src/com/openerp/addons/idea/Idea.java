@@ -47,6 +47,9 @@ public class Idea extends BaseFragment {
 		// OELog.log("Synced: " + flag);
 		DrawerListener drawer = (DrawerListener) getActivity();
 		drawer.refreshDrawer("idea");
+		IdeaDemoRecords rec = new IdeaDemoRecords(getActivity());
+		rec.createDemoRecords();
+		rec.selectAll();
 		return rootView;
 	}
 
