@@ -124,13 +124,18 @@ public class Message extends BaseFragment implements
 			"#EBB035" };
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			mSelectedItemPosition = savedInstanceState.getInt(
 					"mSelectedItemPosition", -1);
 		}
-		setHasOptionsMenu(true);
 		mView = inflater.inflate(R.layout.fragment_message, container, false);
 		scope = new AppScope(getActivity());
 		init();
@@ -405,6 +410,7 @@ public class Message extends BaseFragment implements
 			MenuItem compose = menu.findItem(R.id.menu_message_compose);
 			compose.setVisible(false);
 		}
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	@Override
@@ -526,6 +532,8 @@ public class Message extends BaseFragment implements
 					} else {
 						isParent = false;
 					}
+					int childs = db().count("parent_id = ? ",
+							new String[] { key });
 					if (!parent_list_details.containsKey(key)) {
 						// Fetching row parent message
 						OEDataRow newRow = null;
@@ -536,8 +544,6 @@ public class Message extends BaseFragment implements
 							newRow = db().select(Integer.parseInt(key));
 						}
 
-						int childs = db().count("parent_id = ? ",
-								new String[] { key });
 						newRow.put("childs", childs);
 						parent_list_details.put(key, null);
 						message_row_indexes.put(key, i);
@@ -555,8 +561,9 @@ public class Message extends BaseFragment implements
 
 			mView.findViewById(R.id.loadingProgress).setVisibility(View.GONE);
 			mListViewAdapter.notifiyDataChange(mMessageObjects);
-			mSearchView
-					.setOnQueryTextListener(getQueryListener(mListViewAdapter));
+			if (mSearchView != null)
+				mSearchView
+						.setOnQueryTextListener(getQueryListener(mListViewAdapter));
 			mMessageLoader = null;
 			checkMessageStatus();
 

@@ -155,8 +155,10 @@ public class NoteComposeActivity extends Activity implements
 		if (intent.hasExtra("stage_id")) {
 			mStageId = intent.getIntExtra("stage_id", 0);
 		}
-		mActionbar.setSelectedNavigationItem(mActionbarSpinnerItemsPositions
-				.get("key_" + mStageId));
+		if (mActionbarSpinnerItemsPositions.containsKey("key_" + mStageId))
+			mActionbar
+					.setSelectedNavigationItem(mActionbarSpinnerItemsPositions
+							.get("key_" + mStageId));
 		if (intent.hasExtra("note_title")) {
 			edtNoteTitle.setText(intent.getStringExtra("note_title"));
 		}

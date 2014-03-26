@@ -94,9 +94,14 @@ public class Note extends BaseFragment implements
 	Boolean mSynced = false;
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		setHasOptionsMenu(true);
 		mView = inflater.inflate(R.layout.fragment_note, container, false);
 		Bundle bundle = getArguments();
 		if (bundle != null) {
@@ -209,8 +214,9 @@ public class Note extends BaseFragment implements
 		protected void onPostExecute(Void result) {
 			Log.d(TAG, "Note->NoteLoader->onPostExecute()");
 			mNoteListAdapter.notifiyDataChange(mNotesList);
-			mSearchView
-					.setOnQueryTextListener(getQueryListener(mNoteListAdapter));
+			if (mSearchView != null)
+				mSearchView
+						.setOnQueryTextListener(getQueryListener(mNoteListAdapter));
 			mNoteLoader = null;
 			mView.findViewById(R.id.loadingProgress).setVisibility(View.GONE);
 			checkStatus();
@@ -245,6 +251,7 @@ public class Note extends BaseFragment implements
 		inflater.inflate(R.menu.menu_fragment_note, menu);
 		mSearchView = (SearchView) menu.findItem(R.id.menu_note_search)
 				.getActionView();
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	@Override
