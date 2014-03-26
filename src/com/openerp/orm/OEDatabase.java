@@ -502,9 +502,10 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	}
 
 	public OEHelper getOEInstance() {
+		Log.d(TAG, "OEDatabase->getOEInstance()");
 		if (mOEHelper == null) {
 			try {
-				mOEHelper = new OEHelper(mContext, mUser, this);
+				mOEHelper = new OEHelper(mContext, this);
 			} catch (Exception e) {
 				Log.d(TAG, "OEDatabase->getOEInstance()");
 				Log.e(TAG, e.getMessage()

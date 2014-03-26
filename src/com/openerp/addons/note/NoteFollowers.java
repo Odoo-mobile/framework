@@ -269,8 +269,8 @@ public class NoteFollowers extends BaseFragment implements TokenListener,
 					partner_ids.put(partnerIds);
 					args.put("partner_ids",
 							new JSONArray("[" + partner_ids.toString() + "]"));
-					JSONObject result = oe
-							.createNew("mail.wizard.invite", args);
+					JSONObject result = oe.openERP().createNew(
+							"mail.wizard.invite", args);
 					int id = result.getInt("result");
 					OEArguments arguments = new OEArguments();
 					arguments.add(new JSONArray("[" + id + "]"));

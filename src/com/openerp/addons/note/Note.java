@@ -372,7 +372,7 @@ public class Note extends BaseFragment implements
 					} else {
 						mStatus = false;
 					}
-					oe.call_kw(note.getModelName(), method, args);
+					oe.openERP().call_kw(note.getModelName(), method, args);
 					OEValues values = new OEValues();
 					values.put("open", mStatus);
 					int count = note.update(values, mId);

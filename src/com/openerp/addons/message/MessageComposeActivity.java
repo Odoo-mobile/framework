@@ -438,7 +438,7 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 
 						JSONObject kwargs = new JSONObject();
 						kwargs.put("context",
-								mOE.updateContext(new JSONObject()));
+								mOE.openERP().updateContext(new JSONObject()));
 
 						args.add(arguments);
 						String model = "mail.compose.message";
@@ -450,7 +450,7 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 						// Resetting kwargs
 						args = new OEArguments();
 						args.add(new JSONArray().put(id));
-						args.add(mOE.updateContext(new JSONObject()));
+						args.add(mOE.openERP().updateContext(new JSONObject()));
 
 						// Sending mail
 						mOE.call_kw(model, "send_mail", args, null, null);

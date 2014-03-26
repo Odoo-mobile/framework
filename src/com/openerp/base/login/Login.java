@@ -20,6 +20,7 @@ package com.openerp.base.login;
 
 import java.util.List;
 
+import openerp.OpenERP;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -91,7 +92,7 @@ public class Login extends BaseFragment {
 	OEEditText edtPassword = null;
 
 	/** The OpenERP Object */
-	OEHelper openerp = null;
+	OpenERP openerp = null;
 
 	/*
 	 * (non-Javadoc)
@@ -151,7 +152,7 @@ public class Login extends BaseFragment {
 	 */
 	private void loadDatabaseList() {
 		try {
-			openerp = new OEHelper(context, openERPServerURL);
+			openerp = new OpenERP(openERPServerURL);
 			List<String> dbList = new JSONDataHelper()
 					.arrayToStringList(openerp.getDatabaseList());
 			dbList.add(0,
@@ -254,20 +255,18 @@ public class Login extends BaseFragment {
 			} catch (InterruptedException e) {
 				return false;
 			}
-			if (openerp != null) {
-				String userName = edtUsername.getText().toString();
-				String password = edtPassword.getText().toString();
-				String database = dbListSpinner.getSelectedItem().toString();
-				userData = openerp.login(userName, password, database,
-						openERPServerURL);
-				if (userData != null) {
-					return true;
-				} else {
-					errorMsg = "Invalid Username or Password !";
-					return false;
-				}
-			}
 
+			String userName = edtUsername.getText().toString();
+			String password = edtPassword.getText().toString();
+			String database = dbListSpinner.getSelectedItem().toString();
+			OEHelper openerp = new OEHelper(getActivity());
+			userData = openerp.login(userName, password, database,
+					openERPServerURL);
+			if (userData != null) {
+				return true;
+			} else {
+				errorMsg = "Invalid Username or Password !";
+			}
 			return false;
 		}
 

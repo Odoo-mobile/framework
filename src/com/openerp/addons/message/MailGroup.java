@@ -336,7 +336,7 @@ public class MailGroup extends BaseFragment implements OnPullListener {
 
 				OEArguments arguments = new OEArguments();
 				arguments.add(new JSONArray().put(mGroupId));
-				arguments.add(oe.updateContext(new JSONObject()));
+				arguments.add(oe.openERP().updateContext(new JSONObject()));
 				if (mJoin) {
 					oe.call_kw("action_follow", arguments, null);
 					mToast = "Group joined";

@@ -45,7 +45,7 @@ public class MeetingDB extends OEDatabase {
 		OEHelper oe = getOEInstance();
 		if (oe != null) {
 			try {
-				OEVersion version = oe.getOEVersion();
+				OEVersion version = oe.openERP().getOEVersion();
 				if ((version.getVersion_number() == 7
 						&& version.getVersion_type().equals("saas") && version
 						.getVersion_type_number() == 3)

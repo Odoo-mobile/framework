@@ -386,8 +386,8 @@ public class NoteComposeActivity extends Activity implements
 				try {
 					JSONArray args = new JSONArray();
 					args.put(mPadURL);
-					JSONObject content = mOpenERP.call_kw("pad.common",
-							"pad_get_content", args);
+					JSONObject content = mOpenERP.openERP().call_kw(
+							"pad.common", "pad_get_content", args);
 					memo = content.getString("result");
 					values.put("note_pad_url", mPadURL);
 					memo = name + " <br> " + memo;

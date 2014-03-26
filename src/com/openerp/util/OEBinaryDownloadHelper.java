@@ -104,7 +104,9 @@ public class OEBinaryDownloadHelper {
 				JSONObject fields = new JSONObject();
 				fields.accumulate("fields", "db_datas");
 				fields.accumulate("fields", "datas_fname");
-				JSONObject res = oe.search_read("ir.attachment", fields,
+				JSONObject res = oe.openERP().search_read(
+						"ir.attachment",
+						fields,
 						new JSONObject().accumulate("domain",
 								new JSONArray("[[\"id\", \"=\", "
 										+ this.attachment_id + "]]")), 0, 1,

@@ -124,9 +124,7 @@ public class UserProfile extends BaseFragment {
 			public void onClick(DialogInterface di, int i) {
 				OEUser userData = null;
 				try {
-					OEHelper openerp = new OEHelper(scope.context(), scope
-							.User().getHost());
-
+					OEHelper openerp = new OEHelper(scope.context());
 					userData = openerp.login(scope.User().getUsername(),
 							password.getText().toString(), scope.User()
 									.getDatabase(), scope.User().getHost());

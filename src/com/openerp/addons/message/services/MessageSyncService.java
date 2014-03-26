@@ -197,7 +197,7 @@ public class MessageSyncService extends Service {
 			// Param 4 : thread_level
 			arguments.add(true);
 			// Param 5 : context
-			arguments.add(oe.updateContext(newContext));
+			arguments.add(oe.openERP().updateContext(newContext));
 			// Param 6 : parent_id
 			arguments.addNull();
 			// Param 7 : limit
@@ -259,8 +259,8 @@ public class MessageSyncService extends Service {
 			OEDomain domain = new OEDomain();
 			domain.add("message_id", "in", ids_array);
 			domain.add("partner_id", "=", user.getPartner_id());
-			JSONObject result = oe.search_read("mail.notification", fields,
-					domain.get());
+			JSONObject result = oe.openERP().search_read("mail.notification",
+					fields, domain.get());
 			for (int j = 0; j < result.getJSONArray("records").length(); j++) {
 				JSONObject objRes = result.getJSONArray("records")
 						.getJSONObject(j);
@@ -289,7 +289,7 @@ public class MessageSyncService extends Service {
 
 			OEDomain domain = new OEDomain();
 			domain.add("id", "in", ids_array);
-			JSONObject vote_detail = oe.search_read("mail.message",
+			JSONObject vote_detail = oe.openERP().search_read("mail.message",
 					vote_fields, domain.get(), 0, 0, null, null);
 			for (int j = 0; j < vote_detail.getJSONArray("records").length(); j++) {
 				JSONObject obj_vote = vote_detail.getJSONArray("records")
