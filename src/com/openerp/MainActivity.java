@@ -664,10 +664,12 @@ public class MainActivity extends FragmentActivity implements
 
 	@SuppressWarnings("deprecation")
 	private void setUserPicIcon(Context context) {
-		if (!OEUser.current(context).getAvatar().equals("false")) {
+		if (OEUser.current(context) != null
+				&& !OEUser.current(context).getAvatar().equals("false")) {
 			Drawable profPic = new BitmapDrawable(Base64Helper.getBitmapImage(
 					this, OEUser.current(context).getAvatar()));
-			getActionBar().setIcon(profPic);
+			if (profPic != null)
+				getActionBar().setIcon(profPic);
 		}
 	}
 
@@ -721,7 +723,7 @@ public class MainActivity extends FragmentActivity implements
 		if (addToBackState) {
 			tran.addToBackStack(null);
 		}
-		tran.commit();
+		tran.commitAllowingStateLoss();
 	}
 
 	@Override

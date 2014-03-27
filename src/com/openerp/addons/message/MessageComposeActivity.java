@@ -266,12 +266,9 @@ public class MessageComposeActivity extends Activity implements TokenListener {
 					.browseEach();
 			if (partners != null) {
 				for (OEDataRow partner : partners) {
-					if (OEUser.current(mContext).getPartner_id() != partner
-							.getInt("id")) {
-						mSelectedPartners.put("key_" + partner.getString("id"),
-								partner);
-						mPartnerTagsView.addObject(partner);
-					}
+					mSelectedPartners.put("key_" + partner.getString("id"),
+							partner);
+					mPartnerTagsView.addObject(partner);
 				}
 			}
 			edtSubject.setText("Re: " + mMessageRow.getString("subject"));

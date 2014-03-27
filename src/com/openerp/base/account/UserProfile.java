@@ -74,8 +74,9 @@ public class UserProfile extends BaseFragment {
 
 		imgUserPic = null;
 		imgUserPic = (ImageView) rootView.findViewById(R.id.imgUserProfilePic);
-		imgUserPic.setImageBitmap(Base64Helper.getBitmapImage(scope.context(),
-				scope.User().getAvatar()));
+		if (!scope.User().getAvatar().equals("false"))
+			imgUserPic.setImageBitmap(Base64Helper.getBitmapImage(
+					scope.context(), scope.User().getAvatar()));
 		txvUserLoginName = (OETextView) rootView
 				.findViewById(R.id.txvUserLoginName);
 		txvUserLoginName.setText(scope.User().getAndroidName());

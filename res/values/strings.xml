@@ -94,5 +94,6 @@ When you process messages in your inbox, you can mark some as todo. From this me
     <string name="widget_messages_notification">00</string>
     <string name="widget_compose_notes">OpenComposeNotes</string>
     <string name="widget_compose_messages">OpenComposeMessages</string>
+    <string name="untrusted_ssl_warning">The site\'s security certificate is not trusted !</string>
 
 </resources>

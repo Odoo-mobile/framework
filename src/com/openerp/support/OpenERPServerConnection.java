@@ -18,14 +18,12 @@
  */
 package com.openerp.support;
 
-import java.io.IOException;
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 import openerp.OEVersionException;
 import openerp.OpenERP;
 
-import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -49,11 +47,13 @@ public class OpenERPServerConnection {
 	 *            the context
 	 * @param serverURL
 	 *            the server url
+	 * @param mForceConnect
 	 * @return true, if successful
 	 * @throws OEVersionException
+	 * @throws SSLPeerUnverifiedException
 	 */
 	public boolean testConnection(Context context, String serverURL)
-			throws OEVersionException {
+			throws OEVersionException, SSLPeerUnverifiedException {
 		Log.d(TAG, "OpenERPServerConnection->testConnection()");
 		if (TextUtils.isEmpty(serverURL)) {
 			return false;
@@ -61,6 +61,9 @@ public class OpenERPServerConnection {
 		try {
 			openerp = new OpenERP(serverURL);
 			openerp.getDatabaseList();
+		} catch (SSLPeerUnverifiedException ssl) {
+			Log.d(TAG, "Throw SSLPeerUnverifiedException ");
+			throw new SSLPeerUnverifiedException(ssl.getMessage());
 		} catch (OEVersionException version) {
 			throw new OEVersionException(version.getMessage());
 		} catch (Exception e) {
@@ -79,23 +82,15 @@ public class OpenERPServerConnection {
 	 *            the server url
 	 * @return the databases
 	 * @throws OEVersionException
+	 * @throws SSLPeerUnverifiedException
 	 */
 	public JSONArray getDatabases(Context context, String serverURL)
-			throws OEVersionException {
+			throws OEVersionException, SSLPeerUnverifiedException {
 		JSONArray dbList = null;
 		if (this.testConnection(context, serverURL)) {
 			try {
 				dbList = openerp.getDatabaseList();
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NullPointerException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -109,9 +104,10 @@ public class OpenERPServerConnection {
 	 *            the context
 	 * @return true, if is network available
 	 * @throws OEVersionException
+	 * @throws SSLPeerUnverifiedException
 	 */
 	public static boolean isNetworkAvailable(Context context)
-			throws OEVersionException {
+			throws OEVersionException, SSLPeerUnverifiedException {
 		boolean outcome = false;
 
 		OpenERPServerConnection osc = new OpenERPServerConnection();
@@ -130,9 +126,10 @@ public class OpenERPServerConnection {
 	 *            the url
 	 * @return true, if is network available
 	 * @throws OEVersionException
+	 * @throws SSLPeerUnverifiedException
 	 */
 	public static boolean isNetworkAvailable(Context context, String url)
-			throws OEVersionException {
+			throws OEVersionException, SSLPeerUnverifiedException {
 		boolean outcome = false;
 
 		OpenERPServerConnection osc = new OpenERPServerConnection();

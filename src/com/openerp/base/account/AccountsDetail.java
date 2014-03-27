@@ -194,14 +194,7 @@ public class AccountsDetail extends BaseFragment {
 										.getAndroidName());
 								scope.main().finish();
 							}
-						})
-				.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								return;
-							}
-						});
+						}).setNegativeButton("Cancel", null);
 
 		return builder.create();
 	}
@@ -230,14 +223,7 @@ public class AccountsDetail extends BaseFragment {
 								scope.main().startActivity(
 										scope.main().getIntent());
 							}
-						})
-				.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								return;
-							}
-						});
+						}).setNegativeButton("Cancel", null);
 
 		return builder.create();
 	}

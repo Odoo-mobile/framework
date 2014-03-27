@@ -603,7 +603,9 @@ public class Message extends BaseFragment implements
 				TextView txvMsg = (TextView) mView
 						.findViewById(R.id.txvMessageAllReadMessage);
 				txvMsg.setVisibility(View.VISIBLE);
-				txvMsg.setText(getStatusMessage(mType));
+				int string = getStatusMessage(mType);
+				if (string != 0)
+					txvMsg.setText(string);
 			}
 
 		}

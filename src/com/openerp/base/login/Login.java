@@ -41,6 +41,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
+import com.openerp.App;
 import com.openerp.R;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
@@ -107,6 +108,7 @@ public class Login extends BaseFragment {
 		setHasOptionsMenu(true);
 		this.context = getActivity();
 		scope = new AppScope(this);
+
 		// Inflate the layout for this fragment
 		rootView = inflater.inflate(R.layout.fragment_login, container, false);
 		dbListSpinner = (Spinner) rootView.findViewById(R.id.lstDatabases);
@@ -259,7 +261,9 @@ public class Login extends BaseFragment {
 			String userName = edtUsername.getText().toString();
 			String password = edtPassword.getText().toString();
 			String database = dbListSpinner.getSelectedItem().toString();
-			OEHelper openerp = new OEHelper(getActivity());
+			OEHelper openerp = new OEHelper(getActivity(), false);
+			App app = (App) scope.context().getApplicationContext();
+			app.setOEInstance(null);
 			userData = openerp.login(userName, password, database,
 					openERPServerURL);
 			if (userData != null) {

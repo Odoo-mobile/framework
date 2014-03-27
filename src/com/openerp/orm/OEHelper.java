@@ -49,9 +49,11 @@ public class OEHelper {
 	List<OEDataRow> mRemovedRecordss = new ArrayList<OEDataRow>();
 	OpenERP mOpenERP = null;
 	App mApp = null;
+	boolean withUser = true;
 
 	public OEHelper(Context context, OEDatabase oeDatabase) {
 		Log.d(TAG, "OEHelper->OEHelper()");
+		init();
 		mContext = context;
 		mDatabase = oeDatabase;
 		mApp = (App) context.getApplicationContext();
@@ -63,6 +65,7 @@ public class OEHelper {
 	}
 
 	public OEHelper(Context context) {
+		init();
 		mContext = context;
 		mApp = (App) context.getApplicationContext();
 		mOpenERP = mApp.getOEInstance();
@@ -71,6 +74,17 @@ public class OEHelper {
 			mUser = login(mUser.getUsername(), mUser.getPassword(),
 					mUser.getDatabase(), mUser.getHost());
 		}
+	}
+
+	public OEHelper(Context context, boolean withUser) {
+		init();
+		mContext = context;
+		mApp = (App) context.getApplicationContext();
+		mOpenERP = mApp.getOEInstance();
+		this.withUser = withUser;
+	}
+
+	private void init() {
 	}
 
 	public OEUser login(String username, String password, String database,
@@ -84,7 +98,7 @@ public class OEHelper {
 			int userId = 0;
 			if (response.get("uid") instanceof Integer) {
 				mApp.setOEInstance(mOpenERP);
-				if (OEUser.current(mContext) == null) {
+				if (OEUser.current(mContext) == null || !withUser) {
 					userId = response.getInt("uid");
 
 					OEFieldsHelper fields = new OEFieldsHelper(new String[] {

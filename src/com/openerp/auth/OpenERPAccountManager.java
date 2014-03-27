@@ -27,6 +27,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.openerp.App;
 import com.openerp.config.SyncWizardValues;
 import com.openerp.support.OEUser;
 import com.openerp.support.SyncValue;
@@ -49,7 +50,6 @@ public class OpenERPAccountManager {
 	 */
 	public static List<OEUser> fetchAllAccounts(Context context) {
 		List<OEUser> userObjs = null;
-
 		AccountManager accMgr = AccountManager.get(context);
 		Account[] accounts = accMgr.getAccountsByType(PARAM_AUTHTOKEN_TYPE);
 		if (accounts.length > 0) {
@@ -282,7 +282,9 @@ public class OpenERPAccountManager {
 		AccountManager accMgr = AccountManager.get(context);
 		accMgr.removeAccount(
 				OpenERPAccountManager.getAccount(context, username), null, null);
-
+		App app = (App) context.getApplicationContext();
+		app.setOEInstance(null);
+		current_user = null;
 	}
 
 	public static boolean updateAccountDetails(Context context,

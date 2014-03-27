@@ -4,6 +4,7 @@ import openerp.OpenERP;
 import android.app.Application;
 import android.util.Log;
 
+import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.support.OEUser;
 
 public class App extends Application {
@@ -24,7 +25,9 @@ public class App extends Application {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
+		}
+		if (!OpenERPAccountManager.isAnyUser(getApplicationContext())) {
+			mOEInstance = null;
 		}
 	}
 

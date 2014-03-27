@@ -62,7 +62,7 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 		implements TextView.OnEditorActionListener {
 	// When the token is deleted...
 	public enum TokenDeleteStyle {
-		_Parent, // ...do the parent behavior, not recommended
+		_Parent, // ...do the parent behaviour, not recommended
 		Clear, // ...clear the underlying text
 		PartialCompletion, // ...return the original text used for completion
 		ToString // ...replace the token with toString of the token object
@@ -150,7 +150,7 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 			}
 		} });
 
-		// We had _Parent style during initialization to handle an edge case in
+		// We had _Parent style during initialisation to handle an edge case in
 		// the parent
 		// now we can switch to Clear, usually the best choice
 		setDeletionStyle(TokenDeleteStyle.Clear);
@@ -194,7 +194,6 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 		deletionStyle = dStyle;
 	}
 
-	@SuppressWarnings("unused")
 	public void setTokenClickStyle(TokenClickStyle cStyle) {
 		tokenClickStyle = cStyle;
 	}
@@ -226,7 +225,6 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 	 * 
 	 * Defaults to true. Requires that the objects implement equals() correctly.
 	 */
-	@SuppressWarnings("unused")
 	public void allowDuplicates(boolean allow) {
 		allowDuplicates = allow;
 	}
@@ -704,7 +702,6 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 	 * @param object
 	 *            object to remove, may be null or not in the view
 	 */
-	@SuppressWarnings("unused")
 	public void removeObject(final Object object) {
 		post(new Runnable() {
 			@Override
@@ -1155,7 +1152,7 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 		return serializables;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected ArrayList<Object> convertSerializableArrayToObjectArray(
 			ArrayList<Serializable> s) {
 		return (ArrayList<Object>) (ArrayList) s;
@@ -1262,7 +1259,7 @@ public abstract class MultiTagsTextView extends MultiAutoCompleteTextView
 			return str + "}";
 		}
 
-		@SuppressWarnings("hiding")
+		@SuppressWarnings("unused")
 		public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
 			public SavedState createFromParcel(Parcel in) {
 				return new SavedState(in);

@@ -20,7 +20,10 @@ package com.openerp.base.account;
 
 import java.util.List;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import openerp.OEVersionException;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -202,13 +205,9 @@ public class AccountFragment extends BaseFragment {
 		/** The error msg. */
 		String errorMsg = "";
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see android.os.AsyncTask#onPreExecute()
-		 */
-		@Override
-		protected void onPreExecute() {
+		boolean mSSLError = false;
+
+		public ConnectToServer() {
 			pdialog = new OEDialog(scope.context(), false, "Connecting...");
 			pdialog.show();
 		}
@@ -236,6 +235,10 @@ public class AccountFragment extends BaseFragment {
 				if (!flag) {
 					errorMsg = "Unable to reach OpenERP 7.0 Server.";
 				}
+			} catch (SSLPeerUnverifiedException ssl) {
+				flag = false;
+				mSSLError = true;
+				errorMsg = ssl.getMessage();
 			} catch (OEVersionException e) {
 				flag = false;
 				errorMsg = e.getMessage();
@@ -265,13 +268,27 @@ public class AccountFragment extends BaseFragment {
 				serverConnectASync = null;
 
 			} else {
-				Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG)
-						.show();
 				serverConnectASync.cancel(true);
 				serverConnectASync = null;
+				if (mSSLError) {
+					showForceConnectDialog(errorMsg);
+				} else {
+					Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG)
+							.show();
+				}
 			}
 		}
 
+	}
+
+	private void showForceConnectDialog(String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setIcon(R.drawable.ic_action_alerts_and_states_warning);
+		builder.setTitle("SSL Warning");
+		builder.setMessage(R.string.untrusted_ssl_warning);
+		// builder.setPositiveButton("Proceed anyway", this);
+		builder.setNegativeButton("OK", null);
+		builder.show();
 	}
 
 	@Override
@@ -291,5 +308,14 @@ public class AccountFragment extends BaseFragment {
 	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
+
+	// /**
+	// * On Force connect..
+	// */
+	// @Override
+	// public void onClick(DialogInterface dialog, int which) {
+	// serverConnectASync = new ConnectToServer();
+	// serverConnectASync.execute((Void) null);
+	// }
 
 }
