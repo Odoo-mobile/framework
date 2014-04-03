@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.openerp"
-    android:versionCode="17"
+    android:versionCode="1"
     android:versionName="1.0 Beta" >
 
     <uses-sdk
@@ -61,116 +61,6 @@
                 <action android:name="com.openerp.ACTION_ACCOUNT_CONFIG" />
             </intent-filter>
         </activity>
-        <activity android:name="com.openerp.addons.note.NoteComposeActivity" />
-        <activity android:name="com.openerp.addons.message.MessageComposeActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="image/*" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.com.openerp.auth.profile" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="image/*" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-        </activity>
-
-        <!-- Message provider -->
-        <provider
-            android:name="com.openerp.addons.message.providers.message.MessageProvider"
-            android:authorities="com.openerp.addons.message.providers.message"
-            android:enabled="true"
-            android:exported="true"
-            android:label="Messages"
-            android:syncable="true" />
-        <!-- Message provider service -->
-        <service
-            android:name="com.openerp.addons.message.services.MessageSyncService"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_messages" />
-        </service>
-
-        <!-- Note provider -->
-        <provider
-            android:name="com.openerp.addons.note.providers.note.NoteProvider"
-            android:authorities="com.openerp.addons.note.providers.note"
-            android:enabled="true"
-            android:exported="true"
-            android:label="Notes"
-            android:syncable="true" />
-        <!-- Note provider service -->
-        <service
-            android:name="com.openerp.addons.note.services.NoteSyncService"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_notes" />
-        </service>
-
-        <!-- Mail Group provider -->
-        <provider
-            android:name="com.openerp.addons.message.providers.groups.MailGroupProvider"
-            android:authorities="com.openerp.addons.message.providers.groups"
-            android:enabled="true"
-            android:exported="true"
-            android:label="Groups"
-            android:syncable="true" />
-
-        <!-- Mail Group provider service -->
-        <service
-            android:name="com.openerp.addons.message.services.MailGroupSyncService"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_groups" />
-        </service>
-
-        <!-- Meeting service -->
-        <service
-            android:name="com.openerp.addons.meeting.services.MeetingSyncService"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_meetings" />
-        </service>
 
         <!-- Contact service -->
         <service
@@ -188,53 +78,6 @@
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
         </service>
-
-        <!-- Message Widget -->
-        <receiver
-            android:name="com.openerp.addons.message.widgets.MessageWidget"
-            android:label="OpenERP Messaging" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_message" />
-        </receiver>
-        <!-- Message widget remote view service -->
-        <service
-            android:name="com.openerp.addons.message.widgets.MessageRemoteViewService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <!-- Message widget configuration -->
-        <activity android:name="com.openerp.addons.message.widgets.MessageWidgetConfigure" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
-
-        <!-- Note Widget -->
-        <receiver
-            android:name="com.openerp.addons.note.widgets.NoteWidget"
-            android:label="OpenERP Notes" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_note" />
-        </receiver>
-        <!-- Note widget remote view service -->
-        <service
-            android:name="com.openerp.addons.note.widgets.NoteRemoteViewService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-        <!-- Note widget configuration -->
-        <activity android:name="com.openerp.addons.note.widgets.NoteWidgetConfigure" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

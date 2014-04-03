@@ -20,17 +20,14 @@
 package com.openerp.support.provider;
 
 import android.content.ContentProvider;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
-import com.openerp.addons.note.providers.note.NoteProvider;
 import com.openerp.orm.OESQLiteHelper;
 
 /**
@@ -125,19 +122,7 @@ public abstract class OEContentProvider extends ContentProvider implements
 	 */
 	@Override
 	public Uri insert(Uri uri, ContentValues initialValues) {
-		// TODO Auto-generated method stub
-		long rowID = db.getWritableDatabase().insert(TABLE, Constants.TITLE,
-				initialValues);
-
-		if (rowID > 0) {
-			Uri uriObj = ContentUris.withAppendedId(
-					NoteProvider.Constants.CONTENT_URI, rowID);
-			getContext().getContentResolver().notifyChange(uri, null);
-
-			return (uriObj);
-		}
-
-		throw new SQLException("Failed to insert row into " + uri);
+		return null;
 	}
 
 	/*

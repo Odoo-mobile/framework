@@ -79,6 +79,10 @@ public class SyncWizard extends BaseFragment {
 				.findViewById(R.id.layoutLoginConfig);
 		SyncWizardValues syncValues = new SyncWizardValues();
 		List<SyncValue> syncValuesList = syncValues.syncValues();
+		if (syncValuesList.size() == 0) {
+			getActivity().finish();
+			getActivity().startActivity(getActivity().getIntent());
+		}
 		checkbox = new OECheckBox[syncValuesList.size()];
 		rdoGroups = new RadioGroup[syncValuesList.size()];
 		OETextView[] txvTitles = new OETextView[syncValuesList.size()];

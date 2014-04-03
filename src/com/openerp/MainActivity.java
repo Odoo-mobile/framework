@@ -49,12 +49,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.openerp.addons.message.Message;
-import com.openerp.addons.message.MessageDetail;
-import com.openerp.addons.message.widgets.MessageWidget;
-import com.openerp.addons.note.Note;
-import com.openerp.addons.note.NoteDetail;
-import com.openerp.addons.note.widgets.NoteWidget;
 import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.base.about.AboutFragment;
 import com.openerp.base.account.AccountFragment;
@@ -72,7 +66,6 @@ import com.openerp.util.drawer.DrawerAdatper;
 import com.openerp.util.drawer.DrawerHelper;
 import com.openerp.util.drawer.DrawerItem;
 import com.openerp.util.drawer.DrawerListener;
-import com.openerp.widgets.WidgetHelper;
 
 /**
  * The Class MainActivity.
@@ -248,48 +241,8 @@ public class MainActivity extends FragmentActivity implements
 			}
 
 			/**
-			 * Handling widget fragment requests.
+			 * TODO: handle widget fragment requests.
 			 */
-			if (getIntent().getAction().equals(
-					MessageWidget.ACTION_MESSAGE_WIDGET_CALL)) {
-				String key = getIntent().getExtras().getString(
-						WidgetHelper.EXTRA_WIDGET_ITEM_KEY);
-				if (key.equals("message_main")) {
-					Message message = new Message();
-					message.setArguments(getIntent().getExtras());
-					loadFragment(message);
-				}
-				if (key.equals("message_detail")) {
-					MessageDetail message = new MessageDetail();
-					Bundle args = new Bundle();
-					args.putInt(
-							"message_id",
-							getIntent().getExtras().getInt(
-									WidgetHelper.EXTRA_WIDGET_DATA_VALUE));
-					message.setArguments(args);
-					loadFragment(message);
-				}
-			}
-			if (getIntent().getAction().equals(
-					NoteWidget.ACTION_NOTE_WIDGET_CALL)) {
-				String key = getIntent().getExtras().getString(
-						WidgetHelper.EXTRA_WIDGET_ITEM_KEY);
-				if (key.equals("note_detail")) {
-					NoteDetail note = new NoteDetail();
-					Bundle args = new Bundle();
-					args.putInt(
-							"note_id",
-							getIntent().getExtras().getInt(
-									WidgetHelper.EXTRA_WIDGET_DATA_VALUE));
-					note.setArguments(args);
-					loadFragment(note);
-				}
-				if (key.equals("note_main")) {
-					Note note = new Note();
-					note.setArguments(getIntent().getExtras());
-					loadFragment(note);
-				}
-			}
 
 		} else {
 			if (position > 0) {

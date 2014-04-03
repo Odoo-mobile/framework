@@ -29,11 +29,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.openerp.R;
-import com.openerp.util.Base64Helper;
 
 public class TagsView extends MultiTagsTextView implements
 		MultiTagsTextView.TokenListener {
@@ -103,22 +98,7 @@ public class TagsView extends MultiTagsTextView implements
 		ViewGroup tagsParentView = (ViewGroup) TagsView.this.getParent();
 		LayoutInflater l = (LayoutInflater) getContext().getSystemService(
 				Activity.LAYOUT_INFLATER_SERVICE);
-		if (mCustomTagView == null) {
-			TagsItem item = (TagsItem) object;
-			view = l.inflate(R.layout.fragment_message_receipient_tag_layout,
-					tagsParentView, false);
-			((TextView) view.findViewById(R.id.txvTagSubject)).setText(item
-					.getSubject());
-			if (!this.showImage) {
-				view.findViewById(R.id.imgTagImage).setVisibility(View.GONE);
-			}
-			if (this.showImage && item.getImage() != null
-					&& !item.getImage().equals("false")) {
-				((ImageView) view.findViewById(R.id.imgTagImage))
-						.setImageBitmap(Base64Helper.getBitmapImage(mContext,
-								item.getImage()));
-			}
-		} else {
+		if (mCustomTagView != null) {
 			view = mCustomTagView.getViewForTags(l, object, tagsParentView);
 		}
 		return view;
