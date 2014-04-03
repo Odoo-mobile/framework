@@ -65,6 +65,7 @@ public class MessageWidget extends AppWidgetProvider {
 			context.startActivity(intentMain);
 		}
 		if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+				&& intent.hasExtra(MessageWidget.ACTION_MESSAGE_WIDGET_UPDATE)
 				&& intent.getExtras().getBoolean(
 						MessageWidget.ACTION_MESSAGE_WIDGET_UPDATE)) {
 			Log.v(TAG, "ACTION_MESSAGE_WIDGET_UPDATE");
