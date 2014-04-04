@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Methods &mdash; OpenERP Mobile 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootswatch-3.1.0/openerp/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="OpenERP Mobile 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="OpenERP Android Framework Components" href="../index.html" />
+    <link rel="next" title="Drawer Menu" href="../drawer_menus/index.html" />
+    <link rel="prev" title="Fields" href="../fields/index.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-47926740-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+<meta name="google-translate-customization" content="1a9f16396f329347-27b519b501ddf27d-gbee5ada102d015d0-f"></meta>
+
+<!-- AddThis Smart Layers BEGIN -->
+<!-- Go to http://www.addthis.com/get/smart-layers to customize -->
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-530c64087def677e"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'left',
+      'numPreferredServices' : 5
+    }   
+  });
+</script>
+<!-- AddThis Smart Layers END -->
+
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          OpenERP Mobile</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../about/index.html">About OpenERP Mobile Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setting-up/index.html">Setting Up Development Environment</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Getting started with OpenERP mobile framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing-first-app/index.html">OpenERP Android Framework Development</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Methods</a><ul>
+<li><a class="reference internal" href="#local-database-methods">Local Database Methods</a><ul>
+<li><a class="reference internal" href="#create">create</a></li>
+<li><a class="reference internal" href="#createorreplace">createORReplace</a></li>
+<li><a class="reference internal" href="#select">select</a></li>
+<li><a class="reference internal" href="#update">update</a></li>
+<li><a class="reference internal" href="#updatemanytomanyrecords">updateManyToManyRecords</a></li>
+<li><a class="reference internal" href="#delete">delete</a></li>
+<li><a class="reference internal" href="#truncatetable">truncateTable</a></li>
+<li><a class="reference internal" href="#count">count</a></li>
+<li><a class="reference internal" href="#lastid">lastId</a></li>
+<li><a class="reference internal" href="#isemptytable">isEmptyTable</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#server-related-methods">Server related methods</a><ul>
+<li><a class="reference internal" href="#getoeinstance">getOEInstance</a></li>
+<li><a class="reference internal" href="#login">login</a></li>
+<li><a class="reference internal" href="#ismodelinstalled">isModelInstalled</a></li>
+<li><a class="reference internal" href="#syncwithserver">syncWithServer</a></li>
+<li><a class="reference internal" href="#syncwithmethod">syncWithMethod</a></li>
+<li><a class="reference internal" href="#id1">create</a></li>
+<li><a class="reference internal" href="#id2">update</a></li>
+<li><a class="reference internal" href="#id3">delete</a></li>
+<li><a class="reference internal" href="#search-read">search_read</a></li>
+<li><a class="reference internal" href="#search-read-remain">search_read_remain</a></li>
+<li><a class="reference internal" href="#call-kw">call_kw</a></li>
+<li><a class="reference internal" href="#getremovedrecords">getRemovedRecords</a></li>
+<li><a class="reference internal" href="#getaffectedids">getAffectedIds</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="../fields/index.html" title="Previous Chapter: Fields"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm">&laquo; Fields</span>
+    </a>
+  </li>
+  <li>
+    <a href="../drawer_menus/index.html" title="Next Chapter: Drawer Menu"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm">Drawer Menu &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+    
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+
+	        
+        
+      
+  <div class="section" id="methods">
+<h1>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h1>
+<p>Methods are based on each ModelObject which inherits OEDatabase class.</p>
+<div class="section" id="local-database-methods">
+<h2>Local Database Methods<a class="headerlink" href="#local-database-methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="create">
+<h3>create<a class="headerlink" href="#create" title="Permalink to this headline">¶</a></h3>
+<p>Used to create new record in Local database.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="n">OEValues</span> <span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEValues</span><span class="o">();</span>
+
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;ABC&quot;</span><span class="o">);</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;age&quot;</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
+
+<span class="kt">long</span> <span class="n">new_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">values</span><span class="o">);</span> <span class="c1">// Create new record and return new created id.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="createorreplace">
+<h3>createORReplace<a class="headerlink" href="#createorreplace" title="Permalink to this headline">¶</a></h3>
+<p>Used to create record if not exits otherwise, update record. It takes OEValues list as parameter.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">OEValues</span><span class="o">&gt;</span> <span class="n">records</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEValues</span><span class="o">();</span>
+
+<span class="n">OEValues</span> <span class="n">values1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEValues</span><span class="o">();</span> <span class="c1">// will going to create because there is no record in db.</span>
+<span class="n">values1</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;XYZ&quot;</span><span class="o">);</span>
+<span class="n">values1</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;age&quot;</span><span class="o">,</span> <span class="mi">15</span><span class="o">);</span>
+
+<span class="n">records</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">values1</span><span class="o">);</span>
+
+<span class="n">OEValues</span> <span class="n">values2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEValues</span><span class="o">();</span> <span class="c1">// will going to update record because local id exists</span>
+<span class="n">values2</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;ABC&quot;</span><span class="o">);</span>
+<span class="n">values2</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;age&quot;</span><span class="o">,</span> <span class="mi">12</span><span class="o">);</span>
+
+<span class="n">records</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">values2</span><span class="o">);</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span> <span class="n">mAffectedIds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">createORReplace</span><span class="o">(</span><span class="n">records</span><span class="o">);</span> <span class="c1">// will return affected ids.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="select">
+<h3>select<a class="headerlink" href="#select" title="Permalink to this headline">¶</a></h3>
+<p>Used to select records from Local SQLite database.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">OEDataRow</span><span class="o">&gt;</span> <span class="n">records</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">select</span><span class="o">();</span>               <span class="c1">// Select all record from SQLite</span>
+<span class="n">OEDataRow</span> <span class="n">record</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">select</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>                    <span class="c1">// Select specific record.</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">OEDataRow</span><span class="o">&gt;</span> <span class="n">records</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">select</span><span class="o">(</span><span class="s">&quot;age &gt; ?&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span> <span class="s">&quot;10&quot;</span> <span class="o">});</span> <span class="c1">// select records with custom where clause</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="update">
+<h3>update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h3>
+<p>Used to update local record.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="n">OEValues</span> <span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEValues</span><span class="o">();</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;ABC&quot;</span><span class="o">);</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;age&quot;</span><span class="o">,</span> <span class="mi">15</span><span class="o">);</span>
+
+<span class="kt">int</span> <span class="n">affected_rows</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">values</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span> <span class="c1">// will return affected rows.</span>
+
+<span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEValues</span><span class="o">();</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;age&quot;</span><span class="o">,</span> <span class="mi">15</span><span class="o">);</span>
+
+<span class="n">affected_rows</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">values</span><span class="o">,</span> <span class="s">&quot;age = ?&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span><span class="s">&quot;10&quot;</span><span class="o">});</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="updatemanytomanyrecords">
+<h3>updateManyToManyRecords<a class="headerlink" href="#updatemanytomanyrecords" title="Permalink to this headline">¶</a></h3>
+<p>Used to update many to many records of related column.</p>
+<p>Possible operation to update Many to many records.</p>
+<p><strong>Operation.ADD</strong></p>
+<p>Add given ids to related table</p>
+<p><strong>Operation.APPEND</strong></p>
+<p>Append given ids with existing rows</p>
+<p><strong>Operation.REMOVE</strong></p>
+<p>Remove given ids from many to many relation table</p>
+<p><strong>Operation.REPLACE</strong></p>
+<p>It first remove all related rows and than replace with new one</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">ids</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
+
+<span class="n">ids</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+<span class="n">ids</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">12</span><span class="o">);</span>
+<span class="n">ids</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">13</span><span class="o">);</span>
+
+<span class="c1">// updateManyToManyRecords(&quot;relation_column_name&quot;, Operation, &quot;record_id&quot;, &quot;relation_record_ids OR id&quot;)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="na">updateManyToManyRecords</span><span class="o">(</span><span class="s">&quot;subject_ids&quot;</span><span class="o">,</span> <span class="n">Operation</span><span class="o">.</span><span class="na">REPLACE</span><span class="o">,</span> <span class="mi">10</span><span class="o">,</span> <span class="n">ids</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="delete">
+<h3>delete<a class="headerlink" href="#delete" title="Permalink to this headline">¶</a></h3>
+<p>Used to delete record from local database</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span> <span class="c1">// returns number of record deleted.</span>
+
+<span class="n">count</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="s">&quot;age &gt; ? &quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span><span class="s">&quot;20&quot;</span><span class="o">});</span> <span class="c1">// returns number of record deleted.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="truncatetable">
+<h3>truncateTable<a class="headerlink" href="#truncatetable" title="Permalink to this headline">¶</a></h3>
+<p>Used to clean table records.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="kt">boolean</span> <span class="n">cleaned</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">truncateTable</span><span class="o">();</span> <span class="c1">// returns boolean flag</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="count">
+<h3>count<a class="headerlink" href="#count" title="Permalink to this headline">¶</a></h3>
+<p>Used to count number of records available in local SQLite database</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">count</span><span class="o">();</span>  <span class="c1">// returns total number of records</span>
+
+<span class="kt">int</span> <span class="n">mCount</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">count</span><span class="o">(</span><span class="s">&quot;age &gt; ?&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span><span class="s">&quot;5&quot;</span><span class="o">});</span> <span class="c1">// returns total number of records based on condition</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="lastid">
+<h3>lastId<a class="headerlink" href="#lastid" title="Permalink to this headline">¶</a></h3>
+<p>Used to get table records last id.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="kt">int</span> <span class="n">last_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">lastId</span><span class="o">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="isemptytable">
+<h3>isEmptyTable<a class="headerlink" href="#isemptytable" title="Permalink to this headline">¶</a></h3>
+<p>Used to check whether table is empty or not</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="k">if</span><span class="o">(</span><span class="n">model</span><span class="o">.</span><span class="na">isEmptyTable</span><span class="o">()){</span>
+        <span class="c1">//TODO: next stuff</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="server-related-methods">
+<h2>Server related methods<a class="headerlink" href="#server-related-methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getoeinstance">
+<h3>getOEInstance<a class="headerlink" href="#getoeinstance" title="Permalink to this headline">¶</a></h3>
+<p>Used to get OpenERP helper instance. Which allows you to interact with OpenERP server.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="login">
+<h3>login<a class="headerlink" href="#login" title="Permalink to this headline">¶</a></h3>
+<p>Used to create session between OpenERP server and mobile app.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="c1">// Create session between application and server. Returns User object</span>
+<span class="n">OEUser</span> <span class="n">user</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">login</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">,</span> <span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;database&quot;</span><span class="o">,</span> <span class="s">&quot;OpenERP server URL&quot;</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ismodelinstalled">
+<h3>isModelInstalled<a class="headerlink" href="#ismodelinstalled" title="Permalink to this headline">¶</a></h3>
+<p>Used to check whether model installed on server or not.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="k">if</span><span class="o">(</span><span class="n">openerp</span><span class="o">.</span><span class="na">isModelInstalled</span><span class="o">(</span><span class="s">&quot;note.note&quot;</span><span class="o">)){</span>
+        <span class="c1">//TODO: next stuff</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="syncwithserver">
+<h3>syncWithServer<a class="headerlink" href="#syncwithserver" title="Permalink to this headline">¶</a></h3>
+<p>Used to sync data with server. It will automatically takes all columns from ModelObject and request to server. After getting response it will store each record and its relation records to its specific tables.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="c1">// Returns True, if sync finished.</span>
+<span class="k">if</span><span class="o">(</span><span class="n">openerp</span><span class="o">.</span><span class="na">syncWithServer</span><span class="o">()){</span>
+        <span class="c1">//TODO: sync completed. next stuff</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Possible parameters:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="c1">// all default parameters</span>
+<span class="n">syncWithServer</span><span class="o">()</span>
+
+<span class="c1">// take boolean. If true, will remove local record if it not exists on server.</span>
+<span class="n">syncWithServer</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">removeLocalRecordIfNotExists</span><span class="o">)</span>
+
+<span class="c1">// take OEDomain, If passed, will filter requesting records from server.</span>
+<span class="n">syncWithServer</span><span class="o">(</span><span class="n">OEDomain</span> <span class="n">domain</span><span class="o">)</span>
+
+<span class="c1">// take two argumetns as said above.</span>
+<span class="n">syncWitServer</span><span class="o">(</span><span class="n">OEDomain</span> <span class="n">domain</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">removeLocalRecordIfNotExists</span><span class="o">)</span>
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">OEdomain</span> <span class="n">domain</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEDomain</span><span class="o">();</span>
+<span class="n">domain</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;age&quot;</span><span class="o">,</span> <span class="s">&quot;&gt;&quot;</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
+
+<span class="kt">boolean</span> <span class="n">done</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">syncWithServer</span><span class="o">(</span><span class="n">domain</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="syncwithmethod">
+<h3>syncWithMethod<a class="headerlink" href="#syncwithmethod" title="Permalink to this headline">¶</a></h3>
+<p>This method will used when you have created your model based on server&#8217;s custom method result colums.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">OEArguments</span> <span class="n">args</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEArgumets</span><span class="o">();</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">ids</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
+<span class="n">ids</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+<span class="n">ids</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">20</span><span class="o">);</span>
+
+<span class="n">args</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">ids</span><span class="o">);</span>
+<span class="n">args</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+<span class="n">args</span><span class="o">.</span><span class="na">addNull</span><span class="o">();</span>
+
+<span class="c1">// OEArguments will create : [[10,20], true, null]</span>
+
+<span class="kt">boolean</span> <span class="n">done</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">syncWithMethod</span><span class="o">(</span><span class="s">&quot;get_users&quot;</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>create<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Used to create record on server. After creating record on server ORM will create that record in local database by itself.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">OEValues</span> <span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEValues</span><span class="o">();</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;PQR&quot;</span><span class="o">);</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;age&quot;</span><span class="o">,</span> <span class="mi">14</span><span class="o">);</span>
+
+<span class="kt">int</span> <span class="n">new_id</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">values</span><span class="o">);</span> <span class="c1">// returns new created id</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>update<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Used to udpate server record. After updating on server it will update record in local database.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">OEValues</span> <span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEValues</span><span class="o">();</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;age&quot;</span><span class="o">,</span> <span class="mi">15</span><span class="o">);</span>
+
+<span class="k">if</span><span class="o">(</span><span class="n">openerp</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">values</span><span class="o">,</span> <span class="mi">20</span><span class="o">)){</span>
+        <span class="c1">// updated</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>delete<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Used to remove record from server after removing on server will remove from local.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">openrp</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="mi">20</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="search-read">
+<h3>search_read<a class="headerlink" href="#search-read" title="Permalink to this headline">¶</a></h3>
+<p>Used to select record from server. Will return List of OEDataRow.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">OEDataRow</span><span class="o">&gt;</span> <span class="n">records</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">search_read</span><span class="o">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="search-read-remain">
+<h3>search_read_remain<a class="headerlink" href="#search-read-remain" title="Permalink to this headline">¶</a></h3>
+<p>Used to select record that are not exists on local database. &gt; last id.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">OEDataRow</span><span class="o">&gt;</span> <span class="n">records</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">search_read_remain</span><span class="o">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="call-kw">
+<h3>call_kw<a class="headerlink" href="#call-kw" title="Permalink to this headline">¶</a></h3>
+<p>Used to call server custom method. Returns JSONObject.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">OEArguments</span> <span class="n">args</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OEArguments</span><span class="o">();</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">ids</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
+<span class="n">ids</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+<span class="n">ids</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">20</span><span class="o">);</span>
+
+<span class="n">args</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">ids</span><span class="o">);</span>
+<span class="n">args</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+<span class="n">args</span><span class="o">.</span><span class="na">putNull</span><span class="o">();</span>
+
+<span class="n">JSONObject</span> <span class="n">result</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">call_kw</span><span class="o">(</span><span class="s">&quot;get_users&quot;</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+</pre></div>
+</div>
+<p>Possible parameters:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="c1">// method and arguments</span>
+<span class="n">call_kw</span><span class="o">(</span><span class="n">String</span> <span class="n">method</span><span class="o">,</span> <span class="n">OEArguments</span> <span class="n">arguments</span><span class="o">)</span>
+
+<span class="c1">// method, arguments and user context (if any)</span>
+<span class="n">call_kw</span><span class="o">(</span><span class="n">String</span> <span class="n">method</span><span class="o">,</span> <span class="n">OEArguments</span> <span class="n">arguments</span><span class="o">,</span> <span class="n">JSONObject</span> <span class="n">context</span><span class="o">)</span>
+
+<span class="c1">// method, arguments, user context and kwargs if any</span>
+<span class="n">call_kw</span><span class="o">(</span><span class="n">String</span> <span class="n">method</span><span class="o">,</span> <span class="n">OEArguments</span> <span class="n">arguments</span><span class="o">,</span> <span class="n">JSONObject</span> <span class="n">context</span><span class="o">,</span> <span class="n">JSONObject</span> <span class="n">kwargs</span><span class="o">)</span>
+
+<span class="c1">// model, method, arguments, user context and kwargs if any</span>
+<span class="n">call_kw</span><span class="o">(</span><span class="n">String</span> <span class="n">model</span><span class="o">,</span> <span class="n">String</span> <span class="n">method</span><span class="o">,</span> <span class="n">OEArguments</span> <span class="n">arguments</span><span class="o">,</span> <span class="n">JSONObject</span> <span class="n">context</span><span class="o">,</span> <span class="n">JSONObject</span> <span class="n">kwargs</span><span class="o">)</span>
+</pre></div>
+</div>
+<p>Getting user context:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="n">JSONObject</span> <span class="n">newContextValues</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JSONObject</span><span class="o">();</span>
+<span class="n">JSONObject</span> <span class="n">context</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">openERP</span><span class="o">().</span><span class="na">updateContext</span><span class="o">(</span><span class="n">newContextValues</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="getremovedrecords">
+<h3>getRemovedRecords<a class="headerlink" href="#getremovedrecords" title="Permalink to this headline">¶</a></h3>
+<p>Used after sync finish. If any record removed from local than it will return list of removed records.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="k">if</span><span class="o">(</span><span class="n">openerp</span><span class="o">.</span><span class="na">syncWithServer</span><span class="o">()){</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">OEDataRow</span><span class="o">&gt;</span> <span class="n">removedRecords</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">getRemovedRecords</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="getaffectedids">
+<h3>getAffectedIds<a class="headerlink" href="#getaffectedids" title="Permalink to this headline">¶</a></h3>
+<p>Used after sync finish. If any record affected after sync it will return list of ids.</p>
+<p>Syntax:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ModelObject</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelObject</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+<span class="n">OEHelper</span> <span class="n">openerp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">getOEInstance</span><span class="o">();</span>
+
+<span class="k">if</span><span class="o">(</span><span class="n">openerp</span><span class="o">.</span><span class="na">syncWithServer</span><span class="o">()){</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">ids</span> <span class="o">=</span> <span class="n">openerp</span><span class="o">.</span><span class="na">getAffectedIds</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+	
+		
+		<div id="disqus_thread"></div>
+	    <script type="text/javascript">
+	        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+	        var disqus_shortname = 'openerp-mobile-doc'; // required: replace example with your forum shortname
+	
+	        /* * * DON'T EDIT BELOW THIS LINE * * */
+	        (function() {
+	            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	        })();
+	    </script>
+	    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+	    
+    </div>
+    
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, OpenERP SA.<br/>
+      Last updated on Apr 04, 2014.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.2.<br/>
+    </p>
+  </div>
+</footer>
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>
