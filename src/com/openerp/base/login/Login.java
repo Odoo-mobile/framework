@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -51,7 +52,6 @@ import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OEUser;
 import com.openerp.support.fragment.FragmentListener;
-import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
@@ -72,7 +72,7 @@ public class Login extends BaseFragment {
 	String openERPServerURL = "";
 
 	/** The edt server url. */
-	OEEditText edtServerUrl = null;
+	EditText edtServerUrl = null;
 
 	/** The arguments. */
 	Bundle arguments = null;
@@ -87,10 +87,10 @@ public class Login extends BaseFragment {
 	LoginUser loginUserASync = null;
 
 	/** The edt username. */
-	OEEditText edtUsername = null;
+	EditText edtUsername = null;
 
 	/** The edt password. */
-	OEEditText edtPassword = null;
+	EditText edtPassword = null;
 
 	/** The OpenERP Object */
 	OpenERP openerp = null;
@@ -114,11 +114,11 @@ public class Login extends BaseFragment {
 		dbListSpinner = (Spinner) rootView.findViewById(R.id.lstDatabases);
 		this.handleArguments((Bundle) getArguments());
 		this.loadDatabaseList();
-		getActivity().setTitle("Login");
+		getActivity().setTitle(R.string.label_login);
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		getActivity().getActionBar().setHomeButtonEnabled(false);
-		edtUsername = (OEEditText) rootView.findViewById(R.id.edtUsername);
-		edtPassword = (OEEditText) rootView.findViewById(R.id.edtPassword);
+		edtUsername = (EditText) rootView.findViewById(R.id.edtUsername);
+		edtPassword = (EditText) rootView.findViewById(R.id.edtPassword);
 		edtPassword.setOnEditorActionListener(new OnEditorActionListener() {
 
 			@Override
@@ -206,11 +206,14 @@ public class Login extends BaseFragment {
 		edtUsername.setError(null);
 		edtPassword.setError(null);
 		if (TextUtils.isEmpty(edtUsername.getText())) {
-			edtUsername.setError("Provide Username");
+			edtUsername.setError(getResources().getString(
+					R.string.toast_provide_username));
 		} else if (TextUtils.isEmpty(edtPassword.getText())) {
-			edtPassword.setError("Provide Password");
+			edtPassword.setError(getResources().getString(
+					R.string.toast_provide_password));
 		} else if (dbListSpinner.getSelectedItemPosition() == 0) {
-			Toast.makeText(getActivity(), "Please select database",
+			Toast.makeText(getActivity(),
+					getResources().getString(R.string.toast_select_database),
 					Toast.LENGTH_LONG).show();
 		} else {
 			loginUserASync = new LoginUser();
@@ -239,7 +242,8 @@ public class Login extends BaseFragment {
 		 */
 		@Override
 		protected void onPreExecute() {
-			pdialog = new OEDialog(getActivity(), false, "Logging in...");
+			pdialog = new OEDialog(getActivity(), false, getResources()
+					.getString(R.string.title_loggin_in));
 			pdialog.show();
 			edtPassword.setError(null);
 		}
@@ -269,7 +273,8 @@ public class Login extends BaseFragment {
 			if (userData != null) {
 				return true;
 			} else {
-				errorMsg = "Invalid Username or Password !";
+				errorMsg = getResources().getString(
+						R.string.toast_invalid_username_password);
 			}
 			return false;
 		}
@@ -282,7 +287,7 @@ public class Login extends BaseFragment {
 		@Override
 		protected void onPostExecute(final Boolean success) {
 			if (success) {
-				Log.d("Creating Account For Username :",
+				Log.v("Creating Account For Username :",
 						userData.getAndroidName());
 				if (OpenERPAccountManager.fetchAllAccounts(getActivity()) != null) {
 					if (OpenERPAccountManager.isAnyUser(getActivity())) {

@@ -1,7 +1,9 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scrollView"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingTop="?android:attr/actionBarSize" >
 
     <RelativeLayout
         android:id="@+id/mainContent"
@@ -25,7 +27,7 @@
                 android:src="@drawable/openerp_logo" />
         </RelativeLayout>
 
-        <com.openerp.util.controls.OETextView
+        <TextView
             android:id="@+id/txvTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -36,7 +38,7 @@
             android:text="@string/login_title"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.openerp.util.controls.OETextView
+        <TextView
             android:id="@+id/txvsubTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -64,7 +66,7 @@
                 android:layout_marginBottom="20dp"
                 android:prompt="@string/login_select_database" />
 
-            <com.openerp.util.controls.OEEditText
+            <EditText
                 android:id="@+id/edtUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,7 +76,7 @@
                 android:inputType="textUri"
                 android:singleLine="true" />
 
-            <com.openerp.util.controls.OEEditText
+            <EditText
                 android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -4,7 +4,7 @@
         android:id="@+id/menu_add_new_account"
         android:icon="@drawable/ic_action_add_account"
         android:showAsAction="ifRoom|withText"
-        android:title="Add Account">
+        android:title="@string/title_add_account">
     </item>
 
 </menu>

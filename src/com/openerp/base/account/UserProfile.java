@@ -64,7 +64,7 @@ public class UserProfile extends BaseFragment {
 		rootView = inflater.inflate(R.layout.fragment_account_user_profile,
 				container, false);
 		scope = new AppScope(this);
-		scope.main().setTitle("OpenERP User Profile");
+		scope.main().setTitle(R.string.title_user_profile);
 
 		setupView();
 		return rootView;
@@ -119,34 +119,41 @@ public class UserProfile extends BaseFragment {
 		password = new EditText(scope.context());
 		password.setTransformationMethod(PasswordTransformationMethod
 				.getInstance());
-		builder.setTitle("Enter Password").setMessage("Provide your password")
-				.setView(password);
-		builder.setPositiveButton("Update Info", new OnClickListener() {
-			public void onClick(DialogInterface di, int i) {
-				OEUser userData = null;
-				try {
-					OEHelper openerp = new OEHelper(scope.context());
-					userData = openerp.login(scope.User().getUsername(),
-							password.getText().toString(), scope.User()
-									.getDatabase(), scope.User().getHost());
-				} catch (Exception e) {
-				}
-				if (userData != null) {
-					if (OpenERPAccountManager.updateAccountDetails(
-							scope.context(), userData)) {
-						Toast.makeText(getActivity(), "Infomation Updated.",
-								Toast.LENGTH_LONG).show();
+		builder.setTitle(R.string.title_enter_password)
+				.setMessage(R.string.toast_provide_password).setView(password);
+		builder.setPositiveButton(R.string.label_update_info,
+				new OnClickListener() {
+					public void onClick(DialogInterface di, int i) {
+						OEUser userData = null;
+						try {
+							OEHelper openerp = new OEHelper(scope.context());
+							userData = openerp.login(
+									scope.User().getUsername(), password
+											.getText().toString(), scope.User()
+											.getDatabase(), scope.User()
+											.getHost());
+						} catch (Exception e) {
+						}
+						if (userData != null) {
+							if (OpenERPAccountManager.updateAccountDetails(
+									scope.context(), userData)) {
+								Toast.makeText(getActivity(),
+										"Infomation Updated.",
+										Toast.LENGTH_LONG).show();
+							}
+						} else {
+							Toast.makeText(
+									getActivity(),
+									getResources().getString(
+											R.string.toast_invalid_password),
+									Toast.LENGTH_LONG).show();
+						}
+						setupView();
+						dialog.cancel();
+						dialog = null;
 					}
-				} else {
-					Toast.makeText(getActivity(), "Invalid Password !",
-							Toast.LENGTH_LONG).show();
-				}
-				setupView();
-				dialog.cancel();
-				dialog = null;
-			}
-		});
-		builder.setNegativeButton("Cancel", new OnClickListener() {
+				});
+		builder.setNegativeButton(R.string.label_cancel, new OnClickListener() {
 			public void onClick(DialogInterface di, int i) {
 				dialog.cancel();
 				dialog = null;

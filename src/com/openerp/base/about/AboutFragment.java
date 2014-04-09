@@ -55,7 +55,8 @@ public class AboutFragment extends BaseFragment {
 			// setting version name from manifest file
 			String version = getActivity().getPackageManager().getPackageInfo(
 					getActivity().getPackageName(), 0).versionName;
-			versionName.setText("Version " + version);
+			versionName.setText(getResources()
+					.getString(R.string.label_version) + " " + version);
 
 			// setting link in textview
 			aboutLine2 = (OETextView) rootView.findViewById(R.id.line2);
@@ -74,7 +75,6 @@ public class AboutFragment extends BaseFragment {
 			e.printStackTrace();
 		}
 
-		getActivity().setTitle("About");
 		return rootView;
 	}
 

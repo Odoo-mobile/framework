@@ -35,7 +35,6 @@ public class TagsView extends MultiTagsTextView implements
 
 	HashMap<String, TagsItem> selectedTags = new HashMap<String, TagsItem>();
 	Context mContext = null;
-	private boolean showImage = true;
 	CustomTagViewListener mCustomTagView = null;
 	NewTokenCreateListener mNewTokenListener = null;
 
@@ -133,10 +132,6 @@ public class TagsView extends MultiTagsTextView implements
 			items.add(selectedTags.get(key));
 		}
 		return items;
-	}
-
-	public void showImage(boolean flag) {
-		this.showImage = flag;
 	}
 
 	@Override

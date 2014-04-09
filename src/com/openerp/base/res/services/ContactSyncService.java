@@ -69,8 +69,6 @@ public class ContactSyncService extends Service {
 		try {
 			OEUser user = OpenERPAccountManager.getAccountDetail(context,
 					account.name);
-			String saasURL1 = "https://openerp.my.openerp.com";
-			String saasURL2 = "https://accounts.openerp.com";
 
 			ResPartnerDB db = new ResPartnerDB(context);
 			OEHelper oe = db.getOEInstance();
@@ -82,19 +80,14 @@ public class ContactSyncService extends Service {
 			boolean syncServerContacts = settings.getBoolean(
 					"server_contact_sync", false);
 
-			if (user.getHost().toString().contains(saasURL1)
-					|| user.getHost().toString().contains(saasURL2)) {
-				contact.createContacts(db.select());
-			} else {
-				if (syncServerContacts && oe != null) {
-					Log.v(TAG, "Contact sync with server");
-					int company_id = Integer.parseInt(user.getCompany_id());
-					OEDomain domain = new OEDomain();
-					domain.add("company_id", "=", company_id);
-					oe.syncWithServer(domain, false);
-				}
-				contact.createContacts(db.select());
+			if (syncServerContacts && oe != null) {
+				Log.v(TAG, "Contact sync with server");
+				int company_id = Integer.parseInt(user.getCompany_id());
+				OEDomain domain = new OEDomain();
+				domain.add("company_id", "=", company_id);
+				oe.syncWithServer(domain, false);
 			}
+			contact.createContacts(db.select());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

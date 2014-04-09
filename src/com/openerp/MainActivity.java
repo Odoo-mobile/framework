@@ -31,6 +31,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -217,28 +218,13 @@ public class MainActivity extends FragmentActivity implements
 		}
 		mAppTitle = mDrawerListItems.get(position).getTitle();
 		setTitle(mAppTitle);
+
+		/**
+		 * TODO: handle intent request from outside
+		 */
 		if (getIntent().getAction() != null
 				&& !getIntent().getAction().toString()
 						.equalsIgnoreCase("android.intent.action.MAIN")) {
-			if (getIntent().getAction().toString().equalsIgnoreCase("MESSAGE")) {
-				int size = mDrawerListItems.size();
-				for (int i = 0; i < size; i++) {
-					if (mDrawerAdatper.getItem(i).getTitle()
-							.equalsIgnoreCase("Messages")) {
-						loadFragment(mDrawerAdatper.getItem(i + 1));
-					}
-				}
-			}
-			if (getIntent().getAction().toString().equalsIgnoreCase("NOTES")) {
-				int size = mDrawerListItems.size();
-				for (int i = 0; i < size; i++) {
-					if (mDrawerAdatper.getItem(i).getTitle()
-							.equalsIgnoreCase("Notes")) {
-						loadFragment(mDrawerAdatper.getItem(i + 1));
-						break;
-					}
-				}
-			}
 
 			/**
 			 * TODO: handle widget fragment requests.
@@ -269,7 +255,7 @@ public class MainActivity extends FragmentActivity implements
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-		builder.setTitle("Select Account")
+		builder.setTitle(R.string.title_select_account)
 				.setSingleChoiceItems(accountList(accounts), 1,
 						new DialogInterface.OnClickListener() {
 
@@ -279,7 +265,7 @@ public class MainActivity extends FragmentActivity implements
 								mAccount = accounts.get(which);
 							}
 						})
-				.setNeutralButton("New", new OnClickListener() {
+				.setNeutralButton(R.string.label_new, new OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -290,7 +276,7 @@ public class MainActivity extends FragmentActivity implements
 					}
 				})
 				// Set the action buttons
-				.setPositiveButton("Login",
+				.setPositiveButton(R.string.label_login,
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
@@ -305,7 +291,7 @@ public class MainActivity extends FragmentActivity implements
 								init();
 							}
 						})
-				.setNegativeButton("Cancel",
+				.setNegativeButton(R.string.label_cancel,
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
@@ -428,7 +414,8 @@ public class MainActivity extends FragmentActivity implements
 				setSyncPeriodic(authority, sync_interval, 1, 1);
 			}
 		}
-		Toast.makeText(this, "Setting saved.", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, R.string.toast_setting_saved, Toast.LENGTH_LONG)
+				.show();
 	}
 
 	/* Called whenever we call invalidateOptionsMenu() */
@@ -629,19 +616,23 @@ public class MainActivity extends FragmentActivity implements
 	private List<DrawerItem> setSettingMenu() {
 		List<DrawerItem> sys = new ArrayList<DrawerItem>();
 		String key = "com.openerp.settings";
-		sys.add(new DrawerItem(key, "Settings", true));
-		sys.add(new DrawerItem(key, "Profile", 0, R.drawable.ic_action_user,
-				getFragBundle(new Fragment(), "settings", SettingKeys.PROFILE)));
+		Resources r = getResources();
+		sys.add(new DrawerItem(key, r.getString(R.string.title_settings), true));
+		sys.add(new DrawerItem(key, r.getString(R.string.title_profile), 0,
+				R.drawable.ic_action_user, getFragBundle(new Fragment(),
+						"settings", SettingKeys.PROFILE)));
 
-		sys.add(new DrawerItem(key, "General Settings", 0,
+		sys.add(new DrawerItem(key, r
+				.getString(R.string.title_general_settings), 0,
 				R.drawable.ic_action_settings, getFragBundle(new Fragment(),
 						"settings", SettingKeys.GLOBAL_SETTING)));
 
-		sys.add(new DrawerItem(key, "Accounts", 0,
+		sys.add(new DrawerItem(key, r.getString(R.string.title_accounts), 0,
 				R.drawable.ic_action_accounts, getFragBundle(new Fragment(),
 						"settings", SettingKeys.ACCOUNTS)));
-		sys.add(new DrawerItem(key, "About Us", 0, R.drawable.ic_action_about,
-				getFragBundle(new Fragment(), "settings", SettingKeys.ABOUT_US)));
+		sys.add(new DrawerItem(key, r.getString(R.string.title_about_us), 0,
+				R.drawable.ic_action_about, getFragBundle(new Fragment(),
+						"settings", SettingKeys.ABOUT_US)));
 		return sys;
 	}
 

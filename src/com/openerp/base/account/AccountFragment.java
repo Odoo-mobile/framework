@@ -23,6 +23,7 @@ import java.util.List;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import openerp.OEVersionException;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -39,6 +40,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -50,7 +52,6 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OpenERPServerConnection;
 import com.openerp.support.fragment.FragmentListener;
-import com.openerp.util.controls.OEEditText;
 import com.openerp.util.drawer.DrawerItem;
 
 /**
@@ -71,7 +72,7 @@ public class AccountFragment extends BaseFragment {
 	String openERPServerURL = "";
 
 	/** The edt server url. */
-	OEEditText edtServerUrl = null;
+	EditText edtServerUrl = null;
 
 	/** The server connect a sync. */
 	ConnectToServer serverConnectASync = null;
@@ -89,6 +90,7 @@ public class AccountFragment extends BaseFragment {
 	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
 	 * android.view.ViewGroup, android.os.Bundle)
 	 */
+	@SuppressLint("DefaultLocale")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -101,10 +103,10 @@ public class AccountFragment extends BaseFragment {
 		scope = new AppScope(this);
 
 		rootView.findViewById(R.id.edtServerURL).requestFocus();
-		getActivity().setTitle("Setup Account");
+		getActivity().setTitle(R.string.title_setup_account);
 		chkSecureConnection = (CheckBox) rootView
 				.findViewById(R.id.chkIsSecureConnection);
-		edtServerUrl = (OEEditText) rootView.findViewById(R.id.edtServerURL);
+		edtServerUrl = (EditText) rootView.findViewById(R.id.edtServerURL);
 		chkSecureConnection.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -174,7 +176,8 @@ public class AccountFragment extends BaseFragment {
 		StringBuffer serverURL = new StringBuffer();
 		edtServerUrl.setError(null);
 		if (TextUtils.isEmpty(edtServerUrl.getText())) {
-			edtServerUrl.setError("Provide Server URL");
+			edtServerUrl.setError(getResources().getString(
+					R.string.toast_provide_server_url));
 		} else {
 
 			if (!edtServerUrl.getText().toString().contains("http://")
@@ -208,7 +211,8 @@ public class AccountFragment extends BaseFragment {
 		boolean mSSLError = false;
 
 		public ConnectToServer() {
-			pdialog = new OEDialog(scope.context(), false, "Connecting...");
+			pdialog = new OEDialog(scope.context(), false, getResources()
+					.getString(R.string.title_connecting));
 			pdialog.show();
 		}
 
@@ -233,7 +237,8 @@ public class AccountFragment extends BaseFragment {
 				flag = oeConnect
 						.testConnection(getActivity(), openERPServerURL);
 				if (!flag) {
-					errorMsg = "Unable to reach OpenERP 7.0 Server.";
+					errorMsg = getResources().getString(
+							R.string.toast_unable_to_reach_openerp_server);
 				}
 			} catch (SSLPeerUnverifiedException ssl) {
 				flag = false;
@@ -284,10 +289,9 @@ public class AccountFragment extends BaseFragment {
 	private void showForceConnectDialog(String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setIcon(R.drawable.ic_action_alerts_and_states_warning);
-		builder.setTitle("SSL Warning");
+		builder.setTitle(R.string.title_ssl_warning);
 		builder.setMessage(R.string.untrusted_ssl_warning);
-		// builder.setPositiveButton("Proceed anyway", this);
-		builder.setNegativeButton("OK", null);
+		builder.setNegativeButton(R.string.label_ok, null);
 		builder.show();
 	}
 
@@ -308,14 +312,5 @@ public class AccountFragment extends BaseFragment {
 	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
-
-	// /**
-	// * On Force connect..
-	// */
-	// @Override
-	// public void onClick(DialogInterface dialog, int which) {
-	// serverConnectASync = new ConnectToServer();
-	// serverConnectASync.execute((Void) null);
-	// }
 
 }

@@ -13,6 +13,7 @@
         android:id="@+id/imgUserPic"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:contentDescription="@string/account_user_dp"
         android:paddingRight="8dp"
         android:src="@drawable/ic_action_user" />
 
@@ -33,14 +34,12 @@
             android:id="@+id/txvMultiName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User Name"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
             android:id="@+id/txvMultiEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User Email"
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 

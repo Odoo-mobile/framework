@@ -62,7 +62,7 @@ public class AccountsDetail extends BaseFragment {
 		rootView = inflater.inflate(R.layout.fragment_all_accounts_detail,
 				container, false);
 		scope = new AppScope(this);
-		scope.main().setTitle("Accounts");
+		scope.main().setTitle(R.string.title_accounts);
 		setupGrid();
 		return rootView;
 	}
@@ -178,8 +178,8 @@ public class AccountsDetail extends BaseFragment {
 		// Source of the data in the DIalog
 
 		// Set the dialog title
-		builder.setTitle("Confirm")
-				.setMessage("Are you sure want to logout?")
+		builder.setTitle(R.string.title_confirm)
+				.setMessage(R.string.toast_are_you_sure_logout)
 
 				// Set the action buttons
 				.setPositiveButton("Yes",
@@ -194,7 +194,7 @@ public class AccountsDetail extends BaseFragment {
 										.getAndroidName());
 								scope.main().finish();
 							}
-						}).setNegativeButton("Cancel", null);
+						}).setNegativeButton(R.string.label_cancel, null);
 
 		return builder.create();
 	}
@@ -206,11 +206,11 @@ public class AccountsDetail extends BaseFragment {
 		// Source of the data in the DIalog
 
 		// Set the dialog title
-		builder.setTitle("Confirm")
-				.setMessage("Are you sure want to delete account?")
+		builder.setTitle(R.string.title_confirm)
+				.setMessage(R.string.toast_are_you_sure_delete_account)
 
 				// Set the action buttons
-				.setPositiveButton("Yes",
+				.setPositiveButton(R.string.label_yes,
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
@@ -223,7 +223,7 @@ public class AccountsDetail extends BaseFragment {
 								scope.main().startActivity(
 										scope.main().getIntent());
 							}
-						}).setNegativeButton("Cancel", null);
+						}).setNegativeButton(R.string.label_cancel, null);
 
 		return builder.create();
 	}

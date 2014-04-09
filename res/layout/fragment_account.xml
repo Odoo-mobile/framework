@@ -1,7 +1,9 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scrollView"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingTop="?android:attr/actionBarSize" >
 
     <RelativeLayout
         android:id="@+id/mainContent"
@@ -25,7 +27,7 @@
                 android:src="@drawable/openerp_logo" />
         </RelativeLayout>
 
-        <com.openerp.util.controls.OETextView
+        <TextView
             android:id="@+id/txvTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -36,7 +38,7 @@
             android:text="@string/account_title"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.openerp.util.controls.OETextView
+        <TextView
             android:id="@+id/txvsubTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -57,7 +59,7 @@
             android:layout_below="@id/txvsubTitle"
             android:padding="20dp" >
 
-            <com.openerp.util.controls.OEEditText
+            <EditText
                 android:id="@+id/edtServerURL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,7 +67,7 @@
                 android:inputType="textUri"
                 android:singleLine="true" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvDesc"
                 style="?android:attr/textAppearanceSmall"
                 android:layout_width="match_parent"
@@ -73,18 +75,18 @@
                 android:layout_below="@+id/edtServerURL"
                 android:layout_marginTop="5dp"
                 android:paddingLeft="5dp"
-                android:text="Provide your port number with URL if any."
+                android:text="@string/str_provide_port_number"
                 android:textColor="#aaa" />
 
-            <com.openerp.util.controls.OECheckBox
+            <CheckBox
                 android:id="@+id/chkIsSecureConnection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txvDesc"
                 android:layout_marginBottom="10dp"
-                android:text="Secure Connection"
-                android:textColor="#414141"
-                android:textSize="11sp" />
+                android:text="@string/str_secure_connection"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#414141" />
         </RelativeLayout>
     </RelativeLayout>
 

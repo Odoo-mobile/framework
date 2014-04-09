@@ -7,13 +7,15 @@
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="#ffffff" />
 
     <ListView
         android:id="@+id/left_drawer"
         android:layout_width="280dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
+        android:layout_gravity="start|bottom"
+        android:layout_marginTop="?android:attr/actionBarSize"
         android:background="#ffffff"
         android:choiceMode="singleChoice"
         android:divider="#E3E9E3"

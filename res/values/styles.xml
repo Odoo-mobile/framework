@@ -14,7 +14,14 @@
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
+
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:actionBarStyle">@style/CustomActionbar</item>
+    </style>
+
+    <style name="CustomActionbar" parent="android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">#ddebebeb</item>
     </style>
 
     <style name="Widget.PullToRefresh.ProgressBar.Horizontal.Center" parent="android:Widget.ProgressBar.Horizontal">
