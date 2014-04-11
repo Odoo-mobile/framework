@@ -1,7 +1,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
     android:paddingTop="?android:attr/actionBarSize" >
 
     <LinearLayout
@@ -25,9 +24,10 @@
             android:orientation="vertical"
             android:padding="10dp" >
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_user_login"
@@ -43,18 +43,20 @@
                 android:layout_marginTop="5dp"
                 android:background="#0099CC" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvUserLoginName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_user_name"
@@ -70,18 +72,20 @@
                 android:layout_marginTop="5dp"
                 android:background="#0099CC" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_server_url"
@@ -97,18 +101,20 @@
                 android:layout_marginTop="5dp"
                 android:background="#0099CC" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvServerUrl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_database"
@@ -124,18 +130,20 @@
                 android:layout_marginTop="5dp"
                 android:background="#0099CC" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvDatabase"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_timezone"
@@ -151,11 +159,12 @@
                 android:layout_marginTop="5dp"
                 android:background="#0099CC" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvTimeZone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />

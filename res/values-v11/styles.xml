@@ -5,14 +5,8 @@
         AppBaseTheme from res/values/styles.xml on API 11+ devices.
     -->
     <style name="AppBaseTheme" parent="android:Theme.Holo.Light">
-
         <!-- API 11 theme customizations can go here. -->
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:actionBarStyle">@style/CustomActionbar</item>
-    </style>
 
-    <style name="CustomActionbar" parent="android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#ddebebeb</item>
     </style>
 
 </resources>

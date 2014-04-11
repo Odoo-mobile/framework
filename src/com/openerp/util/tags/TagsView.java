@@ -24,71 +24,30 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TagsView extends MultiTagsTextView implements
-		MultiTagsTextView.TokenListener {
+public class TagsView extends MultiTagsTextView {
 
-	HashMap<String, TagsItem> selectedTags = new HashMap<String, TagsItem>();
+	HashMap<String, Object> selectedTags = new HashMap<String, Object>();
 	Context mContext = null;
 	CustomTagViewListener mCustomTagView = null;
 	NewTokenCreateListener mNewTokenListener = null;
 
 	public TagsView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setTokenListener(this);
 		mContext = context;
-		setTypeFace(getTextStyle(attrs));
 	}
 
 	@Override
 	protected Object defaultObject(String completionText) {
 		if (mNewTokenListener != null) {
-			return (TagsItem) mNewTokenListener
+			return (Object) mNewTokenListener
 					.newTokenAddListener(completionText);
 		}
 		return null;
-	}
-
-	private void setTypeFace(String textStyle) {
-
-		Typeface typeFace = null;
-		if (textStyle.equals("light")) {
-			typeFace = Typeface.createFromAsset(getResources().getAssets(),
-					"fonts/RobotoSlab-Light.ttf");
-		}
-		if (textStyle.equals("bold")) {
-			typeFace = Typeface.createFromAsset(getResources().getAssets(),
-					"fonts/RobotoSlab-Bold.ttf");
-		}
-
-		if (textStyle.equals("italic")) {
-			typeFace = Typeface.createFromAsset(getResources().getAssets(),
-					"fonts/RobotoSlab-Regular.ttf");
-		}
-
-		setTypeface(typeFace);
-	}
-
-	private String getTextStyle(AttributeSet attrs) {
-		String textStyle = "light";
-		for (int i = 0; i < attrs.getAttributeCount(); i++) {
-			String attr = attrs.getAttributeName(i);
-			if (attr.equals("textStyle")) {
-				textStyle = attrs.getAttributeValue(i);
-				if (textStyle.equals("0x1")) {
-					textStyle = "bold";
-				}
-				if (textStyle.equals("0x2")) {
-					textStyle = "italic";
-				}
-			}
-		}
-		return textStyle;
 	}
 
 	@Override
@@ -112,30 +71,12 @@ public class TagsView extends MultiTagsTextView implements
 		mNewTokenListener = newTokenListener;
 	}
 
-	@Override
-	public void onTokenAdded(Object obj, View view) {
-		final TagsItem item = (TagsItem) obj;
-		selectedTags.put("id_" + item.getId(), item);
-	}
-
-	@Override
-	public void onTokenRemoved(Object arg0) {
-		TagsItem item = (TagsItem) arg0;
-		if (selectedTags.containsKey("id_" + item.getId())) {
-			selectedTags.remove("id_" + item.getId());
-		}
-	}
-
-	public List<TagsItem> getSelectedTags() {
-		List<TagsItem> items = new ArrayList<TagsItem>();
+	public List<Object> getSelectedTags() {
+		List<Object> items = new ArrayList<Object>();
 		for (String key : selectedTags.keySet()) {
 			items.add(selectedTags.get(key));
 		}
 		return items;
-	}
-
-	@Override
-	public void onTokenSelected(Object token, View view) {
 	}
 
 	public interface CustomTagViewListener {
@@ -144,6 +85,6 @@ public class TagsView extends MultiTagsTextView implements
 	}
 
 	public interface NewTokenCreateListener {
-		public TagsItem newTokenAddListener(String token);
+		public Object newTokenAddListener(String token);
 	}
 }

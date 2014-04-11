@@ -29,11 +29,12 @@
                 android:contentDescription="@string/imgcontentDescription"
                 android:src="@drawable/openerp_logo" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/txvVersionName"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/abtus_imgLogo"
+                android:fontFamily="sans-serif-condensed"
                 android:gravity="center"
                 android:paddingBottom="10dp"
                 android:paddingTop="25dp"
@@ -49,10 +50,11 @@
             android:background="@drawable/aboutus_background"
             android:padding="20dp" >
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/line1"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
@@ -60,11 +62,12 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/white" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/line2"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/line1"
+                android:fontFamily="sans-serif-light"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
@@ -72,11 +75,12 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/white" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/line3"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/line2"
+                android:fontFamily="sans-serif-light"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
@@ -84,11 +88,12 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/white" />
 
-            <com.openerp.util.controls.OETextView
+            <TextView
                 android:id="@+id/line4"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/line3"
+                android:fontFamily="sans-serif-light"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"

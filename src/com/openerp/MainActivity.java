@@ -32,9 +32,8 @@ import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -47,7 +46,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.openerp.auth.OpenERPAccountManager;
@@ -104,6 +105,7 @@ public class MainActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		getActionBar().setIcon(R.drawable.ic_launcher);
 		if (savedInstanceState != null) {
 			mDrawerItemSelectedPosition = savedInstanceState
 					.getInt("current_drawer_item");
@@ -154,8 +156,11 @@ public class MainActivity extends FragmentActivity implements
 		Log.d(TAG, "MainActivity->initDrawerControls()");
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
+		if (OEUser.current(mContext) != null)
+			setDrawerHeader();
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_drawer, R.string.drawer_open, R.string.app_name) {
+				R.drawable.ic_navigation_drawer, R.string.drawer_open,
+				R.string.app_name) {
 
 			@Override
 			public void onDrawerClosed(View drawerView) {
@@ -167,11 +172,48 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onDrawerOpened(View drawerView) {
 				super.onDrawerOpened(drawerView);
-				setTitle(mDrawerTitle, mDrawerSubtitle);
-				setUserPicIcon(mContext);
+				setTitle(R.string.app_name);
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+	}
+
+	private void setDrawerHeader() {
+		mDrawerTitle = OEUser.current(mContext).getUsername();
+		mDrawerSubtitle = OEUser.current(mContext).getHost();
+
+		ResPartnerDB partner = new ResPartnerDB(mContext);
+		OEDataRow partnerInfo = partner.select(OEUser.current(mContext)
+				.getPartner_id());
+		if (partnerInfo != null) {
+			mDrawerTitle = partnerInfo.getString("name");
+		}
+
+		View v = getLayoutInflater().inflate(R.layout.drawer_header,
+				mDrawerListView, false);
+		TextView mUserName, mUserURL;
+		ImageView imgUserPic = (ImageView) v
+				.findViewById(R.id.imgUserProfilePic);
+		mUserName = (TextView) v.findViewById(R.id.txvUserProfileName);
+		mUserURL = (TextView) v.findViewById(R.id.txvUserServerURL);
+		mUserName.setText(mDrawerTitle);
+		mUserURL.setText(mDrawerSubtitle);
+		if (OEUser.current(mContext) != null
+				&& !OEUser.current(mContext).getAvatar().equals("false")) {
+			Bitmap profPic = Base64Helper.getBitmapImage(this,
+					OEUser.current(mContext).getAvatar());
+			if (profPic != null)
+				imgUserPic.setImageBitmap(profPic);
+		}
+		v.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				onSettingItemSelected(SettingKeys.PROFILE);
+				mDrawerLayout.closeDrawers();
+			}
+		});
+		mDrawerListView.addHeaderView(v, null, false);
 	}
 
 	private void setDrawerItems() {
@@ -187,30 +229,20 @@ public class MainActivity extends FragmentActivity implements
 		if (mDrawerItemSelectedPosition >= 0) {
 			mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
 		}
-		if (OEUser.current(mContext) != null) {
-			mDrawerTitle = OEUser.current(mContext).getUsername();
-			mDrawerSubtitle = OEUser.current(mContext).getHost();
-			ResPartnerDB partner = new ResPartnerDB(mContext);
-			OEDataRow partnerInfo = partner.select(OEUser.current(mContext)
-					.getPartner_id());
-			if (partnerInfo != null) {
-				mDrawerTitle = partnerInfo.getString("name");
-			}
-		}
 	}
 
 	private void initDrawer() {
 		setDrawerItems();
 		Log.d(TAG, "MainActivity->initDrawer()");
 		mDrawerListView.setOnItemClickListener(this);
-		int position = -1;
+		int position = 1;
 		if (mDrawerListItems.size() > 0) {
-			if (!mDrawerListItems.get(0).isGroupTitle()) {
-				mDrawerListView.setItemChecked(0, true);
-				position = 0;
-			} else {
-				mDrawerListView.setItemChecked(1, true);
+			if (!mDrawerListItems.get(1).isGroupTitle()) {
+				mDrawerListView.setItemChecked(1 + 1, true);
 				position = 1;
+			} else {
+				mDrawerListView.setItemChecked(2 + 1, true);
+				position = 2;
 			}
 		}
 		if (mDrawerItemSelectedPosition >= 0) {
@@ -559,10 +591,11 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position,
 			long id) {
-		DrawerItem item = mDrawerListItems.get(position);
+		int item_position = position - 1;
+		DrawerItem item = mDrawerListItems.get(item_position);
 		if (!item.isGroupTitle()) {
 			if (!item.getKey().equals("com.openerp.settings")) {
-				mDrawerItemSelectedPosition = position;
+				mDrawerItemSelectedPosition = item_position + 1;
 			}
 			mAppTitle = item.getTitle();
 			loadFragment(item);
@@ -599,17 +632,6 @@ public class MainActivity extends FragmentActivity implements
 					&& !fragment.getArguments().containsKey("settings")) {
 				startMainFragment(fragment, false);
 			}
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	private void setUserPicIcon(Context context) {
-		if (OEUser.current(context) != null
-				&& !OEUser.current(context).getAvatar().equals("false")) {
-			Drawable profPic = new BitmapDrawable(Base64Helper.getBitmapImage(
-					this, OEUser.current(context).getAvatar()));
-			if (profPic != null)
-				getActionBar().setIcon(profPic);
 		}
 	}
 

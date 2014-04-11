@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -34,8 +35,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.openerp.MainActivity;
 import com.openerp.R;
@@ -43,16 +47,13 @@ import com.openerp.config.SyncWizardValues;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
 import com.openerp.support.SyncValue;
-import com.openerp.util.controls.OECheckBox;
-import com.openerp.util.controls.OERadioButton;
-import com.openerp.util.controls.OETextView;
 import com.openerp.util.drawer.DrawerItem;
 
 public class SyncWizard extends BaseFragment {
 
 	View rootView = null;
 	MainActivity context = null;
-	OECheckBox checkbox[] = null;
+	CheckBox checkbox[] = null;
 	RadioGroup[] rdoGroups = null;
 	HashMap<String, String> authorities = new HashMap<String, String>();
 
@@ -83,29 +84,33 @@ public class SyncWizard extends BaseFragment {
 			getActivity().finish();
 			getActivity().startActivity(getActivity().getIntent());
 		}
-		checkbox = new OECheckBox[syncValuesList.size()];
+		checkbox = new CheckBox[syncValuesList.size()];
 		rdoGroups = new RadioGroup[syncValuesList.size()];
-		OETextView[] txvTitles = new OETextView[syncValuesList.size()];
+		TextView[] txvTitles = new TextView[syncValuesList.size()];
 		int i = 0;
 		int id = 1;
+		Typeface tf_light = Typeface.create("sans-serif-light", 0);
+		Typeface tf_bold = Typeface.create("sans-serif-condensed", 0);
 		for (SyncValue value : syncValuesList) {
 			if (!value.getIsGroup()) {
 				if (value.getType() == SyncValue.Type.CHECKBOX) {
-					checkbox[i] = new OECheckBox(scope.context());
+					checkbox[i] = new CheckBox(scope.context());
 					checkbox[i].setId(id);
 					checkbox[i].setText(value.getTitle());
+					checkbox[i].setTypeface(tf_light);
 					layout.addView(checkbox[i]);
 				} else {
 					rdoGroups[i] = new RadioGroup(scope.context());
 					rdoGroups[i].setId(i + 50);
-					OERadioButton[] rdoButtons = new OERadioButton[value
+					RadioButton[] rdoButtons = new RadioButton[value
 							.getRadioGroups().size()];
 					int mId = 1;
 					int j = 0;
 					for (SyncValue rdoVal : value.getRadioGroups()) {
-						rdoButtons[j] = new OERadioButton(scope.context());
+						rdoButtons[j] = new RadioButton(scope.context());
 						rdoButtons[j].setId(mId);
 						rdoButtons[j].setText(rdoVal.getTitle());
+						rdoButtons[j].setTypeface(tf_light);
 						rdoGroups[i].addView(rdoButtons[j]);
 						mId++;
 						j++;
@@ -116,12 +121,12 @@ public class SyncWizard extends BaseFragment {
 				i++;
 				id++;
 			} else {
-				txvTitles[i] = new OETextView(scope.context());
+				txvTitles[i] = new TextView(scope.context());
 				txvTitles[i].setId(id);
 				txvTitles[i].setText(value.getTitle());
 				txvTitles[i].setAllCaps(true);
 				txvTitles[i].setPadding(0, 5, 0, 3);
-				txvTitles[i].setTypeFace("bold");
+				txvTitles[i].setTypeface(tf_bold);
 				layout.addView(txvTitles[i]);
 				View lineView = new View(scope.context());
 				lineView.setBackgroundColor(Color.parseColor("#BEBEBE"));
@@ -157,7 +162,7 @@ public class SyncWizard extends BaseFragment {
 
 		switch (item.getItemId()) {
 		case R.id.menu_start_application:
-			for (OECheckBox chkBox : checkbox) {
+			for (CheckBox chkBox : checkbox) {
 				if (chkBox != null) {
 					String authority = authorities.get(chkBox.getId() + "")
 							.toString();
@@ -168,11 +173,11 @@ public class SyncWizard extends BaseFragment {
 			for (RadioGroup rdoGrp : rdoGroups) {
 				if (rdoGrp != null) {
 					for (int i = 0; i < rdoGrp.getChildCount(); i++) {
-						OERadioButton rdoBtn = (OERadioButton) rdoGrp
-								.getChildAt(i);
+						RadioButton rdoBtn = (RadioButton) rdoGrp.getChildAt(i);
 						SharedPreferences settings = PreferenceManager
 								.getDefaultSharedPreferences(scope.context());
 						Editor editor = settings.edit();
+						//TODO: store preference setting for your options.
 						editor.commit();
 						String authority = authorities.get(rdoBtn.getId() + "");
 						scope.main().setAutoSync(authority, rdoBtn.isChecked());

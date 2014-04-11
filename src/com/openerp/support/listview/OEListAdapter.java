@@ -66,8 +66,10 @@ public class OEListAdapter extends ArrayAdapter<Object> {
 
 	public void notifiyDataChange(List<Object> objects) {
 		Log.d(TAG, "OEListAdapter->notifiyDataChange()");
-		mAllObjects = new ArrayList<Object>(objects);
-		mObjects = new ArrayList<Object>(objects);
+		mAllObjects.clear();
+		mObjects.clear();
+		mAllObjects.addAll(objects);
+		mObjects.addAll(objects);
 		notifyDataSetChanged();
 	}
 

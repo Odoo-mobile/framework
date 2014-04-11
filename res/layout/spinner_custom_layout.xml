@@ -3,6 +3,6 @@
     android:id="@+id/txvCustomSpinnerItemText"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:fontFamily="sans-serif-condensed"
     android:padding="10dp"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:textStyle="italic" />
+    android:textAppearance="?android:attr/textAppearanceMedium" />

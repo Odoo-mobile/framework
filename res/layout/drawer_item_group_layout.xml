@@ -9,19 +9,13 @@
         style="?android:attr/textAppearanceSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
         android:gravity="center_vertical"
         android:paddingBottom="2dp"
         android:paddingLeft="10dp"
         android:paddingTop="10dp"
-        android:text="Title"
         android:textAllCaps="true"
         android:textColor="#4B4B4D"
         android:textStyle="bold" />
-
-    <View
-        android:id="@+id/viewDrawerGroupView"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#BEBEBE" />
 
 </LinearLayout>

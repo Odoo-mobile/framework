@@ -25,14 +25,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.view.View.MeasureSpec;
-
-import com.openerp.util.controls.OETextView;
+import android.widget.TextView;
 
 public class TextViewTags {
 
@@ -67,7 +67,7 @@ public class TextViewTags {
 		p.setColor(Color.WHITE);
 		int pos = 0;
 		for (String tag : mTokens) {
-			OETextView txvTag = createTokenTextView(" " + tag + " ");
+			TextView txvTag = createTokenTextView(" " + tag + " ");
 			BitmapDrawable bd = (BitmapDrawable) convertViewToDrawable(txvTag);
 			bd.setBounds(0, 0, bd.getIntrinsicWidth(), bd.getIntrinsicHeight());
 			ssb.setSpan(new ImageSpan(bd), pos, pos + tag.length(),
@@ -77,16 +77,18 @@ public class TextViewTags {
 		return ssb;
 	}
 
-	private OETextView createTokenTextView(String text) {
-		OETextView tv = new OETextView(mContext);
+	private TextView createTokenTextView(String text) {
+		Typeface tf = Typeface.create("sans-serif-light", 0);
+		TextView tv = new TextView(mContext);
 		tv.setText(text);
 		tv.setTextSize(mTextSize);
+		tv.setTypeface(tf);
 		tv.setPadding(3, 3, 3, 3);
 		return tv;
 	}
 
 	@SuppressWarnings("deprecation")
-	private Object convertViewToDrawable(OETextView view) {
+	private Object convertViewToDrawable(TextView view) {
 		view.setBackgroundColor(mColor);
 		view.setTextColor(Color.parseColor(mTextColor));
 		view.setPadding(2, 2, 2, 2);

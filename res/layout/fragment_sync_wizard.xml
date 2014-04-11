@@ -27,22 +27,24 @@
                 android:src="@drawable/openerp_logo" />
         </RelativeLayout>
 
-        <com.openerp.util.controls.OETextView
+        <TextView
             android:id="@+id/txvTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/logoLayout"
+            android:fontFamily="sans-serif-condensed"
             android:gravity="center"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:text="@string/syncwizard_title"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.openerp.util.controls.OETextView
+        <TextView
             android:id="@+id/txvsubTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/txvTitle"
+            android:fontFamily="sans-serif-light"
             android:gravity="center"
             android:paddingBottom="10dp"
             android:paddingLeft="20dp"
