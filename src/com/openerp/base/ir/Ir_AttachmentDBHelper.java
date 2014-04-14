@@ -54,6 +54,10 @@ public class Ir_AttachmentDBHelper extends OEDatabase {
 		columns.add(new OEColumn("type", "Type", OEFields.text()));
 		columns.add(new OEColumn("file_size", "File Size", OEFields.integer()));
 		columns.add(new OEColumn("res_model", "Model", OEFields.varchar(100)));
+		columns.add(new OEColumn("file_type", "content type", OEFields
+				.varchar(100)));
+		columns.add(new OEColumn("file_uri", "File Uri", OEFields.varchar(100),
+				false));
 		columns.add(new OEColumn("company_id", "company id", OEFields
 				.manyToOne(new ResCompanyDB(mContext))));
 		columns.add(new OEColumn("res_id", "resource id", OEFields.integer()));
