@@ -72,6 +72,8 @@ public class Attachment implements OnClickListener {
 	PendingIntent mNotificationResultIntent = null;
 	NotificationManager mNotificationManager = null;
 
+	List<Long> mNewAttachmentIds = new ArrayList<Long>();
+
 	public static int NOTIFICATION_ID = 0;
 
 	public enum Types {
@@ -152,10 +154,21 @@ public class Attachment implements OnClickListener {
 		((Activity) mContext).startActivityForResult(intent, requestCode);
 	}
 
+	public OEDataRow handleResult(Intent data) {
+		return handleResult(-1, data);
+	}
+
+	public List<OEDataRow> handleMultipleResult(Intent data) {
+		List<OEDataRow> attachments = new ArrayList<OEDataRow>();
+		ArrayList<Uri> fileUris = data
+				.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+		for (Uri uri : fileUris) {
+			attachments.add(uriToDataRow(uri, null));
+		}
+		return attachments;
+	}
+
 	public OEDataRow handleResult(int requestCode, Intent data) {
-		OEDataRow attachment = new OEDataRow();
-		String filename = "";
-		String file_type = "";
 		Uri uri = null;
 		Bitmap bitmap = null;
 		switch (requestCode) {
@@ -172,7 +185,18 @@ public class Attachment implements OnClickListener {
 		case REQUEST_FILE:
 			uri = data.getData();
 			break;
+		default: // Single Attachment (share)
+			uri = data.getParcelableExtra(Intent.EXTRA_STREAM);
+			break;
 		}
+
+		return uriToDataRow(uri, bitmap);
+	}
+
+	private OEDataRow uriToDataRow(Uri uri, Bitmap bitmap) {
+		OEDataRow attachment = new OEDataRow();
+		String filename = "";
+		String file_type = "";
 		if (uri != null) {
 			String[] file_info = getFileName(uri);
 			filename = file_info[0];
@@ -200,8 +224,14 @@ public class Attachment implements OnClickListener {
 				File fl = new File(filename);
 				filename = fl.getName();
 			}
+			file_type = mContext.getContentResolver().getType(uri);
+		} else if (uri.getScheme().compareTo("file") == 0) {
+			filename = uri.getLastPathSegment().toString();
+			file_type = "file";
+		} else {
+			filename = filename + "_" + uri.getLastPathSegment();
+			file_type = "file";
 		}
-		file_type = mContext.getContentResolver().getType(uri);
 		file_info = new String[] { filename, file_type };
 		return file_info;
 	}
@@ -242,6 +272,11 @@ public class Attachment implements OnClickListener {
 	}
 
 	public void updateAttachments(String model, int id, List<Object> attachments) {
+		updateAttachments(model, id, attachments, true);
+	}
+
+	public void updateAttachments(String model, int id,
+			List<Object> attachments, boolean asBackgroundTask) {
 		List<OEValues> values = new ArrayList<OEValues>();
 		for (Object attachment : attachments) {
 			OEDataRow row = (OEDataRow) attachment;
@@ -272,9 +307,21 @@ public class Attachment implements OnClickListener {
 			}
 		}
 		if (values.size() > 0) {
-			CreateAttachment attachment = new CreateAttachment(
-					mDb.getOEInstance(), values);
-			attachment.execute();
+			if (asBackgroundTask) {
+				CreateAttachment attachment = new CreateAttachment(
+						mDb.getOEInstance(), values);
+				attachment.execute();
+			} else {
+				OEHelper oe = mDb.getOEInstance();
+				mNewAttachmentIds.clear();
+				if (oe != null) {
+					for (OEValues value : values) {
+						long a_id = oe.create(value);
+						Log.i(TAG, "Attachment created #" + a_id);
+						mNewAttachmentIds.add(a_id);
+					}
+				}
+			}
 		}
 	}
 
@@ -302,6 +349,12 @@ public class Attachment implements OnClickListener {
 			}
 			return null;
 		}
+	}
+
+	public List<Long> newAttachmentIds() {
+		Log.d(TAG, "newAttachmentIds()");
+		Log.v(TAG, "Attachment ids #" + mNewAttachmentIds.toString());
+		return mNewAttachmentIds;
 	}
 
 	private void initNotificationManager() {
