@@ -92,6 +92,8 @@ public class OESQLiteHelper extends SQLiteOpenHelper {
 				db.execSQL(query);
 			}
 		}
+		// Recreating tables
+		onCreate(db);
 	}
 
 	private void setDBTables() {

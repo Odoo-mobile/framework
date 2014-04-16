@@ -32,7 +32,6 @@ import openerp.OEDomain;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -98,12 +97,12 @@ public class Attachment implements OnClickListener {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_GET_CONTENT);
 		switch (type) {
+		case IMAGE_OR_CAPTURE_IMAGE:
+			// createDialog(type);
+			// break;
 		case IMAGE:
 			intent.setType("image/*");
 			requestIntent(intent, REQUEST_IMAGE);
-			break;
-		case IMAGE_OR_CAPTURE_IMAGE:
-			createDialog(type);
 			break;
 		case CAPTURE_IMAGE:
 			intent = new Intent(
@@ -124,20 +123,20 @@ public class Attachment implements OnClickListener {
 
 	}
 
-	private void createDialog(Types type) {
-		mDialogType = type;
-		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-		switch (type) {
-		case IMAGE_OR_CAPTURE_IMAGE:
-			builder.setTitle("Image");
-			mOptions = new String[] { "Select Image", "Capture Image" };
-			break;
-		default:
-			break;
-		}
-		builder.setSingleChoiceItems(mOptions, -1, this);
-		builder.create().show();
-	}
+//	private void createDialog(Types type) {
+//		mDialogType = type;
+//		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+//		switch (type) {
+//		case IMAGE_OR_CAPTURE_IMAGE:
+//			builder.setTitle("Image");
+//			mOptions = new String[] { "Select Image", "Capture Image" };
+//			break;
+//		default:
+//			break;
+//		}
+//		builder.setSingleChoiceItems(mOptions, -1, this);
+//		builder.create().show();
+//	}
 
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
@@ -403,61 +402,81 @@ public class Attachment implements OnClickListener {
 	boolean error = false;
 
 	private void showNotification(final int attachment_id) {
-		initNotificationManager();
-		final int ID = NOTIFICATION_ID++;
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				OEDataRow attachment = mDb.select(attachment_id);
-				if (!attachment.getString("file_uri").equals("false")) {
-					Uri uri = Uri.parse(attachment.getString("file_uri"));
-					requestIntent(uri);
-				} else {
-					mNotificationBuilder.setProgress(0, 0, true);
-					mNotification = mNotificationBuilder.build();
-					mNotificationManager.notify(ID, mNotification);
-
-					OEHelper mOE = mDb.getOEInstance();
-					if (mOE.openERP() != null) {
-						try {
-							mNotificationManager.cancelAll();
-							OEFieldsHelper fields = new OEFieldsHelper(
-									new String[] { "name", "datas",
-											"file_type", "res_model", "res_id" });
-							OEDomain domain = new OEDomain();
-							domain.add("id", "=", attachment_id);
-							JSONObject result = mOE.openERP().search_read(
-									mDb.getModelName(), fields.get(),
-									domain.get());
-							if (result.getJSONArray("records").length() > 0) {
-								JSONObject row = result.getJSONArray("records")
-										.getJSONObject(0);
-								String file_path = createFile(
-										row.getString("name"),
-										row.getString("datas"),
-										row.getString("file_type"));
-								Uri uri = Uri.fromFile(new File(file_path));
-								mNotification = setFileIntent(uri);
-								OEValues values = new OEValues();
-								values.put("file_uri", uri.toString());
-								mDb.update(values, attachment_id);
-								mNotificationManager.notify(ID, mNotification);
-							} else {
-								error = true;
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}
-
-			}
-		}).start();
+		AttachmentDownloader attachmentLoader = new AttachmentDownloader(
+				attachment_id);
+		attachmentLoader.execute();
 		if (error)
 			Toast.makeText(mContext,
 					"Someting gone wrong. No file data found.",
 					Toast.LENGTH_LONG).show();
+	}
+
+	class AttachmentDownloader extends AsyncTask<Void, Void, Void> {
+
+		OEDataRow mAttachmentInfo = null;
+		OEHelper mOE = null;
+		int mID = 0;
+
+		public AttachmentDownloader(int attachment_id) {
+			initNotificationManager();
+			mID = NOTIFICATION_ID++;
+			mAttachmentInfo = mDb.select(attachment_id);
+			if (mAttachmentInfo.getString("file_uri").equals("false")) {
+				mNotificationBuilder.setProgress(0, 0, true);
+				mNotification = mNotificationBuilder.build();
+				mNotificationManager.notify(mID, mNotification);
+			}
+			mOE = mDb.getOEInstance();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			if (!mAttachmentInfo.getString("file_uri").equals("false")) {
+				return null;
+			} else {
+				if (mOE.openERP() != null) {
+					try {
+						OEFieldsHelper fields = new OEFieldsHelper(
+								new String[] { "name", "datas", "file_type",
+										"res_model", "res_id" });
+						OEDomain domain = new OEDomain();
+						domain.add("id", "=", mAttachmentInfo.getInt("id"));
+						JSONObject result = mOE.openERP().search_read(
+								mDb.getModelName(), fields.get(), domain.get());
+						if (result.getJSONArray("records").length() > 0) {
+							JSONObject row = result.getJSONArray("records")
+									.getJSONObject(0);
+							String file_path = createFile(
+									row.getString("name"),
+									row.getString("datas"),
+									row.getString("file_type"));
+							Uri uri = Uri.fromFile(new File(file_path));
+							mNotification = setFileIntent(uri);
+							OEValues values = new OEValues();
+							values.put("file_uri", uri.toString());
+							mDb.update(values, mAttachmentInfo.getInt("id"));
+						} else {
+							error = true;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			if (!mAttachmentInfo.getString("file_uri").equals("false")) {
+				Uri uri = Uri.parse(mAttachmentInfo.getString("file_uri"));
+				requestIntent(uri);
+			} else {
+				mNotificationManager.cancel(mID);
+				mNotificationManager.notify(mID, mNotification);
+			}
+		}
+
 	}
 
 	public void downloadFile(int attachment_id) {
