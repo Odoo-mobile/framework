@@ -435,7 +435,8 @@ public class MainActivity extends FragmentActivity implements
 				.current(mContext).getAndroidName());
 
 		for (SyncAdapterType lst : list) {
-			if (lst.authority.contains("com.openerp.providers")) {
+			if (lst.authority.contains("com.openerp")
+					&& lst.authority.contains("providers")) {
 				default_authorities.add(lst.authority);
 			}
 		}
@@ -443,7 +444,7 @@ public class MainActivity extends FragmentActivity implements
 			boolean isSyncActive = ContentResolver.getSyncAutomatically(
 					mAccount, authority);
 			if (isSyncActive) {
-				setSyncPeriodic(authority, sync_interval, 1, 1);
+				setSyncPeriodic(authority, sync_interval, 60, 1);
 			}
 		}
 		Toast.makeText(this, R.string.toast_setting_saved, Toast.LENGTH_LONG)
