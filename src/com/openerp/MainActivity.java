@@ -145,6 +145,17 @@ public class MainActivity extends FragmentActivity implements
 						OpenERPAccountManager.fetchAllAccounts(mContext))
 						.show();
 			} else {
+				OETouchListener.DEFAULT_HEADER_LAYOUT = R.layout.default_header;
+				OETouchListener.DEFAULT_ANIM_HEADER_IN = R.anim.fade_in;
+				OETouchListener.DEFAULT_ANIM_HEADER_OUT = R.anim.fade_out;
+				OETouchListener.ptr_progress = R.id.ptr_progress;
+				OETouchListener.ptr_text = R.id.ptr_text;
+				OETouchListener.refresh_pull_label = R.string.pull_to_refresh_pull_label;
+				OETouchListener.refreshing_label = R.string.pull_to_refresh_refreshing_label;
+				OETouchListener.release_label = R.string.pull_to_refresh_release_label;
+				OETouchListener.contentView = R.id.ptr_content;
+				OETouchListener.opaqueBackground = R.id.ptr_text_opaque_bg;
+
 				mTouchAttacher = new OETouchListener(this);
 				initDrawer();
 			}
