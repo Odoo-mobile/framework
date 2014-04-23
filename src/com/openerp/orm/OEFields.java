@@ -25,6 +25,7 @@ import com.openerp.orm.types.OEInteger;
 import com.openerp.orm.types.OEManyToMany;
 import com.openerp.orm.types.OEManyToOne;
 import com.openerp.orm.types.OEOneToMany;
+import com.openerp.orm.types.OEReal;
 import com.openerp.orm.types.OEText;
 import com.openerp.orm.types.OETimestamp;
 import com.openerp.orm.types.OEVarchar;
@@ -41,6 +42,10 @@ public class OEFields {
 
 	public static OEInteger integer(int size) {
 		return new OEInteger(size);
+	}
+
+	public static OEReal real(int size) {
+		return new OEReal(size);
 	}
 
 	public static OEBoolean booleantype() {

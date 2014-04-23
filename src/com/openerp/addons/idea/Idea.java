@@ -49,9 +49,9 @@ public class Idea extends BaseFragment {
 
 		// DrawerListener drawer = (DrawerListener) getActivity();
 		// drawer.refreshDrawer("idea");
-//		 IdeaDemoRecords rec = new IdeaDemoRecords(getActivity());
-//		 rec.createDemoRecords();
-//		 rec.selectAll();
+		 IdeaDemoRecords rec = new IdeaDemoRecords(getActivity());
+		 rec.createDemoRecords();
+		 rec.selectAll();
 		rootView.findViewById(R.id.txvIdeaFragment).setOnClickListener(
 				new OnClickListener() {
 

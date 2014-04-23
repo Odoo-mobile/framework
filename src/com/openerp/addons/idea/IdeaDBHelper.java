@@ -129,6 +129,7 @@ public class IdeaDBHelper extends OEDatabase {
 		columns.add(new OEColumn("flag", "boolean flag", OEFields.booleantype()));
 		columns.add(new OEColumn("date", "date", OEFields
 				.datetime("MM/dd/yyyy hh:mm a")));
+		columns.add(new OEColumn("real_value", "Real Value", OEFields.real(20)));
 		return columns;
 	}
 

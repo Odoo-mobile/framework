@@ -102,6 +102,7 @@ public class IdeaDemoRecords {
 			values.put("category_id", i);
 			values.put("date", "2014-04-15 03:09:44");
 			values.put("flag", true);
+			values.put("real_value", 20.5);
 
 			Integer[] ids = new Integer[] { 1, 2 };
 			List<Integer> user_ids = Arrays.asList(ids);
@@ -131,7 +132,7 @@ public class IdeaDemoRecords {
 			OELog.log("cdate", OEDate.getDate(mContext, row.getString("date"),
 					TimeZone.getDefault().getID()));
 			OELog.log("create_date_time", row.getString("create_date_time"));
-
+			OELog.log("real_value", row.getFloat("real_value").toString());
 			OELog.log("category : "
 					+ row.getM2ORecord("category_id").browse()
 							.getString("name"));
