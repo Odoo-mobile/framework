@@ -44,6 +44,10 @@ public class OEFields {
 		return new OEInteger(size);
 	}
 
+	public static OEReal real() {
+		return new OEReal(0);
+	}
+
 	public static OEReal real(int size) {
 		return new OEReal(size);
 	}

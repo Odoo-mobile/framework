@@ -47,6 +47,9 @@ public class OEDate {
 	public static String getDate(Context context, String date,
 			String toTimezone, String format) {
 
+		if (date.equals("false")) {
+			return date;
+		}
 		Calendar cal = Calendar.getInstance();
 		Date originalDate = convertToDate(date);
 		cal.setTime(originalDate);
