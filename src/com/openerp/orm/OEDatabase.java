@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -32,8 +33,15 @@ import android.util.Log;
 
 import com.openerp.base.ir.Ir_model;
 import com.openerp.orm.OEM2MIds.Operation;
+import com.openerp.orm.types.OEDateTime;
+import com.openerp.orm.types.OEManyToMany;
+import com.openerp.orm.types.OEManyToOne;
+import com.openerp.orm.types.OEOneToMany;
+import com.openerp.orm.types.OETimestamp;
+import com.openerp.orm.types.OETypeHelper;
 import com.openerp.receivers.DataSetChangeReceiver;
 import com.openerp.support.OEUser;
+import com.openerp.util.OEDate;
 
 public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	public static final String TAG = "com.openerp.orm.OEDatabase";
@@ -221,6 +229,13 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 					continue;
 				}
 				cValues.put(key, values.get(key).toString());
+			}
+			/**
+			 * Adding default timestamp in UTC TimeZone in YYYY-MM-DD HH:MM:SS
+			 * format.
+			 */
+			if (col.getType() instanceof OETimestamp) {
+				cValues.put(key, OEDate.getDate());
 			}
 		}
 		result.put("m2mObjects", m2mObjectList);
@@ -469,8 +484,14 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	}
 
 	private Object createRowData(OEColumn col, Cursor cr) {
-		if (col.getType() instanceof String) {
-			return cr.getString(cr.getColumnIndex(col.getName()));
+		if (col.getType() instanceof OETypeHelper) {
+			String value = cr.getString(cr.getColumnIndex(col.getName()));
+			if (col.getType() instanceof OETimestamp
+					|| col.getType() instanceof OEDateTime) {
+				value = OEDate.getDate(mContext, value, TimeZone.getDefault()
+						.getID(), OEDate.DEFAULT_FORMAT);
+			}
+			return value;
 		}
 		if (col.getType() instanceof OEManyToOne) {
 			return new OEM2ORecord(col, cr.getString(cr.getColumnIndex(col
@@ -492,7 +513,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		List<String> cols = new ArrayList<String>();
 		cols.add("id");
 		for (OEColumn col : mDBHelper.getModelColumns()) {
-			if (col.getType() instanceof String
+			if (col.getType() instanceof OETypeHelper
 					|| col.getType() instanceof OEManyToOne) {
 				cols.add(col.getName());
 			}

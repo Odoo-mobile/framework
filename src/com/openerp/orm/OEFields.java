@@ -18,90 +18,59 @@
  */
 package com.openerp.orm;
 
-/**
- * The Class OEFields. Different database data types. Also support many2many and
- * many2one
- */
+import com.openerp.orm.types.OEBlob;
+import com.openerp.orm.types.OEBoolean;
+import com.openerp.orm.types.OEDateTime;
+import com.openerp.orm.types.OEInteger;
+import com.openerp.orm.types.OEManyToMany;
+import com.openerp.orm.types.OEManyToOne;
+import com.openerp.orm.types.OEOneToMany;
+import com.openerp.orm.types.OEText;
+import com.openerp.orm.types.OETimestamp;
+import com.openerp.orm.types.OEVarchar;
+
 public class OEFields {
 
-	/**
-	 * Varchar.
-	 * 
-	 * @param size
-	 *            the size
-	 * @return the string
-	 */
-	public static String varchar(int size) {
-		return " VARCHAR(" + size + ") ";
+	public static OEVarchar varchar(int size) {
+		return new OEVarchar(size);
 	}
 
-	/**
-	 * Integer.
-	 * 
-	 * @return the string
-	 */
-	public static String integer() {
-		return " INTEGER ";
+	public static OEInteger integer() {
+		return new OEInteger(0);
 	}
 
-	/**
-	 * Integer.
-	 * 
-	 * @param size
-	 *            the size
-	 * @return the string
-	 */
-	public static String integer(int size) {
-		return " INTEGER(" + size + ") ";
+	public static OEInteger integer(int size) {
+		return new OEInteger(size);
 	}
 
-	/**
-	 * Text.
-	 * 
-	 * @return the string
-	 */
-	public static String text() {
-		return " TEXT ";
+	public static OEBoolean booleantype() {
+		return new OEBoolean();
 	}
 
-	/**
-	 * Blob.
-	 * 
-	 * @return the string
-	 */
-	public static String blob() {
-		return " BLOB ";
+	public static OETimestamp timestamp(String dateformat) {
+		return new OETimestamp(dateformat);
 	}
 
-	/**
-	 * Many to many.
-	 * 
-	 * @param db
-	 *            the db
-	 * @return the many to many object
-	 */
+	public static OEDateTime datetime(String dateformat) {
+		return new OEDateTime(dateformat);
+	}
+
+	public static OEText text() {
+		return new OEText();
+	}
+
+	public static OEBlob blob() {
+		return new OEBlob();
+	}
+
 	public static OEManyToMany manyToMany(Object db) {
 		return new OEManyToMany((OEDBHelper) db);
 	}
 
-	/**
-	 * Many to one.
-	 * 
-	 * @param db
-	 *            the db
-	 * @return the many to one object
-	 */
 	public static OEManyToOne manyToOne(Object db) {
 		return new OEManyToOne((OEDBHelper) db);
 	}
 
-	/**
-	 * One to many.
-	 * 
-	 * @param db
-	 *            the db
-	 * @return the one to many object
-	 */
 	public static OEOneToMany oneToMany(Object db) {
 		return new OEOneToMany((OEDBHelper) db);
 	}

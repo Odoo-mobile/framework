@@ -18,6 +18,8 @@
  */
 package com.openerp.orm;
 
+import com.openerp.orm.types.OEManyToOne;
+
 public class OEM2ORecord {
 	private OEColumn mCol = null;
 	private String mValue = null;

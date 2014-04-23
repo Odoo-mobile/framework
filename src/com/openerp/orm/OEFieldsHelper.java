@@ -29,6 +29,8 @@ import org.json.JSONObject;
 import android.util.Log;
 
 import com.openerp.orm.OEM2MIds.Operation;
+import com.openerp.orm.types.OEManyToMany;
+import com.openerp.orm.types.OEManyToOne;
 
 public class OEFieldsHelper {
 	public static final String TAG = "com.openerp.orm.OEFieldsHelper";

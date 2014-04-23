@@ -20,6 +20,7 @@ package com.openerp.addons.idea;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.util.Log;
@@ -28,6 +29,7 @@ import com.openerp.orm.OEDataRow;
 import com.openerp.orm.OEM2MIds;
 import com.openerp.orm.OEM2MIds.Operation;
 import com.openerp.orm.OEValues;
+import com.openerp.util.OEDate;
 import com.openerp.util.logger.OELog;
 
 public class IdeaDemoRecords {
@@ -98,6 +100,9 @@ public class IdeaDemoRecords {
 			values.put("name", "Idea " + i);
 			values.put("description", "Description " + i);
 			values.put("category_id", i);
+			values.put("date", "2014-04-15 03:09:44");
+			values.put("flag", true);
+
 			Integer[] ids = new Integer[] { 1, 2 };
 			List<Integer> user_ids = Arrays.asList(ids);
 			values.put("user_ids", user_ids);
@@ -122,6 +127,11 @@ public class IdeaDemoRecords {
 		for (OEDataRow row : ideaDb.select()) {
 			OELog.log("RECORD :::::::::::::::::::::::: " + row.getString("id"));
 			OELog.log("name : " + row.getString("name"));
+			OELog.log("date", row.getString("date"));
+			OELog.log("cdate", OEDate.getDate(mContext, row.getString("date"),
+					TimeZone.getDefault().getID()));
+			OELog.log("create_date_time", row.getString("create_date_time"));
+
 			OELog.log("category : "
 					+ row.getM2ORecord("category_id").browse()
 							.getString("name"));
@@ -131,7 +141,9 @@ public class IdeaDemoRecords {
 							.getString("type"));
 			for (OEDataRow file : row.getO2MRecord("idea_files").browseEach()) {
 				OELog.log("idea_files:" + file.getString("name"));
-				OELog.log("idea_idea_id:" + file.getM2ORecord("idea_idea_id").browse().getString("id"));
+				OELog.log("idea_idea_id:"
+						+ file.getM2ORecord("idea_idea_id").browse()
+								.getString("id"));
 			}
 		}
 	}

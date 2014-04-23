@@ -16,7 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.orm;
+package com.openerp.orm.types;
+
+import com.openerp.orm.OEDBHelper;
 
 public class OEOneToMany {
 	OEDBHelper mDb = null;

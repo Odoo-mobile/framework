@@ -18,6 +18,8 @@
  */
 package com.openerp.base.login;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import openerp.OpenERP;
@@ -48,7 +50,6 @@ import com.openerp.auth.OpenERPAccountManager;
 import com.openerp.orm.OEHelper;
 import com.openerp.support.AppScope;
 import com.openerp.support.BaseFragment;
-import com.openerp.support.JSONDataHelper;
 import com.openerp.support.OEDialog;
 import com.openerp.support.OEUser;
 import com.openerp.support.fragment.FragmentListener;
@@ -112,8 +113,7 @@ public class Login extends BaseFragment {
 		// Inflate the layout for this fragment
 		rootView = inflater.inflate(R.layout.fragment_login, container, false);
 		dbListSpinner = (Spinner) rootView.findViewById(R.id.lstDatabases);
-		this.handleArguments((Bundle) getArguments());
-		this.loadDatabaseList();
+		handleArguments((Bundle) getArguments());
 		getActivity().setTitle(R.string.label_login);
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		getActivity().getActionBar().setHomeButtonEnabled(false);
@@ -145,6 +145,10 @@ public class Login extends BaseFragment {
 		if (arguments != null && arguments.size() > 0) {
 			if (arguments.containsKey("openERPServerURL")) {
 				openERPServerURL = arguments.getString("openERPServerURL");
+				String[] databases = arguments.getStringArray("databases");
+				List<String> dbLists = new ArrayList<String>();
+				dbLists.addAll(Arrays.asList(databases));
+				loadDatabaseList(dbLists);
 			}
 		}
 	}
@@ -152,11 +156,8 @@ public class Login extends BaseFragment {
 	/**
 	 * Load database list.
 	 */
-	private void loadDatabaseList() {
+	private void loadDatabaseList(List<String> dbList) {
 		try {
-			openerp = new OpenERP(openERPServerURL);
-			List<String> dbList = new JSONDataHelper()
-					.arrayToStringList(openerp.getDatabaseList());
 			dbList.add(0,
 					getActivity().getString(R.string.login_select_database));
 			ArrayAdapter<String> dbAdapter = new ArrayAdapter<String>(
@@ -255,12 +256,6 @@ public class Login extends BaseFragment {
 		 */
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			try {
-				// Simulate network access.
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				return false;
-			}
 
 			String userName = edtUsername.getText().toString();
 			String password = edtPassword.getText().toString();

@@ -25,26 +25,29 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.provider.Settings;
+import android.util.Log;
 
 /**
  * The Class OEDate.
  */
 @SuppressLint("SimpleDateFormat")
 public class OEDate {
+	public static final String TAG = OEDate.class.getSimpleName();
+	public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	/** The time format. */
-	static SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+	static SimpleDateFormat timeFormat, dateFormat;
 
-	/** The date format. */
-	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
-
-	public static String getDate(String date, String toTimezone) {
-		return OEDate.getDate(date, toTimezone, null);
+	public static String getDate(Context context, String date, String toTimezone) {
+		return OEDate.getDate(context, date, toTimezone, null);
 	}
 
-	public static String getDate(String date, String toTimezone, String format) {
+	public static String getDate(Context context, String date,
+			String toTimezone, String format) {
+
 		Calendar cal = Calendar.getInstance();
-		// cal.setTimeZone(TimeZone.getTimeZone("GMT-1"));
 		Date originalDate = convertToDate(date);
 		cal.setTime(originalDate);
 
@@ -52,14 +55,13 @@ public class OEDate {
 		Date today = removeTime(currentDate());
 		String finalDateTime = "";
 		if (format == null) {
-			dateFormat = new SimpleDateFormat("dd MMM");
-			timeFormat = new SimpleDateFormat("hh:mm a");
+			dateFormat = new SimpleDateFormat(dateFormat(context));
+			timeFormat = new SimpleDateFormat(timeFormat(context));
 			dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
 			timeFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
-			if (today.compareTo(oDate) > 0) {
+			if (today.compareTo(oDate) < 0) {
 				// sending date
 				finalDateTime = dateFormat.format(oDate);
-
 			} else {
 				// sending time because it's today.
 				finalDateTime = timeFormat.format(convertToTimezone(cal,
@@ -76,10 +78,25 @@ public class OEDate {
 
 	}
 
+	public static String dateFormat(Context context) {
+		return Settings.System.getString(context.getContentResolver(),
+				Settings.System.DATE_FORMAT);
+	}
+
+	public static String timeFormat(Context context) {
+		String time_hour = Settings.System.getString(
+				context.getContentResolver(), Settings.System.TIME_12_24);
+
+		String time_format = "HH:mm";
+		if (time_hour.equals("12"))
+			time_format = "hh:mm aaa";
+		return time_format;
+	}
+
 	public static String getDateFromMilis(long timeInMilis) {
 		String date = "";
 		Date original = new Date(timeInMilis);
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 		Date parsedDate = null;
 		try {
 			parsedDate = formatter.parse(formatter.format(original).toString());
@@ -121,8 +138,8 @@ public class OEDate {
 			SimpleDateFormat temp = new SimpleDateFormat(format);
 			temp.setTimeZone(TimeZone.getTimeZone("GMT"));
 			dt = temp.parse(date);
-
 		} catch (Exception e) {
+			Log.e(TAG, "Date format must be yyyy-MM-dd HH:mm:ss");
 			e.printStackTrace();
 		}
 		return dt;
@@ -176,7 +193,7 @@ public class OEDate {
 
 	public static String getDate() {
 		SimpleDateFormat gmtFormat = new SimpleDateFormat();
-		gmtFormat.applyPattern("yyyy-MM-dd HH:mm:ss");
+		gmtFormat.applyPattern(DEFAULT_FORMAT);
 		TimeZone gmtTime = TimeZone.getTimeZone("GMT");
 		gmtFormat.setTimeZone(gmtTime);
 		return gmtFormat.format(new Date());

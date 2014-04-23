@@ -23,6 +23,11 @@ import java.util.List;
 
 import android.util.Log;
 
+import com.openerp.orm.types.OEManyToMany;
+import com.openerp.orm.types.OEManyToOne;
+import com.openerp.orm.types.OEOneToMany;
+import com.openerp.orm.types.OETypeHelper;
+
 public class SQLHelper {
 
 	public static final String TAG = SQLHelper.class.getSimpleName();
@@ -42,10 +47,10 @@ public class SQLHelper {
 			if (col.getName().equals("id") || col.getName().equals("oea_name")) {
 				continue;
 			}
-			if (col.getType() instanceof String) {
+			if (col.getType() instanceof OETypeHelper) {
 				sql.append(col.getName());
 				sql.append(" ");
-				sql.append(col.getType());
+				sql.append(((OETypeHelper) col.getType()).getType());
 				sql.append(", ");
 			}
 			if (col.getType() instanceof OEManyToOne) {
@@ -58,7 +63,7 @@ public class SQLHelper {
 				}
 				sql.append(col.getName());
 				sql.append(" ");
-				sql.append(OEFields.integer());
+				sql.append(((OETypeHelper) OEFields.integer()).getType());
 				sql.append(", ");
 
 			}
@@ -101,10 +106,10 @@ public class SQLHelper {
 		sql.append(rel_table);
 		sql.append("(");
 		sql.append(column_first + "_id ");
-		sql.append(OEFields.integer());
+		sql.append(((OETypeHelper) OEFields.integer()).getType());
 		sql.append(", ");
 		sql.append(column_second + "_id ");
-		sql.append(OEFields.integer());
+		sql.append(((OETypeHelper) OEFields.integer()).getType());
 		sql.append(defaultRelColumns());
 		sql.append(");");
 		Log.d("SQLHelper", "Table created : " + rel_table);
@@ -152,10 +157,10 @@ public class SQLHelper {
 	private String defaultColumns() {
 		StringBuffer defaultCols = new StringBuffer();
 		defaultCols.append("id ");
-		defaultCols.append(OEFields.integer());
+		defaultCols.append(((OETypeHelper) OEFields.integer()).getType());
 		defaultCols.append(", ");
 		defaultCols.append("oea_name ");
-		defaultCols.append(OEFields.varchar(50));
+		defaultCols.append(((OETypeHelper) OEFields.varchar(50)).getType());
 		defaultCols.append(", ");
 		return defaultCols.toString();
 	}
@@ -164,7 +169,7 @@ public class SQLHelper {
 		StringBuffer defaultCols = new StringBuffer();
 		defaultCols.append(", ");
 		defaultCols.append("oea_name ");
-		defaultCols.append(OEFields.varchar(50));
+		defaultCols.append(((OETypeHelper) OEFields.varchar(50)).getType());
 		return defaultCols.toString();
 	}
 

@@ -16,12 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
-package com.openerp.orm;
+package com.openerp.orm.types;
 
-public class OEManyToOne {
+import com.openerp.orm.OEDBHelper;
+
+public class OEManyToMany {
 	OEDBHelper mDb = null;
 
-	public OEManyToOne(OEDBHelper db) {
+	public OEManyToMany(OEDBHelper db) {
 		mDb = db;
 	}
 

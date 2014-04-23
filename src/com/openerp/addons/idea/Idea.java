@@ -26,12 +26,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.openerp.R;
 import com.openerp.support.BaseFragment;
+import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.drawer.DrawerItem;
-import com.openerp.util.drawer.DrawerListener;
 
 /**
  * The Class Idea.
@@ -45,11 +46,23 @@ public class Idea extends BaseFragment {
 		// Res_PartnerDBHelper partner = new Res_PartnerDBHelper(getActivity());
 		// boolean flag = partner.getOEInstance().syncWithServer();
 		// OELog.log("Synced: " + flag);
-		DrawerListener drawer = (DrawerListener) getActivity();
-		drawer.refreshDrawer("idea");
-		IdeaDemoRecords rec = new IdeaDemoRecords(getActivity());
-		rec.createDemoRecords();
-		rec.selectAll();
+
+		// DrawerListener drawer = (DrawerListener) getActivity();
+		// drawer.refreshDrawer("idea");
+//		 IdeaDemoRecords rec = new IdeaDemoRecords(getActivity());
+//		 rec.createDemoRecords();
+//		 rec.selectAll();
+		rootView.findViewById(R.id.txvIdeaFragment).setOnClickListener(
+				new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+
+						FragmentListener frag = (FragmentListener) getActivity();
+						frag.startDetailFragment(new IdeaDetail());
+
+					}
+				});
 		return rootView;
 	}
 

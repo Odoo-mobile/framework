@@ -39,6 +39,7 @@ public class OpenERPServerConnection {
 	public static final String TAG = "com.openerp.support.OpenERPServerConnection";
 	/** The openerp. */
 	public OpenERP openerp = null;
+	JSONArray mDbLists = null;
 
 	/**
 	 * Test connection.
@@ -60,7 +61,7 @@ public class OpenERPServerConnection {
 		}
 		try {
 			openerp = new OpenERP(serverURL);
-			openerp.getDatabaseList();
+			mDbLists = openerp.getDatabaseList();
 		} catch (SSLPeerUnverifiedException ssl) {
 			Log.d(TAG, "Throw SSLPeerUnverifiedException ");
 			throw new SSLPeerUnverifiedException(ssl.getMessage());
@@ -73,28 +74,14 @@ public class OpenERPServerConnection {
 		return true;
 	}
 
-	/**
-	 * Gets the databases.
-	 * 
-	 * @param context
-	 *            the context
-	 * @param serverURL
-	 *            the server url
-	 * @return the databases
-	 * @throws OEVersionException
-	 * @throws SSLPeerUnverifiedException
-	 */
-	public JSONArray getDatabases(Context context, String serverURL)
-			throws OEVersionException, SSLPeerUnverifiedException {
-		JSONArray dbList = null;
-		if (this.testConnection(context, serverURL)) {
-			try {
-				dbList = openerp.getDatabaseList();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+	public String[] getDatabases() {
+		String[] dbs = new String[mDbLists.length()];
+		try {
+			for (int i = 0; i < mDbLists.length(); i++)
+				dbs[i] = mDbLists.getString(i);
+		} catch (Exception e) {
 		}
-		return dbList;
+		return dbs;
 	}
 
 	/**

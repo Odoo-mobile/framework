@@ -209,11 +209,12 @@ public class AccountFragment extends BaseFragment {
 		String errorMsg = "";
 
 		boolean mSSLError = false;
-
+		OpenERPServerConnection oeConnect = null;
 		public ConnectToServer() {
 			pdialog = new OEDialog(scope.context(), false, getResources()
 					.getString(R.string.title_connecting));
 			pdialog.show();
+			oeConnect = new OpenERPServerConnection();
 		}
 
 		/*
@@ -224,14 +225,6 @@ public class AccountFragment extends BaseFragment {
 		@Override
 		protected Boolean doInBackground(Void... params) {
 
-			try {
-				// Simulate network access.
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				return false;
-			}
-
-			OpenERPServerConnection oeConnect = new OpenERPServerConnection();
 			boolean flag = false;
 			try {
 				flag = oeConnect
@@ -266,6 +259,7 @@ public class AccountFragment extends BaseFragment {
 				Login loginFragment = new Login();
 				Bundle bundle = new Bundle();
 				bundle.putString("openERPServerURL", openERPServerURL);
+				bundle.putStringArray("databases", oeConnect.getDatabases());
 				loginFragment.setArguments(bundle);
 				FragmentListener fragment = (FragmentListener) getActivity();
 				fragment.startMainFragment(loginFragment, true);

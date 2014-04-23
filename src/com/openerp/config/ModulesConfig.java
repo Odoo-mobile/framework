@@ -30,6 +30,6 @@ public class ModulesConfig extends ModulesConfigHelper {
 	 */
 	public ModulesConfig() {
 		/* application modules */
-		// add(new Module("module_idea", "Idea", new Idea(), 0), true);
+		//add(new Module("module_idea", "Idea", new Idea(), 0), true);
 	}
 }

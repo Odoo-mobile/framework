@@ -18,12 +18,15 @@
  */
 package com.openerp.util.logger;
 
+import android.text.TextUtils;
+
 public class OELog {
 	/** The logger. */
 	private final java.util.logging.Logger logger = java.util.logging.Logger
 			.getLogger(this.getClass().toString());
 
-	public static void log(String message) {
+	public static void log(String... messages) {
+		String message = TextUtils.join(", ", messages);
 		OELog log = new OELog();
 		log._log(message);
 	}

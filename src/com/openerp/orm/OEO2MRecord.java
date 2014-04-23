@@ -20,6 +20,8 @@ package com.openerp.orm;
 
 import java.util.List;
 
+import com.openerp.orm.types.OEOneToMany;
+
 public class OEO2MRecord {
 	OEColumn mCol = null;
 	int mId = 0;
