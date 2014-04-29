@@ -50,9 +50,16 @@ public class OEHelper {
 	OpenERP mOpenERP = null;
 	App mApp = null;
 	boolean withUser = true;
+	boolean mAllowSelfSignedSSL = false;
 
 	public OEHelper(Context context, OEDatabase oeDatabase) {
+		this(context, oeDatabase, false);
+	}
+
+	public OEHelper(Context context, OEDatabase oeDatabase,
+			boolean allowSelfSignedSSL) {
 		Log.d(TAG, "OEHelper->OEHelper()");
+		mAllowSelfSignedSSL = allowSelfSignedSSL;
 		init();
 		mContext = context;
 		mDatabase = oeDatabase;
@@ -65,6 +72,7 @@ public class OEHelper {
 	}
 
 	public OEHelper(Context context) {
+		mAllowSelfSignedSSL = false;
 		init();
 		mContext = context;
 		mApp = (App) context.getApplicationContext();
@@ -77,6 +85,12 @@ public class OEHelper {
 	}
 
 	public OEHelper(Context context, boolean withUser) {
+		this(context, withUser, false);
+	}
+
+	public OEHelper(Context context, boolean withUser,
+			boolean allowSelfSignedSSL) {
+		mAllowSelfSignedSSL = allowSelfSignedSSL;
 		init();
 		mContext = context;
 		mApp = (App) context.getApplicationContext();
@@ -92,7 +106,7 @@ public class OEHelper {
 		Log.d(TAG, "OEHelper->login()");
 		OEUser userObj = null;
 		try {
-			mOpenERP = new OpenERP(serverURL);
+			mOpenERP = new OpenERP(serverURL, mAllowSelfSignedSSL);
 			JSONObject response = mOpenERP.authenticate(username, password,
 					database);
 			int userId = 0;
@@ -123,6 +137,7 @@ public class OEHelper {
 					userObj.setUser_id(userId);
 					userObj.setUsername(username);
 					userObj.setPassword(password);
+					userObj.setAllowSelfSignedSSL(mAllowSelfSignedSSL);
 					String company_id = new JSONArray(
 							res.getString("company_id")).getString(0);
 					userObj.setCompany_id(company_id);

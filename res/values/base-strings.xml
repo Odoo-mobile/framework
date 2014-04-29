@@ -103,6 +103,7 @@
     <string name="label_logout">Logout</string>
     <string name="label_version">Version</string>
     <string name="label_update_info">Update Info</string>
+    <string name="label_process_anyway">Process Anyway</string>
 
     <!-- Toasts -->
     <string name="toast_setting_saved">Setting saved.</string>

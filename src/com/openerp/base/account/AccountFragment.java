@@ -26,6 +26,7 @@ import openerp.OEVersionException;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -191,7 +192,7 @@ public class AccountFragment extends BaseFragment {
 
 			serverURL.append(edtServerUrl.getText());
 			this.openERPServerURL = serverURL.toString();
-			serverConnectASync = new ConnectToServer();
+			serverConnectASync = new ConnectToServer(false);
 			serverConnectASync.execute((Void) null);
 
 		}
@@ -210,11 +211,14 @@ public class AccountFragment extends BaseFragment {
 
 		boolean mSSLError = false;
 		OpenERPServerConnection oeConnect = null;
-		public ConnectToServer() {
+		boolean mAllowSelfSignedSSL = false;
+
+		public ConnectToServer(boolean allowSelfSignedSSL) {
+			mAllowSelfSignedSSL = allowSelfSignedSSL;
 			pdialog = new OEDialog(scope.context(), false, getResources()
 					.getString(R.string.title_connecting));
 			pdialog.show();
-			oeConnect = new OpenERPServerConnection();
+			oeConnect = new OpenERPServerConnection(mAllowSelfSignedSSL);
 		}
 
 		/*
@@ -260,6 +264,7 @@ public class AccountFragment extends BaseFragment {
 				Bundle bundle = new Bundle();
 				bundle.putString("openERPServerURL", openERPServerURL);
 				bundle.putStringArray("databases", oeConnect.getDatabases());
+				bundle.putBoolean("allow_self_signed_ssl", mAllowSelfSignedSSL);
 				loginFragment.setArguments(bundle);
 				FragmentListener fragment = (FragmentListener) getActivity();
 				fragment.startMainFragment(loginFragment, true);
@@ -285,7 +290,20 @@ public class AccountFragment extends BaseFragment {
 		builder.setIcon(R.drawable.ic_action_alerts_and_states_warning);
 		builder.setTitle(R.string.title_ssl_warning);
 		builder.setMessage(R.string.untrusted_ssl_warning);
-		builder.setNegativeButton(R.string.label_ok, null);
+		builder.setPositiveButton(R.string.label_process_anyway,
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (serverConnectASync != null) {
+							serverConnectASync.cancel(true);
+							serverConnectASync = null;
+						}
+						serverConnectASync = new ConnectToServer(true);
+						serverConnectASync.execute((Void) null);
+					}
+				});
+		builder.setNegativeButton(R.string.label_cancel, null);
 		builder.show();
 	}
 

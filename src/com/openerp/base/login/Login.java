@@ -71,6 +71,7 @@ public class Login extends BaseFragment {
 
 	/** The open erp server url. */
 	String openERPServerURL = "";
+	boolean mAllowSelfSignedSSL = false;
 
 	/** The edt server url. */
 	EditText edtServerUrl = null;
@@ -145,6 +146,8 @@ public class Login extends BaseFragment {
 		if (arguments != null && arguments.size() > 0) {
 			if (arguments.containsKey("openERPServerURL")) {
 				openERPServerURL = arguments.getString("openERPServerURL");
+				mAllowSelfSignedSSL = arguments
+						.getBoolean("allow_self_signed_ssl");
 				String[] databases = arguments.getStringArray("databases");
 				List<String> dbLists = new ArrayList<String>();
 				dbLists.addAll(Arrays.asList(databases));
@@ -260,7 +263,8 @@ public class Login extends BaseFragment {
 			String userName = edtUsername.getText().toString();
 			String password = edtPassword.getText().toString();
 			String database = dbListSpinner.getSelectedItem().toString();
-			OEHelper openerp = new OEHelper(getActivity(), false);
+			OEHelper openerp = new OEHelper(getActivity(), false,
+					mAllowSelfSignedSSL);
 			App app = (App) scope.context().getApplicationContext();
 			app.setOEInstance(null);
 			userData = openerp.login(userName, password, database,

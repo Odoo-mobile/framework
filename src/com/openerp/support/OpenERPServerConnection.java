@@ -40,6 +40,15 @@ public class OpenERPServerConnection {
 	/** The openerp. */
 	public OpenERP openerp = null;
 	JSONArray mDbLists = null;
+	boolean mAllowSelfSignedSSL = false;
+
+	public OpenERPServerConnection() {
+		mAllowSelfSignedSSL = false;
+	}
+
+	public OpenERPServerConnection(boolean allowSelfSignedSSL) {
+		mAllowSelfSignedSSL = allowSelfSignedSSL;
+	}
 
 	/**
 	 * Test connection.
@@ -60,7 +69,7 @@ public class OpenERPServerConnection {
 			return false;
 		}
 		try {
-			openerp = new OpenERP(serverURL);
+			openerp = new OpenERP(serverURL, mAllowSelfSignedSSL);
 			mDbLists = openerp.getDatabaseList();
 		} catch (SSLPeerUnverifiedException ssl) {
 			Log.d(TAG, "Throw SSLPeerUnverifiedException ");

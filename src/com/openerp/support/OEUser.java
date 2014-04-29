@@ -25,7 +25,6 @@ import android.os.Bundle;
 
 import com.openerp.auth.OpenERPAccountManager;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class UserObject.
  */
@@ -64,6 +63,8 @@ public class OEUser {
 	/** The company_id. */
 	private String company_id;
 
+	private boolean allow_self_signed_ssl = false;
+
 	/**
 	 * Gets the data as bundle.
 	 * 
@@ -82,6 +83,8 @@ public class OEUser {
 		bundle.putString("android_name", this.getAndroidName());
 		bundle.putString("password", this.getPassword());
 		bundle.putString("company_id", this.getCompany_id());
+		bundle.putString("allow_self_signed_ssl",
+				String.valueOf(this.isAllowSelfSignedSSL()));
 		return bundle;
 	}
 
@@ -122,6 +125,7 @@ public class OEUser {
 		this.setAndroidName(data.getString("android_name"));
 		this.setPassword(data.getString("password"));
 		this.setCompany_id(data.getString("company_id"));
+		this.setAllowSelfSignedSSL(data.getBoolean("allow_self_signed_ssl"));
 	}
 
 	/**
@@ -146,6 +150,8 @@ public class OEUser {
 		this.setAndroidName(accMgr.getUserData(account, "android_name"));
 		this.setPassword(accMgr.getUserData(account, "password"));
 		this.setCompany_id(accMgr.getUserData(account, "company_id"));
+		this.setAllowSelfSignedSSL(Boolean.parseBoolean(accMgr.getUserData(
+				account, "allow_self_signed_ssl")));
 	}
 
 	/**
@@ -341,4 +347,13 @@ public class OEUser {
 	public static OEUser current(Context context) {
 		return OpenERPAccountManager.currentUser(context);
 	}
+
+	public boolean isAllowSelfSignedSSL() {
+		return allow_self_signed_ssl;
+	}
+
+	public void setAllowSelfSignedSSL(boolean allow_self_signed_ssl) {
+		this.allow_self_signed_ssl = allow_self_signed_ssl;
+	}
+
 }

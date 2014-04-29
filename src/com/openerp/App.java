@@ -19,7 +19,8 @@ public class App extends Application {
 		OEUser user = OEUser.current(getApplicationContext());
 		if (user != null) {
 			try {
-				mOEInstance = new OpenERP(user.getHost());
+				mOEInstance = new OpenERP(user.getHost(),
+						user.isAllowSelfSignedSSL());
 				mOEInstance.authenticate(user.getUsername(),
 						user.getPassword(), user.getDatabase());
 			} catch (Exception e) {
