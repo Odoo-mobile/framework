@@ -50,6 +50,7 @@ public class OEDate {
 		if (date.equals("false")) {
 			return date;
 		}
+
 		Calendar cal = Calendar.getInstance();
 		Date originalDate = convertToDate(date);
 		cal.setTime(originalDate);

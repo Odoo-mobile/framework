@@ -26,4 +26,6 @@ public interface FragmentListener {
 	public void startDetailFragment(Fragment fragment);
 
 	public void restart();
+
+	public boolean isTwoPane();
 }

@@ -32,4 +32,5 @@ public class PreferenceManager {
 	public int getInt(String key, int default_value) {
 		return Integer.parseInt(mPref.getString(key, default_value + ""));
 	}
+
 }

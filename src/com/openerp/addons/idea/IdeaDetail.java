@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.openerp.R;
 import com.openerp.support.BaseFragment;
@@ -37,6 +38,10 @@ public class IdeaDetail extends BaseFragment {
 			Bundle savedInstanceState) {
 		View mView = inflater.inflate(R.layout.fragment_idea_detail, container,
 				false);
+		Bundle args = getArguments();
+		TextView txv = (TextView) mView.findViewById(R.id.textView1);
+		if (args != null && args.containsKey("name"))
+			txv.setText(args.getString("name"));
 		return mView;
 	}
 
