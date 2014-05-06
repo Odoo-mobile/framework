@@ -89,6 +89,7 @@ public class MainActivity extends FragmentActivity implements
 	String mDrawerSubtitle = "";
 	int mDrawerItemSelectedPosition = -1;
 	ListView mDrawerListView = null;
+	boolean mNewFragment = false;
 
 	FragmentManager mFragment = null;
 
@@ -113,6 +114,9 @@ public class MainActivity extends FragmentActivity implements
 		mContext = this;
 		mFragment = getSupportFragmentManager();
 		if (findViewById(R.id.fragment_detail_container) != null) {
+			findViewById(R.id.fragment_detail_container).setVisibility(
+					View.GONE);
+
 			mTwoPane = true;
 		}
 		init();
@@ -700,9 +704,10 @@ public class MainActivity extends FragmentActivity implements
 			findViewById(R.id.fragment_detail_container).setVisibility(
 					View.GONE);
 			Fragment detail = mFragment.findFragmentByTag("detail_fragment");
-			if (detail != null && !detail.isInLayout()) {
+			if (detail != null && !mNewFragment && !detail.isInLayout()) {
 				startDetailFragment(recreateFragment(detail));
 			}
+
 		}
 		FragmentTransaction tran = mFragment.beginTransaction().replace(
 				container_id, fragment, "main_fragment");
