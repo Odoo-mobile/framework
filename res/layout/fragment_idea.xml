@@ -5,14 +5,10 @@
     android:orientation="vertical"
     android:paddingTop="?android:attr/actionBarSize" >
 
-    <TextView
-        android:id="@+id/txvIdeaFragment"
+    <ListView
+        android:id="@+id/listview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fontFamily="sans-sarif-light"
-        android:gravity="center"
-        android:text="Idea Fragment"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textStyle="bold" />
+        android:layout_height="match_parent" >
+    </ListView>
 
 </LinearLayout>
