@@ -62,6 +62,7 @@ import com.openerp.support.BaseFragment;
 import com.openerp.support.OEUser;
 import com.openerp.support.fragment.FragmentListener;
 import com.openerp.util.Base64Helper;
+import com.openerp.util.OEAppRater;
 import com.openerp.util.OnBackButtonPressedListener;
 import com.openerp.util.PreferenceManager;
 import com.openerp.util.drawer.DrawerAdatper;
@@ -121,6 +122,10 @@ public class MainActivity extends FragmentActivity implements
 		init();
 	}
 
+	private void checkForRateApplication() {
+		OEAppRater.app_launched(this);
+	}
+
 	private void init() {
 		Log.d(TAG, "MainActivity->init()");
 		initDrawerControls();
@@ -161,7 +166,7 @@ public class MainActivity extends FragmentActivity implements
 				initDrawer();
 			}
 		}
-
+		checkForRateApplication();
 	}
 
 	private void initDrawerControls() {
