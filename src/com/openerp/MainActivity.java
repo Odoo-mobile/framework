@@ -108,16 +108,24 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		getActionBar().setIcon(R.drawable.ic_launcher);
-		if (savedInstanceState != null) {
-			mDrawerItemSelectedPosition = savedInstanceState
-					.getInt("current_drawer_item");
-		}
 		mContext = this;
 		mFragment = getSupportFragmentManager();
+		initTouchListener();
 		if (findViewById(R.id.fragment_detail_container) != null) {
 			findViewById(R.id.fragment_detail_container).setVisibility(
 					View.GONE);
 			mTwoPane = true;
+		}
+		if (savedInstanceState != null) {
+			mDrawerItemSelectedPosition = savedInstanceState
+					.getInt("current_drawer_item");
+			if(OpenERPAccountManager.isAnyUser(mContext))
+			{
+				Log.e("Saved instance","if account true");
+				initDrawerControls();
+				initDrawer();
+			}
+			return;
 		}
 		init();
 	}
@@ -151,22 +159,24 @@ public class MainActivity extends FragmentActivity implements
 						OpenERPAccountManager.fetchAllAccounts(mContext))
 						.show();
 			} else {
-				OETouchListener.DEFAULT_HEADER_LAYOUT = R.layout.default_header;
-				OETouchListener.DEFAULT_ANIM_HEADER_IN = R.anim.fade_in;
-				OETouchListener.DEFAULT_ANIM_HEADER_OUT = R.anim.fade_out;
-				OETouchListener.ptr_progress = R.id.ptr_progress;
-				OETouchListener.ptr_text = R.id.ptr_text;
-				OETouchListener.refresh_pull_label = R.string.pull_to_refresh_pull_label;
-				OETouchListener.refreshing_label = R.string.pull_to_refresh_refreshing_label;
-				OETouchListener.release_label = R.string.pull_to_refresh_release_label;
-				OETouchListener.contentView = R.id.ptr_content;
-				OETouchListener.opaqueBackground = R.id.ptr_text_opaque_bg;
-
-				mTouchAttacher = new OETouchListener(this);
 				initDrawer();
 			}
 		}
 		checkForRateApplication();
+	}
+
+	protected void initTouchListener() {
+		OETouchListener.DEFAULT_HEADER_LAYOUT = R.layout.default_header;
+		OETouchListener.DEFAULT_ANIM_HEADER_IN = R.anim.fade_in;
+		OETouchListener.DEFAULT_ANIM_HEADER_OUT = R.anim.fade_out;
+		OETouchListener.ptr_progress = R.id.ptr_progress;
+		OETouchListener.ptr_text = R.id.ptr_text;
+		OETouchListener.refresh_pull_label = R.string.pull_to_refresh_pull_label;
+		OETouchListener.refreshing_label = R.string.pull_to_refresh_refreshing_label;
+		OETouchListener.release_label = R.string.pull_to_refresh_release_label;
+		OETouchListener.contentView = R.id.ptr_content;
+		OETouchListener.opaqueBackground = R.id.ptr_text_opaque_bg;
+		mTouchAttacher = new OETouchListener(this);
 	}
 
 	private void initDrawerControls() {
