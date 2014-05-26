@@ -111,6 +111,7 @@ public class MainActivity extends FragmentActivity implements
 		mContext = this;
 		mFragment = getSupportFragmentManager();
 		initTouchListener();
+		initDrawerControls();
 		if (findViewById(R.id.fragment_detail_container) != null) {
 			findViewById(R.id.fragment_detail_container).setVisibility(
 					View.GONE);
@@ -119,11 +120,9 @@ public class MainActivity extends FragmentActivity implements
 		if (savedInstanceState != null) {
 			mDrawerItemSelectedPosition = savedInstanceState
 					.getInt("current_drawer_item");
-			if(OpenERPAccountManager.isAnyUser(mContext))
-			{
-				Log.e("Saved instance","if account true");
-				initDrawerControls();
-				initDrawer();
+			if (OpenERPAccountManager.isAnyUser(mContext)) {
+				setDrawerItems();
+				initDrawerListeners();
 			}
 			return;
 		}
@@ -183,8 +182,7 @@ public class MainActivity extends FragmentActivity implements
 		Log.d(TAG, "MainActivity->initDrawerControls()");
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
-		if (OEUser.current(mContext) != null)
-			setDrawerHeader();
+
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_navigation_drawer, R.string.drawer_open,
 				R.string.app_name) {
@@ -245,6 +243,8 @@ public class MainActivity extends FragmentActivity implements
 
 	private void setDrawerItems() {
 		Log.d(TAG, "MainActivity->setDrawerItems()");
+		if (OEUser.current(mContext) != null)
+			setDrawerHeader();
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		mDrawerListItems.addAll(DrawerHelper.drawerItems(mContext));
@@ -258,9 +258,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	private void initDrawer() {
-		setDrawerItems();
-		Log.d(TAG, "MainActivity->initDrawer()");
+	private int initDrawerListeners() {
 		mDrawerListView.setOnItemClickListener(this);
 		int position = 1;
 		if (mDrawerListItems.size() > 0) {
@@ -277,6 +275,13 @@ public class MainActivity extends FragmentActivity implements
 		}
 		mAppTitle = mDrawerListItems.get(position).getTitle();
 		setTitle(mAppTitle);
+		return position;
+	}
+
+	private void initDrawer() {
+		Log.d(TAG, "MainActivity->initDrawer()");
+		setDrawerItems();
+		int position = initDrawerListeners();
 
 		/**
 		 * TODO: handle intent request from outside
