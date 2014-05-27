@@ -38,7 +38,7 @@ import com.odoo.support.SyncValue;
 public class OpenERPAccountManager {
 
 	/** The Constant PARAM_AUTHTOKEN_TYPE. */
-	private static final String PARAM_AUTHTOKEN_TYPE = "com.openerp.auth";
+	private static final String PARAM_AUTHTOKEN_TYPE = "com.odoo.auth";
 	public static OEUser current_user = null;
 
 	/**
