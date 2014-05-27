@@ -216,11 +216,11 @@ public class OpenERPAccountManager {
 		OEUser user = OpenERPAccountManager.getAccountDetail(context, username);
 		Account account = OpenERPAccountManager.getAccount(context,
 				user.getAndroidName());
+				
 		if (user != null) {
 			if (cancelAllSync(account)) {
 				AccountManager accMgr = AccountManager.get(context);
 				user.setIsactive(false);
-
 				accMgr.setUserData(account, "isactive", "0");
 				flag = true;
 				current_user = null;
@@ -232,12 +232,10 @@ public class OpenERPAccountManager {
 
 	private static boolean cancelAllSync(Account account) {
 		SyncWizardValues syncVals = new SyncWizardValues();
-		boolean flag = false;
 		for (SyncValue sync : syncVals.syncValues()) {
 			ContentResolver.cancelSync(account, sync.getAuthority());
-			flag = true;
 		}
-		return flag;
+		return true;
 	}
 
 	/**
@@ -276,7 +274,7 @@ public class OpenERPAccountManager {
 	 * @param context
 	 *            the context
 	 * @param username
-	 *            the username
+	 *            the username 
 	 */
 	public static void removeAccount(Context context, String username) {
 		AccountManager accMgr = AccountManager.get(context);
