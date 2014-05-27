@@ -1,12 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:oe="http://schemas.android.com/apk/res/com.openerp"
+    xmlns:oe="http://schemas.android.com/apk/res/com.odoo"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/drawer_item_selector"
     android:orientation="horizontal"
     android:weightSum="2" >
 
-    <com.openerp.util.drawer.DrawerIconView
+    <com.odoo.util.drawer.DrawerIconView
         android:id="@+id/imgDrawerItemIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

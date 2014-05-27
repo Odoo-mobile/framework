@@ -27,7 +27,7 @@
                 android:layout_gravity="center_vertical|center_horizontal"
                 android:layout_marginTop="15dp"
                 android:contentDescription="@string/imgcontentDescription"
-                android:src="@drawable/openerp_logo" />
+                android:src="@drawable/odoo_small" />
 
             <TextView
                 android:id="@+id/txvVersionName"
@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_below="@id/logoLayout"
-            android:background="@drawable/aboutus_background"
+            android:background="#787878"
             android:padding="20dp" >
 
             <TextView

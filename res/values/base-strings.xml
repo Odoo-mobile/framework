@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">OpenERP</string>
-
+    <string name="app_name">Odoo</string>
+    <string name="app_name_odoo">Odoo</string>
     <!-- Account -->
     <string name="account_user_dp">Account User Display Picture</string>
-    <string name="logo_description">OpenERP</string>
-    <string name="account_title">Setup Your OpenERP Server</string>
-    <string name="account_description">Provide your OpenERP Server URL and click on Continue button to test connection and go next step.</string>
+    <string name="logo_description">Odoo</string>
+    <string name="account_title">Setup Your Odoo Server</string>
+    <string name="account_description">Provide your Odoo Server URL and click on Continue button to test connection and go next step.</string>
     <string name="account_edit_server_url">Server URL</string>
     <string name="account_edit_server_port">Port Number (If any)</string>
     <string name="account_continue_button">Continue</string>
@@ -21,7 +21,7 @@
     <string name="str_secure_connection">Secure Connection</string>
 
     <!-- Login Fragment Strings -->
-    <string name="login_title">Config Your OpenERP Login Details</string>
+    <string name="login_title">Config Your Odoo Login Details</string>
     <string name="login_description">Select your working database and provide your username and password to access.</string>
     <string name="login_select_database">Select Database</string>
     <string name="login_edit_username">Username</string>
@@ -62,15 +62,15 @@
     </string-array>
 
     <!-- Aboout Company Fragment Strings -->
-    <string name="about_Company_line1">Copyright © 2004-TODAY OpenERP SA. All Rights Reserved.</string>
-    <string name="about_Company_line2">OpenERP is a trademark of the <a href="https://www.openerp.com/">OpenERP.com.</a></string>
+    <string name="about_Company_line1">Copyright © 2004-TODAY Odoo SA. All Rights Reserved.</string>
+    <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>
     <string name="about_Company_line3">Licenced under the terms of <a href="http://www.gnu.org/licenses/agpl.html/">GNU Affero General Public License</a></string>
-    <string name="about_Company_line4">For more information visit <a href="https://www.openerp.com/">OpenERP.com</a>.</string>
+    <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
     <string name="app_version_name">Version</string>
-    <string name="imgcontentDescription">OpenERP LOGO in upper portion of the screen</string>
+    <string name="imgcontentDescription">Odoo LOGO in upper portion of the screen</string>
 
-    <!-- OpenERP Widget Strings -->
-    <string name="widget_company_logo">OpenERP logo</string>
+    <!-- Odoo Widget Strings -->
+    <string name="widget_company_logo">Odoo logo</string>
     <string name="untrusted_ssl_warning">The site\'s security certificate is not trusted !</string>
 
     <!-- Title -->
@@ -87,7 +87,7 @@
     <string name="title_confirm">Confirm</string>
     <string name="title_ssl_warning">SSL Warning</string>
     <string name="title_enter_password">Enter Password</string>
-    <string name="title_user_profile">OpenERP User Profile</string>
+    <string name="title_user_profile">Odoo User Profile</string>
     <string name="title_configuration">Configuration</string>
     <string name="title_refresh_details">Refresh Details</string>
     <string name="title_add_account">Add Account</string>
@@ -115,6 +115,6 @@
     <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
     <string name="toast_are_you_sure_delete_account">Are you sure want to delete account ?</string>
     <string name="toast_provide_server_url">Provide Server URL</string>
-    <string name="toast_unable_to_reach_openerp_server">Unable to reach OpenERP Server.</string>
+    <string name="toast_unable_to_reach_odoo_server">Unable to reach Odoo Server.</string>
 
 </resources>
