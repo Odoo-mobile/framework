@@ -5,7 +5,7 @@
         android:detailColumn="data3"
         android:detailSocialSummary="true"
         android:icon="@drawable/ic_launcher"
-        android:mimeType="vnd.android.cursor.item/vnd.com.openerp.auth.profile"
+        android:mimeType="vnd.android.cursor.item/vnd.com.odoo.auth.profile"
         android:summaryColumn="data2" />
 
 </ContactsSource>
