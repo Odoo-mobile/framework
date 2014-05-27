@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.openerp"
+    package="com.odoo"
     android:versionCode="1"
     android:versionName="1.0 Beta" >
 
@@ -27,7 +27,7 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
-        android:name="com.openerp.App"
+        android:name="com.odoo.App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -35,7 +35,7 @@
         android:theme="@style/AppTheme" >
 
         <!-- Android Account Authentication Service -->
-        <service android:name="com.openerp.auth.OpenERPAuthenticateService" >
+        <service android:name="com.odoo.auth.OpenERPAuthenticateService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" >
                 </action>
@@ -48,7 +48,7 @@
         </service>
 
         <activity
-            android:name="com.openerp.MainActivity"
+            android:name="com.odoo.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,15 +56,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.openerp.AppSettingsActivity" >
+        <activity android:name="com.odoo.AppSettingsActivity" >
             <intent-filter>
-                <action android:name="com.openerp.ACTION_ACCOUNT_CONFIG" />
+                <action android:name="com.odoo.ACTION_ACCOUNT_CONFIG" />
             </intent-filter>
         </activity>
 
         <!-- Contact service -->
         <service
-            android:name="com.openerp.base.res.services.ContactSyncService"
+            android:name="com.odoo.base.res.services.ContactSyncService"
             android:exported="true"
             android:process=":contacts" >
             <intent-filter>
