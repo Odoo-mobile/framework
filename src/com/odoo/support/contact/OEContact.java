@@ -158,7 +158,7 @@ public class OEContact {
 		builder = ContentProviderOperation.newInsert(mContactContract);
 		builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
 		builder.withValue(ContactsContract.Data.MIMETYPE,
-				"vnd.android.cursor.item/vnd.com.openerp.auth.profile");
+				"vnd.android.cursor.item/vnd.com.odoo.auth.profile");
 		builder.withValue(ContactsContract.Data.DATA1,
 				partner.getString("name"));
 		builder.withValue(ContactsContract.Data.DATA2, partner.getInt("id"));
