@@ -197,7 +197,7 @@ public class OEFieldsHelper {
 				_ids.add(ids);
 			}
 			if (_model_ids.containsKey(db.getModelName())) {
-				if (!_model_ids.containsValue(_ids))
+				if (!hasValue(_model_ids.get(db.getModelName()), _ids))
 					_model_ids.get(db.getModelName()).addAll(_ids);
 			} else {
 				_model_ids.put(db.getModelName(), _ids);
@@ -212,6 +212,23 @@ public class OEFieldsHelper {
 				datas.add(new OERelationData(db, _model_ids.get(key)));
 			}
 			return datas;
+		}
+
+		private boolean hasValue(List<Object> list, Object value) {
+			for (Object obj : list) {
+				if (value instanceof List) {
+					@SuppressWarnings("unchecked")
+					List<Object> vList = (List<Object>) value;
+					for (Object vV : vList) {
+						if (vV.toString().equals(obj.toString()))
+							return true;
+					}
+				} else {
+					if (obj.toString().equals(value.toString()))
+						return true;
+				}
+			}
+			return false;
 		}
 	}
 
