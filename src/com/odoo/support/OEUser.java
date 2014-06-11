@@ -23,7 +23,7 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 
 /**
  * The Class UserObject.
@@ -345,7 +345,7 @@ public class OEUser {
 	}
 
 	public static OEUser current(Context context) {
-		return OpenERPAccountManager.currentUser(context);
+		return OdooAccountManager.currentUser(context);
 	}
 
 	public boolean isAllowSelfSignedSSL() {

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import openerp.OpenERP;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -46,7 +45,7 @@ import android.widget.Toast;
 
 import com.odoo.App;
 import com.odoo.R;
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 import com.odoo.orm.OEHelper;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
@@ -69,8 +68,8 @@ public class Login extends BaseFragment {
 	/** The m action mode. */
 	ActionMode mActionMode;
 
-	/** The open erp server url. */
-	String openERPServerURL = "";
+	/** The odooserver url. */
+	String odooServerURL = "";
 	boolean mAllowSelfSignedSSL = false;
 
 	/** The edt server url. */
@@ -93,9 +92,6 @@ public class Login extends BaseFragment {
 
 	/** The edt password. */
 	EditText edtPassword = null;
-
-	/** The OpenERP Object */
-	OpenERP openerp = null;
 
 	/*
 	 * (non-Javadoc)
@@ -138,14 +134,13 @@ public class Login extends BaseFragment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.openerp.support.FragmentHelper#handleArguments(android.os.Bundle)
+	 * @see com.odoo.support.FragmentHelper#handleArguments(android.os.Bundle)
 	 */
 	public void handleArguments(Bundle bundle) {
 		arguments = bundle;
 		if (arguments != null && arguments.size() > 0) {
-			if (arguments.containsKey("openERPServerURL")) {
-				openERPServerURL = arguments.getString("openERPServerURL");
+			if (arguments.containsKey("odooServerURL")) {
+				odooServerURL = arguments.getString("odooServerURL");
 				mAllowSelfSignedSSL = arguments
 						.getBoolean("allow_self_signed_ssl");
 				String[] databases = arguments.getStringArray("databases");
@@ -263,12 +258,11 @@ public class Login extends BaseFragment {
 			String userName = edtUsername.getText().toString();
 			String password = edtPassword.getText().toString();
 			String database = dbListSpinner.getSelectedItem().toString();
-			OEHelper openerp = new OEHelper(getActivity(), false,
+			OEHelper odoo = new OEHelper(getActivity(), false,
 					mAllowSelfSignedSSL);
 			App app = (App) scope.context().getApplicationContext();
 			app.setOEInstance(null);
-			userData = openerp.login(userName, password, database,
-					openERPServerURL);
+			userData = odoo.login(userName, password, database, odooServerURL);
 			if (userData != null) {
 				return true;
 			} else {
@@ -288,16 +282,14 @@ public class Login extends BaseFragment {
 			if (success) {
 				Log.v("Creating Account For Username :",
 						userData.getAndroidName());
-				if (OpenERPAccountManager.fetchAllAccounts(getActivity()) != null) {
-					if (OpenERPAccountManager.isAnyUser(getActivity())) {
-						OpenERPAccountManager.logoutUser(getActivity(),
-								OpenERPAccountManager
-										.currentUser(getActivity())
+				if (OdooAccountManager.fetchAllAccounts(getActivity()) != null) {
+					if (OdooAccountManager.isAnyUser(getActivity())) {
+						OdooAccountManager.logoutUser(getActivity(),
+								OdooAccountManager.currentUser(getActivity())
 										.getAndroidName());
 					}
 				}
-				if (OpenERPAccountManager
-						.createAccount(getActivity(), userData)) {
+				if (OdooAccountManager.createAccount(getActivity(), userData)) {
 					loginUserASync.cancel(true);
 					pdialog.hide();
 					SyncWizard syncWizard = new SyncWizard();

@@ -27,7 +27,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import openerp.OEDomain;
+import odoo.OEDomain;
 
 import org.json.JSONObject;
 
@@ -123,20 +123,20 @@ public class Attachment implements OnClickListener {
 
 	}
 
-//	private void createDialog(Types type) {
-//		mDialogType = type;
-//		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//		switch (type) {
-//		case IMAGE_OR_CAPTURE_IMAGE:
-//			builder.setTitle("Image");
-//			mOptions = new String[] { "Select Image", "Capture Image" };
-//			break;
-//		default:
-//			break;
-//		}
-//		builder.setSingleChoiceItems(mOptions, -1, this);
-//		builder.create().show();
-//	}
+	// private void createDialog(Types type) {
+	// mDialogType = type;
+	// AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+	// switch (type) {
+	// case IMAGE_OR_CAPTURE_IMAGE:
+	// builder.setTitle("Image");
+	// mOptions = new String[] { "Select Image", "Capture Image" };
+	// break;
+	// default:
+	// break;
+	// }
+	// builder.setSingleChoiceItems(mOptions, -1, this);
+	// builder.create().show();
+	// }
 
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
@@ -434,14 +434,14 @@ public class Attachment implements OnClickListener {
 			if (!mAttachmentInfo.getString("file_uri").equals("false")) {
 				return null;
 			} else {
-				if (mOE.openERP() != null) {
+				if (mOE.odoo() != null) {
 					try {
 						OEFieldsHelper fields = new OEFieldsHelper(
 								new String[] { "name", "datas", "file_type",
 										"res_model", "res_id" });
 						OEDomain domain = new OEDomain();
 						domain.add("id", "=", mAttachmentInfo.getInt("id"));
-						JSONObject result = mOE.openERP().search_read(
+						JSONObject result = mOE.odoo().search_read(
 								mDb.getModelName(), fields.get(), domain.get());
 						if (result.getJSONArray("records").length() > 0) {
 							JSONObject row = result.getJSONArray("records")
@@ -525,7 +525,7 @@ public class Attachment implements OnClickListener {
 
 	private String getAppDirectoryPath() {
 		File externalStorage = Environment.getExternalStorageDirectory();
-		String basePath = externalStorage.getAbsolutePath() + "/OpenERP";
+		String basePath = externalStorage.getAbsolutePath() + "/Odoo";
 		File baseDir = new File(basePath);
 		if (!baseDir.isDirectory()) {
 			baseDir.mkdir();

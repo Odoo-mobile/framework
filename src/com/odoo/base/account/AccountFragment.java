@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import openerp.OEVersionException;
+import odoo.OEVersionException;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -51,7 +51,7 @@ import com.odoo.base.login.Login;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
 import com.odoo.support.OEDialog;
-import com.odoo.support.OpenERPServerConnection;
+import com.odoo.support.OdooServerConnection;
 import com.odoo.support.fragment.FragmentListener;
 import com.odoo.util.drawer.DrawerItem;
 
@@ -69,8 +69,8 @@ public class AccountFragment extends BaseFragment {
 	/** The m action mode. */
 	ActionMode mActionMode;
 
-	/** The open erp server url. */
-	String openERPServerURL = "";
+	/** The odoo server url. */
+	String odooServerURL = "";
 
 	/** The edt server url. */
 	EditText edtServerUrl = null;
@@ -191,7 +191,7 @@ public class AccountFragment extends BaseFragment {
 			}
 
 			serverURL.append(edtServerUrl.getText());
-			this.openERPServerURL = serverURL.toString();
+			odooServerURL = serverURL.toString();
 			serverConnectASync = new ConnectToServer(false);
 			serverConnectASync.execute((Void) null);
 
@@ -210,7 +210,7 @@ public class AccountFragment extends BaseFragment {
 		String errorMsg = "";
 
 		boolean mSSLError = false;
-		OpenERPServerConnection oeConnect = null;
+		OdooServerConnection oeConnect = null;
 		boolean mAllowSelfSignedSSL = false;
 
 		public ConnectToServer(boolean allowSelfSignedSSL) {
@@ -218,7 +218,7 @@ public class AccountFragment extends BaseFragment {
 			pdialog = new OEDialog(scope.context(), false, getResources()
 					.getString(R.string.title_connecting));
 			pdialog.show();
-			oeConnect = new OpenERPServerConnection(mAllowSelfSignedSSL);
+			oeConnect = new OdooServerConnection(mAllowSelfSignedSSL);
 		}
 
 		/*
@@ -231,8 +231,7 @@ public class AccountFragment extends BaseFragment {
 
 			boolean flag = false;
 			try {
-				flag = oeConnect
-						.testConnection(getActivity(), openERPServerURL);
+				flag = oeConnect.testConnection(getActivity(), odooServerURL);
 				if (!flag) {
 					errorMsg = getResources().getString(
 							R.string.toast_unable_to_reach_odoo_server);
@@ -262,7 +261,7 @@ public class AccountFragment extends BaseFragment {
 				// Start New Fragment for Login
 				Login loginFragment = new Login();
 				Bundle bundle = new Bundle();
-				bundle.putString("openERPServerURL", openERPServerURL);
+				bundle.putString("odooServerURL", odooServerURL);
 				bundle.putStringArray("databases", oeConnect.getDatabases());
 				bundle.putBoolean("allow_self_signed_ssl", mAllowSelfSignedSSL);
 				loginFragment.setArguments(bundle);

@@ -33,7 +33,7 @@ import com.odoo.orm.types.OEManyToMany;
 import com.odoo.orm.types.OEManyToOne;
 
 public class OEFieldsHelper {
-	public static final String TAG = "com.openerp.orm.OEFieldsHelper";
+	public static final String TAG = "com.odoo.orm.OEFieldsHelper";
 	JSONObject mFields = new JSONObject();
 	List<OEValues> mValues = new ArrayList<OEValues>();
 	List<OEColumn> mColumns = new ArrayList<OEColumn>();
@@ -162,10 +162,6 @@ public class OEFieldsHelper {
 			}
 		} catch (Exception e) {
 		}
-	}
-
-	public void addManyToOneId(Object model, int id) {
-
 	}
 
 	public JSONObject get() {

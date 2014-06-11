@@ -39,7 +39,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.odoo.R;
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 import com.odoo.orm.OEDataRow;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
@@ -123,7 +123,7 @@ public class AccountsDetail extends BaseFragment {
 
 						@Override
 						public void onClick(View view) {
-							OpenERPAccountManager.loginUser(scope.context(),
+							OdooAccountManager.loginUser(scope.context(),
 									row_data.getString("name"));
 							scope.main().finish();
 							scope.main()
@@ -140,7 +140,7 @@ public class AccountsDetail extends BaseFragment {
 
 	private List<Object> getAccounts() {
 		List<Object> list = new ArrayList<Object>();
-		for (OEUser account : OpenERPAccountManager.fetchAllAccounts(scope
+		for (OEUser account : OdooAccountManager.fetchAllAccounts(scope
 				.context())) {
 			OEDataRow row_data = new OEDataRow();
 
@@ -189,7 +189,7 @@ public class AccountsDetail extends BaseFragment {
 								// User clicked OK, so save the result somewhere
 								// or return them to the component that opened
 								// the dialog
-								OpenERPAccountManager.logoutUser(scope
+								OdooAccountManager.logoutUser(scope
 										.context(), scope.User()
 										.getAndroidName());
 								scope.main().finish();
@@ -217,7 +217,7 @@ public class AccountsDetail extends BaseFragment {
 								// User clicked OK, so save the result somewhere
 								// or return them to the component that opened
 								// the dialog
-								OpenERPAccountManager.removeAccount(
+								OdooAccountManager.removeAccount(
 										scope.context(), accountName);
 								scope.main().finish();
 								scope.main().startActivity(

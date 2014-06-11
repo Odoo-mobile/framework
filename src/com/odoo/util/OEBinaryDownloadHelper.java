@@ -40,10 +40,10 @@ import android.widget.Toast;
 import com.odoo.R;
 import com.odoo.orm.OEDatabase;
 import com.odoo.orm.OEHelper;
-import com.odoo.support.OpenERPServerConnection;
+import com.odoo.support.OdooServerConnection;
 
 public class OEBinaryDownloadHelper {
-	public static final String TAG = "com.openerp.util.OEBinaryDownloadHelper";
+	public static final String TAG = "com.odoo.util.OEBinaryDownloadHelper";
 	ProgressDialog mProgressDialog;
 	DownloadTask downloadTask = null;
 	Context mContext = null;
@@ -52,7 +52,7 @@ public class OEBinaryDownloadHelper {
 		Log.d(TAG, "OEBinaryDownloadHelper->downloadBinary()");
 		mContext = context;
 		try {
-			if (OpenERPServerConnection.isNetworkAvailable(mContext)) {
+			if (OdooServerConnection.isNetworkAvailable(mContext)) {
 				mProgressDialog = new ProgressDialog(mContext);
 				mProgressDialog.setMessage("Downloading...");
 				mProgressDialog.setIndeterminate(true);
@@ -104,7 +104,7 @@ public class OEBinaryDownloadHelper {
 				JSONObject fields = new JSONObject();
 				fields.accumulate("fields", "db_datas");
 				fields.accumulate("fields", "datas_fname");
-				JSONObject res = oe.openERP().search_read(
+				JSONObject res = oe.odoo().search_read(
 						"ir.attachment",
 						fields,
 						new JSONObject().accumulate("domain",

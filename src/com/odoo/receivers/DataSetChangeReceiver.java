@@ -24,14 +24,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class DataSetChangeReceiver.
  */
 public class DataSetChangeReceiver extends BroadcastReceiver {
 
 	/** The Constant DATA_CHANGED. */
-	public static final String DATA_CHANGED = "com.openerp.DATA_CHANGED";
+	public static final String DATA_CHANGED = "com.odoo.DATA_CHANGED";
 
 	/*
 	 * (non-Javadoc)
@@ -41,8 +40,6 @@ public class DataSetChangeReceiver extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context arg0, Intent intent) {
-		// TODO Auto-generated method stub
-		// String tag = intent.getExtras().getString("service");
 		Log.i("DATASET Changed", "Dataset Changed Receiver");
 	}
 

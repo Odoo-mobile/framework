@@ -51,7 +51,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.about.AboutFragment;
 import com.odoo.base.account.AccountFragment;
 import com.odoo.base.account.AccountsDetail;
@@ -77,7 +77,7 @@ import com.openerp.OETouchListener;
 public class MainActivity extends FragmentActivity implements
 		DrawerItem.DrawerItemClickListener, FragmentListener, DrawerListener {
 
-	public static final String TAG = "com.openerp.MainActivity";
+	public static final String TAG = "com.odoo.MainActivity";
 	public static final int RESULT_SETTINGS = 1;
 	public static boolean set_setting_menu = false;
 	public Context mContext = null;
@@ -121,7 +121,7 @@ public class MainActivity extends FragmentActivity implements
 		if (savedInstanceState != null) {
 			mDrawerItemSelectedPosition = savedInstanceState
 					.getInt("current_drawer_item");
-			if (OpenERPAccountManager.isAnyUser(mContext)) {
+			if (OdooAccountManager.isAnyUser(mContext)) {
 				setDrawerItems();
 				initDrawerListeners();
 			}
@@ -140,9 +140,9 @@ public class MainActivity extends FragmentActivity implements
 		boolean reqForNewAccount = getIntent().getBooleanExtra(
 				"create_new_account", false);
 		/**
-		 * checks for available account related to OpenERP
+		 * checks for available account related to Odoo
 		 */
-		if (!OpenERPAccountManager.hasAccounts(this) || reqForNewAccount) {
+		if (!OdooAccountManager.hasAccounts(this) || reqForNewAccount) {
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
 			lockDrawer(true);
@@ -154,10 +154,9 @@ public class MainActivity extends FragmentActivity implements
 			 * User found but not logged in. Requesting for login with available
 			 * accounts.
 			 */
-			if (!OpenERPAccountManager.isAnyUser(mContext)) {
+			if (!OdooAccountManager.isAnyUser(mContext)) {
 				accountSelectionDialog(
-						OpenERPAccountManager.fetchAllAccounts(mContext))
-						.show();
+						OdooAccountManager.fetchAllAccounts(mContext)).show();
 			} else {
 				initDrawer();
 			}
@@ -346,7 +345,7 @@ public class MainActivity extends FragmentActivity implements
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
 								if (mAccount != null) {
-									OpenERPAccountManager.loginUser(mContext,
+									OdooAccountManager.loginUser(mContext,
 											mAccount.getAndroidName());
 								} else {
 									Toast.makeText(mContext,
@@ -464,11 +463,11 @@ public class MainActivity extends FragmentActivity implements
 
 		SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
 
-		Account mAccount = OpenERPAccountManager.getAccount(mContext, OEUser
+		Account mAccount = OdooAccountManager.getAccount(mContext, OEUser
 				.current(mContext).getAndroidName());
 
 		for (SyncAdapterType lst : list) {
-			if (lst.authority.contains("com.openerp")
+			if (lst.authority.contains("com.odoo")
 					&& lst.authority.contains("providers")) {
 				default_authorities.add(lst.authority);
 			}
@@ -528,7 +527,7 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public void setAutoSync(String authority, boolean isON) {
 		try {
-			Account account = OpenERPAccountManager.getAccount(this, OEUser
+			Account account = OdooAccountManager.getAccount(this, OEUser
 					.current(mContext).getAndroidName());
 			if (!ContentResolver.isSyncActive(account, authority)) {
 				ContentResolver.setSyncAutomatically(account, authority, isON);
@@ -547,7 +546,7 @@ public class MainActivity extends FragmentActivity implements
 	 *            the extra data
 	 */
 	public void requestSync(String authority, Bundle bundle) {
-		Account account = OpenERPAccountManager.getAccount(
+		Account account = OdooAccountManager.getAccount(
 				getApplicationContext(), OEUser
 						.current(getApplicationContext()).getAndroidName());
 		Bundle settingsBundle = new Bundle();
@@ -583,8 +582,8 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public void setSyncPeriodic(String authority, long interval_in_minute,
 			long seconds_per_minute, long milliseconds_per_second) {
-		Account account = OpenERPAccountManager.getAccount(this, OEUser
-				.current(mContext).getAndroidName());
+		Account account = OdooAccountManager.getAccount(this,
+				OEUser.current(mContext).getAndroidName());
 		Bundle extras = new Bundle();
 		this.setAutoSync(authority, true);
 		ContentResolver.setIsSyncable(account, authority, 1);
@@ -602,8 +601,8 @@ public class MainActivity extends FragmentActivity implements
 	 *            the authority
 	 */
 	public void cancelSync(String authority) {
-		Account account = OpenERPAccountManager.getAccount(this, OEUser
-				.current(mContext).getAndroidName());
+		Account account = OdooAccountManager.getAccount(this,
+				OEUser.current(mContext).getAndroidName());
 		ContentResolver.cancelSync(account, authority);
 	}
 
@@ -628,7 +627,7 @@ public class MainActivity extends FragmentActivity implements
 		int item_position = position - 1;
 		DrawerItem item = mDrawerListItems.get(item_position);
 		if (!item.isGroupTitle()) {
-			if (!item.getKey().equals("com.openerp.settings")) {
+			if (!item.getKey().equals("com.odoo.settings")) {
 				mDrawerItemSelectedPosition = item_position + 1;
 			}
 			mAppTitle = item.getTitle();
@@ -671,7 +670,7 @@ public class MainActivity extends FragmentActivity implements
 
 	private List<DrawerItem> setSettingMenu() {
 		List<DrawerItem> sys = new ArrayList<DrawerItem>();
-		String key = "com.openerp.settings";
+		String key = "com.odoo.settings";
 		Resources r = getResources();
 		sys.add(new DrawerItem(key, r.getString(R.string.title_settings), true));
 		sys.add(new DrawerItem(key, r.getString(R.string.title_profile), 0,

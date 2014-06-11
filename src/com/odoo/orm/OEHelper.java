@@ -21,9 +21,9 @@ package com.odoo.orm;
 import java.util.ArrayList;
 import java.util.List;
 
-import openerp.OEArguments;
-import openerp.OEDomain;
-import openerp.OpenERP;
+import odoo.OEArguments;
+import odoo.OEDomain;
+import odoo.Odoo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,7 +39,7 @@ import com.odoo.util.OEDate;
 import com.odoo.util.PreferenceManager;
 
 public class OEHelper {
-	public static final String TAG = "com.openerp.orm.OEHelper";
+	public static final String TAG = "com.odoo.orm.OEHelper";
 	Context mContext = null;
 	OEDatabase mDatabase = null;
 	OEUser mUser = null;
@@ -47,7 +47,7 @@ public class OEHelper {
 	int mAffectedRows = 0;
 	List<Long> mResultIds = new ArrayList<Long>();
 	List<OEDataRow> mRemovedRecordss = new ArrayList<OEDataRow>();
-	OpenERP mOpenERP = null;
+	Odoo mOdoo = null;
 	App mApp = null;
 	boolean withUser = true;
 	boolean mAllowSelfSignedSSL = false;
@@ -64,9 +64,9 @@ public class OEHelper {
 		mContext = context;
 		mDatabase = oeDatabase;
 		mApp = (App) context.getApplicationContext();
-		mOpenERP = mApp.getOEInstance();
+		mOdoo = mApp.getOEInstance();
 		mUser = OEUser.current(context);
-		if (mOpenERP == null && mUser != null)
+		if (mOdoo == null && mUser != null)
 			mUser = login(mUser.getUsername(), mUser.getPassword(),
 					mUser.getDatabase(), mUser.getHost());
 	}
@@ -76,7 +76,7 @@ public class OEHelper {
 		init();
 		mContext = context;
 		mApp = (App) context.getApplicationContext();
-		mOpenERP = mApp.getOEInstance();
+		mOdoo = mApp.getOEInstance();
 		mUser = OEUser.current(context);
 		if (mUser != null) {
 			mUser = login(mUser.getUsername(), mUser.getPassword(),
@@ -94,7 +94,7 @@ public class OEHelper {
 		init();
 		mContext = context;
 		mApp = (App) context.getApplicationContext();
-		mOpenERP = mApp.getOEInstance();
+		mOdoo = mApp.getOEInstance();
 		this.withUser = withUser;
 	}
 
@@ -106,12 +106,12 @@ public class OEHelper {
 		Log.d(TAG, "OEHelper->login()");
 		OEUser userObj = null;
 		try {
-			mOpenERP = new OpenERP(serverURL, mAllowSelfSignedSSL);
-			JSONObject response = mOpenERP.authenticate(username, password,
+			mOdoo = new Odoo(serverURL, mAllowSelfSignedSSL);
+			JSONObject response = mOdoo.authenticate(username, password,
 					database);
 			int userId = 0;
 			if (response.get("uid") instanceof Integer) {
-				mApp.setOEInstance(mOpenERP);
+				mApp.setOEInstance(mOdoo);
 				if (OEUser.current(mContext) == null || !withUser) {
 					userId = response.getInt("uid");
 
@@ -119,7 +119,7 @@ public class OEHelper {
 							"partner_id", "tz", "image", "company_id" });
 					OEDomain domain = new OEDomain();
 					domain.add("id", "=", userId);
-					JSONObject res = mOpenERP
+					JSONObject res = mOdoo
 							.search_read("res.users", fields.get(),
 									domain.get()).getJSONArray("records")
 							.getJSONObject(0);
@@ -218,8 +218,8 @@ public class OEHelper {
 		OEFieldsHelper fields = new OEFieldsHelper(
 				mDatabase.getDatabaseColumns());
 		try {
-			JSONObject result = mOpenERP.call_kw(mDatabase.getModelName(),
-					method, args.getArray());
+			JSONObject result = mOdoo.call_kw(mDatabase.getModelName(), method,
+					args.getArray());
 			if (result.getJSONArray("result").length() > 0)
 				mAffectedRows = result.getJSONArray("result").length();
 			synced = handleResultArray(fields, result.getJSONArray("result"),
@@ -257,7 +257,7 @@ public class OEHelper {
 			if (limits == -1) {
 				limits = 50;
 			}
-			JSONObject result = mOpenERP.search_read(mDatabase.getModelName(),
+			JSONObject result = mOdoo.search_read(mDatabase.getModelName(),
 					fields.get(), domain.get(), 0, limits, null, null);
 			mAffectedRows = result.getJSONArray("records").length();
 			synced = handleResultArray(fields, result.getJSONArray("records"),
@@ -301,7 +301,7 @@ public class OEHelper {
 			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "model" });
 			OEDomain domain = new OEDomain();
 			domain.add("model", "=", model);
-			JSONObject result = mOpenERP.search_read(ir_model.getModelName(),
+			JSONObject result = mOdoo.search_read(ir_model.getModelName(),
 					fields.get(), domain.get());
 			if (result.getInt("length") > 0) {
 				installed = true;
@@ -321,7 +321,7 @@ public class OEHelper {
 			}
 		} catch (Exception e) {
 			Log.d(TAG, "OEHelper->isModuleInstalled()");
-			Log.e(TAG, e.getMessage() + ". No connection with OpenERP server");
+			Log.e(TAG, e.getMessage() + ". No connection with Odoo server");
 		}
 		return installed;
 	}
@@ -349,7 +349,7 @@ public class OEHelper {
 			JSONObject domain = null;
 			if (getRemain)
 				domain = getLocalIdsDomain("not in").get();
-			JSONObject result = mOpenERP.search_read(mDatabase.getModelName(),
+			JSONObject result = mOdoo.search_read(mDatabase.getModelName(),
 					fields.get(), domain, 0, 100, null, null);
 			for (int i = 0; i < result.getJSONArray("records").length(); i++) {
 				JSONObject record = result.getJSONArray("records")
@@ -375,7 +375,7 @@ public class OEHelper {
 	public void delete(int id) {
 		Log.d(TAG, "OEHelper->delete()");
 		try {
-			mOpenERP.unlink(mDatabase.getModelName(), id);
+			mOdoo.unlink(mDatabase.getModelName(), id);
 			mDatabase.delete(id);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -405,12 +405,12 @@ public class OEHelper {
 		}
 		try {
 			if (context != null) {
-				arguments.add(mOpenERP.updateContext(context));
+				arguments.add(mOdoo.updateContext(context));
 			}
 			if (kwargs == null)
-				result = mOpenERP.call_kw(model, method, arguments.getArray());
+				result = mOdoo.call_kw(model, method, arguments.getArray());
 			else
-				result = mOpenERP.call_kw(model, method, arguments.getArray(),
+				result = mOdoo.call_kw(model, method, arguments.getArray(),
 						kwargs);
 			return result.get("result");
 		} catch (Exception e) {
@@ -423,7 +423,7 @@ public class OEHelper {
 		Log.d(TAG, "OEHelper->create()");
 		Integer newId = null;
 		try {
-			JSONObject result = mOpenERP.createNew(mDatabase.getModelName(),
+			JSONObject result = mOdoo.createNew(mDatabase.getModelName(),
 					generateArguments(values));
 			newId = result.getInt("result");
 			values.put("id", newId);
@@ -439,7 +439,7 @@ public class OEHelper {
 		Log.d(TAG, "OEHelper->update()");
 		Boolean flag = false;
 		try {
-			flag = mOpenERP.updateValues(mDatabase.getModelName(),
+			flag = mOdoo.updateValues(mDatabase.getModelName(),
 					generateArguments(values), id);
 			if (flag)
 				mDatabase.update(values, id);
@@ -479,7 +479,7 @@ public class OEHelper {
 			OEDomain domain = new OEDomain();
 			domain.add("name", "ilike", name);
 			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "state" });
-			JSONObject result = mOpenERP.search_read("ir.module.module",
+			JSONObject result = mOdoo.search_read("ir.module.module",
 					fields.get(), domain.get());
 			JSONArray records = result.getJSONArray("records");
 			if (records.length() > 0
@@ -493,8 +493,8 @@ public class OEHelper {
 		return flag;
 	}
 
-	public OpenERP openERP() {
-		return mOpenERP;
+	public Odoo odoo() {
+		return mOdoo;
 	}
 
 }

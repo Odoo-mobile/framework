@@ -33,9 +33,9 @@ import com.odoo.support.OEUser;
 import com.odoo.support.SyncValue;
 
 /**
- * The Class OpenERPAccountManager.
+ * The Class OdooAccountManager.
  */
-public class OpenERPAccountManager {
+public class OdooAccountManager {
 
 	/** The Constant PARAM_AUTHTOKEN_TYPE. */
 	private static final String PARAM_AUTHTOKEN_TYPE = "com.odoo.auth";
@@ -66,7 +66,7 @@ public class OpenERPAccountManager {
 	/**
 	 * hasAccounts
 	 * 
-	 * checks for availability of any account for OpenERP
+	 * checks for availability of any account for Odoo
 	 * 
 	 * @param context
 	 * @return true if there is any account related to type
@@ -112,7 +112,7 @@ public class OpenERPAccountManager {
 		if (current_user != null) {
 			flag = true;
 		} else {
-			List<OEUser> accounts = OpenERPAccountManager
+			List<OEUser> accounts = OdooAccountManager
 					.fetchAllAccounts(context);
 			if (accounts != null) {
 				for (OEUser user : accounts) {
@@ -138,8 +138,8 @@ public class OpenERPAccountManager {
 		if (current_user != null) {
 			return current_user;
 		} else {
-			if (OpenERPAccountManager.isAnyUser(context)) {
-				List<OEUser> accounts = OpenERPAccountManager
+			if (OdooAccountManager.isAnyUser(context)) {
+				List<OEUser> accounts = OdooAccountManager
 						.fetchAllAccounts(context);
 				for (OEUser user : accounts) {
 
@@ -163,7 +163,7 @@ public class OpenERPAccountManager {
 	 */
 	public static OEUser getAccountDetail(Context context, String username) {
 
-		List<OEUser> allAccounts = OpenERPAccountManager
+		List<OEUser> allAccounts = OdooAccountManager
 				.fetchAllAccounts(context);
 		for (OEUser user : allAccounts) {
 			if (user.getAndroidName().equals(username)) {
@@ -213,8 +213,8 @@ public class OpenERPAccountManager {
 	 */
 	public static boolean logoutUser(Context context, String username) {
 		boolean flag = false;
-		OEUser user = OpenERPAccountManager.getAccountDetail(context, username);
-		Account account = OpenERPAccountManager.getAccount(context,
+		OEUser user = OdooAccountManager.getAccountDetail(context, username);
+		Account account = OdooAccountManager.getAccount(context,
 				user.getAndroidName());
 				
 		if (user != null) {
@@ -250,18 +250,18 @@ public class OpenERPAccountManager {
 	public static OEUser loginUser(Context context, String username) {
 		OEUser userData = null;
 
-		List<OEUser> allAccounts = OpenERPAccountManager
+		List<OEUser> allAccounts = OdooAccountManager
 				.fetchAllAccounts(context);
 		for (OEUser user : allAccounts) {
-			OpenERPAccountManager.logoutUser(context, user.getAndroidName());
+			OdooAccountManager.logoutUser(context, user.getAndroidName());
 		}
 
-		userData = OpenERPAccountManager.getAccountDetail(context, username);
+		userData = OdooAccountManager.getAccountDetail(context, username);
 		if (userData != null) {
 			AccountManager accMgr = AccountManager.get(context);
 
 			accMgr.setUserData(
-					OpenERPAccountManager.getAccount(context,
+					OdooAccountManager.getAccount(context,
 							userData.getAndroidName()), "isactive", "true");
 		}
 		current_user = userData;
@@ -279,7 +279,7 @@ public class OpenERPAccountManager {
 	public static void removeAccount(Context context, String username) {
 		AccountManager accMgr = AccountManager.get(context);
 		accMgr.removeAccount(
-				OpenERPAccountManager.getAccount(context, username), null, null);
+				OdooAccountManager.getAccount(context, username), null, null);
 		App app = (App) context.getApplicationContext();
 		app.setOEInstance(null);
 		current_user = null;
@@ -289,14 +289,14 @@ public class OpenERPAccountManager {
 			OEUser userObject) {
 
 		boolean flag = false;
-		OEUser user = OpenERPAccountManager.getAccountDetail(context,
+		OEUser user = OdooAccountManager.getAccountDetail(context,
 				userObject.getAndroidName());
 		Bundle userBundle = userObject.getAsBundle();
 		if (user != null) {
 			AccountManager accMgr = AccountManager.get(context);
 			for (String key : userBundle.keySet()) {
 				accMgr.setUserData(
-						OpenERPAccountManager.getAccount(context,
+						OdooAccountManager.getAccount(context,
 								user.getAndroidName()), key,
 						userBundle.getString(key));
 			}

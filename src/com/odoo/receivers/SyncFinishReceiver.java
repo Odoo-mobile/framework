@@ -24,14 +24,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class SyncFinishReceiver.
  */
 public class SyncFinishReceiver extends BroadcastReceiver {
 
 	/** The Constant SYNC_FINISH. */
-	public static final String SYNC_FINISH = "com.openerp.SYNC_FINISH";
+	public static final String SYNC_FINISH = "com.odoo.SYNC_FINISH";
 
 	/*
 	 * (non-Javadoc)
@@ -41,7 +40,6 @@ public class SyncFinishReceiver extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		// TODO Auto-generated method stub
 		Log.i("SyncFinish", "Sync finished");
 
 	}

@@ -24,21 +24,21 @@ import android.content.Intent;
 import android.os.IBinder;
 
 /**
- * The Class OpenERPAuthenticateService.
+ * The Class OdooAuthenticateService.
  */
-public class OpenERPAuthenticateService extends Service {
+public class OdooAuthenticateService extends Service {
 
 	/** The Constant TAG. */
 	@SuppressWarnings("unused")
 	private static final String TAG = "AccountAuthenticatorService";
 
 	/** The oe account authenticator. */
-	private static OpenERPAuthenticator oeAccountAuthenticator = null;
+	private static OdooAuthenticator oeAccountAuthenticator = null;
 
 	/**
 	 * Instantiates a new open erp authenticate service.
 	 */
-	public OpenERPAuthenticateService() {
+	public OdooAuthenticateService() {
 
 		super();
 
@@ -54,7 +54,7 @@ public class OpenERPAuthenticateService extends Service {
 		IBinder ret = null;
 		if (intent.getAction().equals(
 				android.accounts.AccountManager.ACTION_AUTHENTICATOR_INTENT)) {
-			ret = new OpenERPAuthenticator(this).getIBinder();
+			ret = new OdooAuthenticator(this).getIBinder();
 		}
 		return ret;
 	}
@@ -65,9 +65,9 @@ public class OpenERPAuthenticateService extends Service {
 	 * @return the authenticator
 	 */
 	@SuppressWarnings("unused")
-	private OpenERPAuthenticator getAuthenticator() {
+	private OdooAuthenticator getAuthenticator() {
 		if (oeAccountAuthenticator == null) {
-			oeAccountAuthenticator = new OpenERPAuthenticator(this);
+			oeAccountAuthenticator = new OdooAuthenticator(this);
 		}
 		return oeAccountAuthenticator;
 

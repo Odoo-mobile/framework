@@ -35,7 +35,7 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 import com.odoo.orm.OEDataRow;
 import com.odoo.orm.OEValues;
 import com.odoo.support.OEUser;
@@ -43,7 +43,7 @@ import com.odoo.util.Base64Helper;
 
 public class OEContact {
 
-	public static final String TAG = "com.openerp.support.contact.OEContact";
+	public static final String TAG = "com.odoo.support.contact.OEContact";
 
 	ContentResolver mContentResolver = null;
 	Uri rawContactUri = null;
@@ -63,8 +63,8 @@ public class OEContact {
 	public OEContact(Context context, OEUser user) {
 		mContext = context;
 		mUser = user;
-		mAccount = OpenERPAccountManager.getAccount(context,
-				user.getAndroidName());
+		mAccount = OdooAccountManager
+				.getAccount(context, user.getAndroidName());
 		mContentResolver = mContext.getContentResolver();
 
 		mRawContacts = RawContacts.CONTENT_URI;

@@ -44,7 +44,7 @@ import com.odoo.support.OEUser;
 import com.odoo.util.OEDate;
 
 public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
-	public static final String TAG = "com.openerp.orm.OEDatabase";
+	public static final String TAG = "com.odoo.orm.OEDatabase";
 	Context mContext = null;
 	OEDBHelper mDBHelper = null;
 	OEUser mUser = null;
@@ -529,8 +529,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 				mOEHelper = new OEHelper(mContext, this);
 			} catch (Exception e) {
 				Log.d(TAG, "OEDatabase->getOEInstance()");
-				Log.e(TAG, e.getMessage()
-						+ ". No connection with OpenERP server");
+				Log.e(TAG, e.getMessage() + ". No connection with Odoo server");
 			}
 		}
 		return mOEHelper;
