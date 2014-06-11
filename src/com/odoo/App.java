@@ -18,17 +18,17 @@
  */
 package com.odoo;
 
-import openerp.OpenERP;
+import odoo.Odoo;
 import android.app.Application;
 import android.util.Log;
 
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 import com.odoo.support.OEUser;
 
 public class App extends Application {
 
 	public static final String TAG = App.class.getSimpleName();
-	public static OpenERP mOEInstance = null;
+	public static Odoo mOEInstance = null;
 
 	@Override
 	public void onCreate() {
@@ -37,7 +37,7 @@ public class App extends Application {
 		OEUser user = OEUser.current(getApplicationContext());
 		if (user != null) {
 			try {
-				mOEInstance = new OpenERP(user.getHost(),
+				mOEInstance = new Odoo(user.getHost(),
 						user.isAllowSelfSignedSSL());
 				mOEInstance.authenticate(user.getUsername(),
 						user.getPassword(), user.getDatabase());
@@ -45,17 +45,17 @@ public class App extends Application {
 				e.printStackTrace();
 			}
 		}
-		if (!OpenERPAccountManager.isAnyUser(getApplicationContext())) {
+		if (!OdooAccountManager.isAnyUser(getApplicationContext())) {
 			mOEInstance = null;
 		}
 	}
 
-	public OpenERP getOEInstance() {
+	public Odoo getOEInstance() {
 		Log.d(TAG, "App->getOEInstance()");
 		return mOEInstance;
 	}
 
-	public void setOEInstance(OpenERP openERP) {
-		mOEInstance = openERP;
+	public void setOEInstance(Odoo odoo) {
+		mOEInstance = odoo;
 	}
 }

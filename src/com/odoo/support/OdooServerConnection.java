@@ -20,8 +20,8 @@ package com.odoo.support;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import openerp.OEVersionException;
-import openerp.OpenERP;
+import odoo.OEVersionException;
+import odoo.Odoo;
 
 import org.json.JSONArray;
 
@@ -29,24 +29,23 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 
 /**
- * The Class OpenERPServerConnection.
+ * The Class OdooServerConnection.
  */
-public class OpenERPServerConnection {
+public class OdooServerConnection {
 
-	public static final String TAG = "com.openerp.support.OpenERPServerConnection";
-	/** The openerp. */
-	public OpenERP openerp = null;
+	public static final String TAG = "com.odoo.support.OdooServerConnection";
+	public Odoo odoo = null;
 	JSONArray mDbLists = null;
 	boolean mAllowSelfSignedSSL = false;
 
-	public OpenERPServerConnection() {
+	public OdooServerConnection() {
 		mAllowSelfSignedSSL = false;
 	}
 
-	public OpenERPServerConnection(boolean allowSelfSignedSSL) {
+	public OdooServerConnection(boolean allowSelfSignedSSL) {
 		mAllowSelfSignedSSL = allowSelfSignedSSL;
 	}
 
@@ -64,13 +63,13 @@ public class OpenERPServerConnection {
 	 */
 	public boolean testConnection(Context context, String serverURL)
 			throws OEVersionException, SSLPeerUnverifiedException {
-		Log.d(TAG, "OpenERPServerConnection->testConnection()");
+		Log.d(TAG, "OdooServerConnection->testConnection()");
 		if (TextUtils.isEmpty(serverURL)) {
 			return false;
 		}
 		try {
-			openerp = new OpenERP(serverURL, mAllowSelfSignedSSL);
-			mDbLists = openerp.getDatabaseList();
+			odoo = new Odoo(serverURL, mAllowSelfSignedSSL);
+			mDbLists = odoo.getDatabaseList();
 		} catch (SSLPeerUnverifiedException ssl) {
 			Log.d(TAG, "Throw SSLPeerUnverifiedException ");
 			throw new SSLPeerUnverifiedException(ssl.getMessage());
@@ -106,9 +105,9 @@ public class OpenERPServerConnection {
 			throws OEVersionException, SSLPeerUnverifiedException {
 		boolean outcome = false;
 
-		OpenERPServerConnection osc = new OpenERPServerConnection();
-		outcome = osc.testConnection(context, OpenERPAccountManager
-				.currentUser(context).getHost());
+		OdooServerConnection osc = new OdooServerConnection();
+		outcome = osc.testConnection(context,
+				OdooAccountManager.currentUser(context).getHost());
 
 		return outcome;
 	}
@@ -128,7 +127,7 @@ public class OpenERPServerConnection {
 			throws OEVersionException, SSLPeerUnverifiedException {
 		boolean outcome = false;
 
-		OpenERPServerConnection osc = new OpenERPServerConnection();
+		OdooServerConnection osc = new OdooServerConnection();
 		outcome = osc.testConnection(context, url);
 
 		return outcome;

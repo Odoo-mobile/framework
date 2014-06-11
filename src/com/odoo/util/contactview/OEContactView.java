@@ -35,7 +35,7 @@ import com.odoo.support.contact.OEContact;
 
 public class OEContactView extends QuickContactBadge {
 
-	public static final String TAG = "com.openerp.util.contactview.OEContactView";
+	public static final String TAG = "com.odoo.util.contactview.OEContactView";
 
 	int mPartner_id = 0;
 	Uri mContactUri = null;

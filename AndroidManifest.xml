@@ -35,7 +35,7 @@
         android:theme="@style/AppTheme" >
 
         <!-- Android Account Authentication Service -->
-        <service android:name="com.odoo.auth.OpenERPAuthenticateService" >
+        <service android:name="com.odoo.auth.OdooAuthenticateService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" >
                 </action>

@@ -27,73 +27,75 @@ import com.odoo.orm.types.OEManyToMany;
 import com.odoo.orm.types.OEManyToOne;
 import com.odoo.orm.types.OEOneToMany;
 import com.odoo.orm.types.OETypeHelper;
+import com.odoo.util.logger.OELog;
 
 public class SQLHelper {
 
 	public static final String TAG = SQLHelper.class.getSimpleName();
+	List<String> mTables = new ArrayList<String>();
 
-	public List<String> createTable(OEDBHelper db) {
-		return createTable(db, false);
+	public SQLHelper() {
+		Log.v(TAG, "SQLHelper()");
 	}
 
-	public List<String> createTable(OEDBHelper db, boolean isOneToMany) {
+	public List<String> createTable(OEDBHelper db) {
 		Log.d(TAG, "SQLHelper->createTable()");
 		List<String> queries = new ArrayList<String>();
-		StringBuffer sql = new StringBuffer();
-		sql.append("CREATE TABLE IF NOT EXISTS ");
-		sql.append(modelToTable(db.getModelName()));
-		sql.append(" (");
-		for (OEColumn col : db.getModelColumns()) {
-			if (col.getName().equals("id") || col.getName().equals("oea_name")) {
-				continue;
-			}
-			if (col.getType() instanceof OETypeHelper) {
-				sql.append(col.getName());
-				sql.append(" ");
-				sql.append(((OETypeHelper) col.getType()).getType());
-				sql.append(", ");
-			}
-			if (col.getType() instanceof OEManyToOne) {
-				if (!isOneToMany) {
+		String table = modelToTable(db.getModelName());
+		if (!mTables.contains(table)) {
+			mTables.add(table);
+			StringBuffer sql = new StringBuffer();
+			sql.append("CREATE TABLE IF NOT EXISTS ");
+			sql.append(table);
+			sql.append(" (");
+			for (OEColumn col : db.getModelColumns()) {
+				if (col.getName().equals("id")
+						|| col.getName().equals("oea_name")) {
+					continue;
+				}
+				if (col.getType() instanceof OETypeHelper) {
+					sql.append(col.getName());
+					sql.append(" ");
+					sql.append(((OETypeHelper) col.getType()).getType());
+					sql.append(", ");
+				}
+				if (col.getType() instanceof OEManyToOne) {
 					OEManyToOne manyToOne = (OEManyToOne) col.getType();
 					List<String> many2one = createTable(manyToOne.getDBHelper());
 					for (String query : many2one) {
 						queries.add(query);
 					}
-				}
-				sql.append(col.getName());
-				sql.append(" ");
-				sql.append(((OETypeHelper) OEFields.integer()).getType());
-				sql.append(", ");
+					sql.append(col.getName());
+					sql.append(" ");
+					sql.append(((OETypeHelper) OEFields.integer()).getType());
+					sql.append(", ");
 
-			}
-			if (col.getType() instanceof OEOneToMany) {
-				OEOneToMany oneToMany = (OEOneToMany) col.getType();
-				List<String> one2many = createTable(oneToMany.getDBHelper(),
-						true);
-				for (String query : one2many) {
-					queries.add(query);
 				}
-				continue;
-			}
-			if (col.getType() instanceof OEManyToMany) {
-				OEManyToMany manyTomany = (OEManyToMany) col.getType();
-				List<String> many2many = createTable(manyTomany.getDBHelper());
-				for (String query : many2many) {
-					queries.add(query);
-					queries.add(createMany2ManyRel(db.getModelName(),
-							manyTomany.getDBHelper().getModelName()));
+				if (col.getType() instanceof OEOneToMany) {
+					OEOneToMany oneToMany = (OEOneToMany) col.getType();
+					List<String> one2many = createTable(oneToMany.getDBHelper());
+					for (String query : one2many) {
+						queries.add(query);
+					}
+				}
+				if (col.getType() instanceof OEManyToMany) {
+					OEManyToMany manyTomany = (OEManyToMany) col.getType();
+					List<String> many2many = createTable(manyTomany
+							.getDBHelper());
+					for (String query : many2many) {
+						queries.add(query);
+						queries.add(createMany2ManyRel(db.getModelName(),
+								manyTomany.getDBHelper().getModelName()));
+					}
 				}
 			}
+			sql.append(defaultColumns());
+			sql.deleteCharAt(sql.lastIndexOf(","));
+			sql.append(");");
+			queries.add(sql.toString());
+			Log.d("SQLHelper", "Table created : " + table);
 		}
-		sql.append(defaultColumns());
-		sql.deleteCharAt(sql.lastIndexOf(","));
-		sql.append(");");
-		queries.add(sql.toString());
-
-		String table = modelToTable(db.getModelName());
-		Log.d("SQLHelper", "Table created : " + table);
-
+		OELog.log(mTables.toString());
 		return queries;
 	}
 

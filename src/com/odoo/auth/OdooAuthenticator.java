@@ -32,11 +32,11 @@ import com.odoo.MainActivity;
 import com.odoo.orm.OESQLiteHelper;
 
 /**
- * The Class OpenERPAuthenticator.
+ * The Class OdooAuthenticator.
  */
-public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
+public class OdooAuthenticator extends AbstractAccountAuthenticator {
 
-	/** The m conetext. */
+	/** The m context. */
 	private Context mContext;
 
 	/**
@@ -45,7 +45,7 @@ public class OpenERPAuthenticator extends AbstractAccountAuthenticator {
 	 * @param context
 	 *            the context
 	 */
-	public OpenERPAuthenticator(Context context) {
+	public OdooAuthenticator(Context context) {
 		super(context);
 		mContext = context;
 	}

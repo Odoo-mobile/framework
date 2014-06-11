@@ -80,8 +80,8 @@ public class OEFields {
 		return new OEManyToOne((OEDBHelper) db);
 	}
 
-	public static OEOneToMany oneToMany(Object db) {
-		return new OEOneToMany((OEDBHelper) db);
+	public static OEOneToMany oneToMany(Object db, String column_name) {
+		return new OEOneToMany((OEDBHelper) db, column_name);
 	}
 
 }

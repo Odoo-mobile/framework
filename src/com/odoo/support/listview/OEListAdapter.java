@@ -28,7 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
 public class OEListAdapter extends ArrayAdapter<Object> {
-	public static final String TAG = "com.openerp.support.listview.OEListAdapter";
+	public static final String TAG = "com.odoo.support.listview.OEListAdapter";
 	Context mContext = null;
 	List<Object> mObjects = null;
 	List<Object> mAllObjects = null;

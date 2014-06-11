@@ -27,8 +27,8 @@ import android.util.Log;
 
 import com.odoo.orm.OEDataRow;
 import com.odoo.orm.OEM2MIds;
-import com.odoo.orm.OEValues;
 import com.odoo.orm.OEM2MIds.Operation;
+import com.odoo.orm.OEValues;
 import com.odoo.util.OEDate;
 import com.odoo.util.logger.OELog;
 

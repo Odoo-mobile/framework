@@ -40,7 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.R;
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 import com.odoo.orm.OEHelper;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
@@ -126,16 +126,15 @@ public class UserProfile extends BaseFragment {
 					public void onClick(DialogInterface di, int i) {
 						OEUser userData = null;
 						try {
-							OEHelper openerp = new OEHelper(scope.context());
-							userData = openerp.login(
-									scope.User().getUsername(), password
-											.getText().toString(), scope.User()
+							OEHelper odoo = new OEHelper(scope.context());
+							userData = odoo.login(scope.User().getUsername(),
+									password.getText().toString(), scope.User()
 											.getDatabase(), scope.User()
 											.getHost());
 						} catch (Exception e) {
 						}
 						if (userData != null) {
-							if (OpenERPAccountManager.updateAccountDetails(
+							if (OdooAccountManager.updateAccountDetails(
 									scope.context(), userData)) {
 								Toast.makeText(getActivity(),
 										"Infomation Updated.",

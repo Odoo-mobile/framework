@@ -18,7 +18,7 @@
  */
 package com.odoo.base.res.services;
 
-import openerp.OEDomain;
+import odoo.OEDomain;
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
@@ -32,7 +32,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.odoo.auth.OpenERPAccountManager;
+import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.res.ResPartnerDB;
 import com.odoo.orm.OEHelper;
 import com.odoo.support.OEUser;
@@ -40,7 +40,7 @@ import com.odoo.support.contact.OEContact;
 
 public class ContactSyncService extends Service {
 
-	public static final String TAG = "com.openerp.base.res.services.ContactSyncService";
+	public static final String TAG = "com.odoo.base.res.services.ContactSyncService";
 
 	private static SyncAdapterImpl sSyncAdapter = null;
 	Context mContext = null;
@@ -67,7 +67,7 @@ public class ContactSyncService extends Service {
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		try {
-			OEUser user = OpenERPAccountManager.getAccountDetail(context,
+			OEUser user = OdooAccountManager.getAccountDetail(context,
 					account.name);
 
 			ResPartnerDB db = new ResPartnerDB(context);

@@ -22,12 +22,18 @@ import com.odoo.orm.OEDBHelper;
 
 public class OEOneToMany {
 	OEDBHelper mDb = null;
+	String column_name = null;
 
-	public OEOneToMany(OEDBHelper db) {
+	public OEOneToMany(OEDBHelper db, String column_name) {
 		mDb = db;
+		this.column_name = column_name;
 	}
 
 	public OEDBHelper getDBHelper() {
 		return mDb;
+	}
+
+	public String getColumnName() {
+		return this.column_name;
 	}
 }
