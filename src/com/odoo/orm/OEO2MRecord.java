@@ -24,20 +24,20 @@ import com.odoo.orm.types.OEOneToMany;
 
 public class OEO2MRecord {
 	OEColumn mCol = null;
-	int mId = 0;
+	int mRecordId = 0;
 	OEDatabase mDatabase = null;
 
 	public OEO2MRecord(OEDatabase oeDatabase, OEColumn col, int id) {
 		mDatabase = oeDatabase;
 		mCol = col;
-		mId = id;
+		mRecordId = id;
 	}
 
 	public List<OEDataRow> browseEach() {
-		OEOneToMany m2o = (OEOneToMany) mCol.getType();
-		String column = mDatabase.tableName() + "_id";
-		OEDatabase db = (OEDatabase) m2o.getDBHelper();
-		return db.select(column + " = ? ", new String[] { mId + "" });
+		OEOneToMany o2m = (OEOneToMany) mCol.getType();
+		String column = o2m.getColumnName();
+		OEDatabase db = (OEDatabase) o2m.getDBHelper();
+		return db.select(column + " = ? ", new String[] { mRecordId + "" });
 	}
 
 	public OEDataRow browseAt(int index) {

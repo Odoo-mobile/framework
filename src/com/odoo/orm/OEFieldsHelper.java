@@ -1,21 +1,3 @@
-/*
- * Odoo, Open Source Management Solution
- * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http:www.gnu.org/licenses/>
- * 
- */
 package com.odoo.orm;
 
 import java.util.ArrayList;
@@ -31,6 +13,7 @@ import android.util.Log;
 import com.odoo.orm.OEM2MIds.Operation;
 import com.odoo.orm.types.OEManyToMany;
 import com.odoo.orm.types.OEManyToOne;
+import com.odoo.orm.types.OEOneToMany;
 
 public class OEFieldsHelper {
 	public static final String TAG = "com.odoo.orm.OEFieldsHelper";
@@ -76,12 +59,11 @@ public class OEFieldsHelper {
 								JSONArray m2oRec = new JSONArray(
 										value.toString());
 								value = m2oRec.get(0);
+
 								if ((Integer) value != 0) {
 									OEManyToOne m2o = (OEManyToOne) col
 											.getType();
-									OEDatabase db = (OEDatabase) m2o
-											.getDBHelper();
-									mRelRecord.add(db, value);
+									mRelRecord.add(m2o, value);
 								} else {
 									value = false;
 								}
@@ -96,12 +78,22 @@ public class OEFieldsHelper {
 										ids);
 								value = mIds;
 								OEManyToMany m2m = (OEManyToMany) col.getType();
-								OEDatabase db = (OEDatabase) m2m.getDBHelper();
-								mRelRecord.add(db, ids);
+								mRelRecord.add(m2m, ids);
+							}
+						}
+						if (col.getType() instanceof OEOneToMany) {
+							if (value instanceof JSONArray) {
+								JSONArray o2mRec = new JSONArray(
+										value.toString());
+								List<Integer> ids = getIdsList(o2mRec);
+								OEO2MIds mIds = new OEO2MIds(Operation.REPLACE,
+										ids);
+								OEOneToMany o2m = (OEOneToMany) col.getType();
+								mRelRecord.add(o2m, ids);
+								value = mIds;
 							}
 						}
 						cValue.put(key, value);
-
 					}
 				}
 				mValues.add(cValue);
@@ -117,11 +109,6 @@ public class OEFieldsHelper {
 		List<Integer> ids = new ArrayList<Integer>();
 		try {
 			int length = array.length();
-			if (length > 50) {
-				Log.i(TAG,
-						"Many2Many records more than 50... - Limiting to 50 records only");
-				length = 50;
-			}
 			for (int i = 0; i < length; i++) {
 				if (array.get(i) instanceof JSONArray)
 					ids.add(array.getJSONArray(i).getInt(0));
@@ -164,6 +151,10 @@ public class OEFieldsHelper {
 		}
 	}
 
+	public void addManyToOneId(Object model, int id) {
+
+	}
+
 	public JSONObject get() {
 		return mFields;
 	}
@@ -181,9 +172,19 @@ public class OEFieldsHelper {
 		private HashMap<String, List<Object>> _model_ids = new HashMap<String, List<Object>>();
 
 		@SuppressWarnings("unchecked")
-		public void add(OEDatabase db, Object ids) {
+		public void add(Object rel_db, Object ids) {
+			OEDatabase db = null;
+			if (rel_db instanceof OEManyToMany) {
+				db = (OEDatabase) ((OEManyToMany) rel_db).getDBHelper();
+			} else if (rel_db instanceof OEOneToMany) {
+				db = (OEDatabase) ((OEOneToMany) rel_db).getDBHelper();
+			} else if (rel_db instanceof OEManyToOne) {
+				db = (OEDatabase) ((OEManyToOne) rel_db).getDBHelper();
+			} else {
+				db = (OEDatabase) rel_db;
+			}
 			if (!_models.containsKey(db.getModelName())) {
-				_models.put(db.getModelName(), db);
+				_models.put(db.getModelName(), rel_db);
 			}
 			List<Object> _ids = new ArrayList<Object>();
 			if (ids instanceof List) {
@@ -193,8 +194,7 @@ public class OEFieldsHelper {
 				_ids.add(ids);
 			}
 			if (_model_ids.containsKey(db.getModelName())) {
-				if (!hasValue(_model_ids.get(db.getModelName()), _ids))
-					_model_ids.get(db.getModelName()).addAll(_ids);
+				_model_ids.get(db.getModelName()).addAll(_ids);
 			} else {
 				_model_ids.put(db.getModelName(), _ids);
 			}
@@ -204,45 +204,29 @@ public class OEFieldsHelper {
 			List<OERelationData> datas = new ArrayList<OEFieldsHelper.OERelationData>();
 			Set<String> keys = _models.keySet();
 			for (String key : keys) {
-				OEDatabase db = (OEDatabase) _models.get(key);
-				datas.add(new OERelationData(db, _model_ids.get(key)));
+				datas.add(new OERelationData(_models.get(key), _model_ids
+						.get(key)));
 			}
 			return datas;
 		}
 
-		private boolean hasValue(List<Object> list, Object value) {
-			for (Object obj : list) {
-				if (value instanceof List) {
-					@SuppressWarnings("unchecked")
-					List<Object> vList = (List<Object>) value;
-					for (Object vV : vList) {
-						if (vV.toString().equals(obj.toString()))
-							return true;
-					}
-				} else {
-					if (obj.toString().equals(value.toString()))
-						return true;
-				}
-			}
-			return false;
-		}
 	}
 
 	public class OERelationData {
-		OEDatabase db;
+		Object db;
 		List<Object> ids;
 
-		public OERelationData(OEDatabase db, List<Object> ids) {
+		public OERelationData(Object db, List<Object> ids) {
 			super();
 			this.db = db;
 			this.ids = ids;
 		}
 
-		public OEDatabase getDb() {
+		public Object getDb() {
 			return db;
 		}
 
-		public void setDb(OEDatabase db) {
+		public void setDb(Object db) {
 			this.db = db;
 		}
 

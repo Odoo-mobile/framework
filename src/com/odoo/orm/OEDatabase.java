@@ -214,6 +214,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		ContentValues cValues = new ContentValues();
 		List<HashMap<String, Object>> m2mObjectList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> o2mObjectList = new ArrayList<HashMap<String, Object>>();
 		List<OEColumn> cols = mDBHelper.getModelColumns();
 		cols.addAll(getDefaultCols());
 		for (OEColumn col : cols) {
@@ -228,6 +229,15 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 					m2mObjectList.add(m2mObjects);
 					continue;
 				}
+				// FIXME
+				if (values.get(key) instanceof OEO2MIds) {
+					HashMap<String, Object> o2mObjects = new HashMap<String, Object>();
+					OEDBHelper o2mDb = findFieldModel(key);
+					o2mObjects.put("o2mObject", o2mDb);
+					o2mObjects.put("o2mRecordsObj", values.get(key));
+					o2mObjectList.add(o2mObjects);
+					continue;
+				}
 				cValues.put(key, values.get(key).toString());
 			}
 			/**
@@ -239,6 +249,7 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			}
 		}
 		result.put("m2mObjects", m2mObjectList);
+		result.put("o2mObjects", o2mObjectList);
 		result.put("cValues", cValues);
 		return result;
 	}
@@ -326,8 +337,14 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 	private OEDBHelper findFieldModel(String field) {
 		for (OEColumn col : mDBHelper.getModelColumns()) {
 			if (field.equals(col.getName())) {
-				OEManyToMany m2m = (OEManyToMany) col.getType();
-				return m2m.getDBHelper();
+				if (col.getType() instanceof OEOneToMany) {
+					OEOneToMany m2m = (OEOneToMany) col.getType();
+					return m2m.getDBHelper();
+				}
+				if (col.getType() instanceof OEManyToMany) {
+					OEManyToMany m2m = (OEManyToMany) col.getType();
+					return m2m.getDBHelper();
+				}
 			}
 		}
 		return null;
