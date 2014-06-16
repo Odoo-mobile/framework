@@ -145,6 +145,22 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 				}
 			}
 		}
+		if (res.containsKey("o2mObjects")) {
+			@SuppressWarnings("unchecked")
+			List<HashMap<String, Object>> objectList = (List<HashMap<String, Object>>) res
+					.get("o2mObjects");
+			for (HashMap<String, Object> obj : objectList) {
+				OEDatabase o2mDb = (OEDatabase) obj.get("o2mObject");
+				OEColumn o2mCol = (OEColumn) obj.get("o2mCol");
+				OEO2MIds ids = (OEO2MIds) obj.get("o2mRecordsObj");
+				OEOneToMany o2m = (OEOneToMany) o2mCol.getType();
+				OEValues vals = new OEValues();
+				vals.put(o2m.getColumnName(), values.get("id"));
+				for (int id : ids.getIds()) {
+					o2mDb.update(vals, id);
+				}
+			}
+		}
 		return count;
 
 	}
@@ -207,6 +223,22 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 						obj.get("m2mRecordsObj"));
 			}
 		}
+		if (res.containsKey("o2mObjects")) {
+			@SuppressWarnings("unchecked")
+			List<HashMap<String, Object>> objectList = (List<HashMap<String, Object>>) res
+					.get("o2mObjects");
+			for (HashMap<String, Object> obj : objectList) {
+				OEDatabase o2mDb = (OEDatabase) obj.get("o2mObject");
+				OEColumn o2mCol = (OEColumn) obj.get("o2mCol");
+				OEO2MIds ids = (OEO2MIds) obj.get("o2mRecordsObj");
+				OEOneToMany o2m = (OEOneToMany) o2mCol.getType();
+				OEValues vals = new OEValues();
+				vals.put(o2m.getColumnName(), newId);
+				for (int id : ids.getIds()) {
+					o2mDb.update(vals, id);
+				}
+			}
+		}
 		return newId;
 	}
 
@@ -229,15 +261,19 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 					m2mObjectList.add(m2mObjects);
 					continue;
 				}
-				// FIXME
 				if (values.get(key) instanceof OEO2MIds) {
 					HashMap<String, Object> o2mObjects = new HashMap<String, Object>();
 					OEDBHelper o2mDb = findFieldModel(key);
 					o2mObjects.put("o2mObject", o2mDb);
+					o2mObjects.put("o2mCol", col);
 					o2mObjects.put("o2mRecordsObj", values.get(key));
 					o2mObjectList.add(o2mObjects);
 					continue;
 				}
+				if (col.getType() instanceof OEOneToMany) {
+					continue;
+				}
+
 				cValues.put(key, values.get(key).toString());
 			}
 			/**
@@ -505,8 +541,13 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			String value = cr.getString(cr.getColumnIndex(col.getName()));
 			if (col.getType() instanceof OETimestamp
 					|| col.getType() instanceof OEDateTime) {
+				String date_format = OEDate.DEFAULT_FORMAT;
+				if (col.getType() instanceof OEDateTime) {
+					OEDateTime dttime = (OEDateTime) col.getType();
+					date_format = dttime.getPattern();
+				}
 				value = OEDate.getDate(mContext, value, TimeZone.getDefault()
-						.getID(), OEDate.DEFAULT_FORMAT);
+						.getID(), date_format);
 			}
 			return value;
 		}
