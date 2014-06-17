@@ -18,7 +18,7 @@
  */
 package com.odoo.config;
 
-import com.odoo.addons.idea.Idea;
+import com.odoo.addons.idea.Library;
 import com.odoo.support.Module;
 import com.odoo.support.ModulesConfigHelper;
 
@@ -32,7 +32,6 @@ public class ModulesConfig extends ModulesConfigHelper {
 	 */
 	public ModulesConfig() {
 		/* application modules */
-
-		add(new Module("module_idea", "Idea", new Idea(), 0), true);
+		add(new Module("module_library", "Library", new Library(), 0), true);
 	}
 }

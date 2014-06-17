@@ -34,6 +34,9 @@ import android.util.Log;
 import com.odoo.App;
 import com.odoo.base.ir.Ir_model;
 import com.odoo.orm.OEFieldsHelper.OERelationData;
+import com.odoo.orm.types.OEManyToMany;
+import com.odoo.orm.types.OEManyToOne;
+import com.odoo.orm.types.OEOneToMany;
 import com.odoo.support.OEUser;
 import com.odoo.util.OEDate;
 import com.odoo.util.PreferenceManager;
@@ -51,6 +54,7 @@ public class OEHelper {
 	App mApp = null;
 	boolean withUser = true;
 	boolean mAllowSelfSignedSSL = false;
+	List<String> mOne2ManyCols = new ArrayList<String>();
 
 	public OEHelper(Context context, OEDatabase oeDatabase) {
 		this(context, oeDatabase, false);
@@ -99,6 +103,7 @@ public class OEHelper {
 	}
 
 	private void init() {
+		mOne2ManyCols = new ArrayList<String>();
 	}
 
 	public OEUser login(String username, String password, String database,
@@ -238,8 +243,14 @@ public class OEHelper {
 		Log.d(TAG, "Model: " + mDatabase.getModelName());
 		if (mUser != null)
 			Log.d(TAG, "User: " + mUser.getAndroidName());
-		OEFieldsHelper fields = new OEFieldsHelper(
-				mDatabase.getDatabaseColumns());
+		List<OEColumn> dbCols = mDatabase.getDatabaseColumns();
+		List<OEColumn> dbFinalList = new ArrayList<OEColumn>();
+		for (OEColumn col : dbCols) {
+			if (!mOne2ManyCols.contains(col.getName())) {
+				dbFinalList.add(col);
+			}
+		}
+		OEFieldsHelper fields = new OEFieldsHelper(dbFinalList);
 		try {
 			if (domain == null) {
 				domain = new OEDomain();
@@ -253,7 +264,6 @@ public class OEHelper {
 				domain.add("create_date", ">=",
 						OEDate.getDateBefore(data_limit));
 			}
-
 			if (limits == -1) {
 				limits = 50;
 			}
@@ -270,16 +280,57 @@ public class OEHelper {
 		return synced;
 	}
 
+	public void setOne2ManyCol(String column) {
+		mOne2ManyCols.add(column);
+	}
+
+	public boolean skipOne2Many(String column) {
+		if (mOne2ManyCols.contains(column)) {
+			return true;
+		}
+		return false;
+	}
+
 	private boolean handleResultArray(OEFieldsHelper fields, JSONArray results,
 			boolean removeLocalIfNotExists) {
 		boolean flag = false;
 		try {
 			fields.addAll(results);
-			// Handling many2many and many2one records
 			List<OERelationData> rel_models = fields.getRelationData();
 			for (OERelationData rel : rel_models) {
-				OEHelper oe = rel.getDb().getOEInstance();
-				oe.syncWithServer(false, null, rel.getIds(), false, 0, false);
+				// Handling many2many records
+				if (rel.getDb() instanceof OEManyToMany) {
+					Log.v(TAG, "Syncing ManyToMany Records");
+					OEManyToMany m2mObj = (OEManyToMany) rel.getDb();
+					OEHelper oe = ((OEDatabase) m2mObj.getDBHelper())
+							.getOEInstance();
+					oe.syncWithServer(false, null, rel.getIds(), false, 0,
+							false);
+
+				} else if (rel.getDb() instanceof OEManyToOne) {
+					// Handling many2One records
+					Log.v(TAG, "Syncing ManyToOne Records");
+					OEManyToOne m2oObj = (OEManyToOne) rel.getDb();
+					OEHelper oe = ((OEDatabase) m2oObj.getDBHelper())
+							.getOEInstance();
+					oe.syncWithServer(false, null, rel.getIds(), false, 0,
+							false);
+				} else if (rel.getDb() instanceof OEOneToMany) {
+					Log.v(TAG, "Syncing OneToMany Records");
+					OEOneToMany o2mObj = (OEOneToMany) rel.getDb();
+					OEHelper oe = ((OEDatabase) o2mObj.getDBHelper())
+							.getOEInstance();
+					oe.setOne2ManyCol(o2mObj.getColumnName());
+					oe.syncWithServer(false, null, rel.getIds(), false, 0,
+							false);
+				} else {
+					Log.v(TAG, "Syncing "
+							+ rel.getDb().getClass().getSimpleName()
+							+ " Records");
+					OEHelper oe = ((OEDatabase) rel.getDb()).getOEInstance();
+					oe.syncWithServer(false, null, rel.getIds(), false, 0,
+							false);
+				}
 			}
 			List<Long> result_ids = mDatabase.createORReplace(
 					fields.getValues(), removeLocalIfNotExists);

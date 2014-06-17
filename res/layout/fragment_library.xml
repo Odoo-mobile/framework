@@ -5,8 +5,14 @@
     android:orientation="vertical"
     android:paddingTop="?android:attr/actionBarSize" >
 
+    <include
+        android:id="@+id/loadingProgress"
+        layout="@layout/listview_data_loading_progress"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" />
+
     <ListView
-        android:id="@+id/listview"
+        android:id="@+id/listRecords"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
     </ListView>

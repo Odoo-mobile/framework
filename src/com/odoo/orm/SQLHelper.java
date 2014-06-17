@@ -27,7 +27,6 @@ import com.odoo.orm.types.OEManyToMany;
 import com.odoo.orm.types.OEManyToOne;
 import com.odoo.orm.types.OEOneToMany;
 import com.odoo.orm.types.OETypeHelper;
-import com.odoo.util.logger.OELog;
 
 public class SQLHelper {
 
@@ -95,7 +94,6 @@ public class SQLHelper {
 			queries.add(sql.toString());
 			Log.d("SQLHelper", "Table created : " + table);
 		}
-		OELog.log(mTables.toString());
 		return queries;
 	}
 
