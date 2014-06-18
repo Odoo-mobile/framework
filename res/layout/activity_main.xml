@@ -8,7 +8,13 @@
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffffff" />
+        android:background="#ffffff" >
+
+        <include
+            android:id="@+id/application_loader"
+            layout="@layout/application_preloader"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <ListView
         android:id="@+id/left_drawer"

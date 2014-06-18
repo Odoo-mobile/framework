@@ -21,6 +21,7 @@ package com.odoo;
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.Odoo;
 import android.accounts.Account;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -34,6 +35,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -63,6 +65,7 @@ import com.odoo.support.OEUser;
 import com.odoo.support.fragment.FragmentListener;
 import com.odoo.util.Base64Helper;
 import com.odoo.util.OEAppRater;
+import com.odoo.util.OdooTaskWaiter;
 import com.odoo.util.OnBackButtonPressedListener;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.drawer.DrawerAdatper;
@@ -75,7 +78,8 @@ import com.openerp.OETouchListener;
  * The Class MainActivity.
  */
 public class MainActivity extends FragmentActivity implements
-		DrawerItem.DrawerItemClickListener, FragmentListener, DrawerListener {
+		DrawerItem.DrawerItemClickListener, FragmentListener, DrawerListener,
+		OdooTaskWaiter {
 
 	public static final String TAG = "com.odoo.MainActivity";
 	public static final int RESULT_SETTINGS = 1;
@@ -104,6 +108,8 @@ public class MainActivity extends FragmentActivity implements
 	private OnBackButtonPressedListener backPressed = null;
 	private boolean mTwoPane;
 
+	App mApp = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -111,6 +117,18 @@ public class MainActivity extends FragmentActivity implements
 		getActionBar().setIcon(R.drawable.ic_odoo_o);
 		mContext = this;
 		mFragment = getSupportFragmentManager();
+		mApp = (App) getApplication();
+		if (mApp.getOEInstance() == null && savedInstanceState == null) {
+			CreateOdooInstance odooInstance = new CreateOdooInstance(
+					savedInstanceState);
+			odooInstance.execute();
+		} else {
+			onTaskDone(savedInstanceState);
+		}
+	}
+
+	@Override
+	public void onTaskDone(Bundle savedInstanceState) {
 		initTouchListener();
 		initDrawerControls();
 		if (findViewById(R.id.fragment_detail_container) != null) {
@@ -778,5 +796,46 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public boolean isTwoPane() {
 		return mTwoPane;
+	}
+
+	class CreateOdooInstance extends AsyncTask<Void, Odoo, Odoo> {
+		Bundle mSavedInstanceState = null;
+		App mApp = null;
+
+		public CreateOdooInstance(Bundle savedInstanceState) {
+			mSavedInstanceState = savedInstanceState;
+			mApp = (App) getApplication();
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			findViewById(R.id.application_loader).setVisibility(View.VISIBLE);
+			getActionBar().hide();
+		}
+
+		@Override
+		protected Odoo doInBackground(Void... params) {
+			try {
+				Thread.sleep(1500);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return mApp.createInstance();
+		}
+
+		@Override
+		protected void onPostExecute(Odoo result) {
+			super.onPostExecute(result);
+			findViewById(R.id.application_loader).setVisibility(View.GONE);
+			OnOdooInstanceCreateListener app = mApp;
+			app.onOdooInstanceCreated(result);
+			onTaskDone(mSavedInstanceState);
+			getActionBar().show();
+		}
+	}
+
+	public interface OnOdooInstanceCreateListener {
+		public void onOdooInstanceCreated(Odoo odoo);
 	}
 }
