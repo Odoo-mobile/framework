@@ -18,14 +18,14 @@
  */
 package com.odoo;
 
+import com.odoo.support.OEUser;
+
 import odoo.Odoo;
 import android.app.Application;
 import android.util.Log;
 
-import com.odoo.auth.OdooAccountManager;
-import com.odoo.support.OEUser;
-
-public class App extends Application {
+public class App extends Application implements
+		MainActivity.OnOdooInstanceCreateListener {
 
 	public static final String TAG = App.class.getSimpleName();
 	public static Odoo mOEInstance = null;
@@ -34,28 +34,37 @@ public class App extends Application {
 	public void onCreate() {
 		Log.d(TAG, "App->onCreate()");
 		super.onCreate();
+	}
+
+	public Odoo createInstance() {
+		Odoo odoo = null;
 		OEUser user = OEUser.current(getApplicationContext());
 		if (user != null) {
 			try {
-				mOEInstance = new Odoo(user.getHost(),
-						user.isAllowSelfSignedSSL());
-				mOEInstance.authenticate(user.getUsername(),
-						user.getPassword(), user.getDatabase());
+				odoo = new Odoo(user.getHost(), user.isAllowSelfSignedSSL());
+				odoo.authenticate(user.getUsername(), user.getPassword(),
+						user.getDatabase());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		if (!OdooAccountManager.isAnyUser(getApplicationContext())) {
-			mOEInstance = null;
-		}
+		return odoo;
 	}
 
 	public Odoo getOEInstance() {
 		Log.d(TAG, "App->getOEInstance()");
+		if (mOEInstance == null) {
+			mOEInstance = createInstance();
+		}
 		return mOEInstance;
 	}
 
 	public void setOEInstance(Odoo odoo) {
 		mOEInstance = odoo;
+	}
+
+	@Override
+	public void onOdooInstanceCreated(Odoo odoo) {
+		setOEInstance(odoo);
 	}
 }
