@@ -27,14 +27,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.odoo.base.ir.Ir_AttachmentDBHelper;
-import com.odoo.base.ir.Ir_model;
-import com.odoo.base.mail.MailFollowers;
-import com.odoo.base.res.ResCompanyDB;
-import com.odoo.base.res.ResPartnerDB;
-import com.odoo.config.ModulesConfig;
-import com.odoo.support.Module;
-import com.odoo.support.fragment.FragmentHelper;
+import com.odoo.config.OModules;
+import com.odoo.support.OModule;
+import com.odoo.support.fragment.OModuleHelper;
 
 public class OESQLiteHelper extends SQLiteOpenHelper {
 
@@ -43,22 +38,22 @@ public class OESQLiteHelper extends SQLiteOpenHelper {
 	public static final String DATABASE_NAME = "OdooSQLite.db";
 	public static final int DATABASE_VERSION = 1;
 	Context mContext = null;
-	ModulesConfig mModuleConfig = null;
+	OModules mModuleConfig = null;
 	List<String> mDBTables = new ArrayList<String>();
 
 	public OESQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		mContext = context;
-		mModuleConfig = new ModulesConfig();
+		mModuleConfig = new OModules();
 	}
 
 	public List<OEDBHelper> baseModels() {
 		List<OEDBHelper> baseModels = new ArrayList<OEDBHelper>();
-		baseModels.add(new ResPartnerDB(mContext));
-		baseModels.add(new ResCompanyDB(mContext));
-		baseModels.add(new Ir_model(mContext));
-		baseModels.add(new Ir_AttachmentDBHelper(mContext));
-		baseModels.add(new MailFollowers(mContext));
+		// baseModels.add(new ResPartner(mContext));
+		// baseModels.add(new ResCompanyDB(mContext));
+		// // baseModels.add(new Ir_model(mContext));
+		// baseModels.add(new Ir_AttachmentDBHelper(mContext));
+		// baseModels.add(new MailFollowers(mContext));
 		return baseModels;
 	}
 
@@ -69,30 +64,28 @@ public class OESQLiteHelper extends SQLiteOpenHelper {
 		for (OEDBHelper db_helper : baseModels()) {
 			List<String> sqlQueries = sqlHelper.createTable(db_helper);
 			for (String query : sqlQueries) {
-				db.execSQL(query);
+				// db.execSQL(query);
 			}
 		}
-		for (Module module : mModuleConfig.modules()) {
-			FragmentHelper model = (FragmentHelper) module.getModuleInstance();
-			OEDBHelper model_db = (OEDBHelper) model.databaseHelper(mContext);
-			List<String> sqlQueries = sqlHelper.createTable(model_db);
-			for (String query : sqlQueries) {
-				db.execSQL(query);
-			}
-		}
+		/*
+		 * for (OModule module : mModuleConfig.modules()) { FragmentHelper model
+		 * = (FragmentHelper) module.getModuleInstance(); OEDBHelper model_db =
+		 * (OEDBHelper) model.databaseHelper(mContext); List<String> sqlQueries
+		 * = sqlHelper.createTable(model_db); for (String query : sqlQueries) {
+		 * //db.execSQL(query); } }
+		 */
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		SQLHelper sqlHelper = new SQLHelper();
-		for (Module module : mModuleConfig.modules()) {
-			FragmentHelper model = (FragmentHelper) module.getModuleInstance();
-			OEDBHelper model_db = (OEDBHelper) model.databaseHelper(mContext);
-			List<String> sqlQueries = sqlHelper.dropTable(model_db);
-			for (String query : sqlQueries) {
-				db.execSQL(query);
-			}
-		}
+		/*
+		 * for (OModule module : mModuleConfig.modules()) { FragmentHelper model
+		 * = (FragmentHelper) module.getModuleInstance(); OEDBHelper model_db =
+		 * (OEDBHelper) model.databaseHelper(mContext); List<String> sqlQueries
+		 * = sqlHelper.dropTable(model_db); for (String query : sqlQueries) {
+		 * db.execSQL(query); } }
+		 */
 		// Recreating tables
 		onCreate(db);
 	}

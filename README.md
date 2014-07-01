@@ -1,5 +1,5 @@
-Odoo Mobile Framework
-=====================
+Odoo Mobile Framework v2.0
+==========================
 
 Odoo is a powerful open source framework. With help of this framework we can rapidly develop almost any application.
 

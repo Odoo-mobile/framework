@@ -28,7 +28,6 @@ import android.view.View;
 import android.widget.QuickContactBadge;
 import android.widget.Toast;
 
-import com.odoo.base.res.ResPartnerDB;
 import com.odoo.orm.OEDataRow;
 import com.odoo.support.OEUser;
 import com.odoo.support.contact.OEContact;
@@ -105,8 +104,8 @@ public class OEContactView extends QuickContactBadge {
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
-								OEDataRow partner = new ResPartnerDB(mContext)
-										.select(partner_id);
+								OEDataRow partner = null;// new
+															// ResPartner(mContext).select(partner_id);
 								if (mContact.createContact(partner)) {
 									Toast.makeText(mContext, "Contact Saved.",
 											Toast.LENGTH_LONG).show();

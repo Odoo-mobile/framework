@@ -21,7 +21,11 @@ package com.odoo;
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.OEDomain;
 import odoo.Odoo;
+
+import org.json.JSONArray;
+
 import android.accounts.Account;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -58,8 +62,9 @@ import com.odoo.base.about.AboutFragment;
 import com.odoo.base.account.AccountFragment;
 import com.odoo.base.account.AccountsDetail;
 import com.odoo.base.account.UserProfile;
-import com.odoo.base.res.ResPartnerDB;
-import com.odoo.orm.OEDataRow;
+import com.odoo.base.ir.IrModel;
+import com.odoo.base.login_signup.AccountCreate;
+import com.odoo.base.login_signup.LoginSignup;
 import com.odoo.support.BaseFragment;
 import com.odoo.support.OEUser;
 import com.odoo.support.fragment.FragmentListener;
@@ -118,10 +123,17 @@ public class MainActivity extends FragmentActivity implements
 		mContext = this;
 		mFragment = getSupportFragmentManager();
 		mApp = (App) getApplication();
-		if (mApp.getOEInstance() == null && savedInstanceState == null) {
-			CreateOdooInstance odooInstance = new CreateOdooInstance(
-					savedInstanceState);
-			odooInstance.execute();
+		IrModel models = new IrModel(mContext);
+		if (OEUser.current(mContext) != null
+				&& ((mApp.getOdoo() == null && savedInstanceState == null) || models
+						.count() <= 0)) {
+			// Recreating model fields
+			AccountCreate account = new AccountCreate();
+			Bundle args = new Bundle();
+			args.putBoolean("no_config_wizard", true);
+			args.putAll(OEUser.current(mContext).getAsBundle());
+			account.setArguments(args);
+			startMainFragment(account, false);
 		} else {
 			onTaskDone(savedInstanceState);
 		}
@@ -164,8 +176,14 @@ public class MainActivity extends FragmentActivity implements
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
 			lockDrawer(true);
-			AccountFragment account = new AccountFragment();
-			startMainFragment(account, false);
+			// Hiding Actionbar
+
+			LoginSignup loginSignUp = new LoginSignup();
+			startMainFragment(loginSignUp, false);
+
+			// TODO: remove after finish
+			// AccountFragment account = new AccountFragment();
+			// startMainFragment(account, false);
 		} else {
 			lockDrawer(false);
 			/**
@@ -222,16 +240,10 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void setDrawerHeader() {
-		mDrawerTitle = OEUser.current(mContext).getUsername();
-		mDrawerSubtitle = OEUser.current(mContext).getHost();
-
-		ResPartnerDB partner = new ResPartnerDB(mContext);
-		OEDataRow partnerInfo = partner.select(OEUser.current(mContext)
-				.getPartner_id());
-		if (partnerInfo != null) {
-			mDrawerTitle = partnerInfo.getString("name");
-		}
-
+		OEUser user = OEUser.current(mContext);
+		mDrawerTitle = user.getName();
+		mDrawerSubtitle = (user.isOAauthLogin()) ? user.getInstanceUrl() : user
+				.getHost();
 		View v = getLayoutInflater().inflate(R.layout.drawer_header,
 				mDrawerListView, false);
 		TextView mUserName, mUserURL;
@@ -717,7 +729,7 @@ public class MainActivity extends FragmentActivity implements
 		return fragment;
 	}
 
-	private void lockDrawer(boolean flag) {
+	public void lockDrawer(boolean flag) {
 		if (!flag) {
 			mDrawerLayout.setDrawerLockMode(DrawerLayout.STATE_IDLE);
 		} else {
@@ -820,6 +832,21 @@ public class MainActivity extends FragmentActivity implements
 				Thread.sleep(1500);
 			} catch (Exception e) {
 				e.printStackTrace();
+			}
+			if (OEUser.current(mContext) != null) {
+				IrModel model = new IrModel(mContext);
+				PreferenceManager pref = new PreferenceManager(mContext);
+				List<String> model_list = new ArrayList<String>();
+				for (String m : pref.getStringSet("models"))
+					model_list.add(m);
+				try {
+					OEDomain domain = new OEDomain();
+					domain.add("model", "in",
+							new JSONArray(model_list.toString()));
+					model.getSyncHelper().syncWithServer(domain);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			return mApp.createInstance();
 		}

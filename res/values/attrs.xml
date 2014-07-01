@@ -4,5 +4,36 @@
     <declare-styleable name="DrawerIconView">
         <attr name="tint" format="reference|color" />
     </declare-styleable>
+    <!-- Odoo Controls -->
+
+    <declare-styleable name="OField">
+        <attr name="field_name" format="string" />
+        <attr name="editable" format="boolean" />
+        <attr name="with_label" format="boolean" />
+        <attr name="field_textAppearance" format="reference" />
+        <attr name="label_textAppearance" format="reference" />
+        <attr name="label_color" format="color" />
+        <attr name="field_color" format="color" />
+        <attr name="fieldTextStyle" format="string" />
+    </declare-styleable>
+    <declare-styleable name="OLabel">
+        <attr name="label" format="string" />
+        <attr name="textAppearance" format="reference" />
+        <attr name="color" format="color" />
+        <attr name="bottom_border_height" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="OList">
+        <attr name="pullable" format="boolean" />
+        <attr name="row_swipable" format="boolean" />
+        <attr name="group_by" format="string" />
+    </declare-styleable>
+    <declare-styleable name="OForm">
+        <attr name="background_selector" format="reference" />
+        <attr name="model" format="string" />
+    </declare-styleable>
+    <declare-styleable name="OManyToOneWidget">
+        <attr name="model_name" format="string" />
+        <attr name="column_name" format="string" />
+    </declare-styleable>
 
 </resources>

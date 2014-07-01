@@ -23,17 +23,18 @@ import android.text.TextUtils;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView.OnQueryTextListener;
 
-import com.odoo.orm.OEDatabase;
-import com.odoo.support.fragment.FragmentHelper;
+import com.odoo.orm.OModel;
+import com.odoo.support.fragment.FragmentListener;
+import com.odoo.support.fragment.OModuleHelper;
 
 /**
  * The Class BaseFragment.
  */
-public abstract class BaseFragment extends Fragment implements FragmentHelper {
+public abstract class BaseFragment extends Fragment implements OModuleHelper {
 
 	/** The scope. */
 	public AppScope scope;
-	private OEDatabase mDb = null;
+	private OModel mDb = null;
 	/** The list search adapter. */
 	private ArrayAdapter<Object> listSearchAdapter;
 
@@ -77,8 +78,13 @@ public abstract class BaseFragment extends Fragment implements FragmentHelper {
 		}
 	};
 
-	public OEDatabase db() {
-		mDb = (OEDatabase) databaseHelper(getActivity());
+	public void startFragment(Fragment fragment, Boolean addToBackState) {
+		FragmentListener fragmentListener = (FragmentListener) getActivity();
+		fragmentListener.startMainFragment(fragment, addToBackState);
+	}
+
+	public OModel db() {
+		mDb = (OModel) databaseHelper(getActivity());
 		return mDb;
 	}
 }

@@ -32,7 +32,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.odoo.App;
-import com.odoo.base.ir.Ir_model;
+import com.odoo.base.ir.IrModel;
 import com.odoo.orm.OEFieldsHelper.OERelationData;
 import com.odoo.orm.types.OEManyToMany;
 import com.odoo.orm.types.OEManyToOne;
@@ -68,7 +68,7 @@ public class OEHelper {
 		mContext = context;
 		mDatabase = oeDatabase;
 		mApp = (App) context.getApplicationContext();
-		mOdoo = mApp.getOEInstance();
+		mOdoo = mApp.getOdoo();
 		mUser = OEUser.current(context);
 		if (mOdoo == null && mUser != null)
 			mUser = login(mUser.getUsername(), mUser.getPassword(),
@@ -80,7 +80,7 @@ public class OEHelper {
 		init();
 		mContext = context;
 		mApp = (App) context.getApplicationContext();
-		mOdoo = mApp.getOEInstance();
+		mOdoo = mApp.getOdoo();
 		mUser = OEUser.current(context);
 		if (mUser != null) {
 			mUser = login(mUser.getUsername(), mUser.getPassword(),
@@ -98,7 +98,7 @@ public class OEHelper {
 		init();
 		mContext = context;
 		mApp = (App) context.getApplicationContext();
-		mOdoo = mApp.getOEInstance();
+		mOdoo = mApp.getOdoo();
 		this.withUser = withUser;
 	}
 
@@ -116,7 +116,7 @@ public class OEHelper {
 					database);
 			int userId = 0;
 			if (response.get("uid") instanceof Integer) {
-				mApp.setOEInstance(mOdoo);
+				mApp.setOdooInstance(mOdoo);
 				if (OEUser.current(mContext) == null || !withUser) {
 					userId = response.getInt("uid");
 
@@ -347,7 +347,7 @@ public class OEHelper {
 
 	public boolean isModelInstalled(String model) {
 		boolean installed = true;
-		Ir_model ir_model = new Ir_model(mContext);
+		IrModel ir_model = new IrModel(mContext);
 		try {
 			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "model" });
 			OEDomain domain = new OEDomain();
@@ -363,10 +363,10 @@ public class OEHelper {
 				values.put("model", record.getString("model"));
 				values.put("is_installed", installed);
 				int count = ir_model.count("model = ?", new String[] { model });
-				if (count > 0)
-					ir_model.update(values, "model = ?", new String[] { model });
-				else
-					ir_model.create(values);
+				// if (count > 0)
+				// ir_model.update(values, "model = ?", new String[] { model });
+				// else
+				// ir_model.create(values);
 			} else {
 				installed = false;
 			}

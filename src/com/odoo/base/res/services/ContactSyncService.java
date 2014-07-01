@@ -33,7 +33,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.odoo.auth.OdooAccountManager;
-import com.odoo.base.res.ResPartnerDB;
+import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OEHelper;
 import com.odoo.support.OEUser;
 import com.odoo.support.contact.OEContact;
@@ -70,8 +70,8 @@ public class ContactSyncService extends Service {
 			OEUser user = OdooAccountManager.getAccountDetail(context,
 					account.name);
 
-			ResPartnerDB db = new ResPartnerDB(context);
-			OEHelper oe = db.getOEInstance();
+			ResPartner db = new ResPartner(context);
+			OEHelper oe = null;// db.getOEInstance();
 
 			OEContact contact = new OEContact(context, user);
 

@@ -22,6 +22,10 @@ public class OEInteger extends OETypeHelper {
 
 	public static final String KEY = "INTEGER";
 
+	public OEInteger() {
+		mType = OEInteger.KEY;
+	}
+
 	public OEInteger(int size) {
 		mType = OEInteger.KEY;
 		mSize = size;

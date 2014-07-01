@@ -51,7 +51,6 @@ import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
 import com.odoo.support.OEDialog;
 import com.odoo.support.OEUser;
-import com.odoo.support.fragment.FragmentListener;
 import com.odoo.util.drawer.DrawerItem;
 
 /**
@@ -261,7 +260,7 @@ public class Login extends BaseFragment {
 			OEHelper odoo = new OEHelper(getActivity(), false,
 					mAllowSelfSignedSSL);
 			App app = (App) scope.context().getApplicationContext();
-			app.setOEInstance(null);
+			app.setOdooInstance(null);
 			userData = odoo.login(userName, password, database, odooServerURL);
 			if (userData != null) {
 				return true;
@@ -292,10 +291,6 @@ public class Login extends BaseFragment {
 				if (OdooAccountManager.createAccount(getActivity(), userData)) {
 					loginUserASync.cancel(true);
 					pdialog.hide();
-					SyncWizard syncWizard = new SyncWizard();
-					FragmentListener mFragment = (FragmentListener) getActivity();
-					mFragment.startMainFragment(syncWizard, false);
-
 				}
 			} else {
 				edtPassword.setError(errorMsg);
@@ -337,4 +332,5 @@ public class Login extends BaseFragment {
 	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
+
 }

@@ -81,7 +81,7 @@ public class Attachment implements OnClickListener {
 
 	String[] mOptions = null;
 	Types mDialogType = null;
-	Ir_AttachmentDBHelper mDb = null;
+	IrAttachment mDb = null;
 
 	public static final int REQUEST_CAMERA = 111;
 	public static final int REQUEST_IMAGE = 112;
@@ -90,7 +90,7 @@ public class Attachment implements OnClickListener {
 
 	public Attachment(Context context) {
 		mContext = context;
-		mDb = new Ir_AttachmentDBHelper(mContext);
+		mDb = new IrAttachment(mContext);
 	}
 
 	public void requestAttachment(Types type) {
@@ -236,14 +236,15 @@ public class Attachment implements OnClickListener {
 	}
 
 	public List<OEDataRow> select(String model, int id) {
-		return mDb.select("res_model = ? AND res_id = ?", new String[] { model,
-				id + "" });
+		return null;// return mDb.select("res_model = ? AND res_id = ?", new
+					// String[] { model,
+		// id + "" });
 	}
 
 	public void removeAttachment(int attachment_id) {
-		RemoveAttachment remove = new RemoveAttachment(mDb.getOEInstance(),
-				attachment_id);
-		remove.execute();
+		// RemoveAttachment remove = new RemoveAttachment(mDb.getOEInstance(),
+		// attachment_id);
+		// remove.execute();
 	}
 
 	class RemoveAttachment extends AsyncTask<Void, Void, Void> {
@@ -306,21 +307,21 @@ public class Attachment implements OnClickListener {
 			}
 		}
 		if (values.size() > 0) {
-			if (asBackgroundTask) {
-				CreateAttachment attachment = new CreateAttachment(
-						mDb.getOEInstance(), values);
-				attachment.execute();
-			} else {
-				OEHelper oe = mDb.getOEInstance();
-				mNewAttachmentIds.clear();
-				if (oe != null) {
-					for (OEValues value : values) {
-						long a_id = oe.create(value);
-						Log.i(TAG, "Attachment created #" + a_id);
-						mNewAttachmentIds.add(a_id);
-					}
-				}
-			}
+			// if (asBackgroundTask) {
+			// CreateAttachment attachment = new CreateAttachment(
+			// mDb.getOEInstance(), values);
+			// attachment.execute();
+			// } else {
+			// OEHelper oe = mDb.getOEInstance();
+			// mNewAttachmentIds.clear();
+			// if (oe != null) {
+			// for (OEValues value : values) {
+			// long a_id = oe.create(value);
+			// Log.i(TAG, "Attachment created #" + a_id);
+			// mNewAttachmentIds.add(a_id);
+			// }
+			// }
+			// }
 		}
 	}
 
@@ -420,13 +421,13 @@ public class Attachment implements OnClickListener {
 		public AttachmentDownloader(int attachment_id) {
 			initNotificationManager();
 			mID = NOTIFICATION_ID++;
-			mAttachmentInfo = mDb.select(attachment_id);
+			// mAttachmentInfo = mDb.select(attachment_id);
 			if (mAttachmentInfo.getString("file_uri").equals("false")) {
 				mNotificationBuilder.setProgress(0, 0, true);
 				mNotification = mNotificationBuilder.build();
 				mNotificationManager.notify(mID, mNotification);
 			}
-			mOE = mDb.getOEInstance();
+			// mOE = mDb.getOEInstance();
 		}
 
 		@Override
@@ -454,7 +455,7 @@ public class Attachment implements OnClickListener {
 							mNotification = setFileIntent(uri);
 							OEValues values = new OEValues();
 							values.put("file_uri", uri.toString());
-							mDb.update(values, mAttachmentInfo.getInt("id"));
+							// mDb.update(values, mAttachmentInfo.getInt("id"));
 						} else {
 							error = true;
 						}

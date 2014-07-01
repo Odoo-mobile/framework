@@ -70,6 +70,11 @@ public class OdooServerConnection {
 		try {
 			odoo = new Odoo(serverURL, mAllowSelfSignedSSL);
 			mDbLists = odoo.getDatabaseList();
+			if (mDbLists == null) {
+				mDbLists = new JSONArray();
+				if (odoo.getDatabaseName() != null)
+					mDbLists.put(odoo.getDatabaseName());
+			}
 		} catch (SSLPeerUnverifiedException ssl) {
 			Log.d(TAG, "Throw SSLPeerUnverifiedException ");
 			throw new SSLPeerUnverifiedException(ssl.getMessage());

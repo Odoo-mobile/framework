@@ -9,9 +9,8 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.odoo.addons.idea.BooksDB;
-import com.odoo.auth.OdooAccountManager;
-import com.odoo.orm.OEHelper;
+import com.odoo.addons.idea.model.BookBook;
+import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.service.OEService;
 
@@ -32,13 +31,11 @@ public class LibraryService extends OEService {
 		try {
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-			BooksDB db = new BooksDB(context);
-			db.setAccountUser(OdooAccountManager.getAccountDetail(context,
-					account.name));
-			OEHelper oe = db.getOEInstance();
-			if (oe != null && oe.syncWithServer(true)) {
+			BookBook db = new BookBook(context);
+			OSyncHelper sync = db.getSyncHelper();
+			if (sync.syncWithServer())
 				context.sendBroadcast(intent);
-			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

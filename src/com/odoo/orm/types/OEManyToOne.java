@@ -19,9 +19,14 @@
 package com.odoo.orm.types;
 
 import com.odoo.orm.OEDBHelper;
+import com.odoo.orm.OModel;
 
 public class OEManyToOne {
 	OEDBHelper mDb = null;
+
+	public OEManyToOne(OModel model) {
+
+	}
 
 	public OEManyToOne(OEDBHelper db) {
 		mDb = db;

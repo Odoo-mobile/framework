@@ -16,26 +16,34 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.ir;
+package com.odoo.util;
 
-import java.util.List;
-
-import android.content.Context;
-
-import com.odoo.support.BaseFragment;
-import com.odoo.support.fragment.FragmentHelper;
-import com.odoo.util.drawer.DrawerItem;
-
-public class Ir_modelFragment extends BaseFragment implements FragmentHelper {
-
-	@Override
-	public Object databaseHelper(Context context) {
-		return null;
+public class StringUtils {
+	public static String repeat(String string, int repeat) {
+		StringBuffer str = new StringBuffer();
+		for (int i = 0; i < repeat; i++)
+			str.append(string);
+		return str.toString();
 	}
 
-	@Override
-	public List<DrawerItem> drawerMenus(Context context) {
-		return null;
+	public static String capitalizeString(String string) {
+		char[] chars = string.toLowerCase().toCharArray();
+		boolean found = false;
+		for (int i = 0; i < chars.length; i++) {
+			if (!found && Character.isLetter(chars[i])) {
+				chars[i] = Character.toUpperCase(chars[i]);
+				found = true;
+			} else if (Character.isWhitespace(chars[i]) || chars[i] == '.'
+					|| chars[i] == '\'') { // You
+											// can
+											// add
+											// other
+											// chars
+											// here
+				found = false;
+			}
+		}
+		return String.valueOf(chars);
 	}
 
 }

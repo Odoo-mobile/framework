@@ -177,7 +177,7 @@ public class SyncWizard extends BaseFragment {
 						SharedPreferences settings = PreferenceManager
 								.getDefaultSharedPreferences(scope.context());
 						Editor editor = settings.edit();
-						//TODO: store preference setting for your options.
+						// TODO: store preference setting for your options.
 						editor.commit();
 						String authority = authorities.get(rdoBtn.getId() + "");
 						scope.main().setAutoSync(authority, rdoBtn.isChecked());

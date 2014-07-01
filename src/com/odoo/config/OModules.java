@@ -16,38 +16,17 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.ir;
+package com.odoo.config;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.odoo.addons.idea.Library;
+import com.odoo.support.OModule;
+import com.odoo.support.OModulesHelper;
 
-import android.content.Context;
+/**
+ * The Class ModulesConfig.
+ */
+public class OModules extends OModulesHelper {
 
-import com.odoo.orm.OEColumn;
-import com.odoo.orm.OEDatabase;
-import com.odoo.orm.OEFields;
+	OModule library = new OModule(Library.class).setDefault();
 
-public class Ir_model extends OEDatabase {
-
-	Context mContext = null;
-
-	public Ir_model(Context context) {
-		super(context);
-		mContext = context;
-
-	}
-
-	@Override
-	public String getModelName() {
-		return "ir.model";
-	}
-
-	@Override
-	public List<OEColumn> getModelColumns() {
-		List<OEColumn> columns = new ArrayList<OEColumn>();
-		columns.add(new OEColumn("model", "model name", OEFields.varchar(50)));
-		columns.add(new OEColumn("is_installed", "is installed", OEFields
-				.varchar(6)));
-		return columns;
-	}
 }

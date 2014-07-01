@@ -20,23 +20,20 @@ package com.odoo.orm;
 
 import java.util.List;
 
-import com.odoo.orm.types.OEManyToMany;
-
 public class OEM2MRecord {
-	OEColumn mCol = null;
+	OColumn mCol = null;
 	int mId = 0;
-	OEDatabase mDatabase = null;
+	OModel mDatabase = null;
 
-	public OEM2MRecord(OEDatabase oeDatabase, OEColumn col, int id) {
-		mDatabase = oeDatabase;
+	public OEM2MRecord(OModel model, OColumn col, int id) {
+		mDatabase = model;
 		mCol = col;
 		mId = id;
 	}
 
 	public List<OEDataRow> browseEach() {
-		OEManyToMany m2o = (OEManyToMany) mCol.getType();
-		return mDatabase.selectM2M(m2o.getDBHelper(), mDatabase.tableName()
-				+ "_id = ?", new String[] { mId + "" });
+		OModel rel = mDatabase.createInstance(mCol.getType());
+		return mDatabase.selectM2MRecords(mDatabase, rel, mId);
 	}
 
 	public OEDataRow browseAt(int index) {

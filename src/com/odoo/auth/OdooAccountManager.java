@@ -163,8 +163,7 @@ public class OdooAccountManager {
 	 */
 	public static OEUser getAccountDetail(Context context, String username) {
 
-		List<OEUser> allAccounts = OdooAccountManager
-				.fetchAllAccounts(context);
+		List<OEUser> allAccounts = OdooAccountManager.fetchAllAccounts(context);
 		for (OEUser user : allAccounts) {
 			if (user.getAndroidName().equals(username)) {
 				return user;
@@ -216,7 +215,7 @@ public class OdooAccountManager {
 		OEUser user = OdooAccountManager.getAccountDetail(context, username);
 		Account account = OdooAccountManager.getAccount(context,
 				user.getAndroidName());
-				
+
 		if (user != null) {
 			if (cancelAllSync(account)) {
 				AccountManager accMgr = AccountManager.get(context);
@@ -250,8 +249,7 @@ public class OdooAccountManager {
 	public static OEUser loginUser(Context context, String username) {
 		OEUser userData = null;
 
-		List<OEUser> allAccounts = OdooAccountManager
-				.fetchAllAccounts(context);
+		List<OEUser> allAccounts = OdooAccountManager.fetchAllAccounts(context);
 		for (OEUser user : allAccounts) {
 			OdooAccountManager.logoutUser(context, user.getAndroidName());
 		}
@@ -274,14 +272,14 @@ public class OdooAccountManager {
 	 * @param context
 	 *            the context
 	 * @param username
-	 *            the username 
+	 *            the username
 	 */
 	public static void removeAccount(Context context, String username) {
 		AccountManager accMgr = AccountManager.get(context);
-		accMgr.removeAccount(
-				OdooAccountManager.getAccount(context, username), null, null);
+		accMgr.removeAccount(OdooAccountManager.getAccount(context, username),
+				null, null);
 		App app = (App) context.getApplicationContext();
-		app.setOEInstance(null);
+		app.setOdooInstance(null);
 		current_user = null;
 	}
 

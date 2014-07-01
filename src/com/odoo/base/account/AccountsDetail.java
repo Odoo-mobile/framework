@@ -189,9 +189,8 @@ public class AccountsDetail extends BaseFragment {
 								// User clicked OK, so save the result somewhere
 								// or return them to the component that opened
 								// the dialog
-								OdooAccountManager.logoutUser(scope
-										.context(), scope.User()
-										.getAndroidName());
+								OdooAccountManager.logoutUser(scope.context(),
+										scope.User().getAndroidName());
 								scope.main().finish();
 							}
 						}).setNegativeButton(R.string.label_cancel, null);

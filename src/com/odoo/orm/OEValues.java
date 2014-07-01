@@ -78,4 +78,9 @@ public class OEValues {
 	public int size() {
 		return _values.size();
 	}
+
+	@Override
+	public String toString() {
+		return _values.toString();
+	}
 }

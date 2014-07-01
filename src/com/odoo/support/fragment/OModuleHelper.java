@@ -16,22 +16,27 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.config;
+package com.odoo.support.fragment;
 
-import com.odoo.addons.idea.Library;
-import com.odoo.support.Module;
-import com.odoo.support.ModulesConfigHelper;
+import java.util.List;
 
-/**
- * The Class ModulesConfig.
- */
-public class ModulesConfig extends ModulesConfigHelper {
+import android.content.Context;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-	/**
-	 * Instantiates a new modules config.
-	 */
-	public ModulesConfig() {
-		/* application modules */
-		add(new Module("module_library", "Library", new Library(), 0), true);
-	}
+import com.odoo.util.drawer.DrawerItem;
+
+public interface OModuleHelper {
+	public Object databaseHelper(Context context);
+
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState);
+
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
+
+	public List<DrawerItem> drawerMenus(Context context);
 }

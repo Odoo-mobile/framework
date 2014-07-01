@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#eeffffff"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <ImageView
+        android:id="@+id/imgInstance"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/txvInstanceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="Instance Name"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#414141" />
+
+    <TextView
+        android:id="@+id/txvInstanceUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="Instance URL"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#414141" />
+
+</LinearLayout>

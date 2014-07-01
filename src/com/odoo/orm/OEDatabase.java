@@ -31,7 +31,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.odoo.base.ir.Ir_model;
+import com.odoo.base.ir.IrModel;
 import com.odoo.orm.OEM2MIds.Operation;
 import com.odoo.orm.types.OEDateTime;
 import com.odoo.orm.types.OEManyToMany;
@@ -552,17 +552,17 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 			return value;
 		}
 		if (col.getType() instanceof OEManyToOne) {
-			return new OEM2ORecord(col, cr.getString(cr.getColumnIndex(col
-					.getName())));
+			// return new OEM2ORecord(col,
+			// cr.getString(cr.getColumnIndex(col.getName())));
 		}
 		if (col.getType() instanceof OEManyToMany) {
-			return new OEM2MRecord(this, col,
-					cr.getInt(cr.getColumnIndex("id")));
+			// return new OEM2MRecord(this, col,
+			// cr.getInt(cr.getColumnIndex("id")));
 		}
 
 		if (col.getType() instanceof OEOneToMany) {
-			return new OEO2MRecord(this, col,
-					cr.getInt(cr.getColumnIndex("id")));
+			// return new OEO2MRecord(this, col,
+			// cr.getInt(cr.getColumnIndex("id")));
 		}
 		return null;
 	}
@@ -599,12 +599,12 @@ public abstract class OEDatabase extends OESQLiteHelper implements OEDBHelper {
 		if (oe != null) {
 			installed = oe.isModelInstalled(getModelName());
 		} else {
-			Ir_model ir = new Ir_model(mContext);
-			List<OEDataRow> rows = ir.select("model = ?",
-					new String[] { getModelName() });
-			if (rows.size() > 0) {
-				installed = rows.get(0).getBoolean("is_installed");
-			}
+			IrModel ir = new IrModel(mContext);
+			// List<OEDataRow> rows = ir.select("model = ?", new String[] {
+			// getModelName() });
+			// if (rows.size() > 0) {
+			// installed = rows.get(0).getBoolean("is_installed");
+			// }
 		}
 		return installed;
 	}

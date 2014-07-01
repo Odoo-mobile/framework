@@ -20,7 +20,7 @@ package com.odoo.orm.types;
 
 public class OEBoolean extends OETypeHelper {
 
-	public static final String KEY = "VARCHAR";
+	public static final String KEY = "BOOLEAN";
 
 	public OEBoolean() {
 		mType = OEBoolean.KEY;

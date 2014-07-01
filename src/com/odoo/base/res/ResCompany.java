@@ -16,22 +16,23 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.util;
+package com.odoo.base.res;
 
-public class StringHelper {
-	public static String capitalizeString(String string) {
-		char[] chars = string.toLowerCase().toCharArray();
-		boolean found = false;
-		for (int i = 0; i < chars.length; i++) {
-			if (!found && Character.isLetter(chars[i])) {
-				chars[i] = Character.toUpperCase(chars[i]);
-				found = true;
-			} else if (Character.isWhitespace(chars[i]) || chars[i] == '.'
-					|| chars[i] == '\'') { // You can add other chars here
-				found = false;
-			}
-		}
-		return String.valueOf(chars);
+import android.content.Context;
+
+import com.odoo.orm.OColumn;
+import com.odoo.orm.OModel;
+import com.odoo.orm.types.OEVarchar;
+
+/**
+ * The Class ResCompany.
+ */
+public class ResCompany extends OModel {
+
+	OColumn name = new OColumn("Name", OEVarchar.class, 100);
+
+	public ResCompany(Context context) {
+		super(context, "res.company");
 	}
 
 }

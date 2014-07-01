@@ -1,7 +1,12 @@
 package com.odoo.util;
 
+import com.odoo.R;
+
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,7 +38,37 @@ public class OEControls {
 	}
 
 	public static void setVisible(View parent_view, int resource_id) {
-		parent_view.findViewById(resource_id).setVisibility(View.VISIBLE);
+		OEControls.setVisible(parent_view, resource_id, false, null);
+	}
+
+	public static void setVisible(View parent_view, int resource_id,
+			boolean animate, Context context) {
+		View view = parent_view.findViewById(resource_id);
+		if (!animate) {
+			view.setVisibility(View.VISIBLE);
+		} else {
+			OEControls.slideInFromRight(parent_view, resource_id, 500, context);
+		}
+	}
+
+	public static void slideInFromRight(View parent_view, int resource_id,
+			long duration, Context context) {
+		View view = parent_view.findViewById(resource_id);
+		view.setVisibility(View.VISIBLE);
+		Animation animate = AnimationUtils.loadAnimation(context,
+				R.anim.slide_in_from_left);
+		view.startAnimation(animate);
+
+	}
+
+	public static void slideOutToRight(View parent_view, int resource_id,
+			long duration, Context context) {
+		View view = parent_view.findViewById(resource_id);
+		view.setVisibility(View.VISIBLE);
+		Animation animate = AnimationUtils.loadAnimation(context,
+				R.anim.slide_in_from_left);
+		view.startAnimation(animate);
+
 	}
 
 	public static void setInvisible(View parent_view, int resource_id) {
@@ -41,7 +76,17 @@ public class OEControls {
 	}
 
 	public static void setGone(View parent_view, int resource_id) {
-		parent_view.findViewById(resource_id).setVisibility(View.GONE);
+		OEControls.setGone(parent_view, resource_id, false, null);
+	}
+
+	public static void setGone(View parent_view, int resource_id,
+			boolean animate, Context context) {
+		View view = parent_view.findViewById(resource_id);
+		if (!animate) {
+			view.setVisibility(View.GONE);
+		} else {
+			OEControls.slideOutToRight(parent_view, resource_id, 500, context);
+		}
 	}
 
 }

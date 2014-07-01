@@ -16,35 +16,41 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.res;
+package com.odoo.support;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
+public class OModulesHelper {
 
-import com.odoo.orm.OEColumn;
-import com.odoo.orm.OEDatabase;
-import com.odoo.orm.OEFields;
+	List<OModule> mModules = new ArrayList<OModule>();
+	OModule mDefaultModule = null;
 
-/**
- * The Class Res_Company.
- */
-public class ResCompanyDB extends OEDatabase {
-	public ResCompanyDB(Context context) {
-		super(context);
+	public List<OModule> getModules() {
+		if (mModules.size() <= 0)
+			prepareModuleList();
+		return mModules;
 	}
 
-	@Override
-	public String getModelName() {
-		return "res.company";
+	private void prepareModuleList() {
+		for (Field module_col : getClass().getDeclaredFields()) {
+			if (module_col.getType().isAssignableFrom(OModule.class)) {
+				module_col.setAccessible(true);
+				try {
+					OModule module = (OModule) module_col.get(this);
+					if (module.isDefault()) {
+						mDefaultModule = module;
+					}
+					mModules.add(module);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
-	@Override
-	public List<OEColumn> getModelColumns() {
-		List<OEColumn> columns = new ArrayList<OEColumn>();
-		columns.add(new OEColumn("name", "Name", OEFields.varchar(100)));
-		return columns;
+	public OModule getDefaultModule() {
+		return mDefaultModule;
 	}
-
 }

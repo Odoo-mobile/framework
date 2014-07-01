@@ -3,6 +3,7 @@
 
     <string name="app_name">Odoo</string>
     <string name="app_name_odoo">Odoo</string>
+    <string name="odoo_oauth_url">https://accounts.odoo.com</string>
     <!-- Account -->
     <string name="account_user_dp">Account User Display Picture</string>
     <string name="logo_description">Odoo</string>
@@ -84,6 +85,9 @@
     <string name="title_about_us">About Us</string>
     <string name="title_connecting">Connecting&#8230;</string>
     <string name="title_loggin_in">Logging in&#8230;</string>
+    <string name="title_account_create">Creating account&#8230;</string>
+    <string name="title_database_create">Creating database&#8230;</string>
+    <string name="title_getting_instances">Getting instances&#8230;</string>
     <string name="title_confirm">Confirm</string>
     <string name="title_ssl_warning">SSL Warning</string>
     <string name="title_enter_password">Enter Password</string>

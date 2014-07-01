@@ -18,23 +18,27 @@
  */
 package com.odoo.orm;
 
-import com.odoo.orm.types.OEManyToOne;
-
 public class OEM2ORecord {
-	private OEColumn mCol = null;
-	private String mValue = null;
+	private OColumn mCol = null;
+	private String record_id = "false";
+	private OModel base_model = null;
 
-	public OEM2ORecord(OEColumn col, String value) {
+	public OEM2ORecord(OModel base, OColumn col, String value) {
+		base_model = base;
 		mCol = col;
-		mValue = value;
+		record_id = value;
+	}
+
+	public Object getId() {
+		if (record_id.equals("false"))
+			return false;
+		return Integer.parseInt(record_id);
 	}
 
 	public OEDataRow browse() {
-		OEManyToOne m2o = (OEManyToOne) mCol.getType();
-		OEDatabase db = (OEDatabase) m2o.getDBHelper();
-		if (mValue.equals("false")) {
+		OModel rel = base_model.createInstance(mCol.getType());
+		if (record_id.equals("false"))
 			return null;
-		}
-		return db.select(Integer.parseInt(mValue));
+		return rel.select(Integer.parseInt(record_id));
 	}
 }

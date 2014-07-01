@@ -31,12 +31,15 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.odoo.R;
-import com.odoo.addons.idea.BooksDB.BookAuthor;
-import com.odoo.addons.idea.BooksDB.BookCategory;
-import com.odoo.addons.idea.BooksDB.BookStudent;
+import com.odoo.addons.idea.model.BookBook;
+import com.odoo.addons.idea.model.BookBook.BookAuthor;
+import com.odoo.addons.idea.model.BookBook.BookCategory;
+import com.odoo.addons.idea.model.BookBook.BookStudent;
 import com.odoo.addons.idea.providers.library.LibraryProvider;
 import com.odoo.orm.OEDataRow;
 import com.odoo.receivers.SyncFinishReceiver;
@@ -51,7 +54,8 @@ import com.openerp.OETouchListener.OnPullListener;
 /**
  * The Class Idea.
  */
-public class Library extends BaseFragment implements OnPullListener {
+public class Library extends BaseFragment implements OnPullListener,
+		OnItemClickListener {
 
 	public static final String TAG = Library.class.getSimpleName();
 
@@ -96,6 +100,7 @@ public class Library extends BaseFragment implements OnPullListener {
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setAdapter(mListAdapter);
+		mListControl.setOnItemClickListener(this);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();
 	}
@@ -152,7 +157,6 @@ public class Library extends BaseFragment implements OnPullListener {
 					.browseEach()) {
 				values.add("- " + category.getString("name"));
 			}
-
 			break;
 		case Authors:
 			OEDataRow country = row.getM2ORecord("country_id").browse();
@@ -178,7 +182,7 @@ public class Library extends BaseFragment implements OnPullListener {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new BooksDB(context);
+		return new BookBook(context);
 	}
 
 	@Override
@@ -198,22 +202,22 @@ public class Library extends BaseFragment implements OnPullListener {
 
 	private int count(Context context, Keys key) {
 		int count = 0;
-		switch (key) {
-		case Authors:
-			count = new BookAuthor(context).count();
-			break;
-		case Books:
-			count = new BooksDB(context).count();
-			break;
-		case Category:
-			count = new BookCategory(context).count();
-			break;
-		case Students:
-			count = new BookStudent(context).count();
-			break;
-		default:
-			break;
-		}
+		// switch (key) {
+		// case Authors:
+		// count = new BookAuthor(context).count();
+		// break;
+		// case Books:
+		// count = new BooksDB(context).count();
+		// break;
+		// case Category:
+		// count = new BookCategory(context).count();
+		// break;
+		// case Students:
+		// count = new BookStudent(context).count();
+		// break;
+		// default:
+		// break;
+		// }
 		return count;
 	}
 
@@ -256,4 +260,15 @@ public class Library extends BaseFragment implements OnPullListener {
 		}
 	};
 
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		OEDataRow row = (OEDataRow) mListRecords.get(position);
+		LibraryDetail library = new LibraryDetail();
+		Bundle bundle = new Bundle();
+		bundle.putString("key", mCurrentKey.toString());
+		bundle.putInt("id", row.getInt("id"));
+		library.setArguments(bundle);
+		startFragment(library, true);
+	}
 }

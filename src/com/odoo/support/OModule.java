@@ -16,27 +16,43 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.support.fragment;
-
-import java.util.List;
+package com.odoo.support;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import com.odoo.util.drawer.DrawerItem;
+import com.odoo.orm.OModel;
+import com.odoo.support.fragment.OModuleHelper;
 
-public interface FragmentHelper {
-	public Object databaseHelper(Context context);
+public class OModule {
 
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState);
+	Class<?> module = null;
+	Boolean isDefault = false;
 
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
+	public OModule(Class<?> module) {
+		super();
+		this.module = module;
+	}
 
-	public List<DrawerItem> drawerMenus(Context context);
+	public OModule setDefault() {
+		isDefault = true;
+		return this;
+	}
+
+	public Object newInstance() {
+		try {
+			return module.newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public boolean isDefault() {
+		return isDefault;
+	}
+
+	public OModel getModel(Context context) {
+		OModuleHelper module = (OModuleHelper) newInstance();
+		return (OModel) module.databaseHelper(context);
+	}
 }

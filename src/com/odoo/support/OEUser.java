@@ -33,6 +33,8 @@ public class OEUser {
 	/** The username. */
 	private String username;
 
+	private String name;
+
 	/** The user_id. */
 	private int user_id;
 
@@ -65,6 +67,13 @@ public class OEUser {
 
 	private boolean allow_self_signed_ssl = false;
 
+	private boolean oauth_login = false;
+
+	// If oauth login
+	private String instance_url = null;
+	private String instance_database = null;
+	private String client_id = null;
+
 	/**
 	 * Gets the data as bundle.
 	 * 
@@ -72,6 +81,7 @@ public class OEUser {
 	 */
 	public Bundle getAsBundle() {
 		Bundle bundle = new Bundle();
+		bundle.putString("name", this.getName());
 		bundle.putString("username", this.getUsername());
 		bundle.putString("user_id", this.getUser_id() + "");
 		bundle.putString("partner_id", this.getPartner_id() + "");
@@ -85,7 +95,19 @@ public class OEUser {
 		bundle.putString("company_id", this.getCompany_id());
 		bundle.putString("allow_self_signed_ssl",
 				String.valueOf(this.isAllowSelfSignedSSL()));
+		bundle.putString("instance_database", this.getInstanceDatabase());
+		bundle.putString("instance_url", this.getInstanceUrl());
+		bundle.putString("oauth_login", this.isOAauthLogin() + "");
+		bundle.putString("client_id", this.getClientId());
 		return bundle;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -114,18 +136,25 @@ public class OEUser {
 	 *            the new from bundle
 	 */
 	public void setFromBundle(Bundle data) {
+		this.setName(data.getString("name"));
 		this.setUsername(data.getString("username"));
 		this.setUser_id(Integer.parseInt(data.getString("user_id")));
 		this.setPartner_id(Integer.parseInt(data.getString("partner_id")));
 		this.setTimezone(data.getString("timezone"));
-		this.setIsactive(data.getBoolean("isactive"));
+		this.setIsactive(Boolean.parseBoolean(data.getString("isactive")));
 		this.setAvatar(data.getString("avatar"));
 		this.setDatabase(data.getString("database"));
 		this.setHost(data.getString("host"));
 		this.setAndroidName(data.getString("android_name"));
 		this.setPassword(data.getString("password"));
 		this.setCompany_id(data.getString("company_id"));
-		this.setAllowSelfSignedSSL(data.getBoolean("allow_self_signed_ssl"));
+		this.setAllowSelfSignedSSL(Boolean.parseBoolean(data
+				.getString("allow_self_signed_ssl")));
+		// If oAuth Login
+		this.setInstanceDatabase(data.getString("instance_database"));
+		this.setInstanceUrl(data.getString("instance_url"));
+		this.setOAuthLogin(Boolean.parseBoolean(data.getString("oauth_login")));
+		this.setClientId(data.getString("client_id"));
 	}
 
 	/**
@@ -137,6 +166,7 @@ public class OEUser {
 	 *            the account
 	 */
 	public void fillFromAccount(AccountManager accMgr, Account account) {
+		this.setName(accMgr.getUserData(account, "name"));
 		this.setUsername(accMgr.getUserData(account, "username"));
 		this.setUser_id(Integer.parseInt(accMgr.getUserData(account, "user_id")));
 		this.setPartner_id(Integer.parseInt(accMgr.getUserData(account,
@@ -152,6 +182,13 @@ public class OEUser {
 		this.setCompany_id(accMgr.getUserData(account, "company_id"));
 		this.setAllowSelfSignedSSL(Boolean.parseBoolean(accMgr.getUserData(
 				account, "allow_self_signed_ssl")));
+		// If oAuth login
+		this.setOAuthLogin(Boolean.parseBoolean(accMgr.getUserData(account,
+				"oauth_login")));
+		this.setInstanceDatabase(accMgr.getUserData(account,
+				"instance_database"));
+		this.setInstanceUrl(accMgr.getUserData(account, "instance_url"));
+		this.setClientId(accMgr.getUserData(account, "client_id"));
 	}
 
 	/**
@@ -356,4 +393,35 @@ public class OEUser {
 		this.allow_self_signed_ssl = allow_self_signed_ssl;
 	}
 
+	public boolean isOAauthLogin() {
+		return oauth_login;
+	}
+
+	public void setOAuthLogin(boolean oauth_login) {
+		this.oauth_login = oauth_login;
+	}
+
+	public String getInstanceUrl() {
+		return instance_url;
+	}
+
+	public void setInstanceUrl(String instnace_url) {
+		this.instance_url = instnace_url;
+	}
+
+	public String getInstanceDatabase() {
+		return instance_database;
+	}
+
+	public void setInstanceDatabase(String instance_database) {
+		this.instance_database = instance_database;
+	}
+
+	public String getClientId() {
+		return client_id;
+	}
+
+	public void setClientId(String client_id) {
+		this.client_id = client_id;
+	}
 }
