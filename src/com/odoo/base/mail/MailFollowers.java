@@ -18,36 +18,24 @@
  */
 package com.odoo.base.mail;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 
-import com.odoo.base.res.ResPartnerDB;
-import com.odoo.orm.OEColumn;
-import com.odoo.orm.OEDatabase;
-import com.odoo.orm.OEFields;
+import com.odoo.base.res.ResPartner;
+import com.odoo.orm.OColumn;
+import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.OModel;
+import com.odoo.orm.types.OInteger;
+import com.odoo.orm.types.OText;
 
-public class MailFollowers extends OEDatabase {
-	Context mContext = null;
+public class MailFollowers extends OModel {
+
+	OColumn res_model = new OColumn("Model", OText.class);
+	OColumn res_id = new OColumn("Res ID", OInteger.class);
+	OColumn partner_id = new OColumn("Partner", ResPartner.class,
+			RelationType.ManyToOne);
 
 	public MailFollowers(Context context) {
-		super(context);
-		mContext = context;
+		super(context, "mail.followers");
 	}
 
-	@Override
-	public String getModelName() {
-		return "mail.followers";
-	}
-
-	@Override
-	public List<OEColumn> getModelColumns() {
-		List<OEColumn> cols = new ArrayList<OEColumn>();
-		cols.add(new OEColumn("res_model", "Model", OEFields.text()));
-		cols.add(new OEColumn("res_id", "Note ID", OEFields.integer()));
-		cols.add(new OEColumn("partner_id", "Partner ID", OEFields
-				.manyToOne(new ResPartnerDB(mContext))));
-		return cols;
-	}
 }

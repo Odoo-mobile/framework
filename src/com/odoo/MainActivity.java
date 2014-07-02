@@ -21,7 +21,6 @@ package com.odoo;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.Odoo;
 import android.accounts.Account;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -35,7 +34,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -55,18 +53,16 @@ import android.widget.Toast;
 
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.about.AboutFragment;
-import com.odoo.base.account.AccountFragment;
 import com.odoo.base.account.AccountsDetail;
 import com.odoo.base.account.UserProfile;
-import com.odoo.base.res.ResPartnerDB;
-import com.odoo.orm.OEDataRow;
+import com.odoo.base.ir.IrModel;
+import com.odoo.base.login_signup.AccountCreate;
+import com.odoo.base.login_signup.LoginSignup;
 import com.odoo.support.BaseFragment;
-import com.odoo.support.OEUser;
+import com.odoo.support.OUser;
 import com.odoo.support.fragment.FragmentListener;
 import com.odoo.util.Base64Helper;
-import com.odoo.util.OEAppRater;
-import com.odoo.util.OdooTaskWaiter;
-import com.odoo.util.OnBackButtonPressedListener;
+import com.odoo.util.OAppRater;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.drawer.DrawerAdatper;
 import com.odoo.util.drawer.DrawerHelper;
@@ -78,37 +74,33 @@ import com.openerp.OETouchListener;
  * The Class MainActivity.
  */
 public class MainActivity extends FragmentActivity implements
-		DrawerItem.DrawerItemClickListener, FragmentListener, DrawerListener,
-		OdooTaskWaiter {
+		DrawerItem.DrawerItemClickListener, FragmentListener, DrawerListener {
 
-	public static final String TAG = "com.odoo.MainActivity";
-	public static final int RESULT_SETTINGS = 1;
-	public static boolean set_setting_menu = false;
-	public Context mContext = null;
+	private static final String TAG = "com.odoo.MainActivity";
+	private static final int RESULT_SETTINGS = 1;
+	private Context mContext = null;
 
-	DrawerLayout mDrawerLayout = null;
-	ActionBarDrawerToggle mDrawerToggle = null;
-	List<DrawerItem> mDrawerListItems = new ArrayList<DrawerItem>();
-	DrawerAdatper mDrawerAdatper = null;
-	String mAppTitle = "";
-	String mDrawerTitle = "";
-	String mDrawerSubtitle = "";
-	int mDrawerItemSelectedPosition = -1;
-	ListView mDrawerListView = null;
-	boolean mNewFragment = false;
+	private DrawerLayout mDrawerLayout = null;
+	private ActionBarDrawerToggle mDrawerToggle = null;
+	private List<DrawerItem> mDrawerListItems = new ArrayList<DrawerItem>();
+	private DrawerAdatper mDrawerAdatper = null;
+	private String mAppTitle = "", mDrawerTitle = "", mDrawerSubtitle = "";
+	private int mDrawerItemSelectedPosition = -1;
+	private ListView mDrawerListView = null;
+	private boolean mNewFragment = false;
 
-	FragmentManager mFragment = null;
+	private FragmentManager mFragment = null;
 
-	public enum SettingKeys {
+	private enum SettingKeys {
 		GLOBAL_SETTING, PROFILE, ACCOUNTS, ABOUT_US
 	}
 
 	private CharSequence mTitle;
 	private OETouchListener mTouchAttacher;
-	private OnBackButtonPressedListener backPressed = null;
 	private boolean mTwoPane;
 
-	App mApp = null;
+	private App mApp = null;
+	private OUser mAccount = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -118,16 +110,23 @@ public class MainActivity extends FragmentActivity implements
 		mContext = this;
 		mFragment = getSupportFragmentManager();
 		mApp = (App) getApplication();
-		if (mApp.getOEInstance() == null && savedInstanceState == null) {
-			CreateOdooInstance odooInstance = new CreateOdooInstance(
-					savedInstanceState);
-			odooInstance.execute();
+		IrModel models = new IrModel(mContext);
+		if (mApp.inNetwork()
+				&& OUser.current(mContext) != null
+				&& ((mApp.getOdoo() == null && savedInstanceState == null) || models
+						.count() <= 0)) {
+			// Recreating model fields
+			AccountCreate account = new AccountCreate();
+			Bundle args = new Bundle();
+			args.putBoolean("no_config_wizard", true);
+			args.putAll(OUser.current(mContext).getAsBundle());
+			account.setArguments(args);
+			startMainFragment(account, false);
 		} else {
 			onTaskDone(savedInstanceState);
 		}
 	}
 
-	@Override
 	public void onTaskDone(Bundle savedInstanceState) {
 		initTouchListener();
 		initDrawerControls();
@@ -149,7 +148,7 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void checkForRateApplication() {
-		OEAppRater.app_launched(this);
+		OAppRater.app_launched(this);
 	}
 
 	private void init() {
@@ -164,8 +163,9 @@ public class MainActivity extends FragmentActivity implements
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
 			lockDrawer(true);
-			AccountFragment account = new AccountFragment();
-			startMainFragment(account, false);
+			LoginSignup loginSignUp = new LoginSignup();
+			startMainFragment(loginSignUp, false);
+
 		} else {
 			lockDrawer(false);
 			/**
@@ -182,7 +182,7 @@ public class MainActivity extends FragmentActivity implements
 		checkForRateApplication();
 	}
 
-	protected void initTouchListener() {
+	private void initTouchListener() {
 		OETouchListener.DEFAULT_HEADER_LAYOUT = R.layout.default_header;
 		OETouchListener.DEFAULT_ANIM_HEADER_IN = R.anim.fade_in;
 		OETouchListener.DEFAULT_ANIM_HEADER_OUT = R.anim.fade_out;
@@ -222,16 +222,10 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void setDrawerHeader() {
-		mDrawerTitle = OEUser.current(mContext).getUsername();
-		mDrawerSubtitle = OEUser.current(mContext).getHost();
-
-		ResPartnerDB partner = new ResPartnerDB(mContext);
-		OEDataRow partnerInfo = partner.select(OEUser.current(mContext)
-				.getPartner_id());
-		if (partnerInfo != null) {
-			mDrawerTitle = partnerInfo.getString("name");
-		}
-
+		OUser user = OUser.current(mContext);
+		mDrawerTitle = user.getName();
+		mDrawerSubtitle = (user.isOAauthLogin()) ? user.getInstanceUrl() : user
+				.getHost();
 		View v = getLayoutInflater().inflate(R.layout.drawer_header,
 				mDrawerListView, false);
 		TextView mUserName, mUserURL;
@@ -241,10 +235,10 @@ public class MainActivity extends FragmentActivity implements
 		mUserURL = (TextView) v.findViewById(R.id.txvUserServerURL);
 		mUserName.setText(mDrawerTitle);
 		mUserURL.setText(mDrawerSubtitle);
-		if (OEUser.current(mContext) != null
-				&& !OEUser.current(mContext).getAvatar().equals("false")) {
+		if (OUser.current(mContext) != null
+				&& !OUser.current(mContext).getAvatar().equals("false")) {
 			Bitmap profPic = Base64Helper.getBitmapImage(this,
-					OEUser.current(mContext).getAvatar());
+					OUser.current(mContext).getAvatar());
 			if (profPic != null)
 				imgUserPic.setImageBitmap(profPic);
 		}
@@ -261,7 +255,7 @@ public class MainActivity extends FragmentActivity implements
 
 	private void setDrawerItems() {
 		Log.d(TAG, "MainActivity->setDrawerItems()");
-		if (OEUser.current(mContext) != null)
+		if (OUser.current(mContext) != null)
 			setDrawerHeader();
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -321,19 +315,17 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	private String[] accountList(List<OEUser> accounts) {
+	private String[] accountList(List<OUser> accounts) {
 		String[] account_list = new String[accounts.size()];
 		int i = 0;
-		for (OEUser user : accounts) {
+		for (OUser user : accounts) {
 			account_list[i] = user.getAndroidName();
 			i++;
 		}
 		return account_list;
 	}
 
-	OEUser mAccount = null;
-
-	public Dialog accountSelectionDialog(final List<OEUser> accounts) {
+	private Dialog accountSelectionDialog(final List<OUser> accounts) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -353,8 +345,8 @@ public class MainActivity extends FragmentActivity implements
 					public void onClick(DialogInterface dialog, int which) {
 						getActionBar().setDisplayHomeAsUpEnabled(false);
 						getActionBar().setHomeButtonEnabled(false);
-						AccountFragment fragment = new AccountFragment();
-						startMainFragment(fragment, false);
+						LoginSignup loginSignUp = new LoginSignup();
+						startMainFragment(loginSignUp, false);
 					}
 				})
 				// Set the action buttons
@@ -427,27 +419,23 @@ public class MainActivity extends FragmentActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	public boolean onSettingItemSelected(SettingKeys key) {
+	private boolean onSettingItemSelected(SettingKeys key) {
 		switch (key) {
 		case GLOBAL_SETTING:
-			set_setting_menu = false;
 			Intent i = new Intent(this, AppSettingsActivity.class);
 			startActivityForResult(i, RESULT_SETTINGS);
 			return true;
 		case ABOUT_US:
-			set_setting_menu = true;
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
 			AboutFragment about = new AboutFragment();
 			startMainFragment(about, true);
 			return true;
 		case ACCOUNTS:
-			set_setting_menu = true;
 			AccountsDetail acFragment = new AccountsDetail();
 			startMainFragment(acFragment, true);
 			return true;
 		case PROFILE:
-			set_setting_menu = true;
 			UserProfile profileFragment = new UserProfile();
 			startMainFragment(profileFragment, true);
 			return true;
@@ -481,7 +469,7 @@ public class MainActivity extends FragmentActivity implements
 
 		SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
 
-		Account mAccount = OdooAccountManager.getAccount(mContext, OEUser
+		Account mAccount = OdooAccountManager.getAccount(mContext, OUser
 				.current(mContext).getAndroidName());
 
 		for (SyncAdapterType lst : list) {
@@ -545,7 +533,7 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public void setAutoSync(String authority, boolean isON) {
 		try {
-			Account account = OdooAccountManager.getAccount(this, OEUser
+			Account account = OdooAccountManager.getAccount(this, OUser
 					.current(mContext).getAndroidName());
 			if (!ContentResolver.isSyncActive(account, authority)) {
 				ContentResolver.setSyncAutomatically(account, authority, isON);
@@ -565,8 +553,8 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public void requestSync(String authority, Bundle bundle) {
 		Account account = OdooAccountManager.getAccount(
-				getApplicationContext(), OEUser
-						.current(getApplicationContext()).getAndroidName());
+				getApplicationContext(), OUser.current(getApplicationContext())
+						.getAndroidName());
 		Bundle settingsBundle = new Bundle();
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 		settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -601,7 +589,7 @@ public class MainActivity extends FragmentActivity implements
 	public void setSyncPeriodic(String authority, long interval_in_minute,
 			long seconds_per_minute, long milliseconds_per_second) {
 		Account account = OdooAccountManager.getAccount(this,
-				OEUser.current(mContext).getAndroidName());
+				OUser.current(mContext).getAndroidName());
 		Bundle extras = new Bundle();
 		this.setAutoSync(authority, true);
 		ContentResolver.setIsSyncable(account, authority, 1);
@@ -620,23 +608,8 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public void cancelSync(String authority) {
 		Account account = OdooAccountManager.getAccount(this,
-				OEUser.current(mContext).getAndroidName());
+				OUser.current(mContext).getAndroidName());
 		ContentResolver.cancelSync(account, authority);
-	}
-
-	@Override
-	public void onBackPressed() {
-		if (backPressed != null) {
-			if (backPressed.onBackPressed()) {
-				super.onBackPressed();
-			}
-		} else {
-			super.onBackPressed();
-		}
-	}
-
-	public void setOnBackPressed(OnBackButtonPressedListener callback) {
-		backPressed = callback;
 	}
 
 	@Override
@@ -659,7 +632,6 @@ public class MainActivity extends FragmentActivity implements
 	private void loadFragment(DrawerItem item) {
 
 		Fragment fragment = (Fragment) item.getFragmentInstace();
-		;
 		if (item.getTagColor() != null
 				&& !fragment.getArguments().containsKey("tag_color")) {
 			Bundle tagcolor = fragment.getArguments();
@@ -717,7 +689,7 @@ public class MainActivity extends FragmentActivity implements
 		return fragment;
 	}
 
-	private void lockDrawer(boolean flag) {
+	public void lockDrawer(boolean flag) {
 		if (!flag) {
 			mDrawerLayout.setDrawerLockMode(DrawerLayout.STATE_IDLE);
 		} else {
@@ -796,46 +768,5 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public boolean isTwoPane() {
 		return mTwoPane;
-	}
-
-	class CreateOdooInstance extends AsyncTask<Void, Odoo, Odoo> {
-		Bundle mSavedInstanceState = null;
-		App mApp = null;
-
-		public CreateOdooInstance(Bundle savedInstanceState) {
-			mSavedInstanceState = savedInstanceState;
-			mApp = (App) getApplication();
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			findViewById(R.id.application_loader).setVisibility(View.VISIBLE);
-			getActionBar().hide();
-		}
-
-		@Override
-		protected Odoo doInBackground(Void... params) {
-			try {
-				Thread.sleep(1500);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return mApp.createInstance();
-		}
-
-		@Override
-		protected void onPostExecute(Odoo result) {
-			super.onPostExecute(result);
-			findViewById(R.id.application_loader).setVisibility(View.GONE);
-			OnOdooInstanceCreateListener app = mApp;
-			app.onOdooInstanceCreated(result);
-			onTaskDone(mSavedInstanceState);
-			getActionBar().show();
-		}
-	}
-
-	public interface OnOdooInstanceCreateListener {
-		public void onOdooInstanceCreated(Odoo odoo);
 	}
 }

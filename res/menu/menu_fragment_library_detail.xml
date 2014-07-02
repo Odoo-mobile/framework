@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_library_detail_edit"
+        android:icon="@drawable/ic_action_notes"
+        android:showAsAction="ifRoom|withText"
+        android:title="Edit">
+    </item>
+    <item
+        android:id="@+id/menu_library_detail_save"
+        android:icon="@drawable/ic_action_done"
+        android:showAsAction="ifRoom|withText"
+        android:title="Save">
+    </item>
+
+</menu>

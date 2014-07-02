@@ -18,17 +18,20 @@
  */
 package com.odoo;
 
-import com.odoo.support.OEUser;
-
 import odoo.Odoo;
+import odoo.OdooInstance;
 import android.app.Application;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
-public class App extends Application implements
-		MainActivity.OnOdooInstanceCreateListener {
+import com.odoo.support.OUser;
 
-	public static final String TAG = App.class.getSimpleName();
-	public static Odoo mOEInstance = null;
+public class App extends Application {
+
+	private static final String TAG = App.class.getSimpleName();
+	private static Odoo mOdooInstance = null;
 
 	@Override
 	public void onCreate() {
@@ -38,12 +41,23 @@ public class App extends Application implements
 
 	public Odoo createInstance() {
 		Odoo odoo = null;
-		OEUser user = OEUser.current(getApplicationContext());
+		OUser user = OUser.current(getApplicationContext());
 		if (user != null) {
 			try {
-				odoo = new Odoo(user.getHost(), user.isAllowSelfSignedSSL());
-				odoo.authenticate(user.getUsername(), user.getPassword(),
-						user.getDatabase());
+				if (user.isOAauthLogin()) {
+					odoo = new Odoo(user.getInstanceUrl(),
+							user.isAllowSelfSignedSSL());
+					OdooInstance instance = new OdooInstance();
+					instance.setInstanceUrl(user.getInstanceUrl());
+					instance.setDatabaseName(user.getInstanceDatabase());
+					instance.setClientId(user.getClientId());
+					odoo.oauth_authenticate(instance, user.getUsername(),
+							user.getPassword());
+				} else {
+					odoo = new Odoo(user.getHost(), user.isAllowSelfSignedSSL());
+					odoo.authenticate(user.getUsername(), user.getPassword(),
+							user.getDatabase());
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -51,20 +65,26 @@ public class App extends Application implements
 		return odoo;
 	}
 
-	public Odoo getOEInstance() {
-		Log.d(TAG, "App->getOEInstance()");
-		if (mOEInstance == null) {
-			mOEInstance = createInstance();
+	public Odoo getOdoo() {
+		Log.d(TAG, "App->getOdooInstance()");
+		if (mOdooInstance == null && inNetwork()) {
+			mOdooInstance = createInstance();
 		}
-		return mOEInstance;
+		return mOdooInstance;
 	}
 
-	public void setOEInstance(Odoo odoo) {
-		mOEInstance = odoo;
+	public void setOdooInstance(Odoo odoo) {
+		Log.d(TAG, "App->setOdooInstance()");
+		mOdooInstance = odoo;
 	}
 
-	@Override
-	public void onOdooInstanceCreated(Odoo odoo) {
-		setOEInstance(odoo);
+	public boolean inNetwork() {
+		boolean isConnected = false;
+		ConnectivityManager conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo nInfo = conManager.getActiveNetworkInfo();
+		if (nInfo != null && nInfo.isConnectedOrConnecting()) {
+			isConnected = true;
+		}
+		return isConnected;
 	}
 }

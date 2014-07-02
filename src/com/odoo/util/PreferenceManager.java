@@ -18,8 +18,14 @@
  */
 package com.odoo.util;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 public class PreferenceManager {
 	SharedPreferences mPref = null;
@@ -27,6 +33,31 @@ public class PreferenceManager {
 	public PreferenceManager(Context context) {
 		mPref = android.preference.PreferenceManager
 				.getDefaultSharedPreferences(context);
+	}
+
+	public void putString(String key, String value) {
+		Editor editor = mPref.edit();
+		editor.putString(key, value);
+		editor.commit();
+	}
+
+	public void putStringSet(String key, List<String> values) {
+		Editor editor = mPref.edit();
+		Set<String> vals = new HashSet<String>(values);
+		editor.putStringSet(key, vals);
+		editor.commit();
+	}
+
+	public List<String> getStringSet(String key) {
+		List<String> list = new ArrayList<String>();
+		Set<String> vals = mPref.getStringSet(key, null);
+		if (vals != null)
+			list.addAll(vals);
+		return list;
+	}
+
+	public String getString(String key, String default_value) {
+		return mPref.getString(key, default_value);
 	}
 
 	public int getInt(String key, int default_value) {

@@ -29,7 +29,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.odoo.MainActivity;
-import com.odoo.orm.OESQLiteHelper;
+import com.odoo.orm.OSQLiteHelper;
 
 /**
  * The Class OdooAuthenticator.
@@ -162,7 +162,7 @@ public class OdooAuthenticator extends AbstractAccountAuthenticator {
 					.getBoolean(AccountManager.KEY_BOOLEAN_RESULT);
 
 			if (removalAllowed) {
-				OESQLiteHelper sqlite = new OESQLiteHelper(mContext);
+				OSQLiteHelper sqlite = new OSQLiteHelper(mContext);
 				if (sqlite.cleanUserRecords(account.name)) {
 					// TODO: next task after cleaning all record reletated to
 					// user.

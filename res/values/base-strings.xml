@@ -2,31 +2,16 @@
 <resources>
 
     <string name="app_name">Odoo</string>
-    <string name="app_name_odoo">Odoo</string>
+    <string name="label_odoo">Odoo</string>
     <!-- Account -->
     <string name="account_user_dp">Account User Display Picture</string>
     <string name="logo_description">Odoo</string>
-    <string name="account_title">Setup Your Odoo Server</string>
-    <string name="account_description">Provide your Odoo Server URL and click on Continue button to test connection and go next step.</string>
-    <string name="account_edit_server_url">Server URL</string>
-    <string name="account_edit_server_port">Port Number (If any)</string>
-    <string name="account_continue_button">Continue</string>
-    <string name="account_login_button">Login</string>
     <string name="str_user_login">User Login</string>
     <string name="str_user_name">User Name</string>
     <string name="str_server_url">Server URL</string>
     <string name="str_database">Database</string>
     <string name="str_timezone">TimeZone</string>
-    <string name="str_provide_port_number">Provide your port number with URL if any.</string>
-    <string name="str_secure_connection">Secure Connection</string>
-
-    <!-- Login Fragment Strings -->
-    <string name="login_title">Config Your Odoo Login Details</string>
-    <string name="login_description">Select your working database and provide your username and password to access.</string>
     <string name="login_select_database">Select Database</string>
-    <string name="login_edit_username">Username</string>
-    <string name="login_edit_password">Password</string>
-    <string name="action_settings">Settings</string>
 
     <!-- SyncWizard fragment strings -->
     <string name="syncwizard_title">Enable/Disable your Sync Settings</string>
@@ -80,10 +65,12 @@
     <string name="title_profile">Profile</string>
     <string name="title_general_settings">General Settings</string>
     <string name="title_accounts">Accounts</string>
-    <string name="title_setup_account">Setup Account</string>
     <string name="title_about_us">About Us</string>
     <string name="title_connecting">Connecting&#8230;</string>
     <string name="title_loggin_in">Logging in&#8230;</string>
+    <string name="title_account_create">Creating account&#8230;</string>
+    <string name="title_database_create">Creating database&#8230;</string>
+    <string name="title_getting_instances">Getting instances&#8230;</string>
     <string name="title_confirm">Confirm</string>
     <string name="title_ssl_warning">SSL Warning</string>
     <string name="title_enter_password">Enter Password</string>

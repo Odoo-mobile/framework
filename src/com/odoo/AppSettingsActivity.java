@@ -28,8 +28,6 @@ import android.view.MenuItem;
  */
 public class AppSettingsActivity extends PreferenceActivity {
 
-	public static final String ACTION_ACCOUNT_CONFIG = "com.odoo.ACTION_ACCOUNT_CONFIG";
-
 	/*
 	 * (non-Javadoc)
 	 * 

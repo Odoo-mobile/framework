@@ -40,19 +40,19 @@ import android.widget.TextView;
 
 import com.odoo.R;
 import com.odoo.auth.OdooAccountManager;
-import com.odoo.orm.OEDataRow;
+import com.odoo.base.login_signup.LoginSignup;
+import com.odoo.orm.ODataRow;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
-import com.odoo.support.OEUser;
-import com.odoo.support.fragment.FragmentListener;
-import com.odoo.support.listview.OEListAdapter;
+import com.odoo.support.OUser;
+import com.odoo.support.listview.OListAdapter;
 import com.odoo.util.Base64Helper;
 import com.odoo.util.drawer.DrawerItem;
 
 public class AccountsDetail extends BaseFragment {
 	View rootView = null;
 	GridView gridAccounts = null;
-	OEListAdapter mAdapter = null;
+	OListAdapter mAdapter = null;
 	List<Object> mAccounts = new ArrayList<Object>();
 
 	@Override
@@ -70,7 +70,7 @@ public class AccountsDetail extends BaseFragment {
 	private void setupGrid() {
 		gridAccounts = (GridView) rootView.findViewById(R.id.gridAccounts);
 		mAccounts = new ArrayList<Object>(getAccounts());
-		mAdapter = new OEListAdapter(getActivity(),
+		mAdapter = new OListAdapter(getActivity(),
 				R.layout.fragment_account_detail_item, mAccounts) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
@@ -85,7 +85,7 @@ public class AccountsDetail extends BaseFragment {
 				ImageView imgUserPic = (ImageView) mView
 						.findViewById(R.id.imgAccountPic);
 
-				final OEDataRow row_data = (OEDataRow) mAccounts.get(position);
+				final ODataRow row_data = (ODataRow) mAccounts.get(position);
 				txvName.setText(row_data.getString("name"));
 				txvHost.setText(row_data.getString("host"));
 				if (!row_data.getString("image").equals("false"))
@@ -140,9 +140,9 @@ public class AccountsDetail extends BaseFragment {
 
 	private List<Object> getAccounts() {
 		List<Object> list = new ArrayList<Object>();
-		for (OEUser account : OdooAccountManager.fetchAllAccounts(scope
+		for (OUser account : OdooAccountManager.fetchAllAccounts(scope
 				.context())) {
-			OEDataRow row_data = new OEDataRow();
+			ODataRow row_data = new ODataRow();
 
 			row_data.put("name", account.getAndroidName());
 			row_data.put("image", account.getAvatar());
@@ -162,9 +162,8 @@ public class AccountsDetail extends BaseFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_add_new_account:
-			AccountFragment fragment = new AccountFragment();
-			FragmentListener mFragment = (FragmentListener) getActivity();
-			mFragment.startMainFragment(fragment, true);
+			LoginSignup loginSignUp = new LoginSignup();
+			startFragment(loginSignUp, true);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -189,9 +188,8 @@ public class AccountsDetail extends BaseFragment {
 								// User clicked OK, so save the result somewhere
 								// or return them to the component that opened
 								// the dialog
-								OdooAccountManager.logoutUser(scope
-										.context(), scope.User()
-										.getAndroidName());
+								OdooAccountManager.logoutUser(scope.context(),
+										scope.User().getAndroidName());
 								scope.main().finish();
 							}
 						}).setNegativeButton(R.string.label_cancel, null);

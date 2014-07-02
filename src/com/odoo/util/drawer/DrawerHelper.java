@@ -23,15 +23,15 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.odoo.config.ModulesConfig;
-import com.odoo.support.Module;
-import com.odoo.support.fragment.FragmentHelper;
+import com.odoo.config.OModules;
+import com.odoo.support.OModule;
+import com.odoo.support.fragment.OModuleHelper;
 
 public class DrawerHelper {
 	public static List<DrawerItem> drawerItems(Context context) {
 		List<DrawerItem> items = new ArrayList<DrawerItem>();
-		for (Module module : new ModulesConfig().modules()) {
-			FragmentHelper model = (FragmentHelper) module.getModuleInstance();
+		for (OModule module : new OModules().getModules()) {
+			OModuleHelper model = (OModuleHelper) module.newInstance();
 			List<DrawerItem> drawerItems = model.drawerMenus(context);
 			if (drawerItems != null)
 				items.addAll(drawerItems);
