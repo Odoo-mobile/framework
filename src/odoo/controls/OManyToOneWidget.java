@@ -20,7 +20,6 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.OEDataRow;
 import com.odoo.orm.OModel;
 import com.odoo.support.listview.OEListAdapter;
-import com.odoo.util.logger.OELog;
 
 public class OManyToOneWidget extends LinearLayout implements
 		OnItemSelectedListener {
@@ -140,8 +139,6 @@ public class OManyToOneWidget extends LinearLayout implements
 		}
 		mSpinnerAdapter.notifiyDataChange(mSpinnerObjects);
 		mSpinner.setSelection(mSelectedPosition);
-		if (mManyToOneItemChangeListener != null)
-			mSpinner.setOnItemSelectedListener(this);
 	}
 
 	private OForm getRowForm(OEDataRow row) {
@@ -172,6 +169,7 @@ public class OManyToOneWidget extends LinearLayout implements
 			ManyToOneItemChangeListener listener) {
 		Log.v("", "setOnManyToOneItemChangeListener()");
 		mManyToOneItemChangeListener = listener;
+		mSpinner.setOnItemSelectedListener(this);
 	}
 
 	@Override

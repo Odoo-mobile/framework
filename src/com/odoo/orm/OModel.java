@@ -169,7 +169,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	public OEDataRow select(Integer id) {
-		List<OEDataRow> records = select("id = ?", new Object[] { id }, null,
+		return select(id, false);
+	}
+
+	public OEDataRow select(Integer id, boolean local_record) {
+		String selection = (local_record) ? "local_id = ?" : "id = ?";
+		List<OEDataRow> records = select(selection, new Object[] { id }, null,
 				null, null);
 		if (records.size() > 0)
 			return records.get(0);
@@ -210,6 +215,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 							break;
 						}
 					}
+				}
+				if (row.getInt("id") == 0
+						|| row.getString("id").equals("false")) {
+					row.put("id", 0);
+					row.put("local_record", true);
+				} else {
+					row.put("local_record", false);
 				}
 				records.add(row);
 			} while (cr.moveToNext());
@@ -322,21 +334,23 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	public int create(OEValues values) {
-		Integer newId = values.getInt("id");
+		Integer newId = (values.contains("id")) ? values.getInt("id") : 0;
 		if (!values.contains("odoo_name")) {
 			values.put("odoo_name", mUser.getAndroidName());
 		}
 		SQLiteDatabase db = getWritableDatabase();
 		db.insert(getTableName(), null, createValues(db, values));
 		db.close();
-		if (newId == null) {
-
-		}
 		return newId;
 	}
 
 	public int update(OEValues values, int id) {
-		return update(values, "id = ? ", new Object[] { id });
+		return update(values, id, false);
+	}
+
+	public int update(OEValues values, Integer id, Boolean local_record) {
+		return update(values, (local_record) ? "local_id = ? " : "id = ?",
+				new Object[] { id });
 	}
 
 	public int update(OEValues updateValues, String where, Object[] whereArgs) {
@@ -353,29 +367,32 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	private ContentValues createValues(SQLiteDatabase db, OEValues values) {
 		ContentValues vals = new ContentValues();
 		for (OColumn column : getColumns()) {
-			if (column.getRelationType() == null) {
-				if (values.get(column.getName()) != null)
-					vals.put(column.getName(), values.get(column.getName())
-							.toString());
-			} else {
-				switch (column.getRelationType()) {
-				case ManyToOne:
-					vals.put(column.getName(), values.get(column.getName())
-							.toString());
-					break;
-				case ManyToMany:
-					OModel rel_model = createInstance(column.getType());
-					List<Integer> rel_ids = (List<Integer>) values.get(column
-							.getName());
-					manageManyToManyRecords(db, rel_model, rel_ids,
-							values.getInt("id"), Command.Replace);
-					// (6,false,[new ids]) - will replace with given
-					break;
-				case OneToMany:
-					// (0, false {fields}) - will going to create/add new line
-					// (1, id, {fields}) - will going to update given id.
-					// (2, id, false) - will going to delete record.
-					break;
+			if (values.contains(column.getName())) {
+				if (column.getRelationType() == null) {
+					if (values.get(column.getName()) != null)
+						vals.put(column.getName(), values.get(column.getName())
+								.toString());
+				} else {
+					switch (column.getRelationType()) {
+					case ManyToOne:
+						vals.put(column.getName(), values.get(column.getName())
+								.toString());
+						break;
+					case ManyToMany:
+						OModel rel_model = createInstance(column.getType());
+						List<Integer> rel_ids = (List<Integer>) values
+								.get(column.getName());
+						manageManyToManyRecords(db, rel_model, rel_ids,
+								values.getInt("id"), Command.Replace);
+						// (6,false,[new ids]) - will replace with given
+						break;
+					case OneToMany:
+						// (0, false {fields}) - will going to create/add new
+						// line
+						// (1, id, {fields}) - will going to update given id.
+						// (2, id, false) - will going to delete record.
+						break;
+					}
 				}
 			}
 		}

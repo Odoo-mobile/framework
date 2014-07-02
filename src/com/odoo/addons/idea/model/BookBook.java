@@ -36,7 +36,7 @@ public class BookBook extends OModel {
 	OColumn author_id = new OColumn("Author", BookAuthor.class,
 			RelationType.ManyToOne);
 	OColumn student_id = new OColumn("Student", BookStudent.class,
-			RelationType.ManyToOne);;
+			RelationType.ManyToOne).setRequired(true);
 	OColumn category_ids = new OColumn("Categories", BookCategory.class,
 			RelationType.ManyToMany);
 	OColumn description = new OColumn("Description", OEText.class);
@@ -87,5 +87,4 @@ public class BookBook extends OModel {
 			super(context, "book.student");
 		}
 	}
-
 }

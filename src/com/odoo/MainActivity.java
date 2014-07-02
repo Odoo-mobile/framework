@@ -124,7 +124,8 @@ public class MainActivity extends FragmentActivity implements
 		mFragment = getSupportFragmentManager();
 		mApp = (App) getApplication();
 		IrModel models = new IrModel(mContext);
-		if (OEUser.current(mContext) != null
+		if (mApp.inNetwork()
+				&& OEUser.current(mContext) != null
 				&& ((mApp.getOdoo() == null && savedInstanceState == null) || models
 						.count() <= 0)) {
 			// Recreating model fields

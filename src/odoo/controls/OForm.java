@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -19,9 +16,8 @@ import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OEDataRow;
 import com.odoo.orm.OEValues;
 import com.odoo.orm.OModel;
-import com.odoo.util.logger.OELog;
 
-public class OForm extends LinearLayout implements ManyToOneItemChangeListener {
+public class OForm extends LinearLayout {
 
 	public static final String KEY_BACKGROUND_SELECTOR = "background_selector";
 	public static final String KEY_MODEL = "model";
@@ -93,9 +89,10 @@ public class OForm extends LinearLayout implements ManyToOneItemChangeListener {
 				}
 				field.setEditable(editable);
 				if (widget) {
-					field.showAsManyToOne(column, mRecord, this);
+					field.showAsManyToOne(column, mRecord);
 				} else {
-					field.setText(mRecord.getString(field.getFieldName()));
+					if (mRecord != null)
+						field.setText(mRecord.getString(field.getFieldName()));
 				}
 				field.setLabel(label);
 
@@ -123,23 +120,31 @@ public class OForm extends LinearLayout implements ManyToOneItemChangeListener {
 			values = new OEValues();
 			for (String key : mFields) {
 				OField field = (OField) findViewWithTag(key);
-				values.put(key, field.getText());
+				values.put(field.getFieldName(), field.getValue());
+			}
+			if (mRecord != null) {
+				values.put("local_record",
+						Boolean.parseBoolean(mRecord.getString("local_record")));
+				if (values.getBoolean("local_record")) {
+					values.put("local_id", mRecord.getInt("local_id"));
+					values.put("is_dirty", true);
+				}
 			}
 		}
 		return values;
 	}
 
 	private boolean validateForm() {
-		boolean valid = false;
 		for (String key : mFields) {
 			OField field = (OField) findViewWithTag(key);
 			OColumn col = mFieldColumns.get(field.getFieldName());
 			field.setError(null);
 			if (col.isRequired() && field.isEmpty()) {
 				field.setError(col.getLabel() + " is required");
+				return false;
 			}
 		}
-		return valid;
+		return true;
 	}
 
 	public void initForm(OEDataRow record, boolean editable) {
@@ -147,12 +152,8 @@ public class OForm extends LinearLayout implements ManyToOneItemChangeListener {
 		_initForm(editable);
 	}
 
-	@Override
-	public void onManyToOneItemChangeListener(OColumn column, OEDataRow row) {
-		String key = mFields.get(mFields.indexOf("field_tag_"
-				+ column.getName()));
-		OField field = (OField) findViewWithTag(key);
-		OELog.log(row.toString());
+	public void setEditable(Boolean mEditMode) {
+		_initForm(mEditMode);
 	}
 
 }

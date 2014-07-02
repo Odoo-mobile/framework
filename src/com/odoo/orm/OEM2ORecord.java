@@ -30,14 +30,14 @@ public class OEM2ORecord {
 	}
 
 	public Object getId() {
-		if (record_id.equals("false"))
-			return false;
+		if (record_id == null || record_id.equals("false"))
+			return 0;
 		return Integer.parseInt(record_id);
 	}
 
 	public OEDataRow browse() {
 		OModel rel = base_model.createInstance(mCol.getType());
-		if (record_id.equals("false"))
+		if (record_id == null || record_id.equals("false"))
 			return null;
 		return rel.select(Integer.parseInt(record_id));
 	}

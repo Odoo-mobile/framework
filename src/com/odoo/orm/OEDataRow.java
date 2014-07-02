@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.json.JSONArray;
 
+import android.os.Bundle;
+
 public class OEDataRow {
 	HashMap<String, Object> _data = new HashMap<String, Object>();
 
@@ -36,7 +38,10 @@ public class OEDataRow {
 	}
 
 	public Integer getInt(String key) {
-		return Integer.parseInt(_data.get(key).toString());
+		if (_data.get(key).toString().equals("false"))
+			return 0;
+		else
+			return Integer.parseInt(_data.get(key).toString());
 	}
 
 	public Float getFloat(String key) {
@@ -124,6 +129,14 @@ public class OEDataRow {
 			this.name = name;
 		}
 
+	}
+
+	public Bundle getPrimaryBundleData() {
+		Bundle bundle = new Bundle();
+		bundle.putInt("id", getInt("id"));
+		bundle.putInt("local_id", getInt("local_id"));
+		bundle.putBoolean("local_record", getBoolean("local_record"));
+		return bundle;
 	}
 
 }

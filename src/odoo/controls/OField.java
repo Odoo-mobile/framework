@@ -13,13 +13,14 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OEDataRow;
 import com.odoo.orm.OModel;
 
-public class OField extends LinearLayout {
+public class OField extends LinearLayout implements ManyToOneItemChangeListener {
 
 	public static final String KEY_EDITABLE = "editable";
 	public static final String KEY_WITH_LABEL = "with_label";
@@ -41,6 +42,11 @@ public class OField extends LinearLayout {
 
 	Context mContext = null;
 	TypedArray mTypedArray = null;
+
+	/*
+	 * Field value
+	 */
+	Object mFieldValue = null;
 
 	/*
 	 * Widgets
@@ -127,17 +133,23 @@ public class OField extends LinearLayout {
 			mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
 					LayoutParams.WRAP_CONTENT);
 			mManyToOne.setLayoutParams(mLayoutParams);
-			mManyToOne.setModel(mModel, "name").setRecordId(
-					(Integer) mManyToOneRecord.getM2ORecord(mColumn.getName())
-							.getId());
+			mManyToOne.setModel(mModel, "name");
+			if (mManyToOneRecord != null)
+				mManyToOne.setRecordId((Integer) mManyToOneRecord.getM2ORecord(
+						mColumn.getName()).getId());
 			mManyToOne.reInit();
 			addView(mManyToOne);
 		} else {
 			createTextViewControl();
-			OEDataRow row = mManyToOneRecord.getM2ORecord(mColumn.getName())
-					.browse();
-			if (row != null)
-				setText(row.getString("name"));
+			if (mManyToOneRecord != null) {
+				OEDataRow row = mManyToOneRecord
+						.getM2ORecord(mColumn.getName()).browse();
+				if (row != null)
+					setText(row.getString("name"));
+				else
+					setText("No " + mColumn.getLabel());
+
+			}
 		}
 	}
 
@@ -220,10 +232,10 @@ public class OField extends LinearLayout {
 	}
 
 	public boolean isEmpty() {
-		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
-			return TextUtils.isEmpty(mFieldEditText.getText());
+		if (mFieldWidget != null) {
+			return ((Integer) mFieldValue == 0);
 		} else {
-			return false;
+			return TextUtils.isEmpty(getValue().toString());
 		}
 	}
 
@@ -312,10 +324,13 @@ public class OField extends LinearLayout {
 	}
 
 	public void setError(String error) {
+		if (error == null)
+			return;
 		if (mFieldWidget == null) {
 			mFieldEditText.setError(error);
-			if (error != null)
-				mFieldEditText.requestFocus();
+			mFieldEditText.requestFocus();
+		} else {
+			Toast.makeText(mContext, error, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -328,18 +343,37 @@ public class OField extends LinearLayout {
 	}
 
 	public void showAsManyToOne(OColumn column, OEDataRow record) {
-		showAsManyToOne(column, record, null);
-	}
-
-	public void showAsManyToOne(OColumn column, OEDataRow record,
-			ManyToOneItemChangeListener listener) {
 		mFieldWidget = OFieldWidget.MANY_TO_ONE;
 		mColumn = column;
 		mModel = new OModel(mContext, null).createInstance(column.getType());
 		mManyToOneRecord = record;
 		initControls();
-		if (mManyToOne != null && listener != null) {
-			mManyToOne.setOnManyToOneItemChangeListener(listener);
+		if (mManyToOne != null) {
+			mManyToOne.setOnManyToOneItemChangeListener(this);
 		}
+	}
+
+	public Object getValue() {
+		if (mFieldWidget != null) {
+			return mFieldValue;
+		} else {
+			return getText();
+		}
+	}
+
+	public Boolean isDirtyField() {
+		if (mFieldWidget != null) {
+			return mManyToOne.isDirty();
+		} else {
+			if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
+				mFieldEditText.isDirty();
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void onManyToOneItemChangeListener(OColumn column, OEDataRow row) {
+		mFieldValue = row.get("id");
 	}
 }

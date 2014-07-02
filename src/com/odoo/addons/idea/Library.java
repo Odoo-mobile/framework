@@ -29,6 +29,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -202,22 +205,22 @@ public class Library extends BaseFragment implements OnPullListener,
 
 	private int count(Context context, Keys key) {
 		int count = 0;
-		// switch (key) {
-		// case Authors:
-		// count = new BookAuthor(context).count();
-		// break;
-		// case Books:
-		// count = new BooksDB(context).count();
-		// break;
-		// case Category:
-		// count = new BookCategory(context).count();
-		// break;
-		// case Students:
-		// count = new BookStudent(context).count();
-		// break;
-		// default:
-		// break;
-		// }
+		switch (key) {
+		case Authors:
+			count = new BookAuthor(context).count();
+			break;
+		case Books:
+			count = new BookBook(context).count();
+			break;
+		case Category:
+			count = new BookCategory(context).count();
+			break;
+		case Students:
+			count = new BookStudent(context).count();
+			break;
+		default:
+			break;
+		}
 		return count;
 	}
 
@@ -267,8 +270,26 @@ public class Library extends BaseFragment implements OnPullListener,
 		LibraryDetail library = new LibraryDetail();
 		Bundle bundle = new Bundle();
 		bundle.putString("key", mCurrentKey.toString());
-		bundle.putInt("id", row.getInt("id"));
+		bundle.putAll(row.getPrimaryBundleData());
 		library.setArguments(bundle);
 		startFragment(library, true);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		inflater.inflate(R.menu.menu_fragment_library, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.menu_library_detail_create) {
+			LibraryDetail library = new LibraryDetail();
+			Bundle bundle = new Bundle();
+			bundle.putString("key", mCurrentKey.toString());
+			library.setArguments(bundle);
+			startFragment(library, true);
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }
