@@ -15,9 +15,13 @@ import android.view.ViewGroup;
 import com.odoo.R;
 import com.odoo.addons.idea.Library.Keys;
 import com.odoo.addons.idea.model.BookBook;
+import com.odoo.addons.idea.model.BookBook.BookAuthor;
+import com.odoo.addons.idea.model.BookBook.BookCategory;
+import com.odoo.addons.idea.model.BookBook.BookStudent;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.support.BaseFragment;
+import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class LibraryDetail extends BaseFragment {
@@ -49,9 +53,10 @@ public class LibraryDetail extends BaseFragment {
 
 	private void init() {
 		updateMenu(mEditMode);
-		mForm = (OForm) mView.findViewById(R.id.odooFormBooks);
 		switch (mKey) {
 		case Books:
+			OControls.setVisible(mView, R.id.odooFormBooks);
+			mForm = (OForm) mView.findViewById(R.id.odooFormBooks);
 			BookBook books = new BookBook(getActivity());
 			if (mId != null) {
 				mRecord = books.select(mId, mLocalRecord);
@@ -62,10 +67,40 @@ public class LibraryDetail extends BaseFragment {
 			}
 			break;
 		case Authors:
+			OControls.setVisible(mView, R.id.odooFormAuthors);
+			mForm = (OForm) mView.findViewById(R.id.odooFormAuthors);
+			BookAuthor author = new BookAuthor(getActivity());
+			if (mId != null) {
+				mRecord = author.select(mId, mLocalRecord);
+				mForm.initForm(mRecord);
+			} else {
+				mForm.setModel(author);
+				mForm.setEditable(mEditMode);
+			}
 			break;
 		case Students:
+			OControls.setVisible(mView, R.id.odooFormStudents);
+			mForm = (OForm) mView.findViewById(R.id.odooFormStudents);
+			BookStudent student = new BookStudent(getActivity());
+			if (mId != null) {
+				mRecord = student.select(mId, mLocalRecord);
+				mForm.initForm(mRecord);
+			} else {
+				mForm.setModel(student);
+				mForm.setEditable(mEditMode);
+			}
 			break;
 		case Category:
+			OControls.setVisible(mView, R.id.odooFormCategories);
+			mForm = (OForm) mView.findViewById(R.id.odooFormCategories);
+			BookCategory category = new BookCategory(getActivity());
+			if (mId != null) {
+				mRecord = category.select(mId, mLocalRecord);
+				mForm.initForm(mRecord);
+			} else {
+				mForm.setModel(category);
+				mForm.setEditable(mEditMode);
+			}
 			break;
 		}
 
@@ -112,11 +147,41 @@ public class LibraryDetail extends BaseFragment {
 			OValues values = mForm.getFormValues();
 			if (values != null) {
 				updateMenu(mEditMode);
-				if (mId != null)
-					new BookBook(getActivity()).update(values, mId,
-							mLocalRecord);
-				else
-					new BookBook(getActivity()).create(values);
+				if (mId != null) {
+					switch (mKey) {
+					case Books:
+						new BookBook(getActivity()).update(values, mId,
+								mLocalRecord);
+						break;
+					case Authors:
+						new BookAuthor(getActivity()).update(values, mId,
+								mLocalRecord);
+						break;
+					case Students:
+						new BookStudent(getActivity()).update(values, mId,
+								mLocalRecord);
+						break;
+					case Category:
+						new BookCategory(getActivity()).update(values, mId,
+								mLocalRecord);
+						break;
+					}
+				} else {
+					switch (mKey) {
+					case Books:
+						new BookBook(getActivity()).create(values);
+						break;
+					case Authors:
+						new BookAuthor(getActivity()).create(values);
+						break;
+					case Students:
+						new BookStudent(getActivity()).create(values);
+						break;
+					case Category:
+						new BookCategory(getActivity()).create(values);
+						break;
+					}
+				}
 				getActivity().getSupportFragmentManager().popBackStack();
 			}
 			break;

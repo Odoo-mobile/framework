@@ -6,61 +6,154 @@
     android:fillViewport="true"
     android:paddingTop="?android:attr/actionBarSize" >
 
-    <odoo.controls.OForm
-        android:id="@+id/odooFormBooks"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="15dp"
-        odoo:model="book.book" >
+        android:orientation="vertical" >
 
-        <odoo.controls.OManyToOneWidget
+        <odoo.controls.OForm
+            android:id="@+id/odooFormBooks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp"
             android:visibility="gone"
-            odoo:column_name="name"
-            odoo:model_name="book.book" >
-        </odoo.controls.OManyToOneWidget>
+            odoo:model="book.book" >
 
-        <odoo.controls.OField
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="language"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="author_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="student_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="description"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+        </odoo.controls.OForm>
+
+        <odoo.controls.OForm
+            android:id="@+id/odooFormAuthors"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            odoo:field_name="name"
-            odoo:field_textAppearance="?android:attr/textAppearanceMedium"
-            odoo:label_color="@color/odoo_purple"
-            odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:visibility="gone"
+            odoo:model="book.author" >
 
-        <odoo.controls.OField
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="country_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="description"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+        </odoo.controls.OForm>
+
+        <odoo.controls.OForm
+            android:id="@+id/odooFormStudents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            odoo:field_name="language"
-            odoo:field_textAppearance="?android:attr/textAppearanceMedium"
-            odoo:label_color="@color/odoo_purple"
-            odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:visibility="gone"
+            odoo:model="book.student" >
 
-        <odoo.controls.OField
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="course"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="contact"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+        </odoo.controls.OForm>
+
+        <odoo.controls.OForm
+            android:id="@+id/odooFormCategories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            odoo:field_name="author_id"
-            odoo:field_textAppearance="?android:attr/textAppearanceMedium"
-            odoo:label_color="@color/odoo_purple"
-            odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:visibility="gone"
+            odoo:model="book.category" >
 
-        <odoo.controls.OField
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            odoo:field_name="student_id"
-            odoo:field_textAppearance="?android:attr/textAppearanceMedium"
-            odoo:label_color="@color/odoo_purple"
-            odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
 
-        <odoo.controls.OField
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            odoo:field_name="description"
-            odoo:field_textAppearance="?android:attr/textAppearanceMedium"
-            odoo:label_color="@color/odoo_purple"
-            odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
-    </odoo.controls.OForm>
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="description"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+        </odoo.controls.OForm>
+    </LinearLayout>
 
 </ScrollView>

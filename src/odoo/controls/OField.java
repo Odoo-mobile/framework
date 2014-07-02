@@ -9,7 +9,6 @@ import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -127,7 +126,6 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	private void createManyToOneWidget() {
-		Log.v("", "createManyToOneWidget()");
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mManyToOne = new OManyToOneWidget(mContext);
 			mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
@@ -249,7 +247,6 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	private void initAttributeValues() {
-		Log.v("OField", "initAttributeValues()");
 		mAttributes.put(KEY_FIELD_NAME,
 				mTypedArray.getString(R.styleable.OField_field_name));
 		mAttributes.put(KEY_EDITABLE,
