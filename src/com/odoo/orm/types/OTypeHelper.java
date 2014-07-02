@@ -16,26 +16,25 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.mail;
+package com.odoo.orm.types;
 
-import android.content.Context;
+abstract public class OTypeHelper {
+	String mType = "";
+	String mPattern = "";
+	int mSize = 0;
 
-import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OColumn;
-import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.OModel;
-import com.odoo.orm.types.OInteger;
-import com.odoo.orm.types.OText;
-
-public class MailFollowers extends OModel {
-
-	OColumn res_model = new OColumn("Model", OText.class);
-	OColumn res_id = new OColumn("Res ID", OInteger.class);
-	OColumn partner_id = new OColumn("Partner", ResPartner.class,
-			RelationType.ManyToOne);
-
-	public MailFollowers(Context context) {
-		super(context, "mail.followers");
+	public boolean equals(String key) {
+		return mType.equals(key);
 	}
 
+	public String getType() {
+		String type = mType;
+		if (mSize > 0)
+			type += " (" + mSize + ")";
+		return type;
+	}
+
+	public String getPattern() {
+		return mPattern;
+	}
 }

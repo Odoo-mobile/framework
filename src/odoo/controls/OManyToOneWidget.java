@@ -17,9 +17,9 @@ import android.widget.Spinner;
 
 import com.odoo.R;
 import com.odoo.orm.OColumn;
-import com.odoo.orm.OEDataRow;
+import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
-import com.odoo.support.listview.OEListAdapter;
+import com.odoo.support.listview.OListAdapter;
 
 public class OManyToOneWidget extends LinearLayout implements
 		OnItemSelectedListener {
@@ -37,7 +37,7 @@ public class OManyToOneWidget extends LinearLayout implements
 	OColumn mColumn = null;
 	Spinner mSpinner = null;
 	LayoutParams mParams = null;
-	OEListAdapter mSpinnerAdapter = null;
+	OListAdapter mSpinnerAdapter = null;
 	List<Object> mSpinnerObjects = new ArrayList<Object>();
 	Integer mSelectedPosition = -1;
 	Integer mCurrentId = -1;
@@ -107,17 +107,17 @@ public class OManyToOneWidget extends LinearLayout implements
 	}
 
 	private void setAdapter() {
-		mSpinnerAdapter = new OEListAdapter(mContext, 0, mSpinnerObjects) {
+		mSpinnerAdapter = new OListAdapter(mContext, 0, mSpinnerObjects) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				OEDataRow row = (OEDataRow) mSpinnerObjects.get(position);
+				ODataRow row = (ODataRow) mSpinnerObjects.get(position);
 				return getRowForm(row);
 			}
 
 			@Override
 			public View getDropDownView(int position, View convertView,
 					ViewGroup parent) {
-				OEDataRow row = (OEDataRow) mSpinnerObjects.get(position);
+				ODataRow row = (ODataRow) mSpinnerObjects.get(position);
 				return getRowForm(row);
 			}
 		};
@@ -127,11 +127,11 @@ public class OManyToOneWidget extends LinearLayout implements
 
 	private void fillRecords() {
 		mSpinnerObjects.clear();
-		OEDataRow select_row = new OEDataRow();
+		ODataRow select_row = new ODataRow();
 		select_row.put("id", 0);
 		select_row.put(mColumn.getName(), "Select " + mColumn.getLabel());
 		mSpinnerObjects.add(select_row);
-		for (OEDataRow row : mModel.select()) {
+		for (ODataRow row : mModel.select()) {
 			mSpinnerObjects.add(row);
 			if (mCurrentId > 0 && mCurrentId == row.getInt("id")) {
 				mSelectedPosition = mSpinnerObjects.indexOf(row);
@@ -141,7 +141,7 @@ public class OManyToOneWidget extends LinearLayout implements
 		mSpinner.setSelection(mSelectedPosition);
 	}
 
-	private OForm getRowForm(OEDataRow row) {
+	private OForm getRowForm(ODataRow row) {
 		AbsListView.LayoutParams mParams = new AbsListView.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		OForm form = new OForm(mContext);
@@ -175,7 +175,7 @@ public class OManyToOneWidget extends LinearLayout implements
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int position,
 			long id) {
-		OEDataRow row = (OEDataRow) mSpinnerObjects.get(position);
+		ODataRow row = (ODataRow) mSpinnerObjects.get(position);
 		mManyToOneItemChangeListener
 				.onManyToOneItemChangeListener(mColumn, row);
 	}
@@ -186,6 +186,6 @@ public class OManyToOneWidget extends LinearLayout implements
 	}
 
 	public interface ManyToOneItemChangeListener {
-		public void onManyToOneItemChangeListener(OColumn column, OEDataRow row);
+		public void onManyToOneItemChangeListener(OColumn column, ODataRow row);
 	}
 }

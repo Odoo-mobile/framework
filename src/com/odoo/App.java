@@ -26,13 +26,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import com.odoo.support.OEUser;
+import com.odoo.support.OUser;
 
-public class App extends Application implements
-		MainActivity.OnOdooInstanceCreateListener {
+public class App extends Application {
 
-	public static final String TAG = App.class.getSimpleName();
-	public static Odoo mOdooInstance = null;
+	private static final String TAG = App.class.getSimpleName();
+	private static Odoo mOdooInstance = null;
 
 	@Override
 	public void onCreate() {
@@ -42,7 +41,7 @@ public class App extends Application implements
 
 	public Odoo createInstance() {
 		Odoo odoo = null;
-		OEUser user = OEUser.current(getApplicationContext());
+		OUser user = OUser.current(getApplicationContext());
 		if (user != null) {
 			try {
 				if (user.isOAauthLogin()) {
@@ -87,10 +86,5 @@ public class App extends Application implements
 			isConnected = true;
 		}
 		return isConnected;
-	}
-
-	@Override
-	public void onOdooInstanceCreated(Odoo odoo) {
-		setOdooInstance(odoo);
 	}
 }

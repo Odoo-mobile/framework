@@ -8,14 +8,14 @@ import android.content.Context;
 import android.util.Log;
 
 import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.types.OEBlob;
-import com.odoo.orm.types.OEBoolean;
-import com.odoo.orm.types.OEDateTime;
-import com.odoo.orm.types.OEInteger;
-import com.odoo.orm.types.OEReal;
-import com.odoo.orm.types.OEText;
-import com.odoo.orm.types.OETimestamp;
-import com.odoo.orm.types.OEVarchar;
+import com.odoo.orm.types.OBlob;
+import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.ODateTime;
+import com.odoo.orm.types.OInteger;
+import com.odoo.orm.types.OReal;
+import com.odoo.orm.types.OText;
+import com.odoo.orm.types.OTimestamp;
+import com.odoo.orm.types.OVarchar;
 
 public class OSQLHelper {
 
@@ -135,52 +135,52 @@ public class OSQLHelper {
 		try {
 			Class<?> type_class = column.getType();
 			// Varchar
-			if (type_class.isAssignableFrom(OEVarchar.class)) {
-				OEVarchar varchar = new OEVarchar(column.getSize());
+			if (type_class.isAssignableFrom(OVarchar.class)) {
+				OVarchar varchar = new OVarchar(column.getSize());
 				return varchar.getType();
 			}
 
 			// Integer
-			if (type_class.isAssignableFrom(OEInteger.class)) {
-				OEInteger integer = new OEInteger(column.getSize());
+			if (type_class.isAssignableFrom(OInteger.class)) {
+				OInteger integer = new OInteger(column.getSize());
 				return integer.getType();
 			}
 
 			// boolean
-			if (type_class.isAssignableFrom(OEBoolean.class)) {
-				OEBoolean tBoolean = new OEBoolean();
+			if (type_class.isAssignableFrom(OBoolean.class)) {
+				OBoolean tBoolean = new OBoolean();
 				return tBoolean.getType();
 			}
 
 			// Blob
-			if (type_class.isAssignableFrom(OEBlob.class)) {
-				OEBlob blob = new OEBlob();
+			if (type_class.isAssignableFrom(OBlob.class)) {
+				OBlob blob = new OBlob();
 				return blob.getType();
 			}
 			// DateTime
-			if (type_class.isAssignableFrom(OEDateTime.class)) {
-				OEDateTime datetime = new OEDateTime(column.getParsePattern());
+			if (type_class.isAssignableFrom(ODateTime.class)) {
+				ODateTime datetime = new ODateTime(column.getParsePattern());
 				return datetime.getType();
 			}
 			// Real
-			if (type_class.isAssignableFrom(OEReal.class)) {
-				OEReal real = new OEReal(column.getSize());
+			if (type_class.isAssignableFrom(OReal.class)) {
+				OReal real = new OReal(column.getSize());
 				return real.getType();
 			}
 			// Text
-			if (type_class.isAssignableFrom(OEText.class)) {
-				return new OEText().getType();
+			if (type_class.isAssignableFrom(OText.class)) {
+				return new OText().getType();
 			}
 			// TimeStamp
-			if (type_class.isAssignableFrom(OETimestamp.class)) {
-				OETimestamp timestamp = new OETimestamp(
+			if (type_class.isAssignableFrom(OTimestamp.class)) {
+				OTimestamp timestamp = new OTimestamp(
 						column.getParsePattern());
 				return timestamp.getType();
 			}
 			// ManyToOne
 			if (column.getRelationType() != null
 					&& column.getRelationType() == RelationType.ManyToOne) {
-				OEInteger integer = new OEInteger();
+				OInteger integer = new OInteger();
 				return integer.getType();
 			}
 		} catch (Exception e) {

@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.orm.OColumn;
-import com.odoo.orm.OEDataRow;
+import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 
 public class OField extends LinearLayout implements ManyToOneItemChangeListener {
@@ -52,7 +52,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 * Widgets
 	 */
 	OModel mModel = null;
-	OEDataRow mManyToOneRecord = null;
+	ODataRow mManyToOneRecord = null;
 	OColumn mColumn = null;
 
 	/*
@@ -142,7 +142,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		} else {
 			createTextViewControl();
 			if (mManyToOneRecord != null) {
-				OEDataRow row = mManyToOneRecord
+				ODataRow row = mManyToOneRecord
 						.getM2ORecord(mColumn.getName()).browse();
 				if (row != null)
 					setText(row.getString("name"));
@@ -342,7 +342,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		mAttributes.put(KEY_WITH_LABEL, withLabel);
 	}
 
-	public void showAsManyToOne(OColumn column, OEDataRow record) {
+	public void showAsManyToOne(OColumn column, ODataRow record) {
 		mFieldWidget = OFieldWidget.MANY_TO_ONE;
 		mColumn = column;
 		mModel = new OModel(mContext, null).createInstance(column.getType());
@@ -373,7 +373,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	@Override
-	public void onManyToOneItemChangeListener(OColumn column, OEDataRow row) {
+	public void onManyToOneItemChangeListener(OColumn column, ODataRow row) {
 		mFieldValue = row.get("id");
 	}
 }

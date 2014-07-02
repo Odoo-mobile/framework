@@ -16,26 +16,19 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.mail;
+package com.odoo.support.service;
 
+import android.accounts.Account;
+import android.app.Service;
+import android.content.ContentProviderClient;
 import android.content.Context;
+import android.content.SyncResult;
+import android.os.Bundle;
 
-import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OColumn;
-import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.OModel;
-import com.odoo.orm.types.OInteger;
-import com.odoo.orm.types.OText;
+public interface OServiceListener {
+	public Service getService();
 
-public class MailFollowers extends OModel {
-
-	OColumn res_model = new OColumn("Model", OText.class);
-	OColumn res_id = new OColumn("Res ID", OInteger.class);
-	OColumn partner_id = new OColumn("Partner", ResPartner.class,
-			RelationType.ManyToOne);
-
-	public MailFollowers(Context context) {
-		super(context, "mail.followers");
-	}
-
+	public void performSync(Context context, Account account, Bundle extras,
+			String authority, ContentProviderClient provider,
+			SyncResult syncResult);
 }

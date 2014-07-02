@@ -16,26 +16,19 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.mail;
+package com.odoo.util;
 
-import android.content.Context;
+import java.text.DecimalFormat;
 
-import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OColumn;
-import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.OModel;
-import com.odoo.orm.types.OInteger;
-import com.odoo.orm.types.OText;
-
-public class MailFollowers extends OModel {
-
-	OColumn res_model = new OColumn("Model", OText.class);
-	OColumn res_id = new OColumn("Res ID", OInteger.class);
-	OColumn partner_id = new OColumn("Partner", ResPartner.class,
-			RelationType.ManyToOne);
-
-	public MailFollowers(Context context) {
-		super(context, "mail.followers");
+public class OFileSizeHelper {
+	public static String readableFileSize(long size) {
+		if (size <= 0)
+			return "0";
+		final String[] units = new String[] { "Byte", "KB", "MB", "GB", "TB" };
+		int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+		return new DecimalFormat("#,##0.#").format(size
+				/ Math.pow(1024, digitGroups))
+				+ " " + units[digitGroups];
 	}
 
 }

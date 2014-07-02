@@ -12,8 +12,8 @@ import android.content.Context;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
-import com.odoo.orm.types.OEBoolean;
-import com.odoo.orm.types.OEVarchar;
+import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.OVarchar;
 import com.odoo.util.PreferenceManager;
 
 public class IrModelFields extends OModel {
@@ -21,10 +21,10 @@ public class IrModelFields extends OModel {
 	Context mContext = null;
 	List<String> mDefaultColumns = new ArrayList<String>();
 
-	OColumn name = new OColumn("Field name", OEVarchar.class, 100);
-	OColumn ttype = new OColumn("Field Type", OEVarchar.class, 100);
-	OColumn required = new OColumn("Required", OEBoolean.class);
-	OColumn readonly = new OColumn("Readonly", OEBoolean.class);
+	OColumn name = new OColumn("Field name", OVarchar.class, 100);
+	OColumn ttype = new OColumn("Field Type", OVarchar.class, 100);
+	OColumn required = new OColumn("Required", OBoolean.class);
+	OColumn readonly = new OColumn("Readonly", OBoolean.class);
 	OColumn model_id = new OColumn("Model", IrModel.class,
 			RelationType.ManyToOne);
 

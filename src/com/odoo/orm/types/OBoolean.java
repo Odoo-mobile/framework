@@ -16,26 +16,14 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.mail;
+package com.odoo.orm.types;
 
-import android.content.Context;
+public class OBoolean extends OTypeHelper {
 
-import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OColumn;
-import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.OModel;
-import com.odoo.orm.types.OInteger;
-import com.odoo.orm.types.OText;
+	public static final String KEY = "BOOLEAN";
 
-public class MailFollowers extends OModel {
-
-	OColumn res_model = new OColumn("Model", OText.class);
-	OColumn res_id = new OColumn("Res ID", OInteger.class);
-	OColumn partner_id = new OColumn("Partner", ResPartner.class,
-			RelationType.ManyToOne);
-
-	public MailFollowers(Context context) {
-		super(context, "mail.followers");
+	public OBoolean() {
+		mType = OBoolean.KEY;
 	}
 
 }

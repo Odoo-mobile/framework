@@ -31,10 +31,10 @@ import com.odoo.auth.OdooAccountManager;
 import com.odoo.orm.OdooHelper;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
-import com.odoo.support.OEUser;
+import com.odoo.support.OUser;
 import com.odoo.support.OdooServerConnection;
 import com.odoo.support.fragment.FragmentListener;
-import com.odoo.util.OEControls;
+import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class LoginSignup extends BaseFragment implements OnClickListener,
@@ -90,16 +90,16 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		case R.id.txvAddSelfHosted:
 			if (mSelfHosted) {
 				mSelfHosted = false;
-				OEControls.setGone(mView, R.id.layoutSelfHosted);
-				OEControls.setText(mView, R.id.txvAddSelfHosted,
+				OControls.setGone(mView, R.id.layoutSelfHosted);
+				OControls.setText(mView, R.id.txvAddSelfHosted,
 						"Add self-hosted URL");
-				OEControls.setGone(mView, R.id.layoutBorderDB);
-				OEControls.setGone(mView, R.id.layoutDatabase);
+				OControls.setGone(mView, R.id.layoutBorderDB);
+				OControls.setGone(mView, R.id.layoutDatabase);
 			} else {
 				mSelfHosted = true;
-				OEControls.setVisible(mView, R.id.layoutSelfHosted, true,
+				OControls.setVisible(mView, R.id.layoutSelfHosted, true,
 						getActivity());
-				OEControls.setText(mView, R.id.txvAddSelfHosted,
+				OControls.setText(mView, R.id.txvAddSelfHosted,
 						"Login with odoo.com");
 				edtHostedURL = (EditText) mView
 						.findViewById(R.id.edtSelfHostedURL);
@@ -126,7 +126,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 				mServerURL = createServerURL(edtHostedURL.getText().toString());
 			}
 		} else {
-			mServerURL = getResources().getString(R.string.odoo_oauth_url);
+			mServerURL = "https://accounts.odoo.com";
 		}
 		edtUsername.setError(null);
 		edtPassword.setError(null);
@@ -180,7 +180,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 	class LoginProcess extends AsyncTask<Void, Void, Boolean> {
 
 		Bundle userData = null;
-		OEUser mUser = null;
+		OUser mUser = null;
 		Odoo mOdooInstance = null;
 		App app = null;
 
@@ -193,8 +193,8 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			OEControls.setGone(mView, R.id.controls);
-			OEControls.setVisible(mView, R.id.loginProgress);
+			OControls.setGone(mView, R.id.controls);
+			OControls.setVisible(mView, R.id.loginProgress);
 		}
 
 		@Override
@@ -233,8 +233,8 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 				FragmentListener frag = (FragmentListener) getActivity();
 				frag.startMainFragment(account_create, false);
 			} else {
-				OEControls.setGone(mView, R.id.loginProgress);
-				OEControls.setVisible(mView, R.id.controls);
+				OControls.setGone(mView, R.id.loginProgress);
+				OControls.setVisible(mView, R.id.controls);
 				edtPassword.setError(getResources().getString(
 						R.string.toast_invalid_username_password));
 			}
@@ -281,13 +281,13 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			OEControls.setVisible(mView, R.id.serverURLCheckProgress);
-			OEControls.setGone(mView, R.id.imgValidURL);
-			OEControls.setGone(mView, R.id.layoutBorderDB);
-			OEControls.setGone(mView, R.id.layoutDatabase);
+			OControls.setVisible(mView, R.id.serverURLCheckProgress);
+			OControls.setGone(mView, R.id.imgValidURL);
+			OControls.setGone(mView, R.id.layoutBorderDB);
+			OControls.setGone(mView, R.id.layoutDatabase);
 			if (mAutoLogin) {
-				OEControls.setGone(mView, R.id.controls);
-				OEControls.setVisible(mView, R.id.loginProgress);
+				OControls.setGone(mView, R.id.controls);
+				OControls.setVisible(mView, R.id.loginProgress);
 			}
 			odooConnect = new OdooServerConnection(mForceConnect);
 		}
@@ -316,17 +316,17 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		@Override
 		protected void onPostExecute(Boolean success) {
 			super.onPostExecute(success);
-			OEControls.setGone(mView, R.id.serverURLCheckProgress);
+			OControls.setGone(mView, R.id.serverURLCheckProgress);
 			if (success) {
-				OEControls.setVisible(mView, R.id.imgValidURL);
+				OControls.setVisible(mView, R.id.imgValidURL);
 				mOdooURLTest.cancel(true);
 				mOdooURLTest = null;
 				String[] databases = odooConnect.getDatabases();
 				initDatabaseSpinner(databases);
 				mSSLForceConnect = mForceConnect;
 				if (mAutoLogin) {
-					OEControls.setGone(mView, R.id.loginProgress);
-					OEControls.setVisible(mView, R.id.controls);
+					OControls.setGone(mView, R.id.loginProgress);
+					OControls.setVisible(mView, R.id.controls);
 					login();
 				}
 			} else {
@@ -348,9 +348,9 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 
 	private void initDatabaseSpinner(String[] dbs) {
 		if (dbs.length > 1) {
-			OEControls.setVisible(mView, R.id.layoutBorderDB, true,
+			OControls.setVisible(mView, R.id.layoutBorderDB, true,
 					getActivity());
-			OEControls.setVisible(mView, R.id.layoutDatabase, true,
+			OControls.setVisible(mView, R.id.layoutDatabase, true,
 					getActivity());
 			dbListSpinner = (Spinner) mView
 					.findViewById(R.id.spinnerDatabaseList);

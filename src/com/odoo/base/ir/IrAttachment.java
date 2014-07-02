@@ -25,27 +25,27 @@ import com.odoo.base.res.ResCompany;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OModel;
 import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.types.OEInteger;
-import com.odoo.orm.types.OEText;
-import com.odoo.orm.types.OEVarchar;
+import com.odoo.orm.types.OInteger;
+import com.odoo.orm.types.OText;
+import com.odoo.orm.types.OVarchar;
 
 /**
  * The Class Ir_AttachmentDBHelper.
  */
 public class IrAttachment extends OModel {
 
-	OColumn name = new OColumn("Name", OEText.class);
-	OColumn datas_fname = new OColumn("Data file name", OEText.class);
-	OColumn type = new OColumn("Type", OEText.class);
-	OColumn file_size = new OColumn("File Size", OEInteger.class);
-	OColumn res_model = new OColumn("Model", OEVarchar.class, 100);
-	OColumn file_type = new OColumn("Content Type", OEVarchar.class, 100);
+	OColumn name = new OColumn("Name", OText.class);
+	OColumn datas_fname = new OColumn("Data file name", OText.class);
+	OColumn type = new OColumn("Type", OText.class);
+	OColumn file_size = new OColumn("File Size", OInteger.class);
+	OColumn res_model = new OColumn("Model", OVarchar.class, 100);
+	OColumn file_type = new OColumn("Content Type", OVarchar.class, 100);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne);
-	OColumn res_id = new OColumn("Resource id", OEInteger.class);
+	OColumn res_id = new OColumn("Resource id", OInteger.class);
 
 	// Local Column
-	OColumn file_uri = new OColumn("File URI", OEVarchar.class, 100)
+	OColumn file_uri = new OColumn("File URI", OVarchar.class, 100)
 			.setLocalColumn();
 
 	public IrAttachment(Context context) {

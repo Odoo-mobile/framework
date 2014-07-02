@@ -16,26 +16,29 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.mail;
+package com.odoo.orm;
 
-import android.content.Context;
+public class OM2ORecord {
+	private OColumn mCol = null;
+	private String record_id = "false";
+	private OModel base_model = null;
 
-import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OColumn;
-import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.OModel;
-import com.odoo.orm.types.OInteger;
-import com.odoo.orm.types.OText;
-
-public class MailFollowers extends OModel {
-
-	OColumn res_model = new OColumn("Model", OText.class);
-	OColumn res_id = new OColumn("Res ID", OInteger.class);
-	OColumn partner_id = new OColumn("Partner", ResPartner.class,
-			RelationType.ManyToOne);
-
-	public MailFollowers(Context context) {
-		super(context, "mail.followers");
+	public OM2ORecord(OModel base, OColumn col, String value) {
+		base_model = base;
+		mCol = col;
+		record_id = value;
 	}
 
+	public Object getId() {
+		if (record_id == null || record_id.equals("false"))
+			return 0;
+		return Integer.parseInt(record_id);
+	}
+
+	public ODataRow browse() {
+		OModel rel = base_model.createInstance(mCol.getType());
+		if (record_id == null || record_id.equals("false"))
+			return null;
+		return rel.select(Integer.parseInt(record_id));
+	}
 }

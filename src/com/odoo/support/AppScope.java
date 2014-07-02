@@ -30,14 +30,14 @@ import com.odoo.MainActivity;
 public class AppScope {
 
 	/** The user. */
-	private OEUser mUser = new OEUser();
+	private OUser mUser = new OUser();
 
 	/** The context. */
 	private Context mContext = null;
 
 	public AppScope(Fragment fragment) {
 		mContext = (Context) fragment.getActivity();
-		mUser = OEUser.current(mContext);
+		mUser = OUser.current(mContext);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class AppScope {
 	 */
 	public AppScope(Context context) {
 		mContext = context;
-		mUser = OEUser.current(mContext);
+		mUser = OUser.current(mContext);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class AppScope {
 	 * 
 	 * @return the user object
 	 */
-	public OEUser User() {
+	public OUser User() {
 		return mUser;
 	}
 

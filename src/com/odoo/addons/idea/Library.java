@@ -44,12 +44,12 @@ import com.odoo.addons.idea.model.BookBook.BookAuthor;
 import com.odoo.addons.idea.model.BookBook.BookCategory;
 import com.odoo.addons.idea.model.BookBook.BookStudent;
 import com.odoo.addons.idea.providers.library.LibraryProvider;
-import com.odoo.orm.OEDataRow;
+import com.odoo.orm.ODataRow;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
-import com.odoo.support.listview.OEListAdapter;
-import com.odoo.util.OEControls;
+import com.odoo.support.listview.OListAdapter;
+import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
@@ -69,7 +69,7 @@ public class Library extends BaseFragment implements OnPullListener,
 	View mView = null;
 	ListView mListControl = null;
 	List<Object> mListRecords = new ArrayList<Object>();
-	OEListAdapter mListAdapter = null;
+	OListAdapter mListAdapter = null;
 	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
 	Keys mCurrentKey = Keys.Books;
@@ -86,7 +86,7 @@ public class Library extends BaseFragment implements OnPullListener,
 	private void init() {
 		checkArguments();
 		mListControl = (ListView) mView.findViewById(R.id.listRecords);
-		mListAdapter = new OEListAdapter(getActivity(),
+		mListAdapter = new OListAdapter(getActivity(),
 				R.layout.fragment_library_custom_view, mListRecords) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
@@ -95,7 +95,7 @@ public class Library extends BaseFragment implements OnPullListener,
 					mView = getActivity().getLayoutInflater().inflate(
 							getResource(), parent, false);
 				}
-				OEDataRow row = (OEDataRow) mListRecords.get(position);
+				ODataRow row = (ODataRow) mListRecords.get(position);
 				createView(mView, row);
 				return mView;
 			}
@@ -146,36 +146,36 @@ public class Library extends BaseFragment implements OnPullListener,
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			mListAdapter.notifiyDataChange(mListRecords);
-			OEControls.setGone(mView, R.id.loadingProgress);
+			OControls.setGone(mView, R.id.loadingProgress);
 		}
 
 	}
 
-	private void createView(View mView, OEDataRow row) {
-		OEControls.setText(mView, R.id.txvName, row.getString("name"));
+	private void createView(View mView, ODataRow row) {
+		OControls.setText(mView, R.id.txvName, row.getString("name"));
 		List<String> values = new ArrayList<String>();
 		switch (mCurrentKey) {
 		case Books:
-			for (OEDataRow category : row.getM2MRecord("category_ids")
+			for (ODataRow category : row.getM2MRecord("category_ids")
 					.browseEach()) {
 				values.add("- " + category.getString("name"));
 			}
 			break;
 		case Authors:
-			OEDataRow country = row.getM2ORecord("country_id").browse();
+			ODataRow country = row.getM2ORecord("country_id").browse();
 			if (country != null) {
 				values.add(country.getString("name"));
 			}
 
 			break;
 		case Students:
-			for (OEDataRow book : row.getO2MRecord("book_ids").browseEach()) {
+			for (ODataRow book : row.getO2MRecord("book_ids").browseEach()) {
 				values.add("- " + book.getString("name"));
 			}
 			break;
 		case Category:
 		}
-		OEControls.setText(mView, R.id.txvValues, TextUtils.join("\n", values));
+		OControls.setText(mView, R.id.txvValues, TextUtils.join("\n", values));
 	}
 
 	private void checkArguments() {
@@ -266,7 +266,7 @@ public class Library extends BaseFragment implements OnPullListener,
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		OEDataRow row = (OEDataRow) mListRecords.get(position);
+		ODataRow row = (ODataRow) mListRecords.get(position);
 		LibraryDetail library = new LibraryDetail();
 		Bundle bundle = new Bundle();
 		bundle.putString("key", mCurrentKey.toString());

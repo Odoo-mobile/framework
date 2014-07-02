@@ -12,9 +12,9 @@ import android.util.Log;
 import com.odoo.addons.idea.model.BookBook;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
-import com.odoo.support.service.OEService;
+import com.odoo.support.service.OService;
 
-public class LibraryService extends OEService {
+public class LibraryService extends OService {
 
 	public static final String TAG = LibraryService.class.getSimpleName();
 

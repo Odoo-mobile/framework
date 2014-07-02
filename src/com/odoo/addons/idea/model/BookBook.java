@@ -24,14 +24,14 @@ import android.content.Context;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
-import com.odoo.orm.types.OEText;
-import com.odoo.orm.types.OEVarchar;
+import com.odoo.orm.types.OText;
+import com.odoo.orm.types.OVarchar;
 
 public class BookBook extends OModel {
 
-	OColumn name = new OColumn("Name", OEVarchar.class, 100).setRequired(true);
+	OColumn name = new OColumn("Name", OVarchar.class, 100).setRequired(true);
 
-	OColumn language = new OColumn("Language", OEVarchar.class, 64)
+	OColumn language = new OColumn("Language", OVarchar.class, 64)
 			.setRequired(true);
 	OColumn author_id = new OColumn("Author", BookAuthor.class,
 			RelationType.ManyToOne);
@@ -39,7 +39,7 @@ public class BookBook extends OModel {
 			RelationType.ManyToOne).setRequired(true);
 	OColumn category_ids = new OColumn("Categories", BookCategory.class,
 			RelationType.ManyToMany);
-	OColumn description = new OColumn("Description", OEText.class);
+	OColumn description = new OColumn("Description", OText.class);
 
 	public BookBook(Context context) {
 		super(context, "book.book");
@@ -47,8 +47,8 @@ public class BookBook extends OModel {
 
 	public static class BookCategory extends OModel {
 
-		OColumn name = new OColumn("Name", OEVarchar.class, 100);
-		OColumn description = new OColumn("Description", OEText.class);
+		OColumn name = new OColumn("Name", OVarchar.class, 100);
+		OColumn description = new OColumn("Description", OText.class);
 
 		public BookCategory(Context context) {
 			super(context, "book.category");
@@ -58,10 +58,10 @@ public class BookBook extends OModel {
 
 	public static class BookAuthor extends OModel {
 
-		OColumn name = new OColumn("Name", OEVarchar.class, 100);
+		OColumn name = new OColumn("Name", OVarchar.class, 100);
 		OColumn country_id = new OColumn("Country", ResCountry.class,
 				RelationType.ManyToOne);
-		OColumn description = new OColumn("Author Description", OEText.class);
+		OColumn description = new OColumn("Author Description", OText.class);
 
 		public BookAuthor(Context context) {
 			super(context, "book.author");
@@ -69,7 +69,7 @@ public class BookBook extends OModel {
 	}
 
 	public static class ResCountry extends OModel {
-		OColumn name = new OColumn("Country Name", OEVarchar.class, 100);
+		OColumn name = new OColumn("Country Name", OVarchar.class, 100);
 
 		public ResCountry(Context context) {
 			super(context, "res.country");
@@ -77,9 +77,9 @@ public class BookBook extends OModel {
 	}
 
 	public static class BookStudent extends OModel {
-		OColumn name = new OColumn("Name", OEVarchar.class, 100);
-		OColumn course = new OColumn("Course Name", OEVarchar.class, 100);
-		OColumn contact = new OColumn("Contact", OEVarchar.class, 15);
+		OColumn name = new OColumn("Name", OVarchar.class, 100);
+		OColumn course = new OColumn("Course Name", OVarchar.class, 100);
+		OColumn contact = new OColumn("Contact", OVarchar.class, 15);
 		OColumn book_ids = new OColumn("Assigned Books", BookBook.class,
 				RelationType.OneToMany).setRelatedColumn("student_id");
 

@@ -15,8 +15,8 @@ import android.util.Log;
 import com.odoo.App;
 import com.odoo.base.ir.IrModel;
 import com.odoo.orm.ORelationRecordList.ORelationRecord;
-import com.odoo.support.OEUser;
-import com.odoo.util.OEDate;
+import com.odoo.support.OUser;
+import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 
 public class OSyncHelper {
@@ -24,7 +24,7 @@ public class OSyncHelper {
 	public static final String TAG = OSyncHelper.class.getSimpleName();
 
 	Context mContext = null;
-	OEUser mUser = null;
+	OUser mUser = null;
 	OModel mModel = null;
 	Odoo mOdoo = null;
 	Boolean isConnection = false;
@@ -36,7 +36,7 @@ public class OSyncHelper {
 
 	Boolean mCheckForWriteDate = true, mCheckForCreateDate = true;
 
-	public OSyncHelper(Context context, OEUser user, OModel model) {
+	public OSyncHelper(Context context, OUser user, OModel model) {
 		mContext = context;
 		mUser = user;
 		mModel = model;
@@ -79,7 +79,7 @@ public class OSyncHelper {
 					mPref = new PreferenceManager(mContext);
 					int data_limit = mPref.getInt("sync_data_limit", 60);
 					domain.add("create_date", ">=",
-							OEDate.getDateBefore(data_limit));
+							ODate.getDateBefore(data_limit));
 				}
 				// Adding Last sync date comparing with write_date of record
 				if (mCheckForWriteDate && !model.isEmptyTable()) {
@@ -103,13 +103,13 @@ public class OSyncHelper {
 	private String getLastSyncDate(OModel model) {
 		String last_sync_date = "false";
 		IrModel irModel = new IrModel(mContext);
-		List<OEDataRow> records = irModel.select("model = ?",
+		List<ODataRow> records = irModel.select("model = ?",
 				new Object[] { model.getModelName() });
 		if (records.size() > 0) {
 			last_sync_date = records.get(0).getString("last_synced");
 		}
 		if (last_sync_date.equals("false"))
-			last_sync_date = OEDate.getDate();
+			last_sync_date = ODate.getDate();
 		return last_sync_date;
 
 	}
@@ -132,20 +132,20 @@ public class OSyncHelper {
 	}
 
 	private boolean syncFinish(OModel model) {
-		String finish_date_time = OEDate.getDate();
+		String finish_date_time = ODate.getDate();
 		Log.v(TAG, model.getModelName() + " sync finished at "
 				+ finish_date_time + " (UTC)");
 		IrModel irmodel = new IrModel(mContext);
-		OEValues values = new OEValues();
+		OValues values = new OValues();
 		values.put("last_synced", finish_date_time);
 		irmodel.update(values, "model = ?",
 				new Object[] { model.getModelName() });
 		return true;
 	}
 
-	private OEValues createValueRow(OModel model, List<OColumn> columns,
+	private OValues createValueRow(OModel model, List<OColumn> columns,
 			JSONObject record) {
-		OEValues values = new OEValues();
+		OValues values = new OValues();
 		try {
 			List<Integer> r_ids = new ArrayList<Integer>();
 			for (OColumn column : columns) {
@@ -163,7 +163,7 @@ public class OSyncHelper {
 						// Local table contains only id and name so not required
 						// to request on server
 						if (m2o.getColumns(false).size() == 2) {
-							OEValues m2oVals = new OEValues();
+							OValues m2oVals = new OValues();
 							m2oVals.put("id", m2oRecord.get(0));
 							m2oVals.put("name", m2oRecord.get(1));
 							m2o.createORReplace(m2oVals);
@@ -242,7 +242,7 @@ public class OSyncHelper {
 	private void handleResult(OModel model, JSONObject result) {
 		try {
 			JSONArray records = result.getJSONArray("records");
-			List<OEValues> values_list = new ArrayList<OEValues>();
+			List<OValues> values_list = new ArrayList<OValues>();
 			for (int i = 0; i < records.length(); i++) {
 				JSONObject record = records.getJSONObject(i);
 				values_list.add(createValueRow(model, model.getColumns(false),
@@ -266,8 +266,8 @@ public class OSyncHelper {
 		return fields;
 	}
 
-	public List<OEValues> modelInfo(List<String> models) {
-		List<OEValues> models_list = new ArrayList<OEValues>();
+	public List<OValues> modelInfo(List<String> models) {
+		List<OValues> models_list = new ArrayList<OValues>();
 		try {
 			OEDomain domain = new OEDomain();
 			domain.add("name", "in", new JSONArray(models.toString()));
@@ -276,7 +276,7 @@ public class OSyncHelper {
 			JSONArray records = result.getJSONArray("records");
 			for (int i = 0; i < records.length(); i++) {
 				JSONObject record = records.getJSONObject(i);
-				OEValues values = createValueRow(mModel,
+				OValues values = createValueRow(mModel,
 						mModel.getColumns(false), record);
 				models_list.add(values);
 			}

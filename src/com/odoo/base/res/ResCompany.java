@@ -22,14 +22,14 @@ import android.content.Context;
 
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OModel;
-import com.odoo.orm.types.OEVarchar;
+import com.odoo.orm.types.OVarchar;
 
 /**
  * The Class ResCompany.
  */
 public class ResCompany extends OModel {
 
-	OColumn name = new OColumn("Name", OEVarchar.class, 100);
+	OColumn name = new OColumn("Name", OVarchar.class, 100);
 
 	public ResCompany(Context context) {
 		super(context, "res.company");

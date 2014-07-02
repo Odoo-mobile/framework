@@ -34,9 +34,9 @@ import android.util.Log;
 
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OEHelper;
-import com.odoo.support.OEUser;
-import com.odoo.support.contact.OEContact;
+import com.odoo.orm.OSyncHelper;
+import com.odoo.support.OUser;
+import com.odoo.support.contact.OContact;
 
 public class ContactSyncService extends Service {
 
@@ -67,25 +67,25 @@ public class ContactSyncService extends Service {
 			String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		try {
-			OEUser user = OdooAccountManager.getAccountDetail(context,
+			OUser user = OdooAccountManager.getAccountDetail(context,
 					account.name);
 
 			ResPartner db = new ResPartner(context);
-			OEHelper oe = null;// db.getOEInstance();
+			OSyncHelper odoo = db.getSyncHelper();
 
-			OEContact contact = new OEContact(context, user);
+			OContact contact = new OContact(context, user);
 
 			SharedPreferences settings = PreferenceManager
 					.getDefaultSharedPreferences(context);
 			boolean syncServerContacts = settings.getBoolean(
 					"server_contact_sync", false);
 
-			if (syncServerContacts && oe != null) {
+			if (syncServerContacts && odoo != null) {
 				Log.v(TAG, "Contact sync with server");
 				int company_id = Integer.parseInt(user.getCompany_id());
 				OEDomain domain = new OEDomain();
 				domain.add("company_id", "=", company_id);
-				oe.syncWithServer(domain, false);
+				odoo.syncWithServer(domain);
 			}
 			contact.createContacts(db.select());
 		} catch (Exception e) {

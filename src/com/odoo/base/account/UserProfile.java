@@ -20,6 +20,7 @@ package com.odoo.base.account;
 
 import java.util.List;
 
+import odoo.OdooInstance;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -41,10 +42,10 @@ import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.auth.OdooAccountManager;
-import com.odoo.orm.OEHelper;
+import com.odoo.orm.OdooHelper;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
-import com.odoo.support.OEUser;
+import com.odoo.support.OUser;
 import com.odoo.util.Base64Helper;
 import com.odoo.util.drawer.DrawerItem;
 
@@ -124,14 +125,31 @@ public class UserProfile extends BaseFragment {
 		builder.setPositiveButton(R.string.label_update_info,
 				new OnClickListener() {
 					public void onClick(DialogInterface di, int i) {
-						OEUser userData = null;
+						OUser userData = null;
 						try {
-							OEHelper odoo = new OEHelper(scope.context());
-							userData = odoo.login(scope.User().getUsername(),
-									password.getText().toString(), scope.User()
-											.getDatabase(), scope.User()
-											.getHost());
+							OdooHelper odoo = null;
+							if (scope.User().isOAauthLogin()) {
+								odoo = new OdooHelper(getActivity());
+								OdooInstance instance = new OdooInstance();
+								instance.setInstanceUrl(scope.User()
+										.getInstanceUrl());
+								instance.setDatabaseName(scope.User()
+										.getInstanceDatabase());
+								instance.setClientId(scope.User().getClientId());
+								userData = odoo.instance_login(instance, scope
+										.User().getUsername(), password
+										.getText().toString());
+							} else {
+								odoo = new OdooHelper(getActivity(), scope
+										.User().isAllowSelfSignedSSL());
+								userData = odoo.login(scope.User()
+										.getUsername(), password.getText()
+										.toString(),
+										scope.User().getDatabase(), scope
+												.User().getHost());
+							}
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 						if (userData != null) {
 							if (OdooAccountManager.updateAccountDetails(

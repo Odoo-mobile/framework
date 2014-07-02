@@ -25,14 +25,13 @@ import com.odoo.App;
 import com.odoo.R;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.ir.IrModel;
-import com.odoo.base.login.SyncWizard;
 import com.odoo.orm.OdooHelper;
 import com.odoo.support.BaseFragment;
-import com.odoo.support.OEUser;
+import com.odoo.support.OUser;
 import com.odoo.support.OExceptionDialog;
 import com.odoo.support.fragment.FragmentListener;
-import com.odoo.support.listview.OEListAdapter;
-import com.odoo.util.OEControls;
+import com.odoo.support.listview.OListAdapter;
+import com.odoo.util.OControls;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.controls.ExpandableHeightGridView;
 import com.odoo.util.drawer.DrawerItem;
@@ -40,10 +39,10 @@ import com.odoo.util.drawer.DrawerItem;
 public class AccountCreate extends BaseFragment implements OnItemClickListener {
 
 	View mView = null;
-	OEUser mUser = null;
+	OUser mUser = null;
 	AccountCreate mSelf = null;
 	Boolean loadConfigWizard = true, mSelfHosted = false;
-	OEListAdapter mListAdapter = null;
+	OListAdapter mListAdapter = null;
 	List<Object> mInstanceList = new ArrayList<Object>();
 	ExpandableHeightGridView mGridView = null;
 	App mApp = null;
@@ -62,7 +61,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 	}
 
 	private void init() {
-		mListAdapter = new OEListAdapter(getActivity(),
+		mListAdapter = new OListAdapter(getActivity(),
 				R.layout.login_signup_instance_view, mInstanceList) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
@@ -77,9 +76,9 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 				ImageLoader imgLoader = new ImageLoader(position, image_url,
 						R.id.imgInstance);
 				imgLoader.execute();
-				OEControls.setText(mView, R.id.txvInstanceName,
+				OControls.setText(mView, R.id.txvInstanceName,
 						row.getCompanyName());
-				OEControls.setText(mView, R.id.txvInstanceUrl,
+				OControls.setText(mView, R.id.txvInstanceUrl,
 						row.getInstanceUrl());
 				return mView;
 			}
@@ -90,7 +89,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 		if (getArguments().containsKey("no_config_wizard")) {
 			loadConfigWizard = !getArguments().getBoolean("no_config_wizard");
 		}
-		mUser = new OEUser();
+		mUser = new OUser();
 		mUser.setFromBundle(getArguments());
 		if (loadConfigWizard) {
 			GetInstances instances = new GetInstances(getArguments()
@@ -114,7 +113,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 
 		@Override
 		protected void onPreExecute() {
-			OEControls.setText(mView, R.id.progressStatus, getResources()
+			OControls.setText(mView, R.id.progressStatus, getResources()
 					.getString(R.string.title_getting_instances));
 		}
 
@@ -158,8 +157,8 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 
 		public LoadInstances(List<OdooInstance> instances) {
 			mInstances.addAll(instances);
-			OEControls.setGone(mView, R.id.progressLoader);
-			OEControls.setVisible(mView, R.id.instanceList);
+			OControls.setGone(mView, R.id.progressLoader);
+			OControls.setVisible(mView, R.id.instanceList);
 			mGridView = (ExpandableHeightGridView) mView
 					.findViewById(R.id.gridInstances);
 			mGridView.setExpanded(true);
@@ -216,7 +215,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 			super.onPostExecute(result);
 			if (bmp != null) {
 				View mView = mGridView.getChildAt(view_pos);
-				OEControls.setImage(mView, image_view, bmp);
+				OControls.setImage(mView, image_view, bmp);
 			}
 		}
 	}
@@ -231,9 +230,9 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 		public CreateAccount(OdooInstance instance, Boolean selfHosted) {
 			mOdooInstance = instance;
 			mSelfHosted = selfHosted;
-			OEControls.setGone(mView, R.id.instanceList);
-			OEControls.setVisible(mView, R.id.progressLoader);
-			OEControls.setText(mView, R.id.progressStatus, getActivity()
+			OControls.setGone(mView, R.id.instanceList);
+			OControls.setVisible(mView, R.id.progressLoader);
+			OControls.setText(mView, R.id.progressStatus, getActivity()
 					.getResources().getString(R.string.title_account_create));
 		}
 
@@ -241,7 +240,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 		protected Boolean doInBackground(Void... params) {
 			try {
 				OdooHelper odoo = new OdooHelper(getActivity());
-				OEUser user = null;
+				OUser user = null;
 				if (mSelfHosted) {
 					user = odoo.login(mUser.getUsername(), mUser.getPassword(),
 							mUser.getDatabase(), mUser.getHost());
@@ -272,8 +271,8 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 					OExceptionDialog dialog = new OExceptionDialog(
 							getActivity(), true, mOdooException);
 					dialog.show();
-					OEControls.setVisible(mView, R.id.instanceList);
-					OEControls.setGone(mView, R.id.progressLoader);
+					OControls.setVisible(mView, R.id.instanceList);
+					OControls.setGone(mView, R.id.progressLoader);
 				}
 			}
 		}
@@ -289,7 +288,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 
 		@Override
 		protected void onPreExecute() {
-			OEControls.setText(mView, R.id.progressStatus, getResources()
+			OControls.setText(mView, R.id.progressStatus, getResources()
 					.getString(R.string.title_database_create));
 		}
 

@@ -13,13 +13,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.odoo.orm.types.OEBoolean;
-import com.odoo.orm.types.OEDateTime;
-import com.odoo.orm.types.OEInteger;
-import com.odoo.orm.types.OEText;
-import com.odoo.orm.types.OEVarchar;
-import com.odoo.support.OEUser;
-import com.odoo.util.OEDate;
+import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.ODateTime;
+import com.odoo.orm.types.OInteger;
+import com.odoo.orm.types.OText;
+import com.odoo.orm.types.OVarchar;
+import com.odoo.support.OUser;
+import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.StringUtils;
 
@@ -30,7 +30,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	Context mContext = null;
 	String _name = null;
 	List<OColumn> mColumns = new ArrayList<OColumn>();
-	OEUser mUser = null;
+	OUser mUser = null;
 	OSyncHelper mSyncHelper = null;
 
 	public enum Command {
@@ -38,28 +38,28 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	// Server Base Columns
-	OColumn id = new OColumn("ID", OEInteger.class).setDefault(false);
+	OColumn id = new OColumn("ID", OInteger.class).setDefault(false);
 
 	// Local Base Columns
-	OColumn local_id = new OColumn("Local ID", OEInteger.class)
+	OColumn local_id = new OColumn("Local ID", OInteger.class)
 			.setAutoIncrement(true).setLocalColumn();
-	OColumn odoo_name = new OColumn("Odoo Account Name", OEVarchar.class, 100)
+	OColumn odoo_name = new OColumn("Odoo Account Name", OVarchar.class, 100)
 			.setRequired(true).setLocalColumn();
-	OColumn local_write_date = new OColumn("Local Write Date", OEDateTime.class)
+	OColumn local_write_date = new OColumn("Local Write Date", ODateTime.class)
 			.setLocalColumn();
-	OColumn is_dirty = new OColumn("Dirty Row", OEText.class).setDefault(false)
+	OColumn is_dirty = new OColumn("Dirty Row", OText.class).setDefault(false)
 			.setLocalColumn();
-	OColumn is_active = new OColumn("Row Active", OEBoolean.class).setDefault(
+	OColumn is_active = new OColumn("Row Active", OBoolean.class).setDefault(
 			true).setLocalColumn();
 
 	public OModel(Context context, String model_name) {
 		super(context);
 		mContext = context;
 		_name = model_name;
-		mUser = OEUser.current(mContext);
+		mUser = OUser.current(mContext);
 	}
 
-	public void setUser(OEUser user) {
+	public void setUser(OUser user) {
 		mUser = user;
 	}
 
@@ -107,10 +107,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		is_active.setName("is_active");
 		cols.add(is_active);
 
-		OColumn base_id = new OColumn("Base Id", OEInteger.class);
+		OColumn base_id = new OColumn("Base Id", OInteger.class);
 		base_id.setName(getTableName() + "_id");
 		cols.add(base_id);
-		OColumn relation_id = new OColumn("Relation Id", OEInteger.class);
+		OColumn relation_id = new OColumn("Relation Id", OInteger.class);
 		relation_id.setName(relation_model.getTableName() + "_id");
 		cols.add(relation_id);
 		return cols;
@@ -164,53 +164,53 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return null;
 	}
 
-	public List<OEDataRow> select() {
+	public List<ODataRow> select() {
 		return select(null, null, null, null, null);
 	}
 
-	public OEDataRow select(Integer id) {
+	public ODataRow select(Integer id) {
 		return select(id, false);
 	}
 
-	public OEDataRow select(Integer id, boolean local_record) {
+	public ODataRow select(Integer id, boolean local_record) {
 		String selection = (local_record) ? "local_id = ?" : "id = ?";
-		List<OEDataRow> records = select(selection, new Object[] { id }, null,
+		List<ODataRow> records = select(selection, new Object[] { id }, null,
 				null, null);
 		if (records.size() > 0)
 			return records.get(0);
 		return null;
 	}
 
-	public List<OEDataRow> select(String where, Object[] args) {
+	public List<ODataRow> select(String where, Object[] args) {
 		return select(where, args, null, null, null);
 	}
 
-	public List<OEDataRow> select(String where, Object[] whereArgs,
+	public List<ODataRow> select(String where, Object[] whereArgs,
 			String groupBy, String having, String orderBy) {
-		List<OEDataRow> records = new ArrayList<OEDataRow>();
+		List<ODataRow> records = new ArrayList<ODataRow>();
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cr = db.query(getTableName(), new String[] { "*" },
 				getWhereClause(where), getWhereArgs(where, whereArgs), groupBy,
 				having, orderBy);
 		if (cr.moveToFirst()) {
 			do {
-				OEDataRow row = new OEDataRow();
+				ODataRow row = new ODataRow();
 				for (OColumn col : getColumns()) {
 					if (col.getRelationType() == null) {
 						row.put(col.getName(), createRecordRow(col, cr));
 					} else {
 						switch (col.getRelationType()) {
 						case ManyToMany:
-							row.put(col.getName(), new OEM2MRecord(this, col,
+							row.put(col.getName(), new OM2MRecord(this, col,
 									cr.getInt(cr.getColumnIndex("id"))));
 							break;
 						case OneToMany:
-							row.put(col.getName(), new OEO2MRecord(this, col,
+							row.put(col.getName(), new OO2MRecord(this, col,
 									cr.getInt(cr.getColumnIndex("id"))));
 							break;
 						case ManyToOne:
 							row.put(col.getName(),
-									new OEM2ORecord(this, col, cr.getString(cr
+									new OM2ORecord(this, col, cr.getString(cr
 											.getColumnIndex(col.getName()))));
 							break;
 						}
@@ -231,8 +231,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return records;
 	}
 
-	public List<OEDataRow> selectM2MRecords(OModel base, OModel rel, int base_id) {
-		List<OEDataRow> records = new ArrayList<OEDataRow>();
+	public List<ODataRow> selectM2MRecords(OModel base, OModel rel, int base_id) {
+		List<ODataRow> records = new ArrayList<ODataRow>();
 		String table = base.getTableName() + "_" + rel.getTableName() + "_rel";
 		String base_col = base.getTableName() + "_id";
 		String rel_col = rel.getTableName() + "_id";
@@ -307,16 +307,16 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return count;
 	}
 
-	public Integer createORReplace(OEValues values) {
-		List<OEValues> vals = new ArrayList<OEValues>();
+	public Integer createORReplace(OValues values) {
+		List<OValues> vals = new ArrayList<OValues>();
 		vals.add(values);
 		return createORReplace(vals).get(0);
 	}
 
-	public List<Integer> createORReplace(List<OEValues> values_list) {
+	public List<Integer> createORReplace(List<OValues> values_list) {
 		Log.v(TAG, "creating OR Replacing " + values_list.size() + " records");
 		List<Integer> ids = new ArrayList<Integer>();
-		for (OEValues values : values_list) {
+		for (OValues values : values_list) {
 			if (!hasRecord(values.getInt("id")))
 				ids.add(create(values));
 			else {
@@ -333,7 +333,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return false;
 	}
 
-	public int create(OEValues values) {
+	public int create(OValues values) {
 		Integer newId = (values.contains("id")) ? values.getInt("id") : 0;
 		if (!values.contains("odoo_name")) {
 			values.put("odoo_name", mUser.getAndroidName());
@@ -344,16 +344,16 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return newId;
 	}
 
-	public int update(OEValues values, int id) {
+	public int update(OValues values, int id) {
 		return update(values, id, false);
 	}
 
-	public int update(OEValues values, Integer id, Boolean local_record) {
+	public int update(OValues values, Integer id, Boolean local_record) {
 		return update(values, (local_record) ? "local_id = ? " : "id = ?",
 				new Object[] { id });
 	}
 
-	public int update(OEValues updateValues, String where, Object[] whereArgs) {
+	public int update(OValues updateValues, String where, Object[] whereArgs) {
 		int affectedRows = 0;
 		SQLiteDatabase db = getWritableDatabase();
 		affectedRows = db.update(getTableName(),
@@ -364,7 +364,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	// createValues : used by create and update methods
-	private ContentValues createValues(SQLiteDatabase db, OEValues values) {
+	private ContentValues createValues(SQLiteDatabase db, OValues values) {
 		ContentValues vals = new ContentValues();
 		for (OColumn column : getColumns()) {
 			if (values.contains(column.getName())) {
@@ -396,7 +396,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				}
 			}
 		}
-		vals.put("local_write_date", OEDate.getDate());
+		vals.put("local_write_date", ODate.getDate());
 		return vals;
 	}
 
@@ -424,7 +424,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				values.put(base_column, base_id);
 				values.put(rel_column, id);
 				values.put("odoo_name", mUser.getAndroidName());
-				values.put("local_write_date", OEDate.getDate());
+				values.put("local_write_date", ODate.getDate());
 				db.insert(table, null, values);
 			}
 			break;
@@ -471,14 +471,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return mSyncHelper;
 	}
 
-	public List<OEValues> getModelValues(String model) {
+	public List<OValues> getModelValues(String model) {
 		List<String> models = new ArrayList<String>();
 		models.add(model);
 		return getModelValues(models);
 
 	}
 
-	public List<OEValues> getModelValues(List<String> models) {
+	public List<OValues> getModelValues(List<String> models) {
 		if (mSyncHelper == null)
 			mSyncHelper = new OSyncHelper(mContext, mUser, this);
 		return mSyncHelper.modelInfo(models);

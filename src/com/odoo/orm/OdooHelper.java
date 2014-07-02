@@ -16,7 +16,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.odoo.App;
-import com.odoo.support.OEUser;
+import com.odoo.support.OUser;
 
 public class OdooHelper {
 
@@ -38,10 +38,10 @@ public class OdooHelper {
 		mApp = (App) context.getApplicationContext();
 	}
 
-	public OEUser login(String username, String password, String database,
+	public OUser login(String username, String password, String database,
 			String serverURL) {
 		Log.d(TAG, "OEHelper->login()");
-		OEUser userObj = null;
+		OUser userObj = null;
 		try {
 			mOdoo = new Odoo(serverURL, mForceConnect);
 			JSONObject response = mOdoo.authenticate(username, password,
@@ -61,10 +61,10 @@ public class OdooHelper {
 		return userObj;
 	}
 
-	public OEUser instance_login(OdooInstance instance, String username,
+	public OUser instance_login(OdooInstance instance, String username,
 			String password) throws OdooAccountExpireException {
 		Log.d(TAG, "OEHelper->instance_login()");
-		OEUser userObj = null;
+		OUser userObj = null;
 		try {
 			mOdoo = mApp.getOdoo();
 			String odooServer = mOdoo.getServerURL();
@@ -88,18 +88,18 @@ public class OdooHelper {
 		return userObj;
 	}
 
-	private OEUser getUserDetail(OEDomain domain, String database,
+	private OUser getUserDetail(OEDomain domain, String database,
 			String username, String password, String url, int userId,
 			boolean mForceConnect, OdooInstance instance)
 			throws OdooAccountExpireException {
-		OEUser userObj = null;
+		OUser userObj = null;
 		try {
-			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "name",
+			OFieldsHelper fields = new OFieldsHelper(new String[] { "name",
 					"partner_id", "tz", "image", "company_id" });
 			JSONObject res = mOdoo
 					.search_read("res.users", fields.get(), domain.get())
 					.getJSONArray("records").getJSONObject(0);
-			userObj = new OEUser();
+			userObj = new OUser();
 			userObj.setAvatar(res.getString("image"));
 			userObj.setName(res.getString("name"));
 			userObj.setDatabase(database);
@@ -129,7 +129,7 @@ public class OdooHelper {
 		return userObj;
 	}
 
-	public List<OdooInstance> getUserInstances(OEUser user) {
+	public List<OdooInstance> getUserInstances(OUser user) {
 		List<OdooInstance> list = new ArrayList<OdooInstance>();
 		mOdoo = mApp.getOdoo();
 		try {

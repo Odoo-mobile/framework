@@ -16,26 +16,44 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.mail;
 
+package com.odoo.support;
+
+import android.app.ProgressDialog;
 import android.content.Context;
 
-import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OColumn;
-import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.OModel;
-import com.odoo.orm.types.OInteger;
-import com.odoo.orm.types.OText;
+// TODO: Auto-generated Javadoc
+/**
+ * The Class OEDialog.
+ */
+public class ODialog extends ProgressDialog {
 
-public class MailFollowers extends OModel {
+	/**
+	 * Instantiates a new oE dialog.
+	 * 
+	 * @param context
+	 *            the context
+	 */
+	public ODialog(Context context) {
+		super(context);
+		// TODO Auto-generated constructor stub
+	}
 
-	OColumn res_model = new OColumn("Model", OText.class);
-	OColumn res_id = new OColumn("Res ID", OInteger.class);
-	OColumn partner_id = new OColumn("Partner", ResPartner.class,
-			RelationType.ManyToOne);
-
-	public MailFollowers(Context context) {
-		super(context, "mail.followers");
+	/**
+	 * Instantiates a new oE dialog.
+	 * 
+	 * @param context
+	 *            the context
+	 * @param isCancelable
+	 *            the is cancelable
+	 * @param message
+	 *            the message
+	 */
+	public ODialog(Context context, boolean isCancelable, String message) {
+		super(context);
+		this.setTitle("Please wait...");
+		this.setCancelable(isCancelable);
+		this.setMessage(message);
 	}
 
 }

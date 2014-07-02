@@ -24,26 +24,26 @@ import android.content.Context;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
-import com.odoo.orm.types.OEBlob;
-import com.odoo.orm.types.OEText;
-import com.odoo.orm.types.OEVarchar;
+import com.odoo.orm.types.OBlob;
+import com.odoo.orm.types.OText;
+import com.odoo.orm.types.OVarchar;
 
 /**
  * The Class Res_PartnerDBHelper.
  */
 public class ResPartner extends OModel {
 
-	OColumn name = new OColumn("Name", OEText.class);
-	OColumn is_company = new OColumn("Is Company", OEText.class);
-	OColumn image_small = new OColumn("Image", OEBlob.class);
-	OColumn street = new OColumn("Street", OEText.class);
-	OColumn street2 = new OColumn("Street2", OEText.class);
-	OColumn city = new OColumn("City", OEText.class);
-	OColumn zip = new OColumn("Zip", OEVarchar.class, 10);
-	OColumn website = new OColumn("Website", OEText.class);
-	OColumn phone = new OColumn("Phone", OEText.class);
-	OColumn mobile = new OColumn("Mobile", OEText.class);
-	OColumn email = new OColumn("Email", OEText.class);
+	OColumn name = new OColumn("Name", OText.class);
+	OColumn is_company = new OColumn("Is Company", OText.class);
+	OColumn image_small = new OColumn("Image", OBlob.class);
+	OColumn street = new OColumn("Street", OText.class);
+	OColumn street2 = new OColumn("Street2", OText.class);
+	OColumn city = new OColumn("City", OText.class);
+	OColumn zip = new OColumn("Zip", OVarchar.class, 10);
+	OColumn website = new OColumn("Website", OText.class);
+	OColumn phone = new OColumn("Phone", OText.class);
+	OColumn mobile = new OColumn("Mobile", OText.class);
+	OColumn email = new OColumn("Email", OText.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne);
 

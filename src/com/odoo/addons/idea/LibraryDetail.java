@@ -15,21 +15,21 @@ import android.view.ViewGroup;
 import com.odoo.R;
 import com.odoo.addons.idea.Library.Keys;
 import com.odoo.addons.idea.model.BookBook;
-import com.odoo.orm.OEDataRow;
-import com.odoo.orm.OEValues;
+import com.odoo.orm.ODataRow;
+import com.odoo.orm.OValues;
 import com.odoo.support.BaseFragment;
 import com.odoo.util.drawer.DrawerItem;
 
 public class LibraryDetail extends BaseFragment {
 
-	View mView = null;
-	Keys mKey = null;
-	Integer mId = null;
-	Boolean mLocalRecord = false;
-	OForm mForm = null;
-	Boolean mEditMode = false;
-	OEDataRow mRecord = null;
-	Menu mMenu = null;
+	private View mView = null;
+	private Keys mKey = null;
+	private Integer mId = null;
+	private Boolean mLocalRecord = false;
+	private OForm mForm = null;
+	private Boolean mEditMode = false;
+	private ODataRow mRecord = null;
+	private Menu mMenu = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,7 +109,7 @@ public class LibraryDetail extends BaseFragment {
 			break;
 		case R.id.menu_library_detail_save:
 			mEditMode = false;
-			OEValues values = mForm.getFormValues();
+			OValues values = mForm.getFormValues();
 			if (values != null) {
 				updateMenu(mEditMode);
 				if (mId != null)

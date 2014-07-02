@@ -16,26 +16,33 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.base.mail;
+package com.odoo.orm;
 
-import android.content.Context;
+import java.util.List;
 
-import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OColumn;
-import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.OModel;
-import com.odoo.orm.types.OInteger;
-import com.odoo.orm.types.OText;
+public class OO2MRecord {
+	OColumn mCol = null;
+	int mRecordId = 0;
+	OModel mDatabase = null;
 
-public class MailFollowers extends OModel {
+	public OO2MRecord(OModel oModel, OColumn col, int id) {
+		mDatabase = oModel;
+		mCol = col;
+		mRecordId = id;
+	}
 
-	OColumn res_model = new OColumn("Model", OText.class);
-	OColumn res_id = new OColumn("Res ID", OInteger.class);
-	OColumn partner_id = new OColumn("Partner", ResPartner.class,
-			RelationType.ManyToOne);
+	public List<ODataRow> browseEach() {
+		OModel rel = mDatabase.createInstance(mCol.getType());
+		String column = mCol.getRelatedColumn();
+		return rel.select(column + " = ? ", new String[] { mRecordId + "" });
+	}
 
-	public MailFollowers(Context context) {
-		super(context, "mail.followers");
+	public ODataRow browseAt(int index) {
+		List<ODataRow> list = browseEach();
+		if (list.size() == 0) {
+			return null;
+		}
+		return list.get(index);
 	}
 
 }

@@ -14,14 +14,14 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.odoo.R;
-import com.odoo.orm.OEDataRow;
-import com.odoo.support.listview.OEListAdapter;
+import com.odoo.orm.ODataRow;
+import com.odoo.support.listview.OListAdapter;
 
 public class OList extends ScrollView {
 
 	Context mContext = null;
 	TypedArray mTypedArray = null;
-	OEListAdapter mListAdapter = null;
+	OListAdapter mListAdapter = null;
 	List<Object> mRecords = new ArrayList<Object>();
 
 	/*
@@ -61,7 +61,7 @@ public class OList extends ScrollView {
 		mInnerLayout = parentView();
 	}
 
-	public void initListControl(List<OEDataRow> records, int custom_layout) {
+	public void initListControl(List<ODataRow> records, int custom_layout) {
 		mRecords.clear();
 		mRecords.addAll(records);
 		mCustomLayout = custom_layout;
@@ -70,7 +70,7 @@ public class OList extends ScrollView {
 	}
 
 	private void createAdapter() {
-		mListAdapter = new OEListAdapter(mContext, mCustomLayout, mRecords) {
+		mListAdapter = new OListAdapter(mContext, mCustomLayout, mRecords) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View mView = (View) convertView;
@@ -78,7 +78,7 @@ public class OList extends ScrollView {
 				if (mView == null) {
 					mView = inflater.inflate(getResource(), parent, false);
 				}
-				OEDataRow record = (OEDataRow) mRecords.get(position);
+				ODataRow record = (ODataRow) mRecords.get(position);
 				((OForm) mView).initForm(record);
 				return mView;
 			}

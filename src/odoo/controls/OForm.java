@@ -13,8 +13,8 @@ import android.widget.LinearLayout;
 import com.odoo.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.OEDataRow;
-import com.odoo.orm.OEValues;
+import com.odoo.orm.ODataRow;
+import com.odoo.orm.OValues;
 import com.odoo.orm.OModel;
 
 public class OForm extends LinearLayout {
@@ -24,7 +24,7 @@ public class OForm extends LinearLayout {
 
 	Context mContext = null;
 	TypedArray mTypedArray = null;
-	OEDataRow mRecord = null;
+	ODataRow mRecord = null;
 	OControlAttributes mAttrs = new OControlAttributes();
 	OModel mModel = null;
 	List<String> mFields = new ArrayList<String>();
@@ -110,14 +110,14 @@ public class OForm extends LinearLayout {
 		mModel = model;
 	}
 
-	public void initForm(OEDataRow record) {
+	public void initForm(ODataRow record) {
 		initForm(record, false);
 	}
 
-	public OEValues getFormValues() {
-		OEValues values = null;
+	public OValues getFormValues() {
+		OValues values = null;
 		if (validateForm()) {
-			values = new OEValues();
+			values = new OValues();
 			for (String key : mFields) {
 				OField field = (OField) findViewWithTag(key);
 				values.put(field.getFieldName(), field.getValue());
@@ -147,7 +147,7 @@ public class OForm extends LinearLayout {
 		return true;
 	}
 
-	public void initForm(OEDataRow record, boolean editable) {
+	public void initForm(ODataRow record, boolean editable) {
 		mRecord = record;
 		_initForm(editable);
 	}
