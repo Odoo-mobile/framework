@@ -27,8 +27,8 @@ import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.ir.IrModel;
 import com.odoo.orm.OdooHelper;
 import com.odoo.support.BaseFragment;
-import com.odoo.support.OUser;
 import com.odoo.support.OExceptionDialog;
+import com.odoo.support.OUser;
 import com.odoo.support.fragment.FragmentListener;
 import com.odoo.support.listview.OListAdapter;
 import com.odoo.util.OControls;
@@ -281,9 +281,11 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 
 	class DatabaseCreate extends AsyncTask<Void, Void, Void> {
 		App mApp = null;
+		IrModel mIRModel = null;
 
 		public DatabaseCreate() {
 			mApp = (App) getActivity().getApplicationContext();
+			mIRModel = new IrModel(getActivity());
 		}
 
 		@Override
@@ -294,7 +296,6 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			IrModel model = new IrModel(getActivity());
 			PreferenceManager pref = new PreferenceManager(getActivity());
 			List<String> model_list = new ArrayList<String>();
 			for (String m : pref.getStringSet("models"))
@@ -302,7 +303,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 			try {
 				OEDomain domain = new OEDomain();
 				domain.add("model", "in", new JSONArray(model_list.toString()));
-				model.getSyncHelper().noCheckForWriteDate()
+				mIRModel.getSyncHelper().noCheckForWriteDate()
 						.noCheckForCreateDate().syncWithServer(domain);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -313,14 +314,19 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			if (loadConfigWizard) {
-				SyncWizard syncWizard = new SyncWizard();
-				FragmentListener mFragment = (FragmentListener) getActivity();
-				mFragment.startMainFragment(syncWizard, false);
+			if (mIRModel.isEmptyTable()) {
+				DatabaseCreate databaseCreate = new DatabaseCreate();
+				databaseCreate.execute();
 			} else {
-				getActivity().getActionBar().show();
-				getActivity().finish();
-				getActivity().startActivity(getActivity().getIntent());
+				if (loadConfigWizard) {
+					SyncWizard syncWizard = new SyncWizard();
+					FragmentListener mFragment = (FragmentListener) getActivity();
+					mFragment.startMainFragment(syncWizard, false);
+				} else {
+					getActivity().getActionBar().show();
+					getActivity().finish();
+					getActivity().startActivity(getActivity().getIntent());
+				}
 			}
 
 		}

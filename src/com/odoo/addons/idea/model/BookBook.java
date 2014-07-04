@@ -77,6 +77,7 @@ public class BookBook extends OModel {
 	}
 
 	public static class BookStudent extends OModel {
+
 		OColumn name = new OColumn("Name", OVarchar.class, 100);
 		OColumn course = new OColumn("Course Name", OVarchar.class, 100);
 		OColumn contact = new OColumn("Contact", OVarchar.class, 15);
@@ -87,4 +88,5 @@ public class BookBook extends OModel {
 			super(context, "book.student");
 		}
 	}
+
 }

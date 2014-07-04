@@ -85,6 +85,7 @@ public class Library extends BaseFragment implements OnPullListener,
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
+		mListControl.setRowDraggable(true);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();
 	}

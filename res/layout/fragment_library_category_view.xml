@@ -1,5 +1,5 @@
 <odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:odoo="http://schemas.android.com/apk/res/com.odoo"
+    xmlns:odoo="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
