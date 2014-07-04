@@ -18,7 +18,14 @@
  */
 package com.odoo.widgets;
 
+/**
+ * The Class WidgetHelper.
+ */
 public class WidgetHelper {
+
+	/** The Constant EXTRA_WIDGET_ITEM_KEY. */
 	public static final String EXTRA_WIDGET_ITEM_KEY = "com.odoo.widgets.EXTRA_WIDGET_ITEM_KEY";
+
+	/** The Constant EXTRA_WIDGET_DATA_VALUE. */
 	public static final String EXTRA_WIDGET_DATA_VALUE = "com.odoo.widgets.EXTRA_WIDGET_DATA_VALUE";
 }
