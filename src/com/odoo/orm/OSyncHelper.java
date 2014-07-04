@@ -157,33 +157,35 @@ public class OSyncHelper {
 						 * Handling ManyToOne records
 						 */
 						OModel m2o = model.createInstance(column.getType());
-						JSONArray m2oRecord = record.getJSONArray(column
-								.getName());
-
-						// Local table contains only id and name so not required
-						// to request on server
-						if (m2o.getColumns(false).size() == 2) {
-							OValues m2oVals = new OValues();
-							m2oVals.put("id", m2oRecord.get(0));
-							m2oVals.put("name", m2oRecord.get(1));
-							m2o.createORReplace(m2oVals);
-						} else {
-							// Need to create list of ids for model
-							ORelationRecord rel_record = mRelationRecordList.new ORelationRecord();
-							if (mRelationRecordList
-									.contains(m2o.getModelName())) {
-								rel_record = mRelationRecordList.get(m2o
-										.getModelName());
+						if (record.get(column.getName()) instanceof JSONArray) {
+							JSONArray m2oRecord = record.getJSONArray(column
+									.getName());
+							// Local table contains only id and name so not
+							// required
+							// to request on server
+							if (m2o.getColumns(false).size() == 2) {
+								OValues m2oVals = new OValues();
+								m2oVals.put("id", m2oRecord.get(0));
+								m2oVals.put("name", m2oRecord.get(1));
+								m2o.createORReplace(m2oVals);
 							} else {
-								rel_record.setModel(m2o);
+								// Need to create list of ids for model
+								ORelationRecord rel_record = mRelationRecordList.new ORelationRecord();
+								if (mRelationRecordList.contains(m2o
+										.getModelName())) {
+									rel_record = mRelationRecordList.get(m2o
+											.getModelName());
+								} else {
+									rel_record.setModel(m2o);
+								}
+								rel_record.addId(m2oRecord.getInt(0),
+										record.getInt("id"));
+								rel_record.setType(column.getRelationType());
+								mRelationRecordList.add(m2o.getModelName(),
+										rel_record);
 							}
-							rel_record.addId(m2oRecord.getInt(0),
-									record.getInt("id"));
-							rel_record.setType(column.getRelationType());
-							mRelationRecordList.add(m2o.getModelName(),
-									rel_record);
+							values.put(column.getName(), m2oRecord.get(0));
 						}
-						values.put(column.getName(), m2oRecord.get(0));
 						break;
 					case ManyToMany:
 						OModel m2m = model.createInstance(column.getType());
