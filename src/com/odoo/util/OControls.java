@@ -1,7 +1,5 @@
 package com.odoo.util;
 
-import com.odoo.R;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.View;
@@ -9,6 +7,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.odoo.R;
 
 public class OControls {
 

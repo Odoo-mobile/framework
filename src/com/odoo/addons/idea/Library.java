@@ -22,6 +22,8 @@ package com.odoo.addons.idea;
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.OArguments;
+import odoo.Odoo;
 import odoo.controls.OList;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
@@ -76,6 +78,10 @@ public class Library extends BaseFragment implements OnPullListener,
 		scope = new AppScope(this);
 		mView = inflater.inflate(R.layout.fragment_library, container, false);
 		init();
+		OArguments args = new OArguments();
+		Odoo.DEBUG = true;
+		db().getSyncHelper().syncWithMethod("search_read", args);
+		Odoo.DEBUG = false;
 		return mView;
 	}
 

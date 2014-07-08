@@ -32,8 +32,8 @@ import com.odoo.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
-import com.odoo.orm.OValues;
 import com.odoo.orm.OModel;
+import com.odoo.orm.OValues;
 
 /**
  * The Class OForm.

@@ -23,8 +23,8 @@ import android.content.Context;
 
 import com.odoo.base.res.ResCompany;
 import com.odoo.orm.OColumn;
-import com.odoo.orm.OModel;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.OModel;
 import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;

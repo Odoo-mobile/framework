@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import odoo.OEVersionException;
+import odoo.OVersionException;
 import odoo.Odoo;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -143,8 +143,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		if (mDBList.size() > 0) {
 			int db_index = (dbListSpinner == null) ? 0 : dbListSpinner
 					.getSelectedItemPosition() - 1;
-			String database_name = mDBList.get(db_index);
-			if (dbListSpinner != null && db_index + 1 == 0) {
+			if (dbListSpinner != null && db_index + 1 <= 0) {
 				Toast.makeText(
 						getActivity(),
 						getResources()
@@ -152,6 +151,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 						Toast.LENGTH_LONG).show();
 				return;
 			}
+			String database_name = mDBList.get(db_index);
 			Bundle bundle = new Bundle();
 			bundle.putString("server_url", mServerURL);
 			bundle.putString("username", edtUsername.getText().toString());
@@ -305,7 +305,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 				flag = false;
 				mSSLError = true;
 				errorMsg = ssl.getMessage();
-			} catch (OEVersionException e) {
+			} catch (OVersionException e) {
 				flag = false;
 				errorMsg = e.getMessage();
 			}
@@ -322,12 +322,20 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 				mOdooURLTest.cancel(true);
 				mOdooURLTest = null;
 				String[] databases = odooConnect.getDatabases();
-				initDatabaseSpinner(databases);
-				mSSLForceConnect = mForceConnect;
-				if (mAutoLogin) {
-					OControls.setGone(mView, R.id.loginProgress);
-					OControls.setVisible(mView, R.id.controls);
-					login();
+				if (databases.length > 0) {
+					initDatabaseSpinner(databases);
+					mSSLForceConnect = mForceConnect;
+					if (mAutoLogin) {
+						OControls.setGone(mView, R.id.loginProgress);
+						OControls.setVisible(mView, R.id.controls);
+						login();
+					}
+				} else {
+					Toast.makeText(
+							getActivity(),
+							getResources().getString(
+									R.string.toast_no_database_found),
+							Toast.LENGTH_LONG).show();
 				}
 			} else {
 				mOdooURLTest.cancel(true);

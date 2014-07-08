@@ -3,7 +3,7 @@ package com.odoo.base.ir;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OEDomain;
+import odoo.ODomain;
 
 import org.json.JSONArray;
 
@@ -40,8 +40,8 @@ public class IrModelFields extends OModel {
 	}
 
 	@Override
-	public OEDomain defaultDomain() {
-		OEDomain domain = new OEDomain();
+	public ODomain defaultDomain() {
+		ODomain domain = new ODomain();
 		try {
 			domain.add("name", "in", new JSONArray(mDefaultColumns.toString()));
 		} catch (Exception e) {

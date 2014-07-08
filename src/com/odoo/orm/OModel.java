@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import odoo.OEDomain;
+import odoo.ODomain;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -92,8 +92,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	@Override
-	public OEDomain defaultDomain() {
-		return new OEDomain();
+	public ODomain defaultDomain() {
+		return new ODomain();
 	}
 
 	public List<OColumn> getManyToManyColumns(OModel relation_model) {
@@ -201,12 +201,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					} else {
 						switch (col.getRelationType()) {
 						case ManyToMany:
-							row.put(col.getName(), new OM2MRecord(this, col,
-									cr.getInt(cr.getColumnIndex("id"))));
+							row.put(col.getName(),
+									new OM2MRecord(this, col, cr.getInt(cr
+											.getColumnIndex("id"))));
 							break;
 						case OneToMany:
-							row.put(col.getName(), new OO2MRecord(this, col,
-									cr.getInt(cr.getColumnIndex("id"))));
+							row.put(col.getName(),
+									new OO2MRecord(this, col, cr.getInt(cr
+											.getColumnIndex("id"))));
 							break;
 						case ManyToOne:
 							row.put(col.getName(),
@@ -511,5 +513,5 @@ interface OModelHelper {
 
 	public List<OColumn> getColumns(Boolean local);
 
-	public OEDomain defaultDomain();
+	public ODomain defaultDomain();
 }

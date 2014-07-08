@@ -18,7 +18,7 @@
  */
 package com.odoo.base.res.services;
 
-import odoo.OEDomain;
+import odoo.ODomain;
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
@@ -83,7 +83,7 @@ public class ContactSyncService extends Service {
 			if (syncServerContacts && odoo != null) {
 				Log.v(TAG, "Contact sync with server");
 				int company_id = Integer.parseInt(user.getCompany_id());
-				OEDomain domain = new OEDomain();
+				ODomain domain = new ODomain();
 				domain.add("company_id", "=", company_id);
 				odoo.syncWithServer(domain);
 			}

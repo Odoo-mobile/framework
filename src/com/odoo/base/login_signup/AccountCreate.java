@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OEDomain;
+import odoo.ODomain;
 import odoo.OdooAccountExpireException;
 import odoo.OdooInstance;
 
@@ -301,7 +301,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 			for (String m : pref.getStringSet("models"))
 				model_list.add(m);
 			try {
-				OEDomain domain = new OEDomain();
+				ODomain domain = new ODomain();
 				domain.add("model", "in", new JSONArray(model_list.toString()));
 				mIRModel.getSyncHelper().noCheckForWriteDate()
 						.noCheckForCreateDate().syncWithServer(domain);

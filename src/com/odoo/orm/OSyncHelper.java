@@ -3,7 +3,8 @@ package com.odoo.orm;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OEDomain;
+import odoo.OArguments;
+import odoo.ODomain;
 import odoo.Odoo;
 
 import org.json.JSONArray;
@@ -33,6 +34,7 @@ public class OSyncHelper {
 	List<String> mFinishedModels = new ArrayList<String>();
 	List<String> mFinishedRelModels = new ArrayList<String>();
 	PreferenceManager mPref = null;
+	Integer mAffectedRows = 0;
 
 	Boolean mCheckForWriteDate = true, mCheckForCreateDate = true;
 
@@ -50,7 +52,7 @@ public class OSyncHelper {
 		return syncWithServer(null);
 	}
 
-	public boolean syncWithServer(OEDomain domain) {
+	public boolean syncWithServer(ODomain domain) {
 		return syncWithServer(mModel, domain);
 	}
 
@@ -64,13 +66,13 @@ public class OSyncHelper {
 		return this;
 	}
 
-	public boolean syncWithServer(OModel model, OEDomain domain) {
+	public boolean syncWithServer(OModel model, ODomain domain) {
 		Log.v(TAG, "syncWithServer():" + model.getModelName());
 		if (!mFinishedModels.contains(model.getModelName())) {
 			mFinishedModels.add(model.getModelName());
 			try {
 				if (domain == null)
-					domain = new OEDomain();
+					domain = new ODomain();
 
 				// Adding default domain to domain
 				domain.append(model.defaultDomain());
@@ -100,6 +102,22 @@ public class OSyncHelper {
 		return false;
 	}
 
+	public boolean syncWithMethod(String method, OArguments args) {
+		Log.v(TAG, "syncWithMethod():" + mModel.getModelName());
+		boolean synced = false;
+		try {
+			JSONObject result = mOdoo.call_kw(mModel.getModelName(), method,
+					args.getArray());
+			if (result.getJSONArray("result").length() > 0)
+				mAffectedRows = result.getJSONArray("result").length();
+			handleResult(mModel, result);
+			handleRelationRecords(mModel);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return synced;
+	}
+
 	private String getLastSyncDate(OModel model) {
 		String last_sync_date = "false";
 		IrModel irModel = new IrModel(mContext);
@@ -123,7 +141,7 @@ public class OSyncHelper {
 				ORelationRecord rel = mRelationRecordList.get(key);
 				// Related model
 				OModel rel_model = rel.getModel();
-				OEDomain rel_domain = new OEDomain();
+				ODomain rel_domain = new ODomain();
 				if (rel.getIds().size() > 0)
 					rel_domain.add("id", "in", rel.getIds());
 				syncWithServer(rel_model, rel_domain);
@@ -252,6 +270,7 @@ public class OSyncHelper {
 			}
 			// Creating new records.
 			List<Integer> affectedIds = model.createORReplace(values_list);
+			mAffectedRows = affectedIds.size();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -271,7 +290,7 @@ public class OSyncHelper {
 	public List<OValues> modelInfo(List<String> models) {
 		List<OValues> models_list = new ArrayList<OValues>();
 		try {
-			OEDomain domain = new OEDomain();
+			ODomain domain = new ODomain();
 			domain.add("name", "in", new JSONArray(models.toString()));
 			JSONObject result = mOdoo.search_read("ir.module.module",
 					getFields(mModel), domain.get());

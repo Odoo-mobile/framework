@@ -20,7 +20,7 @@ package com.odoo.support;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import odoo.OEVersionException;
+import odoo.OVersionException;
 import odoo.Odoo;
 
 import org.json.JSONArray;
@@ -58,11 +58,11 @@ public class OdooServerConnection {
 	 *            the server url
 	 * @param mForceConnect
 	 * @return true, if successful
-	 * @throws OEVersionException
+	 * @throws OVersionException
 	 * @throws SSLPeerUnverifiedException
 	 */
 	public boolean testConnection(Context context, String serverURL)
-			throws OEVersionException, SSLPeerUnverifiedException {
+			throws OVersionException, SSLPeerUnverifiedException {
 		Log.d(TAG, "OdooServerConnection->testConnection()");
 		if (TextUtils.isEmpty(serverURL)) {
 			return false;
@@ -78,8 +78,8 @@ public class OdooServerConnection {
 		} catch (SSLPeerUnverifiedException ssl) {
 			Log.d(TAG, "Throw SSLPeerUnverifiedException ");
 			throw new SSLPeerUnverifiedException(ssl.getMessage());
-		} catch (OEVersionException version) {
-			throw new OEVersionException(version.getMessage());
+		} catch (OVersionException version) {
+			throw new OVersionException(version.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -103,11 +103,11 @@ public class OdooServerConnection {
 	 * @param context
 	 *            the context
 	 * @return true, if is network available
-	 * @throws OEVersionException
+	 * @throws OVersionException
 	 * @throws SSLPeerUnverifiedException
 	 */
 	public static boolean isNetworkAvailable(Context context)
-			throws OEVersionException, SSLPeerUnverifiedException {
+			throws OVersionException, SSLPeerUnverifiedException {
 		boolean outcome = false;
 
 		OdooServerConnection osc = new OdooServerConnection();
@@ -125,11 +125,11 @@ public class OdooServerConnection {
 	 * @param url
 	 *            the url
 	 * @return true, if is network available
-	 * @throws OEVersionException
+	 * @throws OVersionException
 	 * @throws SSLPeerUnverifiedException
 	 */
 	public static boolean isNetworkAvailable(Context context, String url)
-			throws OEVersionException, SSLPeerUnverifiedException {
+			throws OVersionException, SSLPeerUnverifiedException {
 		boolean outcome = false;
 
 		OdooServerConnection osc = new OdooServerConnection();
