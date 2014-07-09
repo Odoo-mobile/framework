@@ -7,21 +7,43 @@
     odoo:background_selector="@drawable/oe_listview_background_selector"
     odoo:model="book.author" >
 
-    <odoo.controls.OField
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        odoo:fieldTextStyle="bold"
-        odoo:field_name="name"
-        odoo:field_textAppearance="?android:attr/textAppearanceLarge"
-        odoo:with_label="false" >
-    </odoo.controls.OField>
+        android:orientation="horizontal" >
 
-    <odoo.controls.OField
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        odoo:field_name="country_id"
-        odoo:field_textAppearance="?android:attr/textAppearanceMedium"
-        odoo:with_label="false" >
-    </odoo.controls.OField>
+        <odoo.controls.OField
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            odoo:binaryType="image"
+            odoo:defaultImage="@drawable/avatar"
+            odoo:field_name="avatar"
+            odoo:with_label="false" >
+        </odoo.controls.OField>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:fieldTextStyle="bold"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceLarge"
+                odoo:with_label="false" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="country_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:with_label="false" >
+            </odoo.controls.OField>
+        </LinearLayout>
+    </LinearLayout>
 
 </odoo.controls.OForm>

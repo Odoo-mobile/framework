@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.addons.idea.model.BookBook;
+import com.odoo.addons.idea.model.BookBook.BookAuthor;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.OUser;
@@ -36,8 +37,13 @@ public class LibraryService extends OService {
 			BookBook db = new BookBook(context);
 			db.setUser(user);
 			OSyncHelper sync = db.getSyncHelper();
-			if (sync.syncWithServer())
-				context.sendBroadcast(intent);
+			if (sync.syncWithServer()) {
+				BookAuthor author = new BookAuthor(context);
+				author.setUser(user);
+				if (author.getSyncHelper().syncWithServer()) {
+					context.sendBroadcast(intent);
+				}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

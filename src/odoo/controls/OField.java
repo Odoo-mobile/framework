@@ -18,6 +18,8 @@
  */
 package odoo.controls;
 
+import java.util.List;
+
 import odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -25,10 +27,20 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.TextUtils;
+import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.webkit.WebView;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,11 +48,15 @@ import com.odoo.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.util.Base64Helper;
 
 /**
  * The Class OField.
  */
 public class OField extends LinearLayout implements ManyToOneItemChangeListener {
+
+	/** The Constant TAG. */
+	public static final String TAG = OField.class.getSimpleName();
 
 	/** The Constant KEY_EDITABLE. */
 	public static final String KEY_EDITABLE = "editable";
@@ -69,10 +85,23 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	/** The Constant KEY_FIELD_TEXT_APPEARANCE. */
 	public static final String KEY_FIELD_TEXT_APPEARANCE = "field_text_appearance";
 
+	/** The Constant KEY_SINGLE_LINE. */
+	public static final String KEY_SINGLE_LINE = "singleLine";
+
+	/** The Constant KEY_BINARY_TYPE. */
+	public static final String KEY_BINARY_TYPE = "binaryType";
+
+	/** The Constant KEY_DEFAULT_IMAGE. */
+	public static final String KEY_DEFAULT_IMAGE = "defaultImage";
+
+	/** The Constant KEY_BOOLEAN_WIDGET. */
+	public static final String KEY_BOOLEAN_WIDGET = "booleanWidget";
+	public static final String KEY_CUSTOM_LAYOUT = "customLayout";
+
 	/**
-	 * The Enum OFieldType.
+	 * The Enum OFieldMode.
 	 */
-	enum OFieldType {
+	enum OFieldMode {
 
 		/** The editable. */
 		EDITABLE,
@@ -81,12 +110,31 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	/**
-	 * The Enum OFieldWidget.
+	 * The Enum OFieldType.
 	 */
-	enum OFieldWidget {
+	enum OFieldType {
 
 		/** The many to one. */
-		MANY_TO_ONE
+		MANY_TO_ONE,
+		/** The many to many tags. */
+		MANY_TO_MANY_TAGS,
+		/** The binary. */
+		BINARY,
+		/** The binary image. */
+		BINARY_IMAGE,
+		/** The binary file. */
+		BINARY_FILE,
+		/** The boolean widget. */
+		BOOLEAN_WIDGET,
+		/** The boolean checkbox. */
+		BOOLEAN_CHECKBOX,
+		/** The boolean switch. */
+		BOOLEAN_SWITCH,
+		/** The boolean radio. */
+		BOOLEAN_RADIO,
+		/** The web view. */
+		WEB_VIEW
+
 	}
 
 	/** The context. */
@@ -101,8 +149,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	/** The model used with widget controls. */
 	OModel mModel = null;
 
-	/** The many to one record object. */
-	ODataRow mManyToOneRecord = null;
+	/** The m control record. */
+	ODataRow mControlRecord = null;
 
 	/** The column object. */
 	OColumn mColumn = null;
@@ -111,10 +159,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	OControlAttributes mAttributes = new OControlAttributes();
 
 	/** The control field type. */
-	OFieldType mFieldType = OFieldType.READONLY;
+	OFieldMode mFieldType = OFieldMode.READONLY;
 
 	/** The field widget if any. */
-	OFieldWidget mFieldWidget = null;
+	OFieldType mFieldWidget = null;
 
 	/** The layout params. */
 	LayoutParams mLayoutParams = null;
@@ -130,7 +178,12 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 
 	/** The many to one widget. */
 	OManyToOneWidget mManyToOne = null;
-
+	RadioGroup mRadioGroup = null;
+	RadioButton mTrueRadioButton = null;
+	RadioButton mFalseRadioButton = null;
+	CheckBox mCheckBox = null;
+	Switch mSwitch = null;
+	WebView mWebView = null;
 	/** The display metrics. */
 	DisplayMetrics mMetrics = null;
 
@@ -227,12 +280,205 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 * @param fieldWidget
 	 *            the field widget
 	 */
-	private void createWidget(OFieldWidget fieldWidget) {
+	private void createWidget(OFieldType fieldWidget) {
 		switch (fieldWidget) {
 		case MANY_TO_ONE:
 			createManyToOneWidget();
 			break;
+		case BINARY_FILE:
+		case BINARY_IMAGE:
+			createBinaryControl(fieldWidget);
+			break;
+		case BOOLEAN_WIDGET:
+		case BOOLEAN_CHECKBOX:
+		case BOOLEAN_RADIO:
+		case BOOLEAN_SWITCH:
+			createBooleanControl(fieldWidget);
+			break;
+		case WEB_VIEW:
+			createWebView();
+			break;
+		case MANY_TO_MANY_TAGS:
+			createManyToManyTags();
+			break;
+		default:
+			break;
 		}
+	}
+
+	private void createManyToManyTags() {
+		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
+
+		} else {
+			if (mControlRecord != null) {
+
+				List<ODataRow> records = mControlRecord.getM2MRecord(
+						mColumn.getName()).browseEach();
+				if (records.size() > 0) {
+					HorizontalScrollView mHScroll = new HorizontalScrollView(
+							mContext);
+					mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+							LayoutParams.WRAP_CONTENT);
+					mHScroll.setLayoutParams(mLayoutParams);
+					mHScroll.setHorizontalScrollBarEnabled(false);
+					LinearLayout mlayout = new LinearLayout(mContext);
+					mlayout.setLayoutParams(mLayoutParams);
+					mlayout.setOrientation(LinearLayout.HORIZONTAL);
+					int custom_layout = mAttributes.getResource(
+							KEY_CUSTOM_LAYOUT, -1);
+					for (ODataRow row : records) {
+						if (custom_layout > -1) {
+							LayoutInflater inflater = LayoutInflater
+									.from(mContext);
+							OForm form = (OForm) inflater.inflate(
+									custom_layout, null);
+							form.initForm(row);
+							mlayout.addView(form);
+						} else {
+							TextView mtag = new TextView(mContext);
+							mLayoutParams = new LayoutParams(
+									LayoutParams.WRAP_CONTENT,
+									LayoutParams.WRAP_CONTENT);
+							mLayoutParams.setMargins(5, 0, 5, 5);
+							mtag.setLayoutParams(mLayoutParams);
+							mtag.setPadding(5, 8, 5, 8);
+							mtag.setSingleLine(true);
+							mtag.setText(row.getString("name"));
+							mtag.setBackgroundColor(Color.LTGRAY);
+							mtag.setTypeface(OControlHelper.boldFont());
+							mlayout.addView(mtag);
+						}
+					}
+					mHScroll.addView(mlayout);
+					addView(mHScroll);
+
+				}
+			}
+		}
+	}
+
+	private void createWebView() {
+		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
+			createTextViewControl();
+			if (mControlRecord != null) {
+				setText(mControlRecord.getString(mColumn.getName()));
+			}
+		} else {
+			if (mControlRecord != null) {
+				mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+						LayoutParams.WRAP_CONTENT);
+				mWebView = new WebView(mContext);
+				mWebView.setLayoutParams(mLayoutParams);
+				mWebView.loadData(mControlRecord.getString(mColumn.getName()),
+						"text/html; charset=UTF-8", "UTF-8");
+				mWebView.getSettings().setTextZoom(90);
+				addView(mWebView);
+			}
+		}
+	}
+
+	/**
+	 * Creates the boolean control.
+	 * 
+	 * @param fieldWidget
+	 *            the field widget
+	 */
+	private void createBooleanControl(OFieldType fieldWidget) {
+		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
+			mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+					LayoutParams.WRAP_CONTENT);
+			Boolean val = (mControlRecord != null) ? mControlRecord
+					.getBoolean(mColumn.getName()) : false;
+			switch (fieldWidget) {
+			case BOOLEAN_CHECKBOX:
+				mCheckBox = new CheckBox(mContext);
+				mCheckBox.setLayoutParams(mLayoutParams);
+				mCheckBox.setText(mColumn.getLabel());
+				mCheckBox.setChecked(val);
+				addView(mCheckBox);
+				break;
+			case BOOLEAN_RADIO:
+				mRadioGroup = new RadioGroup(mContext);
+				mRadioGroup.setLayoutParams(mLayoutParams);
+				mRadioGroup.setOrientation(RadioGroup.HORIZONTAL);
+				mLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
+						LayoutParams.WRAP_CONTENT);
+				mTrueRadioButton = new RadioButton(mContext);
+				mTrueRadioButton.setLayoutParams(mLayoutParams);
+				mTrueRadioButton.setText("True");
+				mTrueRadioButton.setId(0x1234 + (int) Math.random());
+				if (val)
+					mTrueRadioButton.setChecked(val);
+				mTrueRadioButton.setTag("true_widget");
+				mRadioGroup.addView(mTrueRadioButton);
+				mFalseRadioButton = new RadioButton(mContext);
+				mFalseRadioButton.setLayoutParams(mLayoutParams);
+				mFalseRadioButton.setText("False");
+				mFalseRadioButton.setId(0x4321 + (int) Math.random());
+				if (!val)
+					mFalseRadioButton.setChecked(!val);
+				mFalseRadioButton.setTag("false_widget");
+				mRadioGroup.addView(mFalseRadioButton);
+				addView(mRadioGroup);
+				break;
+			case BOOLEAN_SWITCH:
+				mLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
+						LayoutParams.WRAP_CONTENT);
+				mLayoutParams.setMargins(0, 8, 0, 8);
+				mSwitch = new Switch(mContext);
+				mSwitch.setLayoutParams(mLayoutParams);
+				mSwitch.setTextOn("True");
+				mSwitch.setTextOff("False");
+				mSwitch.setChecked(val);
+				addView(mSwitch);
+				break;
+			default:
+				break;
+			}
+		} else {
+			createTextViewControl();
+			if (mControlRecord != null) {
+				setText(mControlRecord.getString(mColumn.getName()));
+			}
+
+		}
+	}
+
+	/**
+	 * Creates the binary control.
+	 * 
+	 * @param binary_type
+	 *            the binary_type
+	 */
+	private void createBinaryControl(OFieldType binary_type) {
+		ImageView imgBinary = new ImageView(mContext);
+		mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+				LayoutParams.MATCH_PARENT);
+		imgBinary.setLayoutParams(mLayoutParams);
+		int default_image = mAttributes.getResource(KEY_DEFAULT_IMAGE,
+				R.drawable.attachment);
+		switch (binary_type) {
+		case BINARY_FILE:
+			imgBinary
+					.setImageResource((default_image < 0) ? R.drawable.attachment
+							: default_image);
+			break;
+		case BINARY_IMAGE:
+			imgBinary
+					.setImageResource((default_image < 0) ? R.drawable.attachment
+							: default_image);
+			if (mControlRecord != null
+					&& !mControlRecord.getString(mColumn.getName()).equals(
+							"false")) {
+				imgBinary.setImageBitmap(Base64Helper.getBitmapImage(mContext,
+						mControlRecord.getString(mColumn.getName())));
+				imgBinary.setScaleType(ScaleType.CENTER_CROP);
+			}
+			break;
+		default:
+			break;
+		}
+		addView(imgBinary);
 	}
 
 	/**
@@ -245,15 +491,16 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 					LayoutParams.WRAP_CONTENT);
 			mManyToOne.setLayoutParams(mLayoutParams);
 			mManyToOne.setModel(mModel, "name");
-			if (mManyToOneRecord != null)
-				mManyToOne.setRecordId((Integer) mManyToOneRecord.getM2ORecord(
+			if (mControlRecord != null)
+				mManyToOne.setRecordId((Integer) mControlRecord.getM2ORecord(
 						mColumn.getName()).getId());
 			mManyToOne.reInit();
 			addView(mManyToOne);
+			mManyToOne.setOnManyToOneItemChangeListener(this);
 		} else {
 			createTextViewControl();
-			if (mManyToOneRecord != null) {
-				ODataRow row = mManyToOneRecord.getM2ORecord(mColumn.getName())
+			if (mControlRecord != null) {
+				ODataRow row = mControlRecord.getM2ORecord(mColumn.getName())
 						.browse();
 				if (row != null)
 					setText(row.getString("name"));
@@ -296,6 +543,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		Integer mAttrFieldTextAppearnce = mAttributes.getResource(
 				KEY_FIELD_TEXT_APPEARANCE, 0);
 		Integer mAttrFieldStyle = mAttributes.getResource(KEY_FIELD_STYLE, 0);
+		Boolean mSingleLine = mAttributes.getBoolean(KEY_SINGLE_LINE, false);
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mFieldEditText = new EditText(mContext);
 			mFieldEditText.setLayoutParams(mLayoutParams);
@@ -315,6 +563,9 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 						mAttrFieldStyle);
 			}
 			mFieldEditText.setTag(getFieldTag());
+			if (mSingleLine) {
+				mFieldEditText.setSingleLine(true);
+			}
 			addView(mFieldEditText);
 		} else {
 			mFieldTextView = new TextView(mContext);
@@ -336,6 +587,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 						mAttrFieldStyle);
 			}
 			mFieldTextView.setTag(getFieldTag());
+			if (mSingleLine) {
+				mFieldTextView.setSingleLine(true);
+				mFieldTextView.setEllipsize(TruncateAt.END);
+			}
 			addView(mFieldTextView);
 		}
 	}
@@ -376,7 +631,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		boolean editable = mAttributes.getBoolean(KEY_EDITABLE, false);
 		String tag = "odoo_field_" + mAttributes.getString(KEY_FIELD_NAME, "")
 				+ ((editable) ? "_editable" : "_readonly");
-		mFieldType = (editable) ? OFieldType.EDITABLE : OFieldType.READONLY;
+		mFieldType = (editable) ? OFieldMode.EDITABLE : OFieldMode.READONLY;
 		return tag;
 	}
 
@@ -409,6 +664,36 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		} else {
 			mAttributes.put(KEY_FIELD_STYLE, Typeface.NORMAL);
 		}
+		mAttributes.put(KEY_SINGLE_LINE,
+				mTypedArray.getBoolean(R.styleable.OField_singleLine, false));
+		mAttributes.put(KEY_BINARY_TYPE,
+				mTypedArray.getInt(R.styleable.OField_binaryType, -1));
+		int binaryType = mAttributes.getResource(KEY_BINARY_TYPE, -1);
+		if (binaryType > -1) {
+			mFieldWidget = (binaryType == 0) ? OFieldType.BINARY_IMAGE
+					: OFieldType.BINARY_FILE;
+		}
+
+		mAttributes.put(KEY_DEFAULT_IMAGE,
+				mTypedArray.getResourceId(R.styleable.OField_defaultImage, -1));
+		int booleanType = mTypedArray.getInt(R.styleable.OField_booleanWidget,
+				-1);
+		if (booleanType > -1) {
+			switch (booleanType) {
+			case 0:
+				mFieldWidget = OFieldType.BOOLEAN_SWITCH;
+				break;
+			case 1:
+				mFieldWidget = OFieldType.BOOLEAN_RADIO;
+				break;
+			case 2:
+				mFieldWidget = OFieldType.BOOLEAN_CHECKBOX;
+				break;
+			}
+		}
+		mAttributes.put(KEY_BOOLEAN_WIDGET, booleanType);
+		mAttributes.put(KEY_CUSTOM_LAYOUT,
+				mTypedArray.getResourceId(R.styleable.OField_customLayout, -1));
 	}
 
 	/**
@@ -427,10 +712,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 *            the new editable
 	 */
 	public void setEditable(boolean editable) {
-		OFieldType field_type = (editable) ? OFieldType.EDITABLE
-				: OFieldType.READONLY;
+		OFieldMode field_type = (editable) ? OFieldMode.EDITABLE
+				: OFieldMode.READONLY;
 		if (field_type != mFieldType) {
-			mFieldType = (editable) ? OFieldType.EDITABLE : OFieldType.READONLY;
+			mFieldType = (editable) ? OFieldMode.EDITABLE : OFieldMode.READONLY;
 			mAttributes.put(KEY_EDITABLE, editable);
 			initControls();
 		}
@@ -441,7 +726,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 * 
 	 * @return the type
 	 */
-	public OFieldType getType() {
+	public OFieldMode getType() {
 		return mFieldType;
 	}
 
@@ -529,22 +814,28 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	/**
-	 * Show as many to one widget.
+	 * Creates the control.
 	 * 
+	 * @param type
+	 *            the type
 	 * @param column
 	 *            the column
 	 * @param record
 	 *            the record
 	 */
-	public void showAsManyToOne(OColumn column, ODataRow record) {
-		mFieldWidget = OFieldWidget.MANY_TO_ONE;
-		mColumn = column;
-		mModel = new OModel(mContext, null).createInstance(column.getType());
-		mManyToOneRecord = record;
-		initControls();
-		if (mManyToOne != null) {
-			mManyToOne.setOnManyToOneItemChangeListener(this);
+	public void createControl(OFieldType type, OColumn column, ODataRow record) {
+		if (type != OFieldType.BINARY && type != OFieldType.BOOLEAN_WIDGET
+				&& type != OFieldType.WEB_VIEW) {
+			mFieldWidget = type;
+			mModel = new OModel(mContext, null)
+					.createInstance(column.getType());
 		}
+		if (type == OFieldType.WEB_VIEW) {
+			mFieldWidget = type;
+		}
+		mColumn = column;
+		mControlRecord = record;
+		initControls();
 	}
 
 	/**
@@ -554,7 +845,18 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 */
 	public Object getValue() {
 		if (mFieldWidget != null) {
-			return mFieldValue;
+			switch (mFieldWidget) {
+			case BOOLEAN_CHECKBOX:
+				return mCheckBox.isChecked();
+			case BOOLEAN_RADIO:
+				return mTrueRadioButton.isChecked();
+			case BOOLEAN_SWITCH:
+				return mSwitch.isChecked();
+			case MANY_TO_ONE:
+				return mFieldValue;
+			default:
+				return getText();
+			}
 		} else {
 			return getText();
 		}
@@ -576,6 +878,13 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener#
+	 * onManyToOneItemChangeListener(com.odoo.orm.OColumn,
+	 * com.odoo.orm.ODataRow)
+	 */
 	@Override
 	public void onManyToOneItemChangeListener(OColumn column, ODataRow row) {
 		mFieldValue = row.get("id");

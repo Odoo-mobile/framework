@@ -11,6 +11,7 @@ import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
+import com.odoo.orm.types.OHtml;
 import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
@@ -171,10 +172,13 @@ public class OSQLHelper {
 			if (type_class.isAssignableFrom(OText.class)) {
 				return new OText().getType();
 			}
+			// Text
+			if (type_class.isAssignableFrom(OHtml.class)) {
+				return new OHtml().getType();
+			}
 			// TimeStamp
 			if (type_class.isAssignableFrom(OTimestamp.class)) {
-				OTimestamp timestamp = new OTimestamp(
-						column.getParsePattern());
+				OTimestamp timestamp = new OTimestamp(column.getParsePattern());
 				return timestamp.getType();
 			}
 			// ManyToOne

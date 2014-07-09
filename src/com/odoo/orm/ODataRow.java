@@ -98,6 +98,10 @@ public class ODataRow {
 		return list;
 	}
 
+	public boolean contains(String key) {
+		return _data.containsKey(key);
+	}
+
 	@Override
 	public String toString() {
 		return _data.toString();

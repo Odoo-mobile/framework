@@ -24,6 +24,9 @@ import android.content.Context;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
+import com.odoo.orm.types.OBlob;
+import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.OHtml;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 
@@ -39,7 +42,8 @@ public class BookBook extends OModel {
 			RelationType.ManyToOne).setRequired(true);
 	OColumn category_ids = new OColumn("Categories", BookCategory.class,
 			RelationType.ManyToMany);
-	OColumn description = new OColumn("Description", OText.class);
+	OColumn active = new OColumn("Active", OBoolean.class).setDefault(true);
+	OColumn description = new OColumn("Description", OHtml.class);
 
 	public BookBook(Context context) {
 		super(context, "book.book");
@@ -59,6 +63,7 @@ public class BookBook extends OModel {
 	public static class BookAuthor extends OModel {
 
 		OColumn name = new OColumn("Name", OVarchar.class, 100);
+		OColumn avatar = new OColumn("Image", OBlob.class);
 		OColumn country_id = new OColumn("Country", ResCountry.class,
 				RelationType.ManyToOne);
 		OColumn description = new OColumn("Author Description", OText.class);

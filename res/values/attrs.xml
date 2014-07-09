@@ -15,6 +15,18 @@
         <attr name="label_color" format="color" />
         <attr name="field_color" format="color" />
         <attr name="fieldTextStyle" format="string" />
+        <attr name="singleLine" format="boolean" />
+        <attr name="binaryType">
+            <enum name="image" value="0" />
+            <enum name="file" value="1" />
+        </attr>
+        <attr name="booleanWidget">
+            <enum name="switch_widget" value="0" />
+            <enum name="radio_widget" value="1" />
+            <enum name="checkbox_widget" value="2" />
+        </attr>
+        <attr name="defaultImage" format="reference" />
+        <attr name="customLayout" format="reference" />
     </declare-styleable>
     <declare-styleable name="OLabel">
         <attr name="label" format="string" />
@@ -31,6 +43,9 @@
     <declare-styleable name="OForm">
         <attr name="background_selector" format="reference" />
         <attr name="model" format="string" />
+        <attr name="background_selector_boolean_field" format="string" />
+        <attr name="true_background_selector" format="reference" />
+        <attr name="false_background_selector" format="reference" />
     </declare-styleable>
     <declare-styleable name="OManyToOneWidget">
         <attr name="model_name" format="string" />

@@ -22,11 +22,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import odoo.controls.OField.OFieldType;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.odoo.R;
 import com.odoo.orm.OColumn;
@@ -34,6 +37,9 @@ import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.orm.OValues;
+import com.odoo.orm.types.OBlob;
+import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.OHtml;
 
 /**
  * The Class OForm.
@@ -42,6 +48,9 @@ public class OForm extends LinearLayout {
 
 	/** The Constant KEY_BACKGROUND_SELECTOR. */
 	public static final String KEY_BACKGROUND_SELECTOR = "background_selector";
+	public static final String KEY_BACKGROUND_SELECTOR_BOOLEAN_FIELD = "background_selector_boolean_field";
+	public static final String KEY_TRUE_BACKGROUND_SELECTOR = "true_background_selector";
+	public static final String KEY_FALSE_BACKGROUND_SELECTOR = "false_background_selector";
 
 	/** The Constant KEY_MODEL. */
 	public static final String KEY_MODEL = "model";
@@ -66,6 +75,8 @@ public class OForm extends LinearLayout {
 
 	/** The field columns. */
 	HashMap<String, OColumn> mFieldColumns = new HashMap<String, OColumn>();
+
+	List<OField> mFormFieldControls = new ArrayList<OField>();
 
 	/**
 	 * Instantiates a new form.
@@ -125,6 +136,15 @@ public class OForm extends LinearLayout {
 					R.styleable.OForm_background_selector, 0));
 			mAttrs.put(KEY_MODEL,
 					mTypedArray.getString(R.styleable.OForm_model));
+			mAttrs.put(
+					KEY_BACKGROUND_SELECTOR_BOOLEAN_FIELD,
+					mTypedArray
+							.getString(R.styleable.OForm_background_selector_boolean_field));
+			mAttrs.put(KEY_TRUE_BACKGROUND_SELECTOR, mTypedArray.getResourceId(
+					R.styleable.OForm_true_background_selector, -1));
+			mAttrs.put(KEY_FALSE_BACKGROUND_SELECTOR, mTypedArray
+					.getResourceId(R.styleable.OForm_false_background_selector,
+							-1));
 			mModel = OModel.get(mContext, mAttrs.getString(KEY_MODEL, null));
 			mTypedArray.recycle();
 		}
@@ -138,42 +158,80 @@ public class OForm extends LinearLayout {
 	 */
 	private void _initForm(boolean editable) {
 		mFieldColumns.clear();
-		if (mAttrs.getResource(KEY_BACKGROUND_SELECTOR, 0) != 0) {
-			setBackgroundResource(mAttrs
-					.getResource(KEY_BACKGROUND_SELECTOR, 0));
+		mFormFieldControls.clear();
+		findAllFields(this);
+
+		if (mAttrs.get(KEY_BACKGROUND_SELECTOR_BOOLEAN_FIELD) != null) {
+			Boolean val = mRecord.getBoolean(mAttrs.getString(
+					KEY_BACKGROUND_SELECTOR_BOOLEAN_FIELD, ""));
+			if (val) {
+				setBackgroundResource(mAttrs.getResource(
+						KEY_TRUE_BACKGROUND_SELECTOR, -1));
+			} else {
+				setBackgroundResource(mAttrs.getResource(
+						KEY_FALSE_BACKGROUND_SELECTOR, -1));
+			}
 			setClickable(true);
+		} else {
+			if (mAttrs.getResource(KEY_BACKGROUND_SELECTOR, 0) != 0) {
+				setBackgroundResource(mAttrs.getResource(
+						KEY_BACKGROUND_SELECTOR, 0));
+				setClickable(true);
+			}
 		}
-		int childs = getChildCount();
+		int childs = mFormFieldControls.size();
 		for (int i = 0; i < childs; i++) {
-			View v = getChildAt(i);
+			View v = mFormFieldControls.get(i);
 			if (v instanceof OField) {
-				OField field = (OField) getChildAt(i);
+				OField field = (OField) v;
+
 				OColumn column = mModel.getColumn(field.getFieldName());
-				Boolean widget = false;
+				OFieldType widget = null;
 				String label = field.getFieldName();
 				if (column != null) {
 					mFieldColumns.put(field.getFieldName(), column);
 					mFields.add(field.getTag().toString());
 					label = column.getLabel();
 					if (column.getRelationType() != null
-							&& column.getRelationType() == RelationType.ManyToOne)
-						widget = true;
+							&& column.getRelationType() == RelationType.ManyToOne) {
+						widget = OFieldType.MANY_TO_ONE;
+					}
+					if (column.getRelationType() != null
+							&& column.getRelationType() == RelationType.ManyToMany) {
+						widget = OFieldType.MANY_TO_MANY_TAGS;
+					}
+					if (column.getType().isAssignableFrom(OBlob.class)) {
+						widget = OFieldType.BINARY;
+					}
+					if (column.getType().isAssignableFrom(OBoolean.class)) {
+						widget = OFieldType.BOOLEAN_WIDGET;
+					}
+					if (column.getType().isAssignableFrom(OHtml.class)) {
+						widget = OFieldType.WEB_VIEW;
+					}
 				}
-				field.setEditable(editable);
-				if (widget) {
-					field.showAsManyToOne(column, mRecord);
+				if (widget != null) {
+					field.createControl(widget, column, mRecord);
+					field.setEditable(editable);
 				} else {
+					field.setEditable(editable);
 					if (mRecord != null)
 						field.setText(mRecord.getString(field.getFieldName()));
 				}
 				field.setLabel(label);
+			}
+		}
+	}
 
-				switch (field.getType()) {
-				case EDITABLE:
-					break;
-				case READONLY:
-					break;
-				}
+	private void findAllFields(ViewGroup view) {
+		int childs = view.getChildCount();
+		for (int i = 0; i < childs; i++) {
+			View v = view.getChildAt(i);
+			if (v instanceof LinearLayout || v instanceof RelativeLayout) {
+				findAllFields((ViewGroup) v);
+			}
+			if (v instanceof OField) {
+				mFormFieldControls.add((OField) v);
 			}
 		}
 	}

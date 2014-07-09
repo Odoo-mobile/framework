@@ -4,8 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="15dp"
-    odoo:background_selector="@drawable/oe_listview_background_selector"
-    odoo:model="book.book" >
+    odoo:background_selector_boolean_field="active"
+    odoo:false_background_selector="@color/odoo_purple"
+    odoo:model="book.book"
+    odoo:true_background_selector="@drawable/oe_listview_background_selector" >
 
     <odoo.controls.OField
         android:layout_width="match_parent"
@@ -13,6 +15,7 @@
         odoo:fieldTextStyle="bold"
         odoo:field_name="name"
         odoo:field_textAppearance="?android:attr/textAppearanceLarge"
+        odoo:singleLine="true"
         odoo:with_label="false" >
     </odoo.controls.OField>
 
@@ -20,6 +23,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         odoo:field_name="author_id"
+        odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+        odoo:with_label="false" >
+    </odoo.controls.OField>
+
+    <odoo.controls.OField
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        odoo:customLayout="@layout/library_book_category_ids_custom_layout"
+        odoo:field_name="category_ids"
         odoo:field_textAppearance="?android:attr/textAppearanceMedium"
         odoo:with_label="false" >
     </odoo.controls.OField>

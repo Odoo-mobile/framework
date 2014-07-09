@@ -1,5 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:odoo="http://schemas.android.com/apk/res/com.odoo"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:clipToPadding="false"
@@ -16,7 +16,7 @@
         android:id="@+id/listRecords"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:custom_layout="@layout/fragment_library_book_view" >
+        odoo:custom_layout="@layout/fragment_library_book_view" >
     </odoo.controls.OList>
 
 </LinearLayout>
