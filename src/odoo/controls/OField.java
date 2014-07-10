@@ -97,6 +97,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	/** The Constant KEY_BOOLEAN_WIDGET. */
 	public static final String KEY_BOOLEAN_WIDGET = "booleanWidget";
 	public static final String KEY_CUSTOM_LAYOUT = "customLayout";
+	public static final String KEY_BOTTOM_BORDER_HEIGHT = "bottom_border_height";
 
 	/**
 	 * The Enum OFieldMode.
@@ -520,7 +521,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		if (mAttributes.getBoolean(KEY_WITH_LABEL, true)) {
 			mFieldLabel = new OLabel(mContext);
 			mFieldLabel.setLayoutParams(mLayoutParams);
-			mFieldLabel.setBottomBorderHeight(2);
+			mFieldLabel.setBottomBorderHeight(mAttributes.getResource(
+					KEY_BOTTOM_BORDER_HEIGHT, 2));
 			mFieldLabel.setLabel(mAttributes.getString(KEY_FIELD_NAME, ""));
 			Integer mAttrLabelTextAppearnce = mAttributes.getResource(
 					KEY_LABEL_TEXT_APPEARANCE, 0);
@@ -694,6 +696,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		mAttributes.put(KEY_BOOLEAN_WIDGET, booleanType);
 		mAttributes.put(KEY_CUSTOM_LAYOUT,
 				mTypedArray.getResourceId(R.styleable.OField_customLayout, -1));
+		mAttributes.put(KEY_BOTTOM_BORDER_HEIGHT, mTypedArray.getInt(
+				R.styleable.OField_label_bottom_border_height, 2));
 	}
 
 	/**

@@ -232,7 +232,7 @@ public class OManyToOneWidget extends LinearLayout implements
 		select_row.put("id", 0);
 		select_row.put(mColumn.getName(), "Select " + mColumn.getLabel());
 		mSpinnerObjects.add(select_row);
-		for (ODataRow row : mModel.select()) {
+		for (ODataRow row : mModel.select("id != ?", new Object[] { false })) {
 			mSpinnerObjects.add(row);
 			if (mCurrentId > 0 && mCurrentId == row.getInt("id")) {
 				mSelectedPosition = mSpinnerObjects.indexOf(row);

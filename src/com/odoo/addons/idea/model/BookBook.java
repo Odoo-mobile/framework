@@ -34,12 +34,11 @@ public class BookBook extends OModel {
 
 	OColumn name = new OColumn("Name", OVarchar.class, 100).setRequired(true);
 
-	OColumn language = new OColumn("Language", OVarchar.class, 64)
-			.setRequired(true);
+	OColumn language = new OColumn("Language", OVarchar.class, 64);
 	OColumn author_id = new OColumn("Author", BookAuthor.class,
 			RelationType.ManyToOne);
 	OColumn student_id = new OColumn("Student", BookStudent.class,
-			RelationType.ManyToOne).setRequired(true);
+			RelationType.ManyToOne);
 	OColumn category_ids = new OColumn("Categories", BookCategory.class,
 			RelationType.ManyToMany);
 	OColumn active = new OColumn("Active", OBoolean.class).setDefault(true);

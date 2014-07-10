@@ -22,8 +22,6 @@ package com.odoo.addons.idea;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OArguments;
-import odoo.Odoo;
 import odoo.controls.OList;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
@@ -50,6 +48,7 @@ import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.util.logger.OLog;
 import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
@@ -107,6 +106,10 @@ public class Library extends BaseFragment implements OnPullListener,
 					switch (mCurrentKey) {
 					case Books:
 						mListRecords.addAll(db().select());
+						for (ODataRow row : db().select("id = ? ",
+								new Object[] { "0" }))
+							OLog.log(row.getString("id") + ":"
+									+ row.getString("name"));
 						break;
 					case Authors:
 						BookAuthor author = new BookAuthor(getActivity());

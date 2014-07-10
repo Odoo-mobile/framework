@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.addons.idea.Library.Keys;
@@ -19,6 +20,7 @@ import com.odoo.addons.idea.model.BookBook.BookAuthor;
 import com.odoo.addons.idea.model.BookBook.BookCategory;
 import com.odoo.addons.idea.model.BookBook.BookStudent;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OModel;
 import com.odoo.orm.OValues;
 import com.odoo.support.BaseFragment;
 import com.odoo.util.OControls;
@@ -34,6 +36,7 @@ public class LibraryDetail extends BaseFragment {
 	private Boolean mEditMode = false;
 	private ODataRow mRecord = null;
 	private Menu mMenu = null;
+	private OModel mModel = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,24 +60,24 @@ public class LibraryDetail extends BaseFragment {
 		case Books:
 			OControls.setVisible(mView, R.id.odooFormBooks);
 			mForm = (OForm) mView.findViewById(R.id.odooFormBooks);
-			BookBook books = new BookBook(getActivity());
+			mModel = new BookBook(getActivity());
 			if (mId != null) {
-				mRecord = books.select(mId, mLocalRecord);
+				mRecord = mModel.select(mId, mLocalRecord);
 				mForm.initForm(mRecord);
 			} else {
-				mForm.setModel(books);
+				mForm.setModel(mModel);
 				mForm.setEditable(mEditMode);
 			}
 			break;
 		case Authors:
 			OControls.setVisible(mView, R.id.odooFormAuthors);
 			mForm = (OForm) mView.findViewById(R.id.odooFormAuthors);
-			BookAuthor author = new BookAuthor(getActivity());
+			mModel = new BookAuthor(getActivity());
 			if (mId != null) {
-				mRecord = author.select(mId, mLocalRecord);
+				mRecord = mModel.select(mId, mLocalRecord);
 				mForm.initForm(mRecord);
 			} else {
-				mForm.setModel(author);
+				mForm.setModel(mModel);
 				mForm.setEditable(mEditMode);
 			}
 			break;
@@ -141,6 +144,13 @@ public class LibraryDetail extends BaseFragment {
 			mEditMode = !mEditMode;
 			updateMenu(mEditMode);
 			mForm.setEditable(mEditMode);
+			break;
+		case R.id.menu_library_detail_delete:
+			if (mModel.delete(mRecord.getInt("id"))) {
+				Toast.makeText(getActivity(), "Record deleted",
+						Toast.LENGTH_LONG).show();
+				getActivity().getSupportFragmentManager().popBackStack();
+			}
 			break;
 		case R.id.menu_library_detail_save:
 			mEditMode = false;

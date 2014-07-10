@@ -4,10 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="15dp"
-    odoo:background_selector_boolean_field="active"
-    odoo:false_background_selector="@color/odoo_purple"
-    odoo:model="book.book"
-    odoo:true_background_selector="@drawable/oe_listview_background_selector" >
+    odoo:background_selector="@drawable/oe_listview_background_selector"
+    odoo:model="book.book" >
 
     <odoo.controls.OField
         android:layout_width="match_parent"

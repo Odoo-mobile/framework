@@ -159,4 +159,5 @@ public class OColumn {
 	public Boolean isLocal() {
 		return local_column;
 	}
+
 }

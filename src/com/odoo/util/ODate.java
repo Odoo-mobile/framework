@@ -126,7 +126,7 @@ public class ODate {
 	}
 
 	private static Date convertToDate(String date) {
-		return convertToDate(date, "yyyy-MM-dd HH:mm:ss");
+		return convertToDate(date, "yyyy-MM-dd HH:mm:ss", true);
 	}
 
 	/**
@@ -136,11 +136,13 @@ public class ODate {
 	 *            the date
 	 * @return the date
 	 */
-	private static Date convertToDate(String date, String format) {
+	public static Date convertToDate(String date, String format,
+			boolean defaultTimeZone) {
 		Date dt = null;
 		try {
 			SimpleDateFormat temp = new SimpleDateFormat(format);
-			temp.setTimeZone(TimeZone.getTimeZone("GMT"));
+			if (defaultTimeZone)
+				temp.setTimeZone(TimeZone.getTimeZone("GMT"));
 			dt = temp.parse(date);
 		} catch (Exception e) {
 			Log.e(TAG, "Date format must be yyyy-MM-dd HH:mm:ss");
@@ -214,5 +216,18 @@ public class ODate {
 		TimeZone gmtTime = TimeZone.getTimeZone("GMT");
 		gmtFormat.setTimeZone(gmtTime);
 		return gmtFormat.format(date);
+	}
+
+	public static String getUTCDate(String defaultFormat) {
+		return getUTCDate(new Date(), defaultFormat);
+	}
+
+	public static String getUTCDate(Date dt, String defaultFormat) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dt);
+		Calendar utcCal = convertFullToTimezone(cal, "GMT");
+		dateFormat = new SimpleDateFormat(defaultFormat);
+		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+		return dateFormat.format(utcCal.getTime());
 	}
 }

@@ -27,6 +27,7 @@
         </attr>
         <attr name="defaultImage" format="reference" />
         <attr name="customLayout" format="reference" />
+        <attr name="label_bottom_border_height" format="integer" />
     </declare-styleable>
     <declare-styleable name="OLabel">
         <attr name="label" format="string" />

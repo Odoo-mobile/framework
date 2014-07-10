@@ -7,12 +7,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import odoo.ODomain;
+
+import org.json.JSONObject;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.util.Log;
 
+import com.odoo.App;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OInteger;
@@ -27,11 +32,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	public static final String TAG = OModel.class.getSimpleName();
 
-	Context mContext = null;
-	String _name = null;
-	List<OColumn> mColumns = new ArrayList<OColumn>();
-	OUser mUser = null;
-	OSyncHelper mSyncHelper = null;
+	private Context mContext = null;
+	private String _name = null;
+	private List<OColumn> mColumns = new ArrayList<OColumn>();
+	private OUser mUser = null;
+	private OSyncHelper mSyncHelper = null;
+	private Boolean mCheckInActiveRecord = false;
 
 	public enum Command {
 		Add, Update, Delete, Replace
@@ -359,11 +365,41 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	public int update(OValues updateValues, String where, Object[] whereArgs) {
 		int affectedRows = 0;
 		SQLiteDatabase db = getWritableDatabase();
-		affectedRows = db.update(getTableName(),
-				createValues(db, updateValues), getWhereClause(where),
+		ContentValues values = createValues(db, updateValues);
+		values.put("is_dirty", "true");
+		affectedRows = db.update(getTableName(), values, getWhereClause(where),
 				getWhereArgs(where, whereArgs));
 		db.close();
 		return affectedRows;
+	}
+
+	public boolean delete(int id) {
+		return delete("id  = ? ", new Object[] { id });
+	}
+
+	public boolean delete(String where, Object[] whereArgs) {
+		return delete(where, whereArgs, false);
+	}
+
+	public boolean delete(String where, Object[] whereArgs,
+			boolean removeFromLocal) {
+		Boolean deleted = false;
+		if (removeFromLocal) {
+			SQLiteDatabase db = getWritableDatabase();
+			if (db.delete(getTableName(), getWhereClause(where),
+					getWhereArgs(where, whereArgs)) > 0) {
+				deleted = true;
+			}
+			db.close();
+		} else {
+			// Setting is_active to false.
+			OValues values = new OValues();
+			values.put("is_dirty", "true");
+			values.put("is_active", "false");
+			if (update(values, where, whereArgs) > 0)
+				deleted = true;
+		}
+		return deleted;
 	}
 
 	// createValues : used by create and update methods
@@ -446,7 +482,6 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					}
 					// args.add(TextUtils.join(",", ids));
 				} else if (obj instanceof ArrayList<?>) {
-					List<String> ids = new ArrayList<String>();
 					for (Object id : (ArrayList<?>) obj) {
 						// ids.add(id + "");
 						args.add(id + "");
@@ -458,13 +493,17 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			}
 		}
 		args.add((mUser != null) ? mUser.getAndroidName() : "");
-		args.add("true");
+		if (!mCheckInActiveRecord)
+			args.add("true");
 		return args.toArray(new String[args.size()]);
 	}
 
 	private String getWhereClause(String where) {
 		String newWhereClause = (where != null) ? where + " AND " : "";
-		newWhereClause += "odoo_name = ? AND is_active = ? ";
+		if (!mCheckInActiveRecord)
+			newWhereClause += "odoo_name = ? AND is_active = ? ";
+		else
+			newWhereClause += "odoo_name = ? ";
 		return newWhereClause;
 	}
 
@@ -506,6 +545,32 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		if (count() <= 0)
 			return true;
 		return false;
+	}
+
+	public List<Integer> ids() {
+		List<Integer> ids = new ArrayList<Integer>();
+		for (ODataRow row : select()) {
+			ids.add(row.getInt("id"));
+		}
+		return ids;
+	}
+
+	public JSONObject beforeCreateRow(OColumn column, JSONObject original_record) {
+		return original_record;
+	}
+
+	public void checkInActiveRecord(Boolean checkInactiveRecord) {
+		mCheckInActiveRecord = checkInactiveRecord;
+	}
+
+	class AutoUpdateOnServer extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			getSyncHelper().syncWithServer();
+			return null;
+		}
+
 	}
 }
 
