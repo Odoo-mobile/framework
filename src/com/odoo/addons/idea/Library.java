@@ -106,10 +106,6 @@ public class Library extends BaseFragment implements OnPullListener,
 					switch (mCurrentKey) {
 					case Books:
 						mListRecords.addAll(db().select());
-						for (ODataRow row : db().select("id = ? ",
-								new Object[] { "0" }))
-							OLog.log(row.getString("id") + ":"
-									+ row.getString("name"));
 						break;
 					case Authors:
 						BookAuthor author = new BookAuthor(getActivity());
