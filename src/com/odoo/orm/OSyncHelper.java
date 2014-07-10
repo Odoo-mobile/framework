@@ -296,10 +296,11 @@ public class OSyncHelper {
 			values = new JSONObject();
 			for (OColumn col : model.getColumns(false)) {
 				if (col.getRelationType() == null) {
+					Object val = row.get(col.getName());
 					if (val.toString().equals("false") || val == null
 							|| TextUtils.isEmpty(val.toString()))
 						val = false;
-					values.put(col.getName(), row.get(col.getName()));
+					values.put(col.getName(), val);
 				} else {
 					// Relation columns
 					switch (col.getRelationType()) {
