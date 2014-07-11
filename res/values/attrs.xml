@@ -52,5 +52,9 @@
         <attr name="model_name" format="string" />
         <attr name="column_name" format="string" />
     </declare-styleable>
+    <declare-styleable name="OViewPager">
+        <attr name="pager_model" format="string" />
+        <attr name="view_column_name" format="string" />
+    </declare-styleable>
 
 </resources>

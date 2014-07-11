@@ -48,7 +48,6 @@ import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
-import com.odoo.util.logger.OLog;
 import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
