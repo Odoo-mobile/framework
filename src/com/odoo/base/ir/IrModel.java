@@ -24,4 +24,13 @@ public class IrModel extends OModel {
 		super(context, "ir.model");
 	}
 
+	@Override
+	public Boolean checkForCreateDate() {
+		return false;
+	}
+
+	@Override
+	public Boolean checkForWriteDate() {
+		return false;
+	}
 }

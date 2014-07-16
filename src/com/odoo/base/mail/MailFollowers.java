@@ -38,4 +38,13 @@ public class MailFollowers extends OModel {
 		super(context, "mail.followers");
 	}
 
+	@Override
+	public Boolean checkForCreateDate() {
+		return false;
+	}
+
+	@Override
+	public Boolean checkForWriteDate() {
+		return false;
+	}
 }

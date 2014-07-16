@@ -259,6 +259,8 @@ public class OViewPager extends ViewPager implements OViewPagerObjectListener {
 		/** The m view pagger. */
 		OViewPager mViewPagger = null;
 
+		View mView = null;
+
 		/**
 		 * Instantiates a new screen page fragment.
 		 */
@@ -297,13 +299,23 @@ public class OViewPager extends ViewPager implements OViewPagerObjectListener {
 				Bundle savedInstanceState) {
 			setRetainInstance(true);
 			if (mPaggerGetView != null) {
-				View v = mPaggerGetView.paggerGetView(getActivity(),
-						mViewPagger, mObjectListener.getObject(mPosition),
-						mPosition);
-				if (v != null)
-					return v;
+				init();
+				if (mView != null)
+					return mView;
 			}
-			return super.onCreateView(inflater, container, savedInstanceState);
+			mView = super.onCreateView(inflater, container, savedInstanceState);
+			return mView;
+		}
+
+		private void init() {
+			mView = mPaggerGetView.paggerGetView(getActivity(), mViewPagger,
+					mObjectListener.getObject(mPosition), mPosition);
+		}
+
+		@Override
+		public void onResume() {
+			super.onResume();
+			init();
 		}
 
 		/*

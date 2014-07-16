@@ -303,8 +303,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 			try {
 				ODomain domain = new ODomain();
 				domain.add("model", "in", new JSONArray(model_list.toString()));
-				mIRModel.getSyncHelper().noCheckForWriteDate()
-						.noCheckForCreateDate().syncWithServer(domain);
+				mIRModel.getSyncHelper().syncWithServer(domain);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

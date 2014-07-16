@@ -17,7 +17,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.odoo.App;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OInteger;
@@ -561,6 +560,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	public void checkInActiveRecord(Boolean checkInactiveRecord) {
 		mCheckInActiveRecord = checkInactiveRecord;
+	}
+
+	public Boolean checkForWriteDate() {
+		return true;
+	}
+
+	public Boolean checkForCreateDate() {
+		return true;
 	}
 
 	class AutoUpdateOnServer extends AsyncTask<Void, Void, Void> {

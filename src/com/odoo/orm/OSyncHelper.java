@@ -38,8 +38,6 @@ public class OSyncHelper {
 	private PreferenceManager mPref = null;
 	private List<Integer> mAffectedIds = new ArrayList<Integer>();
 
-	Boolean mCheckForWriteDate = true, mCheckForCreateDate = true;
-
 	public OSyncHelper(Context context, OUser user, OModel model) {
 		mContext = context;
 		mUser = user;
@@ -58,16 +56,6 @@ public class OSyncHelper {
 		return syncWithServer(mModel, domain);
 	}
 
-	public OSyncHelper noCheckForWriteDate() {
-		mCheckForWriteDate = false;
-		return this;
-	}
-
-	public OSyncHelper noCheckForCreateDate() {
-		mCheckForCreateDate = false;
-		return this;
-	}
-
 	public boolean syncWithServer(OModel model, ODomain domain) {
 		Log.v(TAG, "syncWithServer():" + model.getModelName());
 		Log.v(TAG, "User : " + mUser.getAndroidName());
@@ -79,7 +67,7 @@ public class OSyncHelper {
 
 				// Adding default domain to domain
 				domain.append(model.defaultDomain());
-				if (mCheckForCreateDate) {
+				if (model.checkForCreateDate()) {
 					// Adding Old data limit
 					mPref = new PreferenceManager(mContext);
 					int data_limit = mPref.getInt("sync_data_limit", 60);
@@ -87,7 +75,7 @@ public class OSyncHelper {
 							ODate.getDateBefore(data_limit));
 				}
 				// Adding Last sync date comparing with write_date of record
-				if (mCheckForWriteDate && !model.isEmptyTable()) {
+				if (model.checkForWriteDate() && !model.isEmptyTable()) {
 					String last_sync_date = getLastSyncDate(model);
 					domain.add("write_date", ">", last_sync_date);
 				}
