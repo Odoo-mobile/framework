@@ -615,10 +615,5 @@ public class OList extends ScrollView implements View.OnClickListener,
 			return keys;
 		}
 
-		/*
-		 * public List<Integer> getViews() { List<Integer> views = new
-		 * ArrayList<Integer>(); for (String key : _listener_view.keySet()) {
-		 * views.add(_listener_view.get(key)); } return views; }
-		 */
 	}
 }
