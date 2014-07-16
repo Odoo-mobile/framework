@@ -19,6 +19,7 @@
 package odoo.controls;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -108,6 +109,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 
 	/** The drag ended. */
 	private Boolean mDragEnded = false;
+
+	private List<ViewClickListeners> mViewClickListener = new ArrayList<ViewClickListeners>();
 
 	/**
 	 * Instantiates a new list control.
@@ -201,14 +204,31 @@ public class OList extends ScrollView implements View.OnClickListener,
 	private void createAdapter() {
 		mListAdapter = new OListAdapter(mContext, mCustomLayout, mRecords) {
 			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
+			public View getView(final int position, View convertView,
+					ViewGroup parent) {
 				View mView = (View) convertView;
 				LayoutInflater inflater = LayoutInflater.from(mContext);
 				if (mView == null) {
 					mView = inflater.inflate(getResource(), parent, false);
 				}
-				ODataRow record = (ODataRow) mRecords.get(position);
-				((OForm) mView).initForm(record);
+				final ODataRow record = (ODataRow) mRecords.get(position);
+				final OForm form = (OForm) mView;
+				form.initForm(record);
+				for (final ViewClickListeners listener : mViewClickListener) {
+					for (final String key : listener.getKeys()) {
+						form.setOnViewClickListener(listener.getViewId(key),
+								new OForm.OnViewClickListener() {
+
+									@Override
+									public void onFormViewClick(View view,
+											ODataRow row) {
+										listener.getListener(key)
+												.onRowViewClick(form, view,
+														position, record);
+									}
+								});
+					}
+				}
 				return mView;
 			}
 		};
@@ -558,5 +578,47 @@ public class OList extends ScrollView implements View.OnClickListener,
 	 */
 	public View getDraggableView() {
 		return mDraggableView;
+	}
+
+	public void setOnListRowViewClickListener(Integer view_id,
+			OnListRowViewClickListener listener) {
+		mViewClickListener.add(new ViewClickListeners(view_id, listener));
+	}
+
+	public interface OnListRowViewClickListener {
+		public void onRowViewClick(ViewGroup view_group, View view,
+				int position, ODataRow row);
+	}
+
+	private class ViewClickListeners {
+		private HashMap<String, OnListRowViewClickListener> _listener_data = new HashMap<String, OnListRowViewClickListener>();
+		private HashMap<String, Integer> _listener_view = new HashMap<String, Integer>();
+
+		public ViewClickListeners(Integer view_id,
+				OnListRowViewClickListener listener) {
+			String key = "KEY_" + view_id;
+			_listener_data.put(key, listener);
+			_listener_view.put(key, view_id);
+		}
+
+		public OnListRowViewClickListener getListener(String key) {
+			return _listener_data.get(key);
+		}
+
+		public Integer getViewId(String key) {
+			return _listener_view.get(key);
+		}
+
+		public List<String> getKeys() {
+			List<String> keys = new ArrayList<String>();
+			keys.addAll(_listener_view.keySet());
+			return keys;
+		}
+
+		/*
+		 * public List<Integer> getViews() { List<Integer> views = new
+		 * ArrayList<Integer>(); for (String key : _listener_view.keySet()) {
+		 * views.add(_listener_view.get(key)); } return views; }
+		 */
 	}
 }

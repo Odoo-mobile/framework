@@ -47,4 +47,5 @@ public class MailFollowers extends OModel {
 	public Boolean checkForWriteDate() {
 		return false;
 	}
+
 }

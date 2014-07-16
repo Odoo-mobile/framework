@@ -53,7 +53,7 @@ public class OControlAttributes extends HashMap<String, Object> {
 	 * @return the string
 	 */
 	public String getString(String key, String defValue) {
-		if (containsKey(key))
+		if (containsKey(key) && get(key) != null)
 			return get(key).toString();
 		return defValue;
 	}

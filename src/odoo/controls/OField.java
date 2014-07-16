@@ -98,6 +98,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	public static final String KEY_BOOLEAN_WIDGET = "booleanWidget";
 	public static final String KEY_CUSTOM_LAYOUT = "customLayout";
 	public static final String KEY_BOTTOM_BORDER_HEIGHT = "bottom_border_height";
+	public static final String KEY_TEXT_LINES = "textLines";
+	public static final String KEY_REF_COLUMN = "ref_column";
 
 	/**
 	 * The Enum OFieldMode.
@@ -344,7 +346,9 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 							mtag.setLayoutParams(mLayoutParams);
 							mtag.setPadding(5, 8, 5, 8);
 							mtag.setSingleLine(true);
-							mtag.setText(row.getString("name"));
+							String ref_column = mAttributes.getString(
+									KEY_REF_COLUMN, "name");
+							mtag.setText(row.getString(ref_column));
 							mtag.setBackgroundColor(Color.LTGRAY);
 							mtag.setTypeface(OControlHelper.boldFont());
 							mlayout.addView(mtag);
@@ -503,8 +507,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			if (mControlRecord != null) {
 				ODataRow row = mControlRecord.getM2ORecord(mColumn.getName())
 						.browse();
+				String ref_column = mAttributes.getString(KEY_REF_COLUMN,
+						"name");
 				if (row != null)
-					setText(row.getString("name"));
+					setText(row.getString(ref_column));
 				else
 					setText("No " + mColumn.getLabel());
 
@@ -592,6 +598,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			if (mSingleLine) {
 				mFieldTextView.setSingleLine(true);
 				mFieldTextView.setEllipsize(TruncateAt.END);
+			}
+			Integer textLines = mAttributes.getResource(KEY_TEXT_LINES, -1);
+			if (textLines > 0) {
+				mFieldTextView.setLines(textLines);
 			}
 			addView(mFieldTextView);
 		}
@@ -698,6 +708,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				mTypedArray.getResourceId(R.styleable.OField_customLayout, -1));
 		mAttributes.put(KEY_BOTTOM_BORDER_HEIGHT, mTypedArray.getInt(
 				R.styleable.OField_label_bottom_border_height, 2));
+		mAttributes.put(KEY_TEXT_LINES,
+				mTypedArray.getInt(R.styleable.OField_textLines, -1));
+		mAttributes.put(KEY_REF_COLUMN,
+				mTypedArray.getString(R.styleable.OField_ref_column));
 	}
 
 	/**

@@ -16,6 +16,8 @@
         <attr name="field_color" format="color" />
         <attr name="fieldTextStyle" format="string" />
         <attr name="singleLine" format="boolean" />
+        <attr name="textLines" format="integer" />
+        <attr name="ref_column" format="string" />
         <attr name="binaryType">
             <enum name="image" value="0" />
             <enum name="file" value="1" />

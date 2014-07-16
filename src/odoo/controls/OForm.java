@@ -44,7 +44,7 @@ import com.odoo.orm.types.OHtml;
 /**
  * The Class OForm.
  */
-public class OForm extends LinearLayout {
+public class OForm extends LinearLayout implements View.OnClickListener {
 
 	/** The Constant KEY_BACKGROUND_SELECTOR. */
 	public static final String KEY_BACKGROUND_SELECTOR = "background_selector";
@@ -77,6 +77,7 @@ public class OForm extends LinearLayout {
 	HashMap<String, OColumn> mFieldColumns = new HashMap<String, OColumn>();
 
 	List<OField> mFormFieldControls = new ArrayList<OField>();
+	OnViewClickListener mOnViewClickListener = null;
 
 	/**
 	 * Instantiates a new form.
@@ -320,6 +321,22 @@ public class OForm extends LinearLayout {
 	 */
 	public void setEditable(Boolean mEditMode) {
 		_initForm(mEditMode);
+	}
+
+	public void setOnViewClickListener(int view_id, OnViewClickListener listener) {
+		findViewById(view_id).setOnClickListener(this);
+		mOnViewClickListener = listener;
+	}
+
+	public interface OnViewClickListener {
+		public void onFormViewClick(View view, ODataRow row);
+	}
+
+	@Override
+	public void onClick(View v) {
+		if (mOnViewClickListener != null) {
+			mOnViewClickListener.onFormViewClick(v, mRecord);
+		}
 	}
 
 }
