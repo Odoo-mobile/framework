@@ -48,8 +48,14 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 
 	/** The Constant KEY_BACKGROUND_SELECTOR. */
 	public static final String KEY_BACKGROUND_SELECTOR = "background_selector";
+
+	/** The Constant KEY_BACKGROUND_SELECTOR_BOOLEAN_FIELD. */
 	public static final String KEY_BACKGROUND_SELECTOR_BOOLEAN_FIELD = "background_selector_boolean_field";
+
+	/** The Constant KEY_TRUE_BACKGROUND_SELECTOR. */
 	public static final String KEY_TRUE_BACKGROUND_SELECTOR = "true_background_selector";
+
+	/** The Constant KEY_FALSE_BACKGROUND_SELECTOR. */
 	public static final String KEY_FALSE_BACKGROUND_SELECTOR = "false_background_selector";
 
 	/** The Constant KEY_MODEL. */
@@ -76,7 +82,10 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 	/** The field columns. */
 	HashMap<String, OColumn> mFieldColumns = new HashMap<String, OColumn>();
 
+	/** The m form field controls. */
 	List<OField> mFormFieldControls = new ArrayList<OField>();
+
+	/** The m on view click listener. */
 	OnViewClickListener mOnViewClickListener = null;
 
 	/**
@@ -185,7 +194,6 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			View v = mFormFieldControls.get(i);
 			if (v instanceof OField) {
 				OField field = (OField) v;
-
 				OColumn column = mModel.getColumn(field.getFieldName());
 				OFieldType widget = null;
 				String label = field.getFieldName();
@@ -200,6 +208,16 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 					if (column.getRelationType() != null
 							&& column.getRelationType() == RelationType.ManyToMany) {
 						widget = OFieldType.MANY_TO_MANY_TAGS;
+					}
+					if (column.isFunctionalColumn()) {
+						Object value = "";
+						if (mRecord != null) {
+							value = mModel.getFunctionalMethodValue(column,
+									mRecord);
+							mRecord.put(column.getName(), value);
+						}
+						column.setType(value.getClass());
+						field.setColumn(column);
 					}
 					if (column.getType().isAssignableFrom(OBlob.class)) {
 						widget = OFieldType.BINARY;
@@ -218,12 +236,20 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 					field.setEditable(editable);
 					if (mRecord != null)
 						field.setText(mRecord.getString(field.getFieldName()));
+					else
+						field.setText("");
 				}
 				field.setLabel(label);
 			}
 		}
 	}
 
+	/**
+	 * Find all fields.
+	 * 
+	 * @param view
+	 *            the view
+	 */
 	private void findAllFields(ViewGroup view) {
 		int childs = view.getChildCount();
 		for (int i = 0; i < childs; i++) {
@@ -323,15 +349,48 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 		_initForm(mEditMode);
 	}
 
+	/**
+	 * Sets the on view click listener.
+	 * 
+	 * @param view_id
+	 *            the view_id
+	 * @param listener
+	 *            the listener
+	 */
 	public void setOnViewClickListener(int view_id, OnViewClickListener listener) {
 		findViewById(view_id).setOnClickListener(this);
 		mOnViewClickListener = listener;
 	}
 
+	/**
+	 * The listener interface for receiving onViewClick events. The class that
+	 * is interested in processing a onViewClick event implements this
+	 * interface, and the object created with that class is registered with a
+	 * component using the component's
+	 * <code>addOnViewClickListener<code> method. When
+	 * the onViewClick event occurs, that object's appropriate
+	 * method is invoked.
+	 * 
+	 * @see OnViewClickEvent
+	 */
 	public interface OnViewClickListener {
+
+		/**
+		 * On form view click.
+		 * 
+		 * @param view
+		 *            the view
+		 * @param row
+		 *            the row
+		 */
 		public void onFormViewClick(View view, ODataRow row);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+	 */
 	@Override
 	public void onClick(View v) {
 		if (mOnViewClickListener != null) {

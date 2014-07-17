@@ -20,7 +20,15 @@
     <odoo.controls.OField
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        odoo:field_name="author_id"
+        odoo:field_name="author_name"
+        odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+        odoo:with_label="false" >
+    </odoo.controls.OField>
+
+    <odoo.controls.OField
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        odoo:field_name="total_categories"
         odoo:field_textAppearance="?android:attr/textAppearanceMedium"
         odoo:with_label="false" >
     </odoo.controls.OField>

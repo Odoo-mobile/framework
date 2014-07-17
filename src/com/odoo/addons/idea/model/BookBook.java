@@ -19,11 +19,15 @@
 
 package com.odoo.addons.idea.model;
 
+import java.util.List;
+
 import android.content.Context;
 
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.OHtml;
@@ -44,8 +48,33 @@ public class BookBook extends OModel {
 	OColumn active = new OColumn("Active", OBoolean.class).setDefault(true);
 	OColumn description = new OColumn("Description", OHtml.class);
 
+	// Functional Fields
+	@Odoo.Functional(method = "getTotalCategories")
+	OColumn total_categories = new OColumn("Categories");
+	@Odoo.Functional(method = "getAuthorName")
+	OColumn author_name = new OColumn("Author Name");
+
 	public BookBook(Context context) {
 		super(context, "book.book");
+	}
+
+	public String getAuthorName(ODataRow row) {
+		ODataRow author = row.getM2ORecord("author_id").browse();
+		if (author != null) {
+			ODataRow country = author.getM2ORecord("country_id").browse();
+			return author.getString("name") + " (" + country.getString("name")
+					+ ")";
+		} else
+			return "No Author";
+	}
+
+	public String getTotalCategories(ODataRow row) {
+		List<ODataRow> categories = row.getM2MRecord("category_ids")
+				.browseEach();
+		if (categories.size() > 0)
+			return categories.size() + " Categories";
+		else
+			return "No Categories";
 	}
 
 	public static class BookCategory extends OModel {

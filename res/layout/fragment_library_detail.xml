@@ -63,6 +63,11 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                odoo:field_name="total_categories" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 odoo:field_name="description"
                 odoo:field_textAppearance="?android:attr/textAppearanceMedium"
                 odoo:label_color="@color/odoo_purple"

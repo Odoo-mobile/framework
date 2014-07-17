@@ -544,6 +544,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			mLayoutParams.setMargins(0, 5, 0, 5);
 	}
 
+	public void setColumn(OColumn column) {
+		mColumn = column;
+	}
+
 	/**
 	 * Creates the text view control.
 	 */
@@ -552,6 +556,9 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				KEY_FIELD_TEXT_APPEARANCE, 0);
 		Integer mAttrFieldStyle = mAttributes.getResource(KEY_FIELD_STYLE, 0);
 		Boolean mSingleLine = mAttributes.getBoolean(KEY_SINGLE_LINE, false);
+		if (mColumn != null && mColumn.isFunctionalColumn()) {
+			mAttributes.put(KEY_EDITABLE, false);
+		}
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mFieldEditText = new EditText(mContext);
 			mFieldEditText.setLayoutParams(mLayoutParams);

@@ -110,6 +110,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 	/** The drag ended. */
 	private Boolean mDragEnded = false;
 
+	/** The m view click listener. */
 	private List<ViewClickListeners> mViewClickListener = new ArrayList<ViewClickListeners>();
 
 	/**
@@ -173,6 +174,11 @@ public class OList extends ScrollView implements View.OnClickListener,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.View#onFinishInflate()
+	 */
 	protected void onFinishInflate() {
 		super.onFinishInflate();
 		removeAllViews();
@@ -334,6 +340,11 @@ public class OList extends ScrollView implements View.OnClickListener,
 		public void onRowItemClick(int position, View view, ODataRow row);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+	 */
 	@Override
 	public void onClick(View v) {
 		if (!mDragMode) {
@@ -353,6 +364,11 @@ public class OList extends ScrollView implements View.OnClickListener,
 		mDragDropListener = listener;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.View.OnLongClickListener#onLongClick(android.view.View)
+	 */
 	@Override
 	public boolean onLongClick(View v) {
 		mDragMode = true;
@@ -385,6 +401,13 @@ public class OList extends ScrollView implements View.OnClickListener,
 			height = getView().getHeight() / 2;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * android.view.View.DragShadowBuilder#onProvideShadowMetrics(android
+		 * .graphics.Point, android.graphics.Point)
+		 */
 		@Override
 		public void onProvideShadowMetrics(Point size, Point touch) {
 			shadow.setBounds(0, 0, width, height);
@@ -392,6 +415,13 @@ public class OList extends ScrollView implements View.OnClickListener,
 			touch.set(width / 2, height / 2);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * android.view.View.DragShadowBuilder#onDrawShadow(android.graphics
+		 * .Canvas)
+		 */
 		@Override
 		public void onDrawShadow(Canvas canvas) {
 			shadow.draw(canvas);
@@ -409,6 +439,12 @@ public class OList extends ScrollView implements View.OnClickListener,
 		mRowDraggable = draggable;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.View.OnTouchListener#onTouch(android.view.View,
+	 * android.view.MotionEvent)
+	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		if (mDragMode && event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -420,6 +456,12 @@ public class OList extends ScrollView implements View.OnClickListener,
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.View.OnDragListener#onDrag(android.view.View,
+	 * android.view.DragEvent)
+	 */
 	@Override
 	public boolean onDrag(final View v, DragEvent event) {
 		int action = event.getAction();
@@ -580,20 +622,67 @@ public class OList extends ScrollView implements View.OnClickListener,
 		return mDraggableView;
 	}
 
+	/**
+	 * Sets the on list row view click listener.
+	 * 
+	 * @param view_id
+	 *            the view_id
+	 * @param listener
+	 *            the listener
+	 */
 	public void setOnListRowViewClickListener(Integer view_id,
 			OnListRowViewClickListener listener) {
 		mViewClickListener.add(new ViewClickListeners(view_id, listener));
 	}
 
+	/**
+	 * The listener interface for receiving onListRowViewClick events. The class
+	 * that is interested in processing a onListRowViewClick event implements
+	 * this interface, and the object created with that class is registered with
+	 * a component using the component's
+	 * <code>addOnListRowViewClickListener<code> method. When
+	 * the onListRowViewClick event occurs, that object's appropriate
+	 * method is invoked.
+	 * 
+	 * @see OnListRowViewClickEvent
+	 */
 	public interface OnListRowViewClickListener {
+
+		/**
+		 * On row view click.
+		 * 
+		 * @param view_group
+		 *            the view_group
+		 * @param view
+		 *            the view
+		 * @param position
+		 *            the position
+		 * @param row
+		 *            the row
+		 */
 		public void onRowViewClick(ViewGroup view_group, View view,
 				int position, ODataRow row);
 	}
 
+	/**
+	 * The Class ViewClickListeners.
+	 */
 	private class ViewClickListeners {
+
+		/** The _listener_data. */
 		private HashMap<String, OnListRowViewClickListener> _listener_data = new HashMap<String, OnListRowViewClickListener>();
+
+		/** The _listener_view. */
 		private HashMap<String, Integer> _listener_view = new HashMap<String, Integer>();
 
+		/**
+		 * Instantiates a new view click listeners.
+		 * 
+		 * @param view_id
+		 *            the view_id
+		 * @param listener
+		 *            the listener
+		 */
 		public ViewClickListeners(Integer view_id,
 				OnListRowViewClickListener listener) {
 			String key = "KEY_" + view_id;
@@ -601,14 +690,33 @@ public class OList extends ScrollView implements View.OnClickListener,
 			_listener_view.put(key, view_id);
 		}
 
+		/**
+		 * Gets the listener.
+		 * 
+		 * @param key
+		 *            the key
+		 * @return the listener
+		 */
 		public OnListRowViewClickListener getListener(String key) {
 			return _listener_data.get(key);
 		}
 
+		/**
+		 * Gets the view id.
+		 * 
+		 * @param key
+		 *            the key
+		 * @return the view id
+		 */
 		public Integer getViewId(String key) {
 			return _listener_view.get(key);
 		}
 
+		/**
+		 * Gets the keys.
+		 * 
+		 * @return the keys
+		 */
 		public List<String> getKeys() {
 			List<String> keys = new ArrayList<String>();
 			keys.addAll(_listener_view.keySet());

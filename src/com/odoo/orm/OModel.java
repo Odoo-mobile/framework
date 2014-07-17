@@ -1,7 +1,27 @@
+/*
+ * Odoo, Open Source Management Solution
+ * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http:www.gnu.org/licenses/>
+ * 
+ */
 package com.odoo.orm;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +37,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.odoo.orm.annotations.Odoo;
+import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OInteger;
@@ -27,36 +49,83 @@ import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.StringUtils;
 
+/**
+ * The Class OModel.
+ */
 public class OModel extends OSQLiteHelper implements OModelHelper {
 
+	/** The Constant TAG. */
 	public static final String TAG = OModel.class.getSimpleName();
 
+	/** The m context. */
 	private Context mContext = null;
+
+	/** The _name. */
 	private String _name = null;
+
+	/** The m columns. */
 	private List<OColumn> mColumns = new ArrayList<OColumn>();
+
+	/** The m functional columns. */
+	private List<OColumn> mFunctionalColumns = new ArrayList<OColumn>();
+
+	/** The m user. */
 	private OUser mUser = null;
+
+	/** The m sync helper. */
 	private OSyncHelper mSyncHelper = null;
+
+	/** The m check in active record. */
 	private Boolean mCheckInActiveRecord = false;
 
+	/**
+	 * The Enum Command.
+	 */
 	public enum Command {
-		Add, Update, Delete, Replace
+
+		/** The Add. */
+		Add,
+		/** The Update. */
+		Update,
+		/** The Delete. */
+		Delete,
+		/** The Replace. */
+		Replace
 	}
 
 	// Server Base Columns
+	/** The id. */
 	OColumn id = new OColumn("ID", OInteger.class).setDefault(false);
 
 	// Local Base Columns
+	/** The local_id. */
 	OColumn local_id = new OColumn("Local ID", OInteger.class)
 			.setAutoIncrement(true).setLocalColumn();
+
+	/** The odoo_name. */
 	OColumn odoo_name = new OColumn("Odoo Account Name", OVarchar.class, 100)
 			.setRequired(true).setLocalColumn();
+
+	/** The local_write_date. */
 	OColumn local_write_date = new OColumn("Local Write Date", ODateTime.class)
 			.setLocalColumn();
+
+	/** The is_dirty. */
 	OColumn is_dirty = new OColumn("Dirty Row", OText.class).setDefault(false)
 			.setLocalColumn();
+
+	/** The is_active. */
 	OColumn is_active = new OColumn("Row Active", OBoolean.class).setDefault(
 			true).setLocalColumn();
 
+	/**
+	 * Instantiates a new o model.
+	 * 
+	 * @param context
+	 *            the context
+	 * @param model_name
+	 *            the model_name
+	 */
 	public OModel(Context context, String model_name) {
 		super(context);
 		mContext = context;
@@ -64,22 +133,48 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		mUser = OUser.current(mContext);
 	}
 
+	/**
+	 * Sets the user.
+	 * 
+	 * @param user
+	 *            the new user
+	 */
 	public void setUser(OUser user) {
 		mUser = user;
 	}
 
+	/**
+	 * Gets the model name.
+	 * 
+	 * @return the model name
+	 */
 	public String getModelName() {
 		return _name;
 	}
 
+	/**
+	 * Gets the table name.
+	 * 
+	 * @return the table name
+	 */
 	public String getTableName() {
 		return _name.replaceAll("\\.", "_");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.odoo.orm.OModelHelper#getColumns()
+	 */
 	public List<OColumn> getColumns() {
 		return getColumns(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.odoo.orm.OModelHelper#getColumns(java.lang.Boolean)
+	 */
 	@Override
 	public List<OColumn> getColumns(Boolean local) {
 		if (mColumns.size() <= 0) {
@@ -96,11 +191,23 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.odoo.orm.OModelHelper#defaultDomain()
+	 */
 	@Override
 	public ODomain defaultDomain() {
 		return new ODomain();
 	}
 
+	/**
+	 * Gets the many to many columns.
+	 * 
+	 * @param relation_model
+	 *            the relation_model
+	 * @return the many to many columns
+	 */
 	public List<OColumn> getManyToManyColumns(OModel relation_model) {
 		List<OColumn> cols = new ArrayList<OColumn>();
 		odoo_name.setName("odoo_name");
@@ -121,6 +228,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return cols;
 	}
 
+	/**
+	 * Prepare columns.
+	 */
 	public void prepareColumns() {
 		List<Field> fields = new ArrayList<Field>();
 		fields.addAll(Arrays.asList(getClass().getSuperclass()
@@ -132,7 +242,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				if (field.getType().isAssignableFrom(OColumn.class)) {
 					OColumn column = (OColumn) field.get(this);
 					column.setName(field.getName());
-					mColumns.add(column);
+					Method method = checkForFunctionalColumn(field);
+					if (method != null) {
+						column.setFunctionalMethod(method);
+						mFunctionalColumns.add(column);
+					} else
+						mColumns.add(column);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -140,6 +255,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		}
 	}
 
+	/**
+	 * Gets the column.
+	 * 
+	 * @param name
+	 *            the name
+	 * @return the column
+	 */
 	public OColumn getColumn(String name) {
 		OColumn column = null;
 		try {
@@ -148,8 +270,11 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				field = getClass().getSuperclass().getDeclaredField(name);
 			if (field != null) {
 				field.setAccessible(true);
+				Method method = checkForFunctionalColumn(field);
 				column = (OColumn) field.get(this);
 				column.setName(name);
+				if (method != null)
+					column.setFunctionalMethod(method);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -157,6 +282,56 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return column;
 	}
 
+	/**
+	 * Check for functional column.
+	 * 
+	 * @param field
+	 *            the field
+	 * @return the method
+	 */
+	private Method checkForFunctionalColumn(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+		if (annotation != null) {
+			Odoo.Functional functional = (Functional) annotation;
+			String method_name = functional.method();
+			try {
+				return getClass().getMethod(method_name, ODataRow.class);
+			} catch (NoSuchMethodException e) {
+				Log.e(TAG, "No Such Method: " + e.getMessage());
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the functional method value.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param record
+	 *            the record
+	 * @return the functional method value
+	 */
+	public Object getFunctionalMethodValue(OColumn column, ODataRow record) {
+		if (column.isFunctionalColumn()) {
+			Method method = column.getMethod();
+			OModel model = this;
+			try {
+				return method.invoke(model, new Object[] { record });
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Creates the instance.
+	 * 
+	 * @param model_class
+	 *            the model_class
+	 * @return the o model
+	 */
 	public OModel createInstance(Class<?> model_class) {
 		try {
 			Constructor<?> constr = model_class.getConstructor(Context.class);
@@ -170,14 +345,35 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return null;
 	}
 
+	/**
+	 * Select.
+	 * 
+	 * @return the list
+	 */
 	public List<ODataRow> select() {
 		return select(null, null, null, null, null);
 	}
 
+	/**
+	 * Select.
+	 * 
+	 * @param id
+	 *            the id
+	 * @return the o data row
+	 */
 	public ODataRow select(Integer id) {
 		return select(id, false);
 	}
 
+	/**
+	 * Select.
+	 * 
+	 * @param id
+	 *            the id
+	 * @param local_record
+	 *            the local_record
+	 * @return the o data row
+	 */
 	public ODataRow select(Integer id, boolean local_record) {
 		String selection = (local_record) ? "local_id = ?" : "id = ?";
 		List<ODataRow> records = select(selection, new Object[] { id }, null,
@@ -187,10 +383,34 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return null;
 	}
 
+	/**
+	 * Select.
+	 * 
+	 * @param where
+	 *            the where
+	 * @param args
+	 *            the args
+	 * @return the list
+	 */
 	public List<ODataRow> select(String where, Object[] args) {
 		return select(where, args, null, null, null);
 	}
 
+	/**
+	 * Select.
+	 * 
+	 * @param where
+	 *            the where
+	 * @param whereArgs
+	 *            the where args
+	 * @param groupBy
+	 *            the group by
+	 * @param having
+	 *            the having
+	 * @param orderBy
+	 *            the order by
+	 * @return the list
+	 */
 	public List<ODataRow> select(String where, Object[] whereArgs,
 			String groupBy, String having, String orderBy) {
 		List<ODataRow> records = new ArrayList<ODataRow>();
@@ -239,6 +459,17 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return records;
 	}
 
+	/**
+	 * Select m2 m records.
+	 * 
+	 * @param base
+	 *            the base
+	 * @param rel
+	 *            the rel
+	 * @param base_id
+	 *            the base_id
+	 * @return the list
+	 */
 	public List<ODataRow> selectM2MRecords(OModel base, OModel rel, int base_id) {
 		List<ODataRow> records = new ArrayList<ODataRow>();
 		String table = base.getTableName() + "_" + rel.getTableName() + "_rel";
@@ -265,6 +496,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return records;
 	}
 
+	/**
+	 * Creates the record row.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param cr
+	 *            the cr
+	 * @return the object
+	 */
 	private Object createRecordRow(OColumn column, Cursor cr) {
 		Object value = false;
 		if (column.getDefaultValue() != null) {
@@ -291,15 +531,34 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return value;
 	}
 
+	/**
+	 * Truncate.
+	 * 
+	 * @return true, if successful
+	 */
 	public boolean truncate() {
 
 		return true;
 	}
 
+	/**
+	 * Count.
+	 * 
+	 * @return the int
+	 */
 	public int count() {
 		return count(null, null);
 	}
 
+	/**
+	 * Count.
+	 * 
+	 * @param where
+	 *            the where
+	 * @param whereArgs
+	 *            the where args
+	 * @return the int
+	 */
 	public int count(String where, Object[] whereArgs) {
 		int count = 0;
 		SQLiteDatabase db = getReadableDatabase();
@@ -315,12 +574,26 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return count;
 	}
 
+	/**
+	 * Creates the or replace.
+	 * 
+	 * @param values
+	 *            the values
+	 * @return the integer
+	 */
 	public Integer createORReplace(OValues values) {
 		List<OValues> vals = new ArrayList<OValues>();
 		vals.add(values);
 		return createORReplace(vals).get(0);
 	}
 
+	/**
+	 * Creates the or replace.
+	 * 
+	 * @param values_list
+	 *            the values_list
+	 * @return the list
+	 */
 	public List<Integer> createORReplace(List<OValues> values_list) {
 		Log.v(TAG, "creating OR Replacing " + values_list.size() + " records");
 		List<Integer> ids = new ArrayList<Integer>();
@@ -335,12 +608,26 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return ids;
 	}
 
+	/**
+	 * Checks for record.
+	 * 
+	 * @param id
+	 *            the id
+	 * @return true, if successful
+	 */
 	public boolean hasRecord(int id) {
 		if (count("id = ? ", new Object[] { id }) > 0)
 			return true;
 		return false;
 	}
 
+	/**
+	 * Creates the.
+	 * 
+	 * @param values
+	 *            the values
+	 * @return the int
+	 */
 	public int create(OValues values) {
 		Integer newId = (values.contains("id")) ? values.getInt("id") : 0;
 		if (!values.contains("odoo_name")) {
@@ -352,15 +639,46 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return newId;
 	}
 
+	/**
+	 * Update.
+	 * 
+	 * @param values
+	 *            the values
+	 * @param id
+	 *            the id
+	 * @return the int
+	 */
 	public int update(OValues values, int id) {
 		return update(values, id, false);
 	}
 
+	/**
+	 * Update.
+	 * 
+	 * @param values
+	 *            the values
+	 * @param id
+	 *            the id
+	 * @param local_record
+	 *            the local_record
+	 * @return the int
+	 */
 	public int update(OValues values, Integer id, Boolean local_record) {
 		return update(values, (local_record) ? "local_id = ? " : "id = ?",
 				new Object[] { id });
 	}
 
+	/**
+	 * Update.
+	 * 
+	 * @param updateValues
+	 *            the update values
+	 * @param where
+	 *            the where
+	 * @param whereArgs
+	 *            the where args
+	 * @return the int
+	 */
 	public int update(OValues updateValues, String where, Object[] whereArgs) {
 		int affectedRows = 0;
 		SQLiteDatabase db = getWritableDatabase();
@@ -372,14 +690,41 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return affectedRows;
 	}
 
+	/**
+	 * Delete.
+	 * 
+	 * @param id
+	 *            the id
+	 * @return true, if successful
+	 */
 	public boolean delete(int id) {
 		return delete("id  = ? ", new Object[] { id });
 	}
 
+	/**
+	 * Delete.
+	 * 
+	 * @param where
+	 *            the where
+	 * @param whereArgs
+	 *            the where args
+	 * @return true, if successful
+	 */
 	public boolean delete(String where, Object[] whereArgs) {
 		return delete(where, whereArgs, false);
 	}
 
+	/**
+	 * Delete.
+	 * 
+	 * @param where
+	 *            the where
+	 * @param whereArgs
+	 *            the where args
+	 * @param removeFromLocal
+	 *            the remove from local
+	 * @return true, if successful
+	 */
 	public boolean delete(String where, Object[] whereArgs,
 			boolean removeFromLocal) {
 		Boolean deleted = false;
@@ -402,6 +747,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	// createValues : used by create and update methods
+	/**
+	 * Creates the values.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param values
+	 *            the values
+	 * @return the content values
+	 */
 	private ContentValues createValues(SQLiteDatabase db, OValues values) {
 		ContentValues vals = new ContentValues();
 		for (OColumn column : getColumns()) {
@@ -438,6 +792,20 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return vals;
 	}
 
+	/**
+	 * Manage many to many records.
+	 * 
+	 * @param db
+	 *            the db
+	 * @param rel_model
+	 *            the rel_model
+	 * @param ids
+	 *            the ids
+	 * @param base_id
+	 *            the base_id
+	 * @param command
+	 *            the command
+	 */
 	public void manageManyToManyRecords(SQLiteDatabase db, OModel rel_model,
 			List<Integer> ids, Integer base_id, Command command) {
 		String table = getTableName() + "_" + rel_model.getTableName() + "_rel";
@@ -469,6 +837,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		}
 	}
 
+	/**
+	 * Gets the where args.
+	 * 
+	 * @param where
+	 *            the where
+	 * @param whereArgs
+	 *            the where args
+	 * @return the where args
+	 */
 	private String[] getWhereArgs(String where, Object[] whereArgs) {
 		List<String> args = new ArrayList<String>();
 		if (whereArgs != null) {
@@ -497,6 +874,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return args.toArray(new String[args.size()]);
 	}
 
+	/**
+	 * Gets the where clause.
+	 * 
+	 * @param where
+	 *            the where
+	 * @return the where clause
+	 */
 	private String getWhereClause(String where) {
 		String newWhereClause = (where != null) ? where + " AND " : "";
 		if (!mCheckInActiveRecord)
@@ -506,12 +890,24 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return newWhereClause;
 	}
 
+	/**
+	 * Gets the sync helper.
+	 * 
+	 * @return the sync helper
+	 */
 	public OSyncHelper getSyncHelper() {
 		if (mSyncHelper == null)
 			mSyncHelper = new OSyncHelper(mContext, mUser, this);
 		return mSyncHelper;
 	}
 
+	/**
+	 * Gets the model values.
+	 * 
+	 * @param model
+	 *            the model
+	 * @return the model values
+	 */
 	public List<OValues> getModelValues(String model) {
 		List<String> models = new ArrayList<String>();
 		models.add(model);
@@ -519,12 +915,28 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	}
 
+	/**
+	 * Gets the model values.
+	 * 
+	 * @param models
+	 *            the models
+	 * @return the model values
+	 */
 	public List<OValues> getModelValues(List<String> models) {
 		if (mSyncHelper == null)
 			mSyncHelper = new OSyncHelper(mContext, mUser, this);
 		return mSyncHelper.modelInfo(models);
 	}
 
+	/**
+	 * Gets the.
+	 * 
+	 * @param context
+	 *            the context
+	 * @param model_name
+	 *            the model_name
+	 * @return the o model
+	 */
 	public static OModel get(Context context, String model_name) {
 		OModel model = null;
 		try {
@@ -540,12 +952,22 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return model;
 	}
 
+	/**
+	 * Checks if is empty table.
+	 * 
+	 * @return true, if is empty table
+	 */
 	public boolean isEmptyTable() {
 		if (count() <= 0)
 			return true;
 		return false;
 	}
 
+	/**
+	 * Ids.
+	 * 
+	 * @return the list
+	 */
 	public List<Integer> ids() {
 		List<Integer> ids = new ArrayList<Integer>();
 		for (ODataRow row : select()) {
@@ -554,24 +976,57 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return ids;
 	}
 
+	/**
+	 * Before create row.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param original_record
+	 *            the original_record
+	 * @return the JSON object
+	 */
 	public JSONObject beforeCreateRow(OColumn column, JSONObject original_record) {
 		return original_record;
 	}
 
+	/**
+	 * Check in active record.
+	 * 
+	 * @param checkInactiveRecord
+	 *            the check inactive record
+	 */
 	public void checkInActiveRecord(Boolean checkInactiveRecord) {
 		mCheckInActiveRecord = checkInactiveRecord;
 	}
 
+	/**
+	 * Check for write date.
+	 * 
+	 * @return the boolean
+	 */
 	public Boolean checkForWriteDate() {
 		return true;
 	}
 
+	/**
+	 * Check for create date.
+	 * 
+	 * @return the boolean
+	 */
 	public Boolean checkForCreateDate() {
 		return true;
 	}
 
+	/**
+	 * The Class AutoUpdateOnServer.
+	 */
 	class AutoUpdateOnServer extends AsyncTask<Void, Void, Void> {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.os.AsyncTask#doInBackground(Params[])
+		 */
 		@Override
 		protected Void doInBackground(Void... params) {
 			getSyncHelper().syncWithServer();
@@ -581,10 +1036,31 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 }
 
+/**
+ * The Interface OModelHelper.
+ */
 interface OModelHelper {
+
+	/**
+	 * Gets the columns.
+	 * 
+	 * @return the columns
+	 */
 	public List<OColumn> getColumns();
 
+	/**
+	 * Gets the columns.
+	 * 
+	 * @param local
+	 *            the local
+	 * @return the columns
+	 */
 	public List<OColumn> getColumns(Boolean local);
 
+	/**
+	 * Default domain.
+	 * 
+	 * @return the o domain
+	 */
 	public ODomain defaultDomain();
 }
