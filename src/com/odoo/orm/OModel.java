@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import odoo.ODomain;
+import odoo.OdooVersion;
 
 import org.json.JSONObject;
 
@@ -37,6 +38,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.odoo.App;
 import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.OBoolean;
@@ -78,6 +80,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	/** The m check in active record. */
 	private Boolean mCheckInActiveRecord = false;
 
+	/** The m app. */
+	private App mApp = null;
+
+	/** The m odoo version. */
+	private OdooVersion mOdooVersion = null;
+
 	/**
 	 * The Enum Command.
 	 */
@@ -96,6 +104,16 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	// Server Base Columns
 	/** The id. */
 	OColumn id = new OColumn("ID", OInteger.class).setDefault(false);
+
+	/** The create_date. */
+	@Odoo.api.v8
+	OColumn create_date = new OColumn("Created On", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
+
+	/** The write_date. */
+	@Odoo.api.v8
+	OColumn write_date = new OColumn("Last Updated On", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
 
 	// Local Base Columns
 	/** The local_id. */
@@ -131,6 +149,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		mContext = context;
 		_name = model_name;
 		mUser = OUser.current(mContext);
+		mApp = (App) context.getApplicationContext();
+		if (mApp.getOdooVersion() == null)
+			mApp.createInstance();
+		mOdooVersion = mApp.getOdooVersion();
 	}
 
 	/**
@@ -240,14 +262,16 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			field.setAccessible(true);
 			try {
 				if (field.getType().isAssignableFrom(OColumn.class)) {
-					OColumn column = (OColumn) field.get(this);
-					column.setName(field.getName());
-					Method method = checkForFunctionalColumn(field);
-					if (method != null) {
-						column.setFunctionalMethod(method);
-						mFunctionalColumns.add(column);
-					} else
-						mColumns.add(column);
+					if (validateFieldVersion(field)) {
+						OColumn column = (OColumn) field.get(this);
+						column.setName(field.getName());
+						Method method = checkForFunctionalColumn(field);
+						if (method != null) {
+							column.setFunctionalMethod(method);
+							mFunctionalColumns.add(column);
+						} else
+							mColumns.add(column);
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -270,11 +294,33 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				field = getClass().getSuperclass().getDeclaredField(name);
 			if (field != null) {
 				field.setAccessible(true);
-				Method method = checkForFunctionalColumn(field);
-				column = (OColumn) field.get(this);
-				column.setName(name);
-				if (method != null)
-					column.setFunctionalMethod(method);
+				if (validateFieldVersion(field)) {
+					Method method = checkForFunctionalColumn(field);
+					column = (OColumn) field.get(this);
+					column.setName(name);
+					if (method != null)
+						column.setFunctionalMethod(method);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return column;
+	}
+
+	public OColumn getPermReadColumn(String name) {
+		OColumn column = null;
+		try {
+			Field field = getClass().getSuperclass().getDeclaredField(name);
+			if (field != null) {
+				field.setAccessible(true);
+				if (validateFieldVersion(field)) {
+					Method method = checkForFunctionalColumn(field);
+					column = (OColumn) field.get(this);
+					column.setName(name);
+					if (method != null)
+						column.setFunctionalMethod(method);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -301,6 +347,40 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			}
 		}
 		return null;
+	}
+
+	public OdooVersion getOdooVersion() {
+		return mOdooVersion;
+	}
+
+	private Boolean validateFieldVersion(Field field) {
+		if (mOdooVersion != null) {
+			Annotation[] annotations = field.getAnnotations();
+			if (annotations.length > 0) {
+				for (Annotation annotation : annotations) {
+					if (annotation.annotationType().getDeclaringClass()
+							.isAssignableFrom(Odoo.api.class)) {
+						switch (mOdooVersion.getVersion_number()) {
+						case 7: // Checks for v7
+							if (annotation.annotationType().isAssignableFrom(
+									Odoo.api.v7.class)) {
+								return true;
+							}
+							break;
+						case 8: // Checks for v8
+							if (annotation.annotationType().isAssignableFrom(
+									Odoo.api.v8.class)) {
+								return true;
+							}
+							break;
+						}
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -362,20 +442,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return the o data row
 	 */
 	public ODataRow select(Integer id) {
-		return select(id, false);
-	}
-
-	/**
-	 * Select.
-	 * 
-	 * @param id
-	 *            the id
-	 * @param local_record
-	 *            the local_record
-	 * @return the o data row
-	 */
-	public ODataRow select(Integer id, boolean local_record) {
-		String selection = (local_record) ? "local_id = ?" : "id = ?";
+		String selection = OColumn.ROW_ID + " = ?";
 		List<ODataRow> records = select(selection, new Object[] { id }, null,
 				null, null);
 		if (records.size() > 0)
@@ -429,12 +496,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						case ManyToMany:
 							row.put(col.getName(),
 									new OM2MRecord(this, col, cr.getInt(cr
-											.getColumnIndex("id"))));
+											.getColumnIndex(OColumn.ROW_ID))));
 							break;
 						case OneToMany:
 							row.put(col.getName(),
 									new OO2MRecord(this, col, cr.getInt(cr
-											.getColumnIndex("id"))));
+											.getColumnIndex(OColumn.ROW_ID))));
 							break;
 						case ManyToOne:
 							row.put(col.getName(),
@@ -447,9 +514,6 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				if (row.getInt("id") == 0
 						|| row.getString("id").equals("false")) {
 					row.put("id", 0);
-					row.put("local_record", true);
-				} else {
-					row.put("local_record", false);
 				}
 				records.add(row);
 			} while (cr.moveToNext());
@@ -491,7 +555,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		cr.close();
 		db.close();
 		records.addAll(rel.select(
-				"id IN (" + StringUtils.repeat(" ?, ", ids.size() - 1) + "?)",
+				OColumn.ROW_ID + " IN ("
+						+ StringUtils.repeat(" ?, ", ids.size() - 1) + "?)",
 				new Object[] { ids }));
 		return records;
 	}
@@ -537,7 +602,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return true, if successful
 	 */
 	public boolean truncate() {
-
+		delete(null, null);
 		return true;
 	}
 
@@ -609,7 +674,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	/**
-	 * Checks for record.
+	 * Checks for record with server 'id' column.
 	 * 
 	 * @param id
 	 *            the id
@@ -629,12 +694,29 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return the int
 	 */
 	public int create(OValues values) {
-		Integer newId = (values.contains("id")) ? values.getInt("id") : 0;
 		if (!values.contains("odoo_name")) {
 			values.put("odoo_name", mUser.getAndroidName());
 		}
 		SQLiteDatabase db = getWritableDatabase();
 		db.insert(getTableName(), null, createValues(db, values));
+		db.close();
+		return getCreateId();
+	}
+
+	/**
+	 * Gets the creates the id.
+	 * 
+	 * @return the creates the id
+	 */
+	private int getCreateId() {
+		int newId = 0;
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cr = db.query("sqlite_sequence", new String[] { "name", "seq" },
+				"name = ?", new String[] { getTableName() }, null, null, null);
+		if (cr.moveToFirst()) {
+			newId = cr.getInt(cr.getColumnIndex("seq"));
+		}
+		cr.close();
 		db.close();
 		return newId;
 	}
@@ -648,24 +730,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the id
 	 * @return the int
 	 */
-	public int update(OValues values, int id) {
-		return update(values, id, false);
-	}
-
-	/**
-	 * Update.
-	 * 
-	 * @param values
-	 *            the values
-	 * @param id
-	 *            the id
-	 * @param local_record
-	 *            the local_record
-	 * @return the int
-	 */
-	public int update(OValues values, Integer id, Boolean local_record) {
-		return update(values, (local_record) ? "local_id = ? " : "id = ?",
-				new Object[] { id });
+	public int update(OValues values, Integer id) {
+		return update(values, OColumn.ROW_ID + " = ? ", new Object[] { id });
 	}
 
 	/**
@@ -698,7 +764,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return true, if successful
 	 */
 	public boolean delete(int id) {
-		return delete("id  = ? ", new Object[] { id });
+		return delete("local_id  = ? ", new Object[] { id });
 	}
 
 	/**

@@ -62,8 +62,10 @@ public class BookBook extends OModel {
 		ODataRow author = row.getM2ORecord("author_id").browse();
 		if (author != null) {
 			ODataRow country = author.getM2ORecord("country_id").browse();
-			return author.getString("name") + " (" + country.getString("name")
-					+ ")";
+			String author_name = author.getString("name");
+			if (country != null)
+				author_name += " (" + country.getString("name") + ")";
+			return author_name;
 		} else
 			return "No Author";
 	}

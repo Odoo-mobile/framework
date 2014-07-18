@@ -19,6 +19,7 @@ import com.odoo.addons.idea.model.BookBook;
 import com.odoo.addons.idea.model.BookBook.BookAuthor;
 import com.odoo.addons.idea.model.BookBook.BookCategory;
 import com.odoo.addons.idea.model.BookBook.BookStudent;
+import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.orm.OValues;
@@ -31,7 +32,6 @@ public class LibraryDetail extends BaseFragment {
 	private View mView = null;
 	private Keys mKey = null;
 	private Integer mId = null;
-	private Boolean mLocalRecord = false;
 	private OForm mForm = null;
 	private Boolean mEditMode = false;
 	private ODataRow mRecord = null;
@@ -62,7 +62,7 @@ public class LibraryDetail extends BaseFragment {
 			mForm = (OForm) mView.findViewById(R.id.odooFormBooks);
 			mModel = new BookBook(getActivity());
 			if (mId != null) {
-				mRecord = mModel.select(mId, mLocalRecord);
+				mRecord = mModel.select(mId);
 				mForm.initForm(mRecord);
 			} else {
 				mForm.setModel(mModel);
@@ -74,7 +74,7 @@ public class LibraryDetail extends BaseFragment {
 			mForm = (OForm) mView.findViewById(R.id.odooFormAuthors);
 			mModel = new BookAuthor(getActivity());
 			if (mId != null) {
-				mRecord = mModel.select(mId, mLocalRecord);
+				mRecord = mModel.select(mId);
 				mForm.initForm(mRecord);
 			} else {
 				mForm.setModel(mModel);
@@ -86,7 +86,7 @@ public class LibraryDetail extends BaseFragment {
 			mForm = (OForm) mView.findViewById(R.id.odooFormStudents);
 			BookStudent student = new BookStudent(getActivity());
 			if (mId != null) {
-				mRecord = student.select(mId, mLocalRecord);
+				mRecord = student.select(mId);
 				mForm.initForm(mRecord);
 			} else {
 				mForm.setModel(student);
@@ -98,7 +98,7 @@ public class LibraryDetail extends BaseFragment {
 			mForm = (OForm) mView.findViewById(R.id.odooFormCategories);
 			BookCategory category = new BookCategory(getActivity());
 			if (mId != null) {
-				mRecord = category.select(mId, mLocalRecord);
+				mRecord = category.select(mId);
 				mForm.initForm(mRecord);
 			} else {
 				mForm.setModel(category);
@@ -117,12 +117,8 @@ public class LibraryDetail extends BaseFragment {
 	private void initArgs() {
 		Bundle args = getArguments();
 		mKey = Library.Keys.valueOf(args.getString("key"));
-		if (args.containsKey("id")) {
-			mLocalRecord = args.getBoolean("local_record");
-			if (mLocalRecord) {
-				mId = args.getInt("local_id");
-			} else
-				mId = args.getInt("id");
+		if (args.containsKey(OColumn.ROW_ID)) {
+			mId = args.getInt(OColumn.ROW_ID);
 		} else
 			mEditMode = true;
 	}
@@ -160,20 +156,16 @@ public class LibraryDetail extends BaseFragment {
 				if (mId != null) {
 					switch (mKey) {
 					case Books:
-						new BookBook(getActivity()).update(values, mId,
-								mLocalRecord);
+						new BookBook(getActivity()).update(values, mId);
 						break;
 					case Authors:
-						new BookAuthor(getActivity()).update(values, mId,
-								mLocalRecord);
+						new BookAuthor(getActivity()).update(values, mId);
 						break;
 					case Students:
-						new BookStudent(getActivity()).update(values, mId,
-								mLocalRecord);
+						new BookStudent(getActivity()).update(values, mId);
 						break;
 					case Category:
-						new BookCategory(getActivity()).update(values, mId,
-								mLocalRecord);
+						new BookCategory(getActivity()).update(values, mId);
 						break;
 					}
 				} else {
