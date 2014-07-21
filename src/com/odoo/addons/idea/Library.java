@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.OList;
+import odoo.controls.OList.BeforeListRowCreateListener;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -55,7 +56,7 @@ import com.openerp.OETouchListener.OnPullListener;
  * The Class Idea.
  */
 public class Library extends BaseFragment implements OnPullListener,
-		OnRowClickListener {
+		OnRowClickListener, BeforeListRowCreateListener {
 
 	public static final String TAG = Library.class.getSimpleName();
 
@@ -86,6 +87,7 @@ public class Library extends BaseFragment implements OnPullListener,
 		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
 		mListControl.setRowDraggable(true);
+		mListControl.setBeforeListRowCreateListener(this);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();
 	}
@@ -259,6 +261,11 @@ public class Library extends BaseFragment implements OnPullListener,
 		bundle.putAll(row.getPrimaryBundleData());
 		library.setArguments(bundle);
 		startFragment(library, true);
+	}
+
+	@Override
+	public void beforeListRowCreate(int position, ODataRow row, View view) {
+		// TODO: update view before displaying it.
 	}
 
 }
