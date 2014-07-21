@@ -62,6 +62,7 @@ public class App extends Application {
 				e.printStackTrace();
 			}
 		}
+		mOdooInstance = odoo;
 		return odoo;
 	}
 
