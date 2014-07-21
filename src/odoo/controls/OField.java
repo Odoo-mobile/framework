@@ -19,6 +19,7 @@
 package odoo.controls;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener;
 import android.annotation.SuppressLint;
@@ -48,7 +49,10 @@ import com.odoo.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.types.ODateTime;
 import com.odoo.util.Base64Helper;
+import com.odoo.util.ODate;
+import com.odoo.util.StringUtils;
 
 /**
  * The Class OField.
@@ -100,6 +104,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	public static final String KEY_BOTTOM_BORDER_HEIGHT = "bottom_border_height";
 	public static final String KEY_TEXT_LINES = "textLines";
 	public static final String KEY_REF_COLUMN = "ref_column";
+	public static final String KEY_SHOW_AS_TEXT = "showAsText";
+	public static final String KEY_DISPLAY_PATTERN = "displayPattern";
 
 	/**
 	 * The Enum OFieldMode.
@@ -363,6 +369,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	private void createWebView() {
+		boolean showAsText = mAttributes.getBoolean(KEY_SHOW_AS_TEXT, false);
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			createTextViewControl();
 			if (mControlRecord != null) {
@@ -370,14 +377,21 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			}
 		} else {
 			if (mControlRecord != null) {
-				mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-						LayoutParams.WRAP_CONTENT);
-				mWebView = new WebView(mContext);
-				mWebView.setLayoutParams(mLayoutParams);
-				mWebView.loadData(mControlRecord.getString(mColumn.getName()),
-						"text/html; charset=UTF-8", "UTF-8");
-				mWebView.getSettings().setTextZoom(90);
-				addView(mWebView);
+				if (!showAsText) {
+					mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+							LayoutParams.WRAP_CONTENT);
+					mWebView = new WebView(mContext);
+					mWebView.setLayoutParams(mLayoutParams);
+					mWebView.loadData(
+							mControlRecord.getString(mColumn.getName()),
+							"text/html; charset=UTF-8", "UTF-8");
+					mWebView.getSettings().setTextZoom(90);
+					addView(mWebView);
+				} else {
+					createTextViewControl();
+					setText(StringUtils.htmlToString(mControlRecord
+							.getString(mColumn.getName())));
+				}
 			}
 		}
 	}
@@ -719,6 +733,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				mTypedArray.getInt(R.styleable.OField_textLines, -1));
 		mAttributes.put(KEY_REF_COLUMN,
 				mTypedArray.getString(R.styleable.OField_ref_column));
+		mAttributes.put(KEY_SHOW_AS_TEXT,
+				mTypedArray.getBoolean(R.styleable.OField_showAsText, false));
+		mAttributes.put(KEY_DISPLAY_PATTERN,
+				mTypedArray.getString(R.styleable.OField_displayPattern));
 	}
 
 	/**
@@ -766,7 +784,16 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mFieldEditText.setText(text);
 		} else {
-			mFieldTextView.setText(text);
+			String displayPattern = mAttributes.getString(KEY_DISPLAY_PATTERN,
+					null);
+			String val = text;
+			if (mColumn != null
+					&& mColumn.getType().isAssignableFrom(ODateTime.class)
+					&& displayPattern != null) {
+				val = ODate.getDate(mContext, text, TimeZone.getDefault()
+						.getID(), displayPattern);
+			}
+			mFieldTextView.setText(val);
 		}
 	}
 

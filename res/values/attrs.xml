@@ -17,6 +17,8 @@
         <attr name="fieldTextStyle" format="string" />
         <attr name="singleLine" format="boolean" />
         <attr name="textLines" format="integer" />
+        <attr name="showAsText" format="boolean" />
+        <attr name="displayPattern" format="string" />
         <attr name="ref_column" format="string" />
         <attr name="binaryType">
             <enum name="image" value="0" />

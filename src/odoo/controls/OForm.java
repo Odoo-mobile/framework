@@ -216,7 +216,8 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 									mRecord);
 							mRecord.put(column.getName(), value);
 						}
-						column.setType(value.getClass());
+						if (column.getType() == null)
+							column.setType(value.getClass());
 						field.setColumn(column);
 					}
 					if (column.getType().isAssignableFrom(OBlob.class)) {

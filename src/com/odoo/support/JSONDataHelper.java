@@ -24,7 +24,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class JSONDataHelper.
  */
