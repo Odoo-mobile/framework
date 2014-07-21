@@ -457,7 +457,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		} else {
 			createTextViewControl();
 			if (mControlRecord != null) {
-				setText(mControlRecord.getString(mColumn.getName()));
+				String value = mControlRecord.getString(mColumn.getName());
+				setText(value);
 			}
 
 		}
@@ -786,14 +787,12 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		} else {
 			String displayPattern = mAttributes.getString(KEY_DISPLAY_PATTERN,
 					null);
-			String val = text;
-			if (mColumn != null
-					&& mColumn.getType().isAssignableFrom(ODateTime.class)
-					&& displayPattern != null) {
-				val = ODate.getDate(mContext, text, TimeZone.getDefault()
+			if (displayPattern != null
+					&& mColumn.getType().isAssignableFrom(ODateTime.class)) {
+				text = ODate.getDate(mContext, text, TimeZone.getDefault()
 						.getID(), displayPattern);
 			}
-			mFieldTextView.setText(val);
+			mFieldTextView.setText(text);
 		}
 	}
 
