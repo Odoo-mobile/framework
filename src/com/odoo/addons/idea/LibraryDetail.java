@@ -145,7 +145,7 @@ public class LibraryDetail extends BaseFragment {
 			mForm.setEditable(mEditMode);
 			break;
 		case R.id.menu_library_detail_delete:
-			if (mModel.delete(mRecord.getInt("id"))) {
+			if (mModel.delete(mRecord.getInt(OColumn.ROW_ID))) {
 				Toast.makeText(getActivity(), "Record deleted",
 						Toast.LENGTH_LONG).show();
 				getActivity().getSupportFragmentManager().popBackStack();

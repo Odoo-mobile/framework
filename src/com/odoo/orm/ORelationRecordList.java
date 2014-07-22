@@ -9,17 +9,17 @@ import java.util.Set;
 import com.odoo.orm.OColumn.RelationType;
 
 public class ORelationRecordList {
-	HashMap<String, ORelationRecord> _relation_records = new HashMap<String, ORelationRecordList.ORelationRecord>();
+	HashMap<String, ORelationRecords> _relation_records = new HashMap<String, ORelationRecordList.ORelationRecords>();
 
 	public boolean contains(String key) {
 		return _relation_records.containsKey(key);
 	}
 
-	public void add(String key, ORelationRecord rel_record) {
+	public void add(String key, ORelationRecords rel_record) {
 		_relation_records.put(key, rel_record);
 	}
 
-	public ORelationRecord get(String key) {
+	public ORelationRecords get(String key) {
 		return _relation_records.get(key);
 	}
 
@@ -27,66 +27,94 @@ public class ORelationRecordList {
 		return _relation_records.keySet();
 	}
 
-	class ORelationRecord {
+	class ORelationRecords {
+		private OModel base_model = null;
+		private OModel rel_model = null;
+		private String ref_column = null;
+		private RelationType relation_type = null;
+		private HashMap<String, Integer> base_ids = new HashMap<String, Integer>();
+		private HashMap<String, List<Integer>> base_rel_ids = new HashMap<String, List<Integer>>();
 
-		RelationType type = null;
-		OModel model = null;
-		HashMap<String, List<Integer>> ref_ids = new HashMap<String, List<Integer>>();
-		String ref_column = null;
-		List<Integer> ids = new ArrayList<Integer>();
-
-		public OModel getModel() {
-			return model;
+		public void setRelationType(RelationType type) {
+			relation_type = type;
 		}
 
-		public void setModel(OModel model) {
-			this.model = model;
+		public RelationType getRelationType() {
+			return relation_type;
 		}
 
-		public List<Integer> getIds() {
-			Set<Integer> idsSet = new HashSet<Integer>(ids);
-			List<Integer> ids = new ArrayList<Integer>();
-			ids.addAll(idsSet);
-			return ids;
+		public void addBaseRelId(Integer base_id, Integer rel_id) {
+			List<Integer> rel_ids = new ArrayList<Integer>();
+			rel_ids.add(rel_id);
+			addBaseRelId(base_id, rel_ids);
 		}
 
-		public void addId(Integer id, Integer ref_id) {
-			String key = model.getTableName() + "_";
-			List<Integer> ref_ids_list = new ArrayList<Integer>();
-			if (ref_ids.containsKey(key + id)) {
-				ref_ids_list.addAll(ref_ids.get(key + id));
+		public void addBaseRelId(Integer base_id, List<Integer> rel_id) {
+			String key = base_model.getTableName() + "_base_" + base_id;
+			base_ids.put(key, base_id);
+			List<Integer> rel_ids = new ArrayList<Integer>();
+			if (base_rel_ids.containsKey(key)) {
+				rel_ids.addAll(base_rel_ids.get(key));
 			}
-			ref_ids_list.add(ref_id);
-			ref_ids.put(key + id, ref_ids_list);
-			this.ids.add(id);
+			rel_ids.addAll(rel_id);
+			base_rel_ids.put(key, rel_ids);
 		}
 
-		public void addIds(List<Integer> ids, Integer ref_id) {
-			for (Integer id : ids) {
-				addId(id, ref_id);
+		public void setBaseModel(OModel model) {
+			base_model = model;
+		}
+
+		public OModel getBaseModel() {
+			return base_model;
+		}
+
+		public void setRelModel(OModel model) {
+			rel_model = model;
+		}
+
+		public OModel getRelModel() {
+			return rel_model;
+		}
+
+		public List<String> getBaseIdsKeySet() {
+			List<String> base_ids_keyset = new ArrayList<String>();
+			base_ids_keyset.addAll(base_ids.keySet());
+			return base_ids_keyset;
+		}
+
+		public Integer getBaseId(String base_key) {
+			return base_ids.get(base_key);
+		}
+
+		public List<Integer> getBaseIds() {
+			HashSet<Integer> ids = new HashSet<Integer>();
+			List<Integer> base_ids = new ArrayList<Integer>();
+			for (String key : getBaseIdsKeySet())
+				ids.add(this.base_ids.get(key));
+			base_ids.addAll(ids);
+			return base_ids;
+		}
+
+		public List<Integer> getRelIds() {
+			List<Integer> rel_ids = new ArrayList<Integer>();
+			HashSet<Integer> ids = new HashSet<Integer>();
+			for (String key : getBaseIdsKeySet()) {
+				ids.addAll(getRelIds(key));
 			}
+			rel_ids.addAll(ids);
+			return rel_ids;
 		}
 
-		public HashMap<String, List<Integer>> getRefIds() {
-			return ref_ids;
+		public List<Integer> getRelIds(String base_key) {
+			return base_rel_ids.get(base_key);
+		}
+
+		public void setRefColumn(String column) {
+			ref_column = column;
 		}
 
 		public String getRefColumn() {
 			return ref_column;
 		}
-
-		public void setRefColumn(String ref_column) {
-			this.ref_column = ref_column;
-		}
-
-		public RelationType getType() {
-			return type;
-		}
-
-		public void setType(RelationType type) {
-			this.type = type;
-		}
-
 	}
-
 }

@@ -62,6 +62,14 @@ public @interface Odoo {
 
 			String[] exclude() default {};
 		}
+
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target({ ElementType.FIELD, ElementType.METHOD })
+		public @interface v9alpha {
+			String[] versions() default {};
+
+			String[] exclude() default {};
+		}
 	}
 
 }

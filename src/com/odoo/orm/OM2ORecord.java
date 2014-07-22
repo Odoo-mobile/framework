@@ -18,6 +18,8 @@
  */
 package com.odoo.orm;
 
+
+
 public class OM2ORecord {
 	private OColumn mCol = null;
 	private String record_id = "false";

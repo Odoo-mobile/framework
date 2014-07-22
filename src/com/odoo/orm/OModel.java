@@ -103,15 +103,17 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	// Server Base Columns
 	/** The id. */
-	OColumn id = new OColumn("ID", OInteger.class).setDefault(false);
+	OColumn id = new OColumn("ID", OInteger.class).setDefault(0);
 
 	/** The create_date. */
 	@Odoo.api.v8
+	@Odoo.api.v9alpha
 	OColumn create_date = new OColumn("Created On", ODateTime.class)
 			.setParsePatter(ODate.DEFAULT_FORMAT);
 
 	/** The write_date. */
 	@Odoo.api.v8
+	@Odoo.api.v9alpha
 	OColumn write_date = new OColumn("Last Updated On", ODateTime.class)
 			.setParsePatter(ODate.DEFAULT_FORMAT);
 
@@ -360,21 +362,25 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				for (Annotation annotation : annotations) {
 					if (annotation.annotationType().getDeclaringClass()
 							.isAssignableFrom(Odoo.api.class)) {
+						int versions = 0;
 						switch (mOdooVersion.getVersion_number()) {
-						case 7: // Checks for v7
+						case 9: // Checks for v9
 							if (annotation.annotationType().isAssignableFrom(
-									Odoo.api.v7.class)) {
-								return true;
+									Odoo.api.v9alpha.class)) {
+								versions++;
 							}
-							break;
 						case 8: // Checks for v8
 							if (annotation.annotationType().isAssignableFrom(
 									Odoo.api.v8.class)) {
-								return true;
+								versions++;
 							}
-							break;
+						case 7: // Checks for v7
+							if (annotation.annotationType().isAssignableFrom(
+									Odoo.api.v7.class)) {
+								versions++;
+							}
 						}
-						return false;
+						return (versions > 0) ? true : false;
 					}
 				}
 			}
@@ -450,6 +456,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return null;
 	}
 
+	public Integer selectRowId(Integer server_id) {
+		List<ODataRow> records = select("id = ? ", new Object[] { server_id });
+		if (records.size() > 0) {
+			return records.get(0).getInt(OColumn.ROW_ID);
+		}
+		return null;
+	}
+
 	/**
 	 * Select.
 	 * 
@@ -496,7 +510,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						case ManyToMany:
 							row.put(col.getName(),
 									new OM2MRecord(this, col, cr.getInt(cr
-											.getColumnIndex(OColumn.ROW_ID))));
+											.getColumnIndex("id"))));
 							break;
 						case OneToMany:
 							row.put(col.getName(),
@@ -667,7 +681,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				ids.add(create(values));
 			else {
 				ids.add(values.getInt("id"));
-				update(values, values.getInt("id"));
+				update(values, "id = ?", new Object[] { values.getInt("id") });
 			}
 		}
 		return ids;
@@ -749,7 +763,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		int affectedRows = 0;
 		SQLiteDatabase db = getWritableDatabase();
 		ContentValues values = createValues(db, updateValues);
-		values.put("is_dirty", "true");
+		if (!updateValues.contains("is_dirty"))
+			values.put("is_dirty", "true");
 		affectedRows = db.update(getTableName(), values, getWhereClause(where),
 				getWhereArgs(where, whereArgs));
 		db.close();
@@ -840,6 +855,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						OModel rel_model = createInstance(column.getType());
 						List<Integer> rel_ids = (List<Integer>) values
 								.get(column.getName());
+						/*
+						 * FIXME: When syncing data and getting records from
+						 * server it contains only id not ROW_ID
+						 * 
+						 * But, when we are updating locally it contains ROW_ID
+						 * and we need to update each record with ROW_ID.
+						 */
 						manageManyToManyRecords(db, rel_model, rel_ids,
 								values.getInt("id"), Command.Replace);
 						// (6,false,[new ids]) - will replace with given
