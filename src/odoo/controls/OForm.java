@@ -195,6 +195,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			if (v instanceof OField) {
 				OField field = (OField) v;
 				OColumn column = mModel.getColumn(field.getFieldName());
+				field.setColumn(column);
 				OFieldType widget = null;
 				String label = field.getFieldName();
 				if (column != null) {
@@ -216,7 +217,8 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 									mRecord);
 							mRecord.put(column.getName(), value);
 						}
-						column.setType(value.getClass());
+						if (column.getType() == null)
+							column.setType(value.getClass());
 						field.setColumn(column);
 					}
 					if (column.getType().isAssignableFrom(OBlob.class)) {

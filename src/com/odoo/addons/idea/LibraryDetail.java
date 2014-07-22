@@ -110,8 +110,11 @@ public class LibraryDetail extends BaseFragment {
 	}
 
 	private void updateMenu(boolean edit_mode) {
-		mMenu.findItem(R.id.menu_library_detail_save).setVisible(edit_mode);
-		mMenu.findItem(R.id.menu_library_detail_edit).setVisible(!edit_mode);
+		if (mMenu != null) {
+			mMenu.findItem(R.id.menu_library_detail_save).setVisible(edit_mode);
+			mMenu.findItem(R.id.menu_library_detail_edit)
+					.setVisible(!edit_mode);
+		}
 	}
 
 	private void initArgs() {

@@ -18,6 +18,9 @@
  */
 package com.odoo.util;
 
+import android.text.Html;
+import android.text.Spanned;
+
 public class StringUtils {
 	public static String repeat(String string, int repeat) {
 		StringBuffer str = new StringBuffer();
@@ -34,16 +37,35 @@ public class StringUtils {
 				chars[i] = Character.toUpperCase(chars[i]);
 				found = true;
 			} else if (Character.isWhitespace(chars[i]) || chars[i] == '.'
-					|| chars[i] == '\'') { // You
-											// can
-											// add
-											// other
-											// chars
-											// here
+					|| chars[i] == '\'') {
 				found = false;
 			}
 		}
 		return String.valueOf(chars);
 	}
 
+	/**
+	 * Html to string.
+	 * 
+	 * @param html
+	 *            the html
+	 * @return the string
+	 */
+	public static String htmlToString(String html) {
+
+		return Html.fromHtml(
+				html.replaceAll("\\<.*?\\>", "").replaceAll("\n", "")
+						.replaceAll("\t", " ")).toString();
+	}
+
+	/**
+	 * String to html.
+	 * 
+	 * @param string
+	 *            the string
+	 * @return the spanned
+	 */
+	public static Spanned stringToHtml(String string) {
+		return Html.fromHtml(string);
+	}
 }
