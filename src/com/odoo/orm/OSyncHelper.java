@@ -18,10 +18,12 @@ import android.util.Log;
 
 import com.odoo.App;
 import com.odoo.base.ir.IrModel;
-import com.odoo.orm.ORelationRecordList.ORelationRecord;
+import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.ORelationRecordList.ORelationRecords;
 import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
+import com.odoo.util.StringUtils;
 
 public class OSyncHelper {
 
@@ -57,6 +59,11 @@ public class OSyncHelper {
 	}
 
 	public boolean syncWithServer(OModel model, ODomain domain) {
+		return syncWithServer(model, domain, true);
+	}
+
+	public boolean syncWithServer(OModel model, ODomain domain,
+			Boolean checkForCreateWriteDate) {
 		Log.v(TAG, "syncWithServer():" + model.getModelName());
 		Log.v(TAG, "User : " + mUser.getAndroidName());
 		if (!mFinishedModels.contains(model.getModelName())) {
@@ -67,17 +74,19 @@ public class OSyncHelper {
 
 				// Adding default domain to domain
 				domain.append(model.defaultDomain());
-				if (model.checkForCreateDate()) {
-					// Adding Old data limit
-					mPref = new PreferenceManager(mContext);
-					int data_limit = mPref.getInt("sync_data_limit", 60);
-					domain.add("create_date", ">=",
-							ODate.getDateBefore(data_limit));
-				}
-				// Adding Last sync date comparing with write_date of record
-				if (model.checkForWriteDate() && !model.isEmptyTable()) {
-					String last_sync_date = getLastSyncDate(model);
-					domain.add("write_date", ">", last_sync_date);
+				if (checkForCreateWriteDate) {
+					if (model.checkForCreateDate()) {
+						// Adding Old data limit
+						mPref = new PreferenceManager(mContext);
+						int data_limit = mPref.getInt("sync_data_limit", 60);
+						domain.add("create_date", ">=",
+								ODate.getDateBefore(data_limit));
+					}
+					// Adding Last sync date comparing with write_date of record
+					if (model.checkForWriteDate() && !model.isEmptyTable()) {
+						String last_sync_date = getLastSyncDate(model);
+						domain.add("write_date", ">", last_sync_date);
+					}
 				}
 				JSONObject result = mOdoo.search_read(model.getModelName(),
 						getFields(model), domain.get());
@@ -113,7 +122,7 @@ public class OSyncHelper {
 			}
 			model.checkInActiveRecord(true);
 			for (Integer id : ids)
-				model.delete(id);
+				model.delete("id = ? ", new Object[] { id });
 			model.checkInActiveRecord(false);
 
 		} catch (Exception e) {
@@ -132,14 +141,13 @@ public class OSyncHelper {
 		try {
 			for (ODataRow row : model.select("is_dirty = ?",
 					new Object[] { true })) {
-
 				Integer recId = row.getInt("id");
 				JSONObject values = createJSONValues(model, row);
 				if (values != null) {
 					mOdoo.updateValues(model.getModelName(), values, recId);
 					OValues vals = new OValues();
 					vals.put("is_dirty", "false");
-					model.update(vals, row.getInt("local_id"), true);
+					model.update(vals, row.getInt("local_id"));
 				}
 			}
 		} catch (Exception e) {
@@ -173,7 +181,6 @@ public class OSyncHelper {
 				for (int i = 0; i < records.length(); i++) {
 					JSONObject record = records.getJSONObject(i);
 					if (model.hasRecord(record.getInt("id"))) {
-						// Check for local write date and server write date
 						mCheckIds.add(record.getInt("id"));
 						record_list.put("key_" + record.getInt("id"), record);
 					} else {
@@ -184,27 +191,26 @@ public class OSyncHelper {
 				List<ODataRow> updateToServerRecordList = new ArrayList<ODataRow>();
 				if (mCheckIds.size() > 0) {
 					// Getting write_date for records
-					JSONObject write_date_list = perm_read(model, mCheckIds);
-					JSONArray results = write_date_list.getJSONArray("result");
-					if (results.length() > 0) {
-						for (int i = 0; i < results.length(); i++) {
-							JSONObject obj = results.getJSONObject(i);
-							Integer record_id = obj.getInt("id");
-							ODataRow record = model.select(record_id);
-							String write_date = obj.getString("write_date");
-							String local_write_date = record
-									.getString("local_write_date");
-							Date local_date = ODate.convertToDate(
-									local_write_date, ODate.DEFAULT_FORMAT,
-									true);
-							Date server_date = ODate.convertToDate(write_date,
-									ODate.DEFAULT_FORMAT, true);
-							if (local_date.compareTo(server_date) > 0) {
-								updateToServerRecordList.add(record);
-							} else {
-								newORUpdateRecords.put(record_list.get("key_"
-										+ record_id));
-							}
+					HashMap<String, String> write_dates = getWriteDate(model,
+							mCheckIds);
+					for (Integer id : mCheckIds) {
+						String key = "KEY_" + id;
+						String write_date = write_dates.get(key);
+						ODataRow record = model.select("id = ? ",
+								new Object[] { id }).get(0);
+						String local_write_date = record
+								.getString("local_write_date");
+
+						Date local_date = ODate.convertToDate(local_write_date,
+								ODate.DEFAULT_FORMAT, true);
+						Date server_date = ODate.convertToDate(write_date,
+								ODate.DEFAULT_FORMAT, true);
+
+						if (local_date.compareTo(server_date) > 0) {
+							updateToServerRecordList.add(record);
+						} else {
+							newORUpdateRecords
+									.put(record_list.get("key_" + id));
 						}
 					}
 				}
@@ -232,7 +238,7 @@ public class OSyncHelper {
 							row.getInt("id"));
 					OValues vals = new OValues();
 					vals.put("is_dirty", "false");
-					model.update(vals, row.getInt("id"));
+					model.update(vals, row.getInt(OColumn.ROW_ID));
 				}
 			}
 		} catch (Exception e) {
@@ -260,7 +266,7 @@ public class OSyncHelper {
 	private void createRecordOnserver(OModel model) {
 		Log.v(TAG, "creating record on server:" + model.getModelName());
 		try {
-			for (ODataRow row : model.select("id = ?", new Object[] { false })) {
+			for (ODataRow row : model.select("id = ? ", new Object[] { 0 })) {
 				Integer newId = 0;
 				JSONObject values = createJSONValues(model, row);
 				if (values != null) {
@@ -271,7 +277,7 @@ public class OSyncHelper {
 					OValues vals = new OValues();
 					vals.put("id", newId);
 					vals.put("is_dirty", "false");
-					model.update(vals, row.getInt("local_id"), true);
+					model.update(vals, row.getInt(OColumn.ROW_ID));
 				}
 			}
 		} catch (Exception e) {
@@ -345,13 +351,53 @@ public class OSyncHelper {
 		for (String key : keys) {
 			if (!mFinishedRelModels.contains(key)) {
 				mFinishedRelModels.add(key);
-				ORelationRecord rel = mRelationRecordList.get(key);
-				// Related model
-				OModel rel_model = rel.getModel();
+				ORelationRecords rel = mRelationRecordList.get(key);
+				// Relation record models
+				OModel base_model = rel.getBaseModel();
+				OModel rel_model = rel.getRelModel();
 				ODomain rel_domain = new ODomain();
-				if (rel.getIds().size() > 0)
-					rel_domain.add("id", "in", rel.getIds());
-				syncWithServer(rel_model, rel_domain);
+				if (rel.getRelIds().size() > 0)
+					rel_domain.add("id", "in", rel.getRelIds());
+				if (syncWithServer(rel_model, rel_domain, false)) {
+					if (rel.getRefColumn() != null) {
+						List<Integer> base_ids = new ArrayList<Integer>();
+						if (rel.getRelationType() != RelationType.OneToMany) {
+							base_ids.addAll(rel.getBaseIds());
+							String where = "id in ("
+									+ StringUtils.repeat(" ?, ",
+											base_ids.size() - 1) + "?)";
+							List<ODataRow> base_records = base_model.select(
+									where, new Object[] { base_ids });
+							for (ODataRow row : base_records) {
+								String base_key = base_model.getTableName()
+										+ "_base_" + row.getInt("id");
+								List<Integer> rel_ids = rel.getRelIds(base_key);
+								List<Integer> mM2mIds = new ArrayList<Integer>();
+								for (Integer r_id : rel_ids) {
+									if (rel.getRelationType() != RelationType.ManyToMany) {
+										OValues vals = new OValues();
+										vals.put(rel.getRefColumn(),
+												rel_model.selectRowId(r_id));
+										vals.put("is_dirty", false);
+										base_model.update(vals,
+												row.getInt(OColumn.ROW_ID));
+									} else {
+										mM2mIds.add(rel_model.selectRowId(r_id));
+									}
+								}
+								if (rel.getRelationType() == RelationType.ManyToMany) {
+									OValues vals = new OValues();
+									vals.put(rel.getRefColumn(), mM2mIds);
+									vals.put("is_dirty", false);
+									vals.put("id", row.getInt("id"));
+									base_model.update(vals,
+											row.getInt(OColumn.ROW_ID));
+								}
+
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -390,24 +436,35 @@ public class OSyncHelper {
 							// Local table contains only id and name so not
 							// required
 							// to request on server
-							if (m2o.getColumns(false).size() == 2) {
+							if (m2o.getColumns(false).size() == 2
+									|| (m2o.getColumns(false).size() == 4 && model
+											.getOdooVersion()
+											.getVersion_number() > 7)) {
 								OValues m2oVals = new OValues();
 								m2oVals.put("id", m2oRecord.get(0));
 								m2oVals.put("name", m2oRecord.get(1));
-								m2o.createORReplace(m2oVals);
+								m2oVals.put("is_dirty", false);
+								Integer row_id = m2o.createORReplace(m2oVals);
+								// Replacing original id with row_id to maintain
+								// relation for local
+								m2oRecord.put(0, row_id);
+								record.put(column.getName(), m2oRecord);
 							} else {
 								// Need to create list of ids for model
-								ORelationRecord rel_record = mRelationRecordList.new ORelationRecord();
+								ORelationRecords rel_record = mRelationRecordList.new ORelationRecords();
 								if (mRelationRecordList.contains(m2o
 										.getModelName())) {
 									rel_record = mRelationRecordList.get(m2o
 											.getModelName());
 								} else {
-									rel_record.setModel(m2o);
+									rel_record.setRelModel(m2o);
+									rel_record.setBaseModel(model);
 								}
-								rel_record.addId(m2oRecord.getInt(0),
-										record.getInt("id"));
-								rel_record.setType(column.getRelationType());
+								rel_record.setRefColumn(column.getName());
+								rel_record.setRelationType(column
+										.getRelationType());
+								rel_record.addBaseRelId(record.getInt("id"),
+										m2oRecord.getInt(0));
 								mRelationRecordList.add(m2o.getModelName(),
 										rel_record);
 							}
@@ -422,16 +479,17 @@ public class OSyncHelper {
 							r_ids.add(ids_list.getInt(i));
 						}
 						values.put(column.getName(), r_ids);
-						ORelationRecord mrel_record = mRelationRecordList.new ORelationRecord();
+						ORelationRecords mrel_record = mRelationRecordList.new ORelationRecords();
 						if (mRelationRecordList.contains(m2m.getModelName())) {
 							mrel_record = mRelationRecordList.get(m2m
 									.getModelName());
 						} else {
-							mrel_record.setModel(m2m);
+							mrel_record.setRelModel(m2m);
+							mrel_record.setBaseModel(model);
 						}
-						mrel_record.addIds(r_ids, record.getInt("id"));
-						mrel_record.setType(column.getRelationType());
-						mrel_record.setRefColumn(column.getRelatedColumn());
+						mrel_record.addBaseRelId(record.getInt("id"), r_ids);
+						mrel_record.setRefColumn(column.getName());
+						mrel_record.setRelationType(column.getRelationType());
 						mRelationRecordList
 								.add(m2m.getModelName(), mrel_record);
 						break;
@@ -444,16 +502,18 @@ public class OSyncHelper {
 							r_ids.add(o2m_ids_list.getInt(i));
 						}
 						// Need to create list of ids for model
-						ORelationRecord rel_record = mRelationRecordList.new ORelationRecord();
+						ORelationRecords rel_record = mRelationRecordList.new ORelationRecords();
 						if (mRelationRecordList.contains(o2m.getModelName())) {
 							rel_record = mRelationRecordList.get(o2m
 									.getModelName());
 						} else {
-							rel_record.setModel(o2m);
+							rel_record.setRelModel(model);
+							rel_record.setBaseModel(o2m);
 						}
-						rel_record.addIds(r_ids, record.getInt("id"));
-						rel_record.setType(column.getRelationType());
+						for (Integer id : r_ids)
+							rel_record.addBaseRelId(id, record.getInt("id"));
 						rel_record.setRefColumn(column.getRelatedColumn());
+						rel_record.setRelationType(column.getRelationType());
 						mRelationRecordList.add(o2m.getModelName(), rel_record);
 						break;
 					}
@@ -462,6 +522,7 @@ public class OSyncHelper {
 					values.put(column.getName(), record.get(column.getName()));
 				}
 			}
+			values.put("is_dirty", false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -475,8 +536,9 @@ public class OSyncHelper {
 			List<OValues> values_list = new ArrayList<OValues>();
 			for (int i = 0; i < records.length(); i++) {
 				JSONObject record = records.getJSONObject(i);
-				values_list.add(createValueRow(model, model.getColumns(false),
-						record));
+				OValues vals = createValueRow(model, model.getColumns(false),
+						record);
+				values_list.add(vals);
 			}
 			// Creating new records.
 			List<Integer> affectedIds = model.createORReplace(values_list);
@@ -529,6 +591,35 @@ public class OSyncHelper {
 			e.printStackTrace();
 			return new JSONObject();
 		}
+	}
+
+	private HashMap<String, String> getWriteDate(OModel model, List<Integer> ids) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		try {
+			JSONArray results = new JSONArray();
+			if (model.getPermReadColumn("write_date") != null) {
+				JSONObject fields = new JSONObject();
+				fields.accumulate("fields", "write_date");
+				ODomain domain = new ODomain();
+				domain.add("id", "in", ids);
+				JSONObject result = mOdoo.search_read(model.getModelName(),
+						fields, domain.get());
+				results = result.getJSONArray("records");
+			} else {
+				JSONObject write_date_list = perm_read(model, ids);
+				results = write_date_list.getJSONArray("result");
+			}
+			if (results.length() > 0) {
+				for (int i = 0; i < results.length(); i++) {
+					JSONObject obj = results.getJSONObject(i);
+					map.put("KEY_" + obj.getInt("id"),
+							obj.getString("write_date"));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return map;
 	}
 
 	private JSONObject perm_read(OModel model, List<Integer> ids) {

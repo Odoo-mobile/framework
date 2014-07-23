@@ -505,12 +505,13 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 * Creates the many to one widget.
 	 */
 	private void createManyToOneWidget() {
+		String ref_column = mAttributes.getString(KEY_REF_COLUMN, "name");
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mManyToOne = new OManyToOneWidget(mContext);
 			mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
 					LayoutParams.WRAP_CONTENT);
 			mManyToOne.setLayoutParams(mLayoutParams);
-			mManyToOne.setModel(mModel, "name");
+			mManyToOne.setModel(mModel, ref_column);
 			if (mControlRecord != null)
 				mManyToOne.setRecordId((Integer) mControlRecord.getM2ORecord(
 						mColumn.getName()).getId());
@@ -522,13 +523,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			if (mControlRecord != null) {
 				ODataRow row = mControlRecord.getM2ORecord(mColumn.getName())
 						.browse();
-				String ref_column = mAttributes.getString(KEY_REF_COLUMN,
-						"name");
 				if (row != null)
 					setText(row.getString(ref_column));
 				else
 					setText("No " + mColumn.getLabel());
-
 			}
 		}
 	}
@@ -938,6 +936,6 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 */
 	@Override
 	public void onManyToOneItemChangeListener(OColumn column, ODataRow row) {
-		mFieldValue = row.get("id");
+		mFieldValue = row.get(OColumn.ROW_ID);
 	}
 }

@@ -43,6 +43,7 @@ import com.odoo.addons.idea.model.BookBook.BookAuthor;
 import com.odoo.addons.idea.model.BookBook.BookCategory;
 import com.odoo.addons.idea.model.BookBook.BookStudent;
 import com.odoo.addons.idea.providers.library.LibraryProvider;
+import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
@@ -258,7 +259,7 @@ public class Library extends BaseFragment implements OnPullListener,
 		LibraryDetail library = new LibraryDetail();
 		Bundle bundle = new Bundle();
 		bundle.putString("key", mCurrentKey.toString());
-		bundle.putAll(row.getPrimaryBundleData());
+		bundle.putInt(OColumn.ROW_ID, row.getInt(OColumn.ROW_ID));
 		library.setArguments(bundle);
 		startFragment(library, true);
 	}

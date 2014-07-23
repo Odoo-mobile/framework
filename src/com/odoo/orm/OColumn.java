@@ -25,6 +25,8 @@ import java.lang.reflect.Method;
  */
 public class OColumn {
 
+	public static final String ROW_ID = "local_id";
+
 	/**
 	 * The Enum RelationType.
 	 */

@@ -69,7 +69,7 @@
     <string name="title_connecting">Connecting&#8230;</string>
     <string name="title_loggin_in">Logging in&#8230;</string>
     <string name="title_account_create">Creating account&#8230;</string>
-    <string name="title_database_create">Creating database&#8230;</string>
+    <string name="title_database_create">Creating local DB&#8230;</string>
     <string name="title_getting_instances">Getting instances&#8230;</string>
     <string name="title_confirm">Confirm</string>
     <string name="title_ssl_warning">SSL Warning</string>

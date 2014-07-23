@@ -8,6 +8,7 @@ import odoo.ODomain;
 import odoo.Odoo;
 import odoo.OdooAccountExpireException;
 import odoo.OdooInstance;
+import odoo.OdooVersion;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -123,6 +124,10 @@ public class OdooHelper {
 				userObj.setInstanceUrl(instance.getInstanceUrl());
 				userObj.setClientId(instance.getClientId());
 			}
+			OdooVersion odooVersion = mApp.getOdooVersion();
+			userObj.setVersion_number(odooVersion.getVersion_number());
+			userObj.setVersion_serie(odooVersion.getServer_serie());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

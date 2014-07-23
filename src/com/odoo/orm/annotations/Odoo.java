@@ -44,4 +44,32 @@ public @interface Odoo {
 		String method() default "";
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface api {
+
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target({ ElementType.FIELD, ElementType.METHOD })
+		public @interface v7 {
+			String[] versions() default {};
+
+			String[] exclude() default {};
+		}
+
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target({ ElementType.FIELD, ElementType.METHOD })
+		public @interface v8 {
+			String[] versions() default {};
+
+			String[] exclude() default {};
+		}
+
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target({ ElementType.FIELD, ElementType.METHOD })
+		public @interface v9alpha {
+			String[] versions() default {};
+
+			String[] exclude() default {};
+		}
+	}
+
 }

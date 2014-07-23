@@ -18,8 +18,10 @@
  */
 package com.odoo;
 
+import odoo.OVersionException;
 import odoo.Odoo;
 import odoo.OdooInstance;
+import odoo.OdooVersion;
 import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -37,6 +39,16 @@ public class App extends Application {
 	public void onCreate() {
 		Log.d(TAG, "App->onCreate()");
 		super.onCreate();
+	}
+
+	public OdooVersion getOdooVersion() {
+		if (mOdooInstance != null)
+			try {
+				return mOdooInstance.getOdooVersion();
+			} catch (OVersionException e) {
+				e.printStackTrace();
+			}
+		return null;
 	}
 
 	public Odoo createInstance() {
@@ -62,7 +74,7 @@ public class App extends Application {
 				e.printStackTrace();
 			}
 		}
-		mOdooInstance = odoo;
+		setOdooInstance(odoo);
 		return odoo;
 	}
 
