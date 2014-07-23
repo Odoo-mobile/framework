@@ -26,6 +26,7 @@ import odoo.controls.OField.OFieldType;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -296,7 +297,9 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			values = new OValues();
 			for (String key : mFields) {
 				OField field = (OField) findViewWithTag(key);
-				values.put(field.getFieldName(), field.getValue());
+				if (field.getValue()!= null) {
+					values.put(field.getFieldName(), field.getValue());
+				}
 			}
 			if (mRecord != null) {
 				values.put("local_record",
