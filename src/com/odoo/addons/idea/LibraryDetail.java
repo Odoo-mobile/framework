@@ -84,24 +84,24 @@ public class LibraryDetail extends BaseFragment {
 		case Students:
 			OControls.setVisible(mView, R.id.odooFormStudents);
 			mForm = (OForm) mView.findViewById(R.id.odooFormStudents);
-			BookStudent student = new BookStudent(getActivity());
+			mModel = new BookStudent(getActivity());
 			if (mId != null) {
-				mRecord = student.select(mId);
+				mRecord = mModel.select(mId);
 				mForm.initForm(mRecord);
 			} else {
-				mForm.setModel(student);
+				mForm.setModel(mModel);
 				mForm.setEditable(mEditMode);
 			}
 			break;
 		case Category:
 			OControls.setVisible(mView, R.id.odooFormCategories);
 			mForm = (OForm) mView.findViewById(R.id.odooFormCategories);
-			BookCategory category = new BookCategory(getActivity());
+			mModel = new BookCategory(getActivity());
 			if (mId != null) {
-				mRecord = category.select(mId);
+				mRecord = mModel.select(mId);
 				mForm.initForm(mRecord);
 			} else {
-				mForm.setModel(category);
+				mForm.setModel(mModel);
 				mForm.setEditable(mEditMode);
 			}
 			break;

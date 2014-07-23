@@ -33,6 +33,7 @@ public class OUser {
 	/** The username. */
 	private String username;
 
+	/** The name. */
 	private String name;
 
 	/** The user_id. */
@@ -65,14 +66,65 @@ public class OUser {
 	/** The company_id. */
 	private String company_id;
 
+	/** The allow_self_signed_ssl. */
 	private boolean allow_self_signed_ssl = false;
 
+	/** The oauth_login. */
 	private boolean oauth_login = false;
 
+	/** The version_number. */
+	private Integer version_number = 0;
+
+	/** The version_serie. */
+	private String version_serie = null;
+
 	// If oauth login
+	/** The instance_url. */
 	private String instance_url = null;
+
+	/** The instance_database. */
 	private String instance_database = null;
+
+	/** The client_id. */
 	private String client_id = null;
+
+	/**
+	 * Gets the name.
+	 * 
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Sets the name.
+	 * 
+	 * @param name
+	 *            the new name
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Gets the company_id.
+	 * 
+	 * @return the company_id
+	 */
+	public String getCompany_id() {
+		return company_id;
+	}
+
+	/**
+	 * Sets the company_id.
+	 * 
+	 * @param company_id
+	 *            the new company_id
+	 */
+	public void setCompany_id(String company_id) {
+		this.company_id = company_id;
+	}
 
 	/**
 	 * Gets the data as bundle.
@@ -99,34 +151,9 @@ public class OUser {
 		bundle.putString("instance_url", this.getInstanceUrl());
 		bundle.putString("oauth_login", this.isOAauthLogin() + "");
 		bundle.putString("client_id", this.getClientId());
+		bundle.putString("odoo_version_number", getVersion_number() + "");
+		bundle.putString("odoo_version_serie", getVersion_serie());
 		return bundle;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * Gets the company_id.
-	 * 
-	 * @return the company_id
-	 */
-	public String getCompany_id() {
-		return company_id;
-	}
-
-	/**
-	 * Sets the company_id.
-	 * 
-	 * @param company_id
-	 *            the new company_id
-	 */
-	public void setCompany_id(String company_id) {
-		this.company_id = company_id;
 	}
 
 	/**
@@ -136,25 +163,28 @@ public class OUser {
 	 *            the new from bundle
 	 */
 	public void setFromBundle(Bundle data) {
-		this.setName(data.getString("name"));
-		this.setUsername(data.getString("username"));
-		this.setUser_id(Integer.parseInt(data.getString("user_id")));
-		this.setPartner_id(Integer.parseInt(data.getString("partner_id")));
-		this.setTimezone(data.getString("timezone"));
-		this.setIsactive(Boolean.parseBoolean(data.getString("isactive")));
-		this.setAvatar(data.getString("avatar"));
-		this.setDatabase(data.getString("database"));
-		this.setHost(data.getString("host"));
-		this.setAndroidName(data.getString("android_name"));
-		this.setPassword(data.getString("password"));
-		this.setCompany_id(data.getString("company_id"));
-		this.setAllowSelfSignedSSL(Boolean.parseBoolean(data
+		setName(data.getString("name"));
+		setUsername(data.getString("username"));
+		setUser_id(Integer.parseInt(data.getString("user_id")));
+		setPartner_id(Integer.parseInt(data.getString("partner_id")));
+		setTimezone(data.getString("timezone"));
+		setIsactive(Boolean.parseBoolean(data.getString("isactive")));
+		setAvatar(data.getString("avatar"));
+		setDatabase(data.getString("database"));
+		setHost(data.getString("host"));
+		setAndroidName(data.getString("android_name"));
+		setPassword(data.getString("password"));
+		setCompany_id(data.getString("company_id"));
+		setAllowSelfSignedSSL(Boolean.parseBoolean(data
 				.getString("allow_self_signed_ssl")));
+		setVersion_number(Integer.parseInt(data
+				.getString("odoo_version_number")));
+		setVersion_serie(data.getString("odoo_version_serie"));
 		// If oAuth Login
-		this.setInstanceDatabase(data.getString("instance_database"));
-		this.setInstanceUrl(data.getString("instance_url"));
-		this.setOAuthLogin(Boolean.parseBoolean(data.getString("oauth_login")));
-		this.setClientId(data.getString("client_id"));
+		setInstanceDatabase(data.getString("instance_database"));
+		setInstanceUrl(data.getString("instance_url"));
+		setOAuthLogin(Boolean.parseBoolean(data.getString("oauth_login")));
+		setClientId(data.getString("client_id"));
 	}
 
 	/**
@@ -166,29 +196,31 @@ public class OUser {
 	 *            the account
 	 */
 	public void fillFromAccount(AccountManager accMgr, Account account) {
-		this.setName(accMgr.getUserData(account, "name"));
-		this.setUsername(accMgr.getUserData(account, "username"));
-		this.setUser_id(Integer.parseInt(accMgr.getUserData(account, "user_id")));
-		this.setPartner_id(Integer.parseInt(accMgr.getUserData(account,
-				"partner_id")));
-		this.setTimezone(accMgr.getUserData(account, "timezone"));
-		this.setIsactive(Boolean.parseBoolean(accMgr.getUserData(account,
-				"isactive")));
-		this.setAvatar(accMgr.getUserData(account, "avatar"));
-		this.setDatabase(accMgr.getUserData(account, "database"));
-		this.setHost(accMgr.getUserData(account, "host"));
-		this.setAndroidName(accMgr.getUserData(account, "android_name"));
-		this.setPassword(accMgr.getUserData(account, "password"));
-		this.setCompany_id(accMgr.getUserData(account, "company_id"));
-		this.setAllowSelfSignedSSL(Boolean.parseBoolean(accMgr.getUserData(
-				account, "allow_self_signed_ssl")));
+		setName(accMgr.getUserData(account, "name"));
+		setUsername(accMgr.getUserData(account, "username"));
+		setUser_id(Integer.parseInt(accMgr.getUserData(account, "user_id")));
+		setPartner_id(Integer.parseInt(accMgr
+				.getUserData(account, "partner_id")));
+		setTimezone(accMgr.getUserData(account, "timezone"));
+		setIsactive(Boolean.parseBoolean(accMgr
+				.getUserData(account, "isactive")));
+		setAvatar(accMgr.getUserData(account, "avatar"));
+		setDatabase(accMgr.getUserData(account, "database"));
+		setHost(accMgr.getUserData(account, "host"));
+		setAndroidName(accMgr.getUserData(account, "android_name"));
+		setPassword(accMgr.getUserData(account, "password"));
+		setCompany_id(accMgr.getUserData(account, "company_id"));
+		setAllowSelfSignedSSL(Boolean.parseBoolean(accMgr.getUserData(account,
+				"allow_self_signed_ssl")));
+		setVersion_number(Integer.parseInt(accMgr.getUserData(account,
+				"odoo_version_number")));
+		setVersion_serie(accMgr.getUserData(account, "odoo_version_serie"));
 		// If oAuth login
-		this.setOAuthLogin(Boolean.parseBoolean(accMgr.getUserData(account,
+		setOAuthLogin(Boolean.parseBoolean(accMgr.getUserData(account,
 				"oauth_login")));
-		this.setInstanceDatabase(accMgr.getUserData(account,
-				"instance_database"));
-		this.setInstanceUrl(accMgr.getUserData(account, "instance_url"));
-		this.setClientId(accMgr.getUserData(account, "client_id"));
+		setInstanceDatabase(accMgr.getUserData(account, "instance_database"));
+		setInstanceUrl(accMgr.getUserData(account, "instance_url"));
+		setClientId(accMgr.getUserData(account, "client_id"));
 	}
 
 	/**
@@ -381,47 +413,135 @@ public class OUser {
 		this.host = host;
 	}
 
+	/**
+	 * Current.
+	 * 
+	 * @param context
+	 *            the context
+	 * @return the o user
+	 */
 	public static OUser current(Context context) {
 		return OdooAccountManager.currentUser(context);
 	}
 
+	/**
+	 * Checks if is allow self signed ssl.
+	 * 
+	 * @return true, if is allow self signed ssl
+	 */
 	public boolean isAllowSelfSignedSSL() {
 		return allow_self_signed_ssl;
 	}
 
+	/**
+	 * Sets the allow self signed ssl.
+	 * 
+	 * @param allow_self_signed_ssl
+	 *            the new allow self signed ssl
+	 */
 	public void setAllowSelfSignedSSL(boolean allow_self_signed_ssl) {
 		this.allow_self_signed_ssl = allow_self_signed_ssl;
 	}
 
+	/**
+	 * Checks if is o aauth login.
+	 * 
+	 * @return true, if is o aauth login
+	 */
 	public boolean isOAauthLogin() {
 		return oauth_login;
 	}
 
+	/**
+	 * Sets the o auth login.
+	 * 
+	 * @param oauth_login
+	 *            the new o auth login
+	 */
 	public void setOAuthLogin(boolean oauth_login) {
 		this.oauth_login = oauth_login;
 	}
 
+	/**
+	 * Gets the instance url.
+	 * 
+	 * @return the instance url
+	 */
 	public String getInstanceUrl() {
 		return instance_url;
 	}
 
+	/**
+	 * Sets the instance url.
+	 * 
+	 * @param instnace_url
+	 *            the new instance url
+	 */
 	public void setInstanceUrl(String instnace_url) {
 		this.instance_url = instnace_url;
 	}
 
+	/**
+	 * Gets the instance database.
+	 * 
+	 * @return the instance database
+	 */
 	public String getInstanceDatabase() {
 		return instance_database;
 	}
 
+	/**
+	 * Sets the instance database.
+	 * 
+	 * @param instance_database
+	 *            the new instance database
+	 */
 	public void setInstanceDatabase(String instance_database) {
 		this.instance_database = instance_database;
 	}
 
+	/**
+	 * Gets the client id.
+	 * 
+	 * @return the client id
+	 */
 	public String getClientId() {
 		return client_id;
 	}
 
+	/**
+	 * Sets the client id.
+	 * 
+	 * @param client_id
+	 *            the new client id
+	 */
 	public void setClientId(String client_id) {
 		this.client_id = client_id;
+	}
+
+	public Integer getVersion_number() {
+		return version_number;
+	}
+
+	public void setVersion_number(Integer version_number) {
+		this.version_number = version_number;
+	}
+
+	public String getVersion_serie() {
+		return version_serie;
+	}
+
+	public void setVersion_serie(String version_serie) {
+		this.version_serie = version_serie;
+	}
+
+	public static String getDBName(Context context) {
+		String db_name = "OdooSQLite";
+		OUser user = current(context);
+		if (user != null) {
+			db_name += "_" + user.getUsername();
+			db_name += "_" + user.getDatabase();
+		}
+		return db_name + ".db";
 	}
 }
