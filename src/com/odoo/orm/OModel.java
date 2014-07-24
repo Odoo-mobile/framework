@@ -33,6 +33,7 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -46,6 +47,7 @@ import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.receivers.DataSetChangeReceiver;
 import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
@@ -365,30 +367,38 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		if (mOdooVersion != null) {
 			Annotation[] annotations = field.getAnnotations();
 			if (annotations.length > 0) {
+				int versions = 0;
 				for (Annotation annotation : annotations) {
+					versions = 0;
 					if (annotation.annotationType().getDeclaringClass()
 							.isAssignableFrom(Odoo.api.class)) {
-						int versions = 0;
 						switch (mOdooVersion.getVersion_number()) {
 						case 9: // Checks for v9
 							if (annotation.annotationType().isAssignableFrom(
 									Odoo.api.v9alpha.class)) {
 								versions++;
 							}
+							break;
 						case 8: // Checks for v8
 							if (annotation.annotationType().isAssignableFrom(
 									Odoo.api.v8.class)) {
 								versions++;
 							}
+							break;
 						case 7: // Checks for v7
 							if (annotation.annotationType().isAssignableFrom(
 									Odoo.api.v7.class)) {
 								versions++;
 							}
+							break;
 						}
-						return (versions > 0) ? true : false;
+					}
+					if (annotation.annotationType().isAssignableFrom(
+							Odoo.Functional.class)) {
+						versions++;
 					}
 				}
+				return (versions > 0) ? true : false;
 			}
 			return true;
 		}
@@ -680,13 +690,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return the list
 	 */
 	public List<Integer> createORReplace(List<OValues> values_list) {
-		Log.v(TAG, "creating OR Replacing " + values_list.size() + " records");
 		List<Integer> ids = new ArrayList<Integer>();
 		for (OValues values : values_list) {
 			if (!hasRecord(values.getInt("id")))
 				ids.add(create(values));
 			else {
-				ids.add(values.getInt("id"));
+				ids.add(selectRowId(values.getInt("id")));
 				update(values, "id = ?", new Object[] { values.getInt("id") });
 			}
 		}
@@ -720,7 +729,17 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		SQLiteDatabase db = getWritableDatabase();
 		db.insert(getTableName(), null, createValues(db, values));
 		db.close();
-		return getCreateId();
+		int newId = getCreateId();
+		sendDatasetChangeBroadcast(newId);
+		return newId;
+	}
+
+	private void sendDatasetChangeBroadcast(Integer newId) {
+		Intent intent = new Intent();
+		intent.setAction(DataSetChangeReceiver.DATA_CHANGED);
+		intent.putExtra("model", getModelName());
+		intent.putExtra("id", newId);
+		mContext.sendBroadcast(intent);
 	}
 
 	/**
@@ -1109,6 +1128,17 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 */
 	public Boolean checkForCreateDate() {
 		return true;
+	}
+
+	public OUser user() {
+		return mUser;
+	}
+
+	public void setCreateWriteLocal(Boolean make_local) {
+		if (make_local) {
+			write_date.setLocalColumn();
+			create_date.setLocalColumn();
+		}
 	}
 
 	/**

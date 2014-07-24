@@ -740,7 +740,6 @@ public class OList extends ScrollView implements View.OnClickListener,
 			keys.addAll(_listener_view.keySet());
 			return keys;
 		}
-
 	}
 
 	/**

@@ -18,6 +18,7 @@
  */
 package odoo.controls;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -47,6 +48,7 @@ import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.ODateTime;
@@ -321,8 +323,14 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		} else {
 			if (mControlRecord != null) {
 
-				List<ODataRow> records = mControlRecord.getM2MRecord(
-						mColumn.getName()).browseEach();
+				List<ODataRow> records = new ArrayList<ODataRow>();
+				if (mColumn.getRelationType() == RelationType.OneToMany) {
+					records.addAll(mControlRecord.getO2MRecord(
+							mColumn.getName()).browseEach());
+				} else {
+					records.addAll(mControlRecord.getM2MRecord(
+							mColumn.getName()).browseEach());
+				}
 				if (records.size() > 0) {
 					HorizontalScrollView mHScroll = new HorizontalScrollView(
 							mContext);

@@ -207,7 +207,8 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 						widget = OFieldType.MANY_TO_ONE;
 					}
 					if (column.getRelationType() != null
-							&& column.getRelationType() == RelationType.ManyToMany) {
+							&& (column.getRelationType() == RelationType.ManyToMany || column
+									.getRelationType() == RelationType.OneToMany)) {
 						widget = OFieldType.MANY_TO_MANY_TAGS;
 					}
 					if (column.isFunctionalColumn()) {
@@ -296,7 +297,9 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			values = new OValues();
 			for (String key : mFields) {
 				OField field = (OField) findViewWithTag(key);
-				values.put(field.getFieldName(), field.getValue());
+				if (field.getValue() != null) {
+					values.put(field.getFieldName(), field.getValue());
+				}
 			}
 			if (mRecord != null) {
 				values.put("local_record",

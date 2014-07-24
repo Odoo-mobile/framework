@@ -58,6 +58,11 @@ public class OSyncHelper {
 		return syncWithServer(mModel, domain);
 	}
 
+	public boolean syncWithServer(ODomain domain,
+			Boolean checkForWriteCreateDate) {
+		return syncWithServer(mModel, domain, checkForWriteCreateDate);
+	}
+
 	public boolean syncWithServer(OModel model, ODomain domain) {
 		return syncWithServer(model, domain, true);
 	}
@@ -66,7 +71,8 @@ public class OSyncHelper {
 			Boolean checkForCreateWriteDate) {
 		Log.v(TAG, "syncWithServer():" + model.getModelName());
 		Log.v(TAG, "User : " + mUser.getAndroidName());
-		if (!mFinishedModels.contains(model.getModelName())) {
+		if (!mFinishedModels.contains(model.getModelName())
+				|| !checkForCreateWriteDate) {
 			mFinishedModels.add(model.getModelName());
 			try {
 				if (domain == null)
@@ -90,7 +96,11 @@ public class OSyncHelper {
 				}
 				JSONObject result = mOdoo.search_read(model.getModelName(),
 						getFields(model), domain.get());
-				handleResult(model, checkForLocalLatestUpdate(model, result));
+				if (checkForCreateWriteDate)
+					handleResult(model,
+							checkForLocalLatestUpdate(model, result));
+				else
+					handleResult(model, result);
 				handleRelationRecords(model);
 				createRecordOnserver(model);
 				updateToServer(model);
@@ -137,7 +147,6 @@ public class OSyncHelper {
 	 * @param model
 	 */
 	private void updateToServer(OModel model) {
-		Log.v(TAG, "updating to server:" + model.getModelName());
 		try {
 			for (ODataRow row : model.select("is_dirty = ?",
 					new Object[] { true })) {
@@ -165,9 +174,6 @@ public class OSyncHelper {
 	 *         server
 	 */
 	private JSONObject checkForLocalLatestUpdate(OModel model, JSONObject result) {
-		Log.v(TAG,
-				"checking for local latest updated record:"
-						+ model.getModelName());
 		JSONObject newResult = result;
 		try {
 			if (result.has("records")
@@ -227,9 +233,6 @@ public class OSyncHelper {
 	}
 
 	private void updateRecordOnServer(OModel model, List<ODataRow> records) {
-		Log.v(TAG,
-				"Updating " + records.size() + " record on server:"
-						+ model.getModelName());
 		try {
 			for (ODataRow row : records) {
 				JSONObject values = createJSONValues(model, row);
@@ -247,7 +250,6 @@ public class OSyncHelper {
 	}
 
 	private void deleteRecordFromServer(OModel model) {
-		Log.v(TAG, "deleting records " + model.getModelName());
 		try {
 			model.checkInActiveRecord(true);
 			for (ODataRow row : model.select("is_active = ? AND is_dirty = ?",
@@ -264,7 +266,6 @@ public class OSyncHelper {
 	}
 
 	private void createRecordOnserver(OModel model) {
-		Log.v(TAG, "creating record on server:" + model.getModelName());
 		try {
 			for (ODataRow row : model.select("id = ? ", new Object[] { 0 })) {
 				Integer newId = 0;
@@ -318,7 +319,6 @@ public class OSyncHelper {
 	}
 
 	public boolean syncWithMethod(String method, OArguments args) {
-		Log.v(TAG, "syncWithMethod():" + mModel.getModelName());
 		boolean synced = false;
 		try {
 			JSONObject result = mOdoo.call_kw(mModel.getModelName(), method,
@@ -331,7 +331,7 @@ public class OSyncHelper {
 		return synced;
 	}
 
-	private String getLastSyncDate(OModel model) {
+	public String getLastSyncDate(OModel model) {
 		String last_sync_date = "false";
 		IrModel irModel = new IrModel(mContext);
 		List<ODataRow> records = irModel.select("model = ?",
@@ -346,55 +346,65 @@ public class OSyncHelper {
 	}
 
 	private void handleRelationRecords(OModel model) {
+
 		List<String> keys = new ArrayList<String>();
 		keys.addAll(mRelationRecordList.keys());
 		for (String key : keys) {
 			if (!mFinishedRelModels.contains(key)) {
 				mFinishedRelModels.add(key);
 				ORelationRecords rel = mRelationRecordList.get(key);
-				// Relation record models
 				OModel base_model = rel.getBaseModel();
 				OModel rel_model = rel.getRelModel();
 				ODomain rel_domain = new ODomain();
-				if (rel.getRelIds().size() > 0)
-					rel_domain.add("id", "in", rel.getRelIds());
-				if (syncWithServer(rel_model, rel_domain, false)) {
+				boolean syncFlag = false;
+				if (rel.getRelIds().size() > 0) {
+					List<Integer> syncIds = new ArrayList<Integer>();
+					for (int id : rel.getRelIds())
+						if (!rel_model.hasRecord(id))
+							syncIds.add(id);
+					rel_domain.add("id", "in", syncIds);
+					if (syncIds.size() > 0) {
+						syncFlag = syncWithServer(rel_model, rel_domain, false);
+					} else
+						syncFlag = true;
+				}
+				if (syncFlag) {
 					if (rel.getRefColumn() != null) {
 						List<Integer> base_ids = new ArrayList<Integer>();
-						if (rel.getRelationType() != RelationType.OneToMany) {
-							base_ids.addAll(rel.getBaseIds());
-							String where = "id in ("
-									+ StringUtils.repeat(" ?, ",
-											base_ids.size() - 1) + "?)";
-							List<ODataRow> base_records = base_model.select(
-									where, new Object[] { base_ids });
-							for (ODataRow row : base_records) {
-								String base_key = base_model.getTableName()
-										+ "_base_" + row.getInt("id");
-								List<Integer> rel_ids = rel.getRelIds(base_key);
-								List<Integer> mM2mIds = new ArrayList<Integer>();
-								for (Integer r_id : rel_ids) {
+						base_ids.addAll(rel.getBaseIds());
+						String where = "id in ("
+								+ StringUtils.repeat(" ?, ",
+										base_ids.size() - 1) + "?)";
+						List<ODataRow> base_records = base_model.select(where,
+								new Object[] { base_ids });
+						for (ODataRow row : base_records) {
+							String base_key = base_model.getTableName()
+									+ "_base_" + row.getInt("id");
+							List<Integer> rel_ids = rel.getRelIds(base_key);
+							List<Integer> mM2mIds = new ArrayList<Integer>();
+							for (Integer r_id : rel_ids) {
+								Integer rel_id = rel_model.selectRowId(r_id);
+								if (rel_id != null) {
 									if (rel.getRelationType() != RelationType.ManyToMany) {
 										OValues vals = new OValues();
-										vals.put(rel.getRefColumn(),
-												rel_model.selectRowId(r_id));
+										vals.put(rel.getRefColumn(), rel_id);
 										vals.put("is_dirty", false);
 										base_model.update(vals,
 												row.getInt(OColumn.ROW_ID));
 									} else {
-										mM2mIds.add(rel_model.selectRowId(r_id));
+										mM2mIds.add(rel_id);
 									}
 								}
-								if (rel.getRelationType() == RelationType.ManyToMany) {
-									OValues vals = new OValues();
-									vals.put(rel.getRefColumn(), mM2mIds);
-									vals.put("is_dirty", false);
-									vals.put("id", row.getInt("id"));
-									base_model.update(vals,
-											row.getInt(OColumn.ROW_ID));
-								}
-
 							}
+							if (rel.getRelationType() == RelationType.ManyToMany) {
+								OValues vals = new OValues();
+								vals.put(rel.getRefColumn(), mM2mIds);
+								vals.put("is_dirty", false);
+								vals.put("id", row.getInt("id"));
+								base_model.update(vals,
+										row.getInt(OColumn.ROW_ID));
+							}
+
 						}
 					}
 				}
@@ -430,6 +440,8 @@ public class OSyncHelper {
 						 * Handling ManyToOne records
 						 */
 						OModel m2o = model.createInstance(column.getType());
+						String rel_key = m2o.getTableName() + "_"
+								+ column.getName();
 						if (record.get(column.getName()) instanceof JSONArray) {
 							JSONArray m2oRecord = record.getJSONArray(column
 									.getName());
@@ -452,10 +464,9 @@ public class OSyncHelper {
 							} else {
 								// Need to create list of ids for model
 								ORelationRecords rel_record = mRelationRecordList.new ORelationRecords();
-								if (mRelationRecordList.contains(m2o
-										.getModelName())) {
-									rel_record = mRelationRecordList.get(m2o
-											.getModelName());
+								if (mRelationRecordList.contains(rel_key)) {
+									rel_record = mRelationRecordList
+											.get(rel_key);
 								} else {
 									rel_record.setRelModel(m2o);
 									rel_record.setBaseModel(model);
@@ -465,14 +476,15 @@ public class OSyncHelper {
 										.getRelationType());
 								rel_record.addBaseRelId(record.getInt("id"),
 										m2oRecord.getInt(0));
-								mRelationRecordList.add(m2o.getModelName(),
-										rel_record);
+								// Creating relation ids list for relation model
+								mRelationRecordList.add(rel_key, rel_record);
 							}
 							values.put(column.getName(), m2oRecord.get(0));
 						}
 						break;
 					case ManyToMany:
 						OModel m2m = model.createInstance(column.getType());
+						rel_key = m2m.getTableName() + "_" + column.getName();
 						JSONArray ids_list = record.getJSONArray(column
 								.getName());
 						for (int i = 0; i < ids_list.length(); i++) {
@@ -480,9 +492,8 @@ public class OSyncHelper {
 						}
 						values.put(column.getName(), r_ids);
 						ORelationRecords mrel_record = mRelationRecordList.new ORelationRecords();
-						if (mRelationRecordList.contains(m2m.getModelName())) {
-							mrel_record = mRelationRecordList.get(m2m
-									.getModelName());
+						if (mRelationRecordList.contains(rel_key)) {
+							mrel_record = mRelationRecordList.get(rel_key);
 						} else {
 							mrel_record.setRelModel(m2m);
 							mrel_record.setBaseModel(model);
@@ -490,11 +501,13 @@ public class OSyncHelper {
 						mrel_record.addBaseRelId(record.getInt("id"), r_ids);
 						mrel_record.setRefColumn(column.getName());
 						mrel_record.setRelationType(column.getRelationType());
-						mRelationRecordList
-								.add(m2m.getModelName(), mrel_record);
+						// Creating relation ids list for relation model
+						List<Integer> mRelationIds = new ArrayList<Integer>();
+						mRelationRecordList.add(rel_key, mrel_record);
 						break;
 					case OneToMany:
 						OModel o2m = model.createInstance(column.getType());
+						rel_key = o2m.getTableName() + "_" + column.getName();
 						JSONArray o2m_ids_list = record.getJSONArray(column
 								.getName());
 						r_ids.clear();
@@ -503,18 +516,17 @@ public class OSyncHelper {
 						}
 						// Need to create list of ids for model
 						ORelationRecords rel_record = mRelationRecordList.new ORelationRecords();
-						if (mRelationRecordList.contains(o2m.getModelName())) {
-							rel_record = mRelationRecordList.get(o2m
-									.getModelName());
+						if (mRelationRecordList.contains(rel_key)) {
+							rel_record = mRelationRecordList.get(rel_key);
 						} else {
-							rel_record.setRelModel(model);
-							rel_record.setBaseModel(o2m);
+							rel_record.setRelModel(o2m);
+							rel_record.setBaseModel(model);
 						}
-						for (Integer id : r_ids)
-							rel_record.addBaseRelId(id, record.getInt("id"));
-						rel_record.setRefColumn(column.getRelatedColumn());
+						rel_record.addBaseRelId(record.getInt("id"), r_ids);
+						rel_record.setRefColumn(column.getName());
 						rel_record.setRelationType(column.getRelationType());
-						mRelationRecordList.add(o2m.getModelName(), rel_record);
+						// Creating relation ids list for relation model
+						mRelationRecordList.add(rel_key, rel_record);
 						break;
 					}
 				} else {
