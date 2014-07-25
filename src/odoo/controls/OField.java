@@ -62,7 +62,6 @@ import com.odoo.util.StringUtils;
  * The Class OField.
  */
 public class OField extends LinearLayout implements ManyToOneItemChangeListener {
-
 	/** The Constant TAG. */
 	public static final String TAG = OField.class.getSimpleName();
 
@@ -503,6 +502,21 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 */
 	private void createBinaryControl(OFieldType binary_type,
 			boolean roundedImage) {
+
+		ODataRow record = null;
+		String column_name = getRefColumn();
+		if (mControlRecord != null) {
+			if (column_name != null) {
+				if (mColumn.getRelationType() == RelationType.ManyToOne) {
+					record = mControlRecord.getM2ORecord(mColumn.getName())
+							.browse();
+				}
+			} else {
+				record = mControlRecord;
+				column_name = mColumn.getName();
+			}
+		}
+
 		ImageView imgBinary = new ImageView(mContext);
 		int heightWidth = mAttributes.getResource(KEY_ROUND_IMAGE_WIDTH_HEIGHT,
 				-1);
@@ -525,11 +539,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 					.decodeResource(mContext.getResources(),
 							(default_image < 0) ? R.drawable.attachment
 									: default_image);
-			if (mControlRecord != null
-					&& !mControlRecord.getString(mColumn.getName()).equals(
-							"false")) {
+			if (record != null
+					&& !record.getString(column_name).equals("false")) {
 				binary_image = Base64Helper.getBitmapImage(mContext,
-						mControlRecord.getString(mColumn.getName()));
+						record.getString(column_name));
 				if (!roundedImage)
 					imgBinary.setScaleType(ScaleType.CENTER_CROP);
 			}
@@ -984,5 +997,9 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	@Override
 	public void onManyToOneItemChangeListener(OColumn column, ODataRow row) {
 		mFieldValue = row.get(OColumn.ROW_ID);
+	}
+
+	public String getRefColumn() {
+		return mAttributes.getString(KEY_REF_COLUMN, null);
 	}
 }

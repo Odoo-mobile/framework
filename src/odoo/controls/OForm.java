@@ -195,6 +195,14 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			if (v instanceof OField) {
 				OField field = (OField) v;
 				OColumn column = mModel.getColumn(field.getFieldName());
+				OModel ref_model = null;
+				if (column.getRelationType() != null) {
+					ref_model = mModel.createInstance(column.getType());
+				}
+				OColumn ref_column = null;
+				if (field.getRefColumn() != null) {
+					ref_column = ref_model.getColumn(field.getRefColumn());
+				}
 				field.setColumn(column);
 				OFieldType widget = null;
 				String label = field.getFieldName();
@@ -222,7 +230,9 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 							column.setType(value.getClass());
 						field.setColumn(column);
 					}
-					if (column.getType().isAssignableFrom(OBlob.class)) {
+					if (column.getType().isAssignableFrom(OBlob.class)
+							|| (ref_column != null && ref_column.getType()
+									.isAssignableFrom(OBlob.class))) {
 						widget = OFieldType.BINARY;
 					}
 					if (column.getType().isAssignableFrom(OBoolean.class)) {
