@@ -290,10 +290,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			createFieldList();
 		for (String key : mDeclaredFields.keySet()) {
 			OColumn column = getColumn(key);
-			if (column.isFunctionalColumn()) {
-				mFunctionalColumns.add(column);
-			} else {
-				mColumns.add(column);
+			if (column != null) {
+				if (column.isFunctionalColumn()) {
+					mFunctionalColumns.add(column);
+				} else {
+					mColumns.add(column);
+				}
 			}
 		}
 	}
@@ -312,6 +314,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			if (field != null) {
 				field.setAccessible(true);
 				column = (OColumn) field.get(this);
+				column.setName(field.getName());
 				Boolean validField = (column.isAccessible()) ? validateFieldVersion(field)
 						: true;
 				if (validField) {
@@ -320,7 +323,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					if (method != null) {
 						column.setFunctionalMethod(method);
 					}
-				}
+				} else
+					return null;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

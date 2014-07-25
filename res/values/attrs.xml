@@ -25,7 +25,7 @@
             <enum name="file" value="1" />
             <enum name="round_image" value="3" />
         </attr>
-        <attr name="roundImageWidthHeight" format="integer" />
+        <attr name="imageWidthHeight" format="integer" />
         <attr name="booleanWidget">
             <enum name="switch_widget" value="0" />
             <enum name="radio_widget" value="1" />

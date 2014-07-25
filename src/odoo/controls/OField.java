@@ -123,7 +123,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	public static final String KEY_DISPLAY_PATTERN = "displayPattern";
 
 	/** The Constant KEY_ROUND_IMAGE_WIDTH_HEIGHT. */
-	public static final String KEY_ROUND_IMAGE_WIDTH_HEIGHT = "roundImageWidthHeight";
+	public static final String KEY_ROUND_IMAGE_WIDTH_HEIGHT = "imageWidthHeight";
 
 	/**
 	 * The Enum OFieldMode.
@@ -794,8 +794,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				mTypedArray.getBoolean(R.styleable.OField_showAsText, false));
 		mAttributes.put(KEY_DISPLAY_PATTERN,
 				mTypedArray.getString(R.styleable.OField_displayPattern));
-		mAttributes.put(KEY_ROUND_IMAGE_WIDTH_HEIGHT, mTypedArray.getInt(
-				R.styleable.OField_roundImageWidthHeight, -1));
+		mAttributes.put(KEY_ROUND_IMAGE_WIDTH_HEIGHT,
+				mTypedArray.getInt(R.styleable.OField_imageWidthHeight, -1));
 	}
 
 	/**
