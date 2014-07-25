@@ -139,7 +139,6 @@ public class ODataRow {
 		Bundle bundle = new Bundle();
 		bundle.putInt("id", getInt("id"));
 		bundle.putInt("local_id", getInt("local_id"));
-		bundle.putBoolean("local_record", getBoolean("local_record"));
 		return bundle;
 	}
 

@@ -237,8 +237,9 @@ public class MainActivity extends FragmentActivity implements
 		mUserURL.setText(mDrawerSubtitle);
 		if (OUser.current(mContext) != null
 				&& !OUser.current(mContext).getAvatar().equals("false")) {
-			Bitmap profPic = Base64Helper.getBitmapImage(this,
-					OUser.current(mContext).getAvatar());
+			Bitmap profPic = Base64Helper.getRoundedCornerBitmap(this,
+					Base64Helper.getBitmapImage(this, OUser.current(mContext)
+							.getAvatar()), true);
 			if (profPic != null)
 				imgUserPic.setImageBitmap(profPic);
 		}
@@ -250,6 +251,15 @@ public class MainActivity extends FragmentActivity implements
 				mDrawerLayout.closeDrawers();
 			}
 		});
+		v.findViewById(R.id.imgBtnSetting).setOnClickListener(
+				new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						onSettingItemSelected(SettingKeys.GLOBAL_SETTING);
+						mDrawerLayout.closeDrawers();
+					}
+				});
 		mDrawerListView.addHeaderView(v, null, false);
 	}
 
@@ -666,11 +676,6 @@ public class MainActivity extends FragmentActivity implements
 		sys.add(new DrawerItem(key, r.getString(R.string.title_profile), 0,
 				R.drawable.ic_action_user, getFragBundle(new Fragment(),
 						"settings", SettingKeys.PROFILE)));
-
-		sys.add(new DrawerItem(key, r
-				.getString(R.string.title_general_settings), 0,
-				R.drawable.ic_action_settings, getFragBundle(new Fragment(),
-						"settings", SettingKeys.GLOBAL_SETTING)));
 
 		sys.add(new DrawerItem(key, r.getString(R.string.title_accounts), 0,
 				R.drawable.ic_action_accounts, getFragBundle(new Fragment(),

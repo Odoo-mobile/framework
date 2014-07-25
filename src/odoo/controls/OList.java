@@ -53,6 +53,9 @@ public class OList extends ScrollView implements View.OnClickListener,
 	/** The Constant KEY_CUSTOM_LAYOUT. */
 	public static final String KEY_CUSTOM_LAYOUT = "custome_layout";
 
+	/** The Constant KEY_SHOW_DIVIDER. */
+	public static final String KEY_SHOW_DIVIDER = "showDivider";
+
 	/** The context. */
 	Context mContext = null;
 
@@ -172,6 +175,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 					R.styleable.OList);
 			mAttr.put(KEY_CUSTOM_LAYOUT, mTypedArray.getResourceId(
 					R.styleable.OList_custom_layout, 0));
+			mAttr.put(KEY_SHOW_DIVIDER,
+					mTypedArray.getBoolean(R.styleable.OList_showDivider, true));
 			mCustomLayout = mAttr.getResource(KEY_CUSTOM_LAYOUT, 0);
 			mTypedArray.recycle();
 		}
@@ -269,7 +274,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 				view.setOnDragListener(this);
 			}
 			mInnerLayout.addView(view);
-			mInnerLayout.addView(divider());
+			if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true))
+				mInnerLayout.addView(divider());
 		}
 		addView(mInnerLayout);
 	}

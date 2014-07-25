@@ -79,6 +79,8 @@ public class OColumn {
 	/** The functional_method. */
 	private Method functional_method = null;
 
+	private Boolean use_annotation = true;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -425,6 +427,27 @@ public class OColumn {
 		functional_method = method;
 		is_functional_column = true;
 		setLocalColumn();
+	}
+
+	/**
+	 * Sets the accessible.
+	 * 
+	 * @param accessible
+	 *            the accessible
+	 * @return the o column
+	 */
+	public OColumn setAccessible(Boolean accessible) {
+		use_annotation = accessible;
+		return this;
+	}
+
+	/**
+	 * Checks if is accessible.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean isAccessible() {
+		return use_annotation;
 	}
 
 }

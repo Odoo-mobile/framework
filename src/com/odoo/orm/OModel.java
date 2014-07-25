@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import odoo.ODomain;
@@ -110,13 +111,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	/** The create_date. */
 	@Odoo.api.v8
 	@Odoo.api.v9alpha
-	OColumn create_date = new OColumn("Created On", ODateTime.class)
+	public OColumn create_date = new OColumn("Created On", ODateTime.class)
 			.setParsePatter(ODate.DEFAULT_FORMAT);
 
 	/** The write_date. */
 	@Odoo.api.v8
 	@Odoo.api.v9alpha
-	OColumn write_date = new OColumn("Last Updated On", ODateTime.class)
+	public OColumn write_date = new OColumn("Last Updated On", ODateTime.class)
 			.setParsePatter(ODate.DEFAULT_FORMAT);
 
 	// Local Base Columns
@@ -139,6 +140,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	/** The is_active. */
 	OColumn is_active = new OColumn("Row Active", OBoolean.class).setDefault(
 			true).setLocalColumn();
+
+	/** The declared fields. */
+	private HashMap<String, Field> mDeclaredFields = new HashMap<String, Field>();
 
 	/**
 	 * Instantiates a new o model.
@@ -163,6 +167,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		} else {
 			mOdooVersion = mApp.getOdooVersion();
 		}
+		createFieldList();
 	}
 
 	/**
@@ -260,31 +265,35 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return cols;
 	}
 
+	private void createFieldList() {
+		try {
+			List<Field> fields = new ArrayList<Field>();
+			fields.addAll(Arrays.asList(getClass().getSuperclass()
+					.getDeclaredFields()));
+			fields.addAll(Arrays.asList(getClass().getDeclaredFields()));
+			mDeclaredFields.clear();
+			for (Field field : fields) {
+				if (field.getType().isAssignableFrom(OColumn.class)) {
+					mDeclaredFields.put(field.getName(), field);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Prepare columns.
 	 */
 	public void prepareColumns() {
-		List<Field> fields = new ArrayList<Field>();
-		fields.addAll(Arrays.asList(getClass().getSuperclass()
-				.getDeclaredFields()));
-		fields.addAll(Arrays.asList(getClass().getDeclaredFields()));
-		for (Field field : fields) {
-			field.setAccessible(true);
-			try {
-				if (field.getType().isAssignableFrom(OColumn.class)) {
-					if (validateFieldVersion(field)) {
-						OColumn column = (OColumn) field.get(this);
-						column.setName(field.getName());
-						Method method = checkForFunctionalColumn(field);
-						if (method != null) {
-							column.setFunctionalMethod(method);
-							mFunctionalColumns.add(column);
-						} else
-							mColumns.add(column);
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+		if (mDeclaredFields.size() == 0)
+			createFieldList();
+		for (String key : mDeclaredFields.keySet()) {
+			OColumn column = getColumn(key);
+			if (column.isFunctionalColumn()) {
+				mFunctionalColumns.add(column);
+			} else {
+				mColumns.add(column);
 			}
 		}
 	}
@@ -299,17 +308,18 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	public OColumn getColumn(String name) {
 		OColumn column = null;
 		try {
-			Field field = getClass().getDeclaredField(name);
-			if (field == null)
-				field = getClass().getSuperclass().getDeclaredField(name);
+			Field field = mDeclaredFields.get(name);
 			if (field != null) {
 				field.setAccessible(true);
-				if (validateFieldVersion(field)) {
+				column = (OColumn) field.get(this);
+				Boolean validField = (column.isAccessible()) ? validateFieldVersion(field)
+						: true;
+				if (validField) {
 					Method method = checkForFunctionalColumn(field);
-					column = (OColumn) field.get(this);
 					column.setName(name);
-					if (method != null)
+					if (method != null) {
 						column.setFunctionalMethod(method);
+					}
 				}
 			}
 		} catch (Exception e) {

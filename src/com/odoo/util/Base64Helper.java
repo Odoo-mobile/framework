@@ -28,6 +28,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
@@ -35,6 +36,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -119,25 +121,36 @@ public class Base64Helper {
 	 *            the bitmap
 	 * @return the rounded corner bitmap
 	 */
-	public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+	public static Bitmap getRoundedCornerBitmap(Context context, Bitmap bitmap,
+			Boolean create_circle) {
+		DisplayMetrics mMetrics = context.getResources().getDisplayMetrics();
+		float mScaleFactor = mMetrics.density;
 		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
 				bitmap.getHeight(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(output);
 
-		final int color = 0xff424242;
+		final int color = Color.BLACK;
 		final Paint paint = new Paint();
-		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+		int width = bitmap.getWidth();
+		int height = (bitmap.getHeight() > width) ? width : bitmap.getHeight();
+		final Rect rect = new Rect(0, 0, width, height);
 		final RectF rectF = new RectF(rect);
-		final float roundPx = 12;
+		final float roundPx = (create_circle) ? (bitmap.getWidth() > 360) ? bitmap
+				.getWidth() : 360
+				: 2;
 
 		paint.setAntiAlias(true);
-		canvas.drawARGB(0, 0, 0, 0);
 		paint.setColor(color);
+		paint.setStyle(Paint.Style.FILL);
+		canvas.drawARGB(0, 0, 0, 0);
 		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-
 		paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		canvas.drawBitmap(bitmap, rect, rect, paint);
-
+		// draw border
+		paint.setColor(Color.parseColor("#cccccc"));
+		paint.setStyle(Paint.Style.STROKE);
+		paint.setStrokeWidth(2F * mScaleFactor);
+		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 		return output;
 	}
 }

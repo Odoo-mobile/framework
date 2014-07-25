@@ -27,6 +27,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
@@ -36,8 +38,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.R;
@@ -47,14 +47,12 @@ import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
 import com.odoo.support.OUser;
 import com.odoo.util.Base64Helper;
+import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class UserProfile extends BaseFragment {
 	View rootView = null;
 	EditText password = null;
-	TextView txvUserLoginName, txvUsername, txvServerUrl, txvTimeZone,
-			txvDatabase;
-	ImageView imgUserPic;
 	AlertDialog.Builder builder = null;
 	Dialog dialog = null;
 
@@ -66,34 +64,35 @@ public class UserProfile extends BaseFragment {
 				container, false);
 		scope = new AppScope(this);
 		scope.main().setTitle(R.string.title_user_profile);
-
 		setupView();
 		return rootView;
 	}
 
 	private void setupView() {
-
-		imgUserPic = null;
-		imgUserPic = (ImageView) rootView.findViewById(R.id.imgUserProfilePic);
+		Bitmap userPic = null;
 		if (!scope.User().getAvatar().equals("false"))
-			imgUserPic.setImageBitmap(Base64Helper.getBitmapImage(
-					scope.context(), scope.User().getAvatar()));
-		txvUserLoginName = (TextView) rootView
-				.findViewById(R.id.txvUserLoginName);
-		txvUserLoginName.setText(scope.User().getAndroidName());
-
-		txvUsername = (TextView) rootView.findViewById(R.id.txvUserName);
-		txvUsername.setText(scope.User().getUsername());
-
-		txvServerUrl = (TextView) rootView.findViewById(R.id.txvServerUrl);
-		txvServerUrl.setText(scope.User().getHost());
-
-		txvDatabase = (TextView) rootView.findViewById(R.id.txvDatabase);
-		txvDatabase.setText(scope.User().getDatabase());
-
-		txvTimeZone = (TextView) rootView.findViewById(R.id.txvTimeZone);
+			userPic = Base64Helper.getRoundedCornerBitmap(getActivity(),
+					Base64Helper.getBitmapImage(scope.context(), scope.User()
+							.getAvatar()), true);
+		else
+			userPic = Base64Helper.getRoundedCornerBitmap(getActivity(),
+					BitmapFactory.decodeResource(getActivity().getResources(),
+							R.drawable.avatar), true);
+		OControls.setImage(rootView, R.id.imgUserProfilePic, userPic);
+		OControls.setText(rootView, R.id.userFullName, scope.User().getName());
+		OControls.setText(rootView, R.id.txvUserName, scope.User()
+				.getUsername());
+		OControls.setText(rootView, R.id.txvServerUrl, (scope.User()
+				.isOAauthLogin()) ? scope.User().getInstanceUrl() : scope
+				.User().getHost());
+		OControls.setText(rootView, R.id.txvDatabase, (scope.User()
+				.isOAauthLogin()) ? scope.User().getInstanceDatabase() : scope
+				.User().getDatabase());
 		String timezone = scope.User().getTimezone();
-		txvTimeZone.setText((timezone.equals("false")) ? "GMT" : timezone);
+		OControls.setText(rootView, R.id.txvTimeZone,
+				(timezone.equals("false")) ? "GMT" : timezone);
+		OControls.setText(rootView, R.id.txvOdooVersion, scope.User()
+				.getVersion_serie());
 
 	}
 

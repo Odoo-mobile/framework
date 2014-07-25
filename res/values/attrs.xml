@@ -23,7 +23,9 @@
         <attr name="binaryType">
             <enum name="image" value="0" />
             <enum name="file" value="1" />
+            <enum name="round_image" value="3" />
         </attr>
+        <attr name="roundImageWidthHeight" format="integer" />
         <attr name="booleanWidget">
             <enum name="switch_widget" value="0" />
             <enum name="radio_widget" value="1" />
@@ -44,6 +46,7 @@
         <attr name="pullable" format="boolean" />
         <attr name="row_swipable" format="boolean" />
         <attr name="group_by" format="string" />
+        <attr name="showDivider" format="boolean" />
     </declare-styleable>
     <declare-styleable name="OForm">
         <attr name="background_selector" format="reference" />

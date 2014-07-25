@@ -15,9 +15,11 @@
         <odoo.controls.OField
             android:layout_width="80dp"
             android:layout_height="80dp"
-            odoo:binaryType="image"
+            android:layout_marginRight="10dp"
+            odoo:binaryType="round_image"
             odoo:defaultImage="@drawable/avatar"
             odoo:field_name="avatar"
+            odoo:roundImageWidthHeight="80"
             odoo:with_label="false" >
         </odoo.controls.OField>
 

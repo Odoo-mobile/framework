@@ -10,6 +10,7 @@
     <string name="str_user_name">User Name</string>
     <string name="str_server_url">Server URL</string>
     <string name="str_database">Database</string>
+    <string name="str_odoo_version">Odoo Version</string>
     <string name="str_timezone">TimeZone</string>
     <string name="login_select_database">Select Database</string>
 

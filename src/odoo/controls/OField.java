@@ -26,6 +26,8 @@ import odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.TextUtils;
@@ -102,12 +104,27 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 
 	/** The Constant KEY_BOOLEAN_WIDGET. */
 	public static final String KEY_BOOLEAN_WIDGET = "booleanWidget";
+
+	/** The Constant KEY_CUSTOM_LAYOUT. */
 	public static final String KEY_CUSTOM_LAYOUT = "customLayout";
+
+	/** The Constant KEY_BOTTOM_BORDER_HEIGHT. */
 	public static final String KEY_BOTTOM_BORDER_HEIGHT = "bottom_border_height";
+
+	/** The Constant KEY_TEXT_LINES. */
 	public static final String KEY_TEXT_LINES = "textLines";
+
+	/** The Constant KEY_REF_COLUMN. */
 	public static final String KEY_REF_COLUMN = "ref_column";
+
+	/** The Constant KEY_SHOW_AS_TEXT. */
 	public static final String KEY_SHOW_AS_TEXT = "showAsText";
+
+	/** The Constant KEY_DISPLAY_PATTERN. */
 	public static final String KEY_DISPLAY_PATTERN = "displayPattern";
+
+	/** The Constant KEY_ROUND_IMAGE_WIDTH_HEIGHT. */
+	public static final String KEY_ROUND_IMAGE_WIDTH_HEIGHT = "roundImageWidthHeight";
 
 	/**
 	 * The Enum OFieldMode.
@@ -133,6 +150,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		BINARY,
 		/** The binary image. */
 		BINARY_IMAGE,
+		/** The binary rounded image. */
+		BINARY_ROUND_IMAGE,
 		/** The binary file. */
 		BINARY_FILE,
 		/** The boolean widget. */
@@ -298,7 +317,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			break;
 		case BINARY_FILE:
 		case BINARY_IMAGE:
-			createBinaryControl(fieldWidget);
+			createBinaryControl(fieldWidget, false);
+			break;
+		case BINARY_ROUND_IMAGE:
+			createBinaryControl(fieldWidget, true);
 			break;
 		case BOOLEAN_WIDGET:
 		case BOOLEAN_CHECKBOX:
@@ -477,12 +499,18 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 * 
 	 * @param binary_type
 	 *            the binary_type
+	 * @param roundedImage
 	 */
-	private void createBinaryControl(OFieldType binary_type) {
+	private void createBinaryControl(OFieldType binary_type,
+			boolean roundedImage) {
 		ImageView imgBinary = new ImageView(mContext);
-		mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT);
-		imgBinary.setLayoutParams(mLayoutParams);
+		int heightWidth = mAttributes.getResource(KEY_ROUND_IMAGE_WIDTH_HEIGHT,
+				-1);
+		if (heightWidth > -1) {
+			heightWidth = (int) (heightWidth * mScaleFactor);
+			mLayoutParams = new LayoutParams(heightWidth, heightWidth);
+			imgBinary.setLayoutParams(mLayoutParams);
+		}
 		int default_image = mAttributes.getResource(KEY_DEFAULT_IMAGE,
 				R.drawable.attachment);
 		switch (binary_type) {
@@ -491,17 +519,25 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 					.setImageResource((default_image < 0) ? R.drawable.attachment
 							: default_image);
 			break;
+		case BINARY_ROUND_IMAGE:
 		case BINARY_IMAGE:
-			imgBinary
-					.setImageResource((default_image < 0) ? R.drawable.attachment
-							: default_image);
+			Bitmap binary_image = BitmapFactory
+					.decodeResource(mContext.getResources(),
+							(default_image < 0) ? R.drawable.attachment
+									: default_image);
 			if (mControlRecord != null
 					&& !mControlRecord.getString(mColumn.getName()).equals(
 							"false")) {
-				imgBinary.setImageBitmap(Base64Helper.getBitmapImage(mContext,
-						mControlRecord.getString(mColumn.getName())));
-				imgBinary.setScaleType(ScaleType.CENTER_CROP);
+				binary_image = Base64Helper.getBitmapImage(mContext,
+						mControlRecord.getString(mColumn.getName()));
+				if (!roundedImage)
+					imgBinary.setScaleType(ScaleType.CENTER_CROP);
 			}
+			if (roundedImage)
+				imgBinary.setImageBitmap(Base64Helper.getRoundedCornerBitmap(
+						mContext, binary_image, true));
+			else
+				imgBinary.setImageBitmap(binary_image);
 			break;
 		default:
 			break;
@@ -710,7 +746,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				mTypedArray.getInt(R.styleable.OField_binaryType, -1));
 		int binaryType = mAttributes.getResource(KEY_BINARY_TYPE, -1);
 		if (binaryType > -1) {
-			mFieldWidget = (binaryType == 0) ? OFieldType.BINARY_IMAGE
+			mFieldWidget = (binaryType == 0 || binaryType == 3) ? (binaryType == 0) ? OFieldType.BINARY_IMAGE
+					: OFieldType.BINARY_ROUND_IMAGE
 					: OFieldType.BINARY_FILE;
 		}
 
@@ -744,6 +781,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				mTypedArray.getBoolean(R.styleable.OField_showAsText, false));
 		mAttributes.put(KEY_DISPLAY_PATTERN,
 				mTypedArray.getString(R.styleable.OField_displayPattern));
+		mAttributes.put(KEY_ROUND_IMAGE_WIDTH_HEIGHT, mTypedArray.getInt(
+				R.styleable.OField_roundImageWidthHeight, -1));
 	}
 
 	/**
