@@ -39,6 +39,7 @@ public class OSyncHelper {
 	private List<String> mFinishedRelModels = new ArrayList<String>();
 	private PreferenceManager mPref = null;
 	private List<Integer> mAffectedIds = new ArrayList<Integer>();
+	private Integer mSyndDataLimit = 0;
 
 	public OSyncHelper(Context context, OUser user, OModel model) {
 		mContext = context;
@@ -81,12 +82,22 @@ public class OSyncHelper {
 				// Adding default domain to domain
 				domain.append(model.defaultDomain());
 				if (checkForCreateWriteDate) {
+
 					if (model.checkForCreateDate()) {
 						// Adding Old data limit
 						mPref = new PreferenceManager(mContext);
 						int data_limit = mPref.getInt("sync_data_limit", 60);
+						List<Integer> ids = model.ids();
+						if (ids.size() > 0 && model.checkForWriteDate()
+								&& !model.isEmptyTable())
+							domain.add("|");
+						if (ids.size() > 0)
+							domain.add("&");
 						domain.add("create_date", ">=",
 								ODate.getDateBefore(data_limit));
+						if (ids.size() > 0)
+							domain.add("id", "not in",
+									new JSONArray(ids.toString()));
 					}
 					// Adding Last sync date comparing with write_date of record
 					if (model.checkForWriteDate() && !model.isEmptyTable()) {
@@ -95,7 +106,8 @@ public class OSyncHelper {
 					}
 				}
 				JSONObject result = mOdoo.search_read(model.getModelName(),
-						getFields(model), domain.get());
+						getFields(model), domain.get(), 0, mSyndDataLimit,
+						null, null);
 				if (checkForCreateWriteDate)
 					handleResult(model,
 							checkForLocalLatestUpdate(model, result));
@@ -632,6 +644,11 @@ public class OSyncHelper {
 			e.printStackTrace();
 		}
 		return map;
+	}
+
+	public OSyncHelper syncDataLimit(Integer dataLimit) {
+		mSyndDataLimit = dataLimit;
+		return this;
 	}
 
 	private JSONObject perm_read(OModel model, List<Integer> ids) {

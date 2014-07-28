@@ -1,5 +1,6 @@
 package com.odoo.addons.idea.services;
 
+import odoo.Odoo;
 import android.accounts.Account;
 import android.app.Service;
 import android.content.ContentProviderClient;
@@ -37,7 +38,10 @@ public class LibraryService extends OService {
 			BookBook db = new BookBook(context);
 			db.setUser(user);
 			OSyncHelper sync = db.getSyncHelper();
+			sync.syncDataLimit(2);
+			Odoo.DEBUG = true;
 			if (sync.syncWithServer()) {
+				Odoo.DEBUG = false;
 				BookAuthor author = new BookAuthor(context);
 				author.setUser(user);
 				if (author.getSyncHelper().syncWithServer()) {

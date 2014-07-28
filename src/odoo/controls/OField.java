@@ -511,7 +511,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 					record = mControlRecord.getM2ORecord(mColumn.getName())
 							.browse();
 				}
-			} else {
+			}
+			if (record == null) {
 				record = mControlRecord;
 				column_name = mColumn.getName();
 			}
