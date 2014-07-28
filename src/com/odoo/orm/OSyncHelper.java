@@ -68,7 +68,7 @@ public class OSyncHelper {
 		return syncWithServer(model, domain, true);
 	}
 
-	public boolean syncWithServer(OModel model, ODomain domain,
+	public boolean syncWithServer(OModel model, ODomain domain_filter,
 			Boolean checkForCreateWriteDate) {
 		Log.v(TAG, "syncWithServer():" + model.getModelName());
 		Log.v(TAG, "User : " + mUser.getAndroidName());
@@ -76,9 +76,8 @@ public class OSyncHelper {
 				|| !checkForCreateWriteDate) {
 			mFinishedModels.add(model.getModelName());
 			try {
-				if (domain == null)
-					domain = new ODomain();
 
+				ODomain domain = new ODomain();
 				// Adding default domain to domain
 				domain.append(model.defaultDomain());
 				if (checkForCreateWriteDate) {
@@ -105,6 +104,8 @@ public class OSyncHelper {
 						domain.add("write_date", ">", last_sync_date);
 					}
 				}
+				if (domain_filter != null)
+					domain.append(domain_filter);
 				JSONObject result = mOdoo.search_read(model.getModelName(),
 						getFields(model), domain.get(), 0, mSyndDataLimit,
 						null, null);
