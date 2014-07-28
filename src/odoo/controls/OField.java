@@ -125,6 +125,9 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	/** The Constant KEY_ROUND_IMAGE_WIDTH_HEIGHT. */
 	public static final String KEY_ROUND_IMAGE_WIDTH_HEIGHT = "imageWidthHeight";
 
+	/** The Constant KEY_CUSTOM_LAYOUT_ORIANTATION. */
+	public static final String KEY_CUSTOM_LAYOUT_ORIANTATION = "customLayoutOriantation";
+
 	/**
 	 * The Enum OFieldMode.
 	 */
@@ -352,16 +355,17 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 					records.addAll(mControlRecord.getM2MRecord(
 							mColumn.getName()).browseEach());
 				}
-				if (records.size() > 0) {
-					HorizontalScrollView mHScroll = new HorizontalScrollView(
-							mContext);
-					mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-							LayoutParams.WRAP_CONTENT);
-					mHScroll.setLayoutParams(mLayoutParams);
-					mHScroll.setHorizontalScrollBarEnabled(false);
-					LinearLayout mlayout = new LinearLayout(mContext);
-					mlayout.setLayoutParams(mLayoutParams);
+				int customLayoutOriantation = mAttributes.getResource(
+						KEY_CUSTOM_LAYOUT_ORIANTATION, -1);
+				mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+						LayoutParams.WRAP_CONTENT);
+				LinearLayout mlayout = new LinearLayout(mContext);
+				mlayout.setLayoutParams(mLayoutParams);
+				if (customLayoutOriantation == 1)
+					mlayout.setOrientation(LinearLayout.VERTICAL);
+				else
 					mlayout.setOrientation(LinearLayout.HORIZONTAL);
+				if (records.size() > 0) {
 					int custom_layout = mAttributes.getResource(
 							KEY_CUSTOM_LAYOUT, -1);
 					for (ODataRow row : records) {
@@ -389,9 +393,29 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 							mlayout.addView(mtag);
 						}
 					}
-					mHScroll.addView(mlayout);
-					addView(mHScroll);
+					switch (customLayoutOriantation) {
+					case 1: // vertical
+						LinearLayout mParentLayout = new LinearLayout(mContext);
+						mParentLayout.setLayoutParams(mLayoutParams);
+						mParentLayout.setOrientation(LinearLayout.VERTICAL);
+						mParentLayout.addView(mlayout);
+						addView(mParentLayout);
+						break;
+					case 0: // horizontal
+					default:
+						HorizontalScrollView mHScroll = new HorizontalScrollView(
+								mContext);
+						mHScroll.setLayoutParams(mLayoutParams);
+						mHScroll.setHorizontalScrollBarEnabled(false);
+						mHScroll.addView(mlayout);
+						addView(mHScroll);
+						break;
+					}
 
+				} else {
+					// No any record.
+					createTextViewControl();
+					setText("No " + mColumn.getLabel());
 				}
 			}
 		}
@@ -797,6 +821,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				mTypedArray.getString(R.styleable.OField_displayPattern));
 		mAttributes.put(KEY_ROUND_IMAGE_WIDTH_HEIGHT,
 				mTypedArray.getInt(R.styleable.OField_imageWidthHeight, -1));
+		mAttributes.put(KEY_CUSTOM_LAYOUT_ORIANTATION, mTypedArray.getInt(
+				R.styleable.OField_customLayoutOriantation, -1));
 	}
 
 	/**

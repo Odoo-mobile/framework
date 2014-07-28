@@ -71,6 +71,7 @@ public class Library extends BaseFragment implements OnPullListener,
 	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
 	Keys mCurrentKey = Keys.Books;
+	Integer mLastPosition = -1;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -89,8 +90,29 @@ public class Library extends BaseFragment implements OnPullListener,
 		mListControl.setOnRowClickListener(this);
 		mListControl.setRowDraggable(true);
 		mListControl.setBeforeListRowCreateListener(this);
-		mDataLoader = new DataLoader();
-		mDataLoader.execute();
+		if (mLastPosition == -1) {
+			mDataLoader = new DataLoader();
+			mDataLoader.execute();
+		} else {
+			showData();
+		}
+	}
+
+	private void showData() {
+		switch (mCurrentKey) {
+		case Authors:
+			mListControl.setCustomView(R.layout.fragment_library_author_view);
+			break;
+		case Category:
+			mListControl.setCustomView(R.layout.fragment_library_category_view);
+			break;
+		case Students:
+			mListControl.setCustomView(R.layout.fragment_library_student_view);
+			break;
+		case Books:
+		}
+		mListControl.initListControl(mListRecords);
+		OControls.setGone(mView, R.id.loadingProgress);
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
@@ -130,23 +152,7 @@ public class Library extends BaseFragment implements OnPullListener,
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			switch (mCurrentKey) {
-			case Authors:
-				mListControl
-						.setCustomView(R.layout.fragment_library_author_view);
-				break;
-			case Category:
-				mListControl
-						.setCustomView(R.layout.fragment_library_category_view);
-				break;
-			case Students:
-				mListControl
-						.setCustomView(R.layout.fragment_library_student_view);
-				break;
-			case Books:
-			}
-			mListControl.initListControl(mListRecords);
-			OControls.setGone(mView, R.id.loadingProgress);
+			showData();
 		}
 
 	}
@@ -261,6 +267,7 @@ public class Library extends BaseFragment implements OnPullListener,
 		bundle.putString("key", mCurrentKey.toString());
 		bundle.putInt(OColumn.ROW_ID, row.getInt(OColumn.ROW_ID));
 		library.setArguments(bundle);
+		mLastPosition = position;
 		startFragment(library, true);
 	}
 

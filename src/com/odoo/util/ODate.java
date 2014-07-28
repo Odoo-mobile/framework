@@ -36,6 +36,8 @@ import android.util.Log;
 public class ODate {
 	public static final String TAG = ODate.class.getSimpleName();
 	public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+	public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
 
 	/** The time format. */
 	static SimpleDateFormat timeFormat, dateFormat;

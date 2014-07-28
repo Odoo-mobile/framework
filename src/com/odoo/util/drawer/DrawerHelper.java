@@ -27,7 +27,18 @@ import com.odoo.config.OModules;
 import com.odoo.support.OModule;
 import com.odoo.support.fragment.OModuleHelper;
 
+/**
+ * The Class DrawerHelper.
+ */
 public class DrawerHelper {
+
+	/**
+	 * Drawer items.
+	 * 
+	 * @param context
+	 *            the context
+	 * @return the list
+	 */
 	public static List<DrawerItem> drawerItems(Context context) {
 		List<DrawerItem> items = new ArrayList<DrawerItem>();
 		for (OModule module : new OModules().getModules()) {
