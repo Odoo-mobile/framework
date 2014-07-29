@@ -20,11 +20,20 @@
 package com.odoo.base.res;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.odoo.addons.idea.model.BookBook.ResCountry;
+import com.odoo.addons.partners.model.ResPartnerCategory;
+import com.odoo.addons.partners.model.ResPartnerTitle;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.types.OBlob;
+import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.ODateTime;
+import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 
@@ -47,8 +56,44 @@ public class ResPartner extends OModel {
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne);
 
+	// Extra Demo Module Columns
+	@Odoo.Functional(method = "displayName")
+	OColumn display_name = new OColumn("Name", OVarchar.class, 64)
+			.setRequired(true);
+	OColumn date = new OColumn("Date", ODateTime.class);
+	OColumn title = new OColumn("Title", ResPartnerTitle.class,
+			RelationType.ManyToOne);
+	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
+			RelationType.ManyToOne);
+	OColumn child_ids = new OColumn("Contacts", ResPartner.class,
+			RelationType.OneToMany).setRelatedColumn("parent_id");
+	OColumn ref = new OColumn("Contact Reference", OVarchar.class, 64);
+	OColumn lang = new OColumn("Language", OVarchar.class, 64);
+	OColumn user_id = new OColumn("SalesPerson", ResUsers.class,
+			RelationType.ManyToOne);
+	OColumn comment = new OColumn("Notes", OText.class);
+	OColumn category_id = new OColumn("Tags", ResPartnerCategory.class,
+			RelationType.ManyToMany);
+	OColumn credit_limit = new OColumn("Credit Limit", OInteger.class);
+	OColumn customer = new OColumn("Customer", OBoolean.class);
+	OColumn supplier = new OColumn("Supplier", OBoolean.class);
+	OColumn employee = new OColumn("Employee", OBoolean.class);
+	OColumn state_id = new OColumn("State", ResCountry.class,
+			RelationType.ManyToOne);
+	OColumn country_id = new OColumn("Country", ResCountry.class,
+			RelationType.ManyToOne);
+
 	public ResPartner(Context context) {
 		super(context, "res.partner");
 	}
 
+	public String displayName(ODataRow row) {
+		ODataRow data = row.getM2ORecord("parent_id").browse();
+		if (data != null)
+			return row.getString("name") + " ("
+					+ data.getString("name")
+					+ ")";
+		else
+			return row.getString("name");
+	}
 }

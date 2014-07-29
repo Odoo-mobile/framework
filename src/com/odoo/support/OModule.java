@@ -19,6 +19,7 @@
 package com.odoo.support;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.odoo.orm.OModel;
 import com.odoo.support.fragment.OModuleHelper;

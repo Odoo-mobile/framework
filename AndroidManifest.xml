@@ -99,6 +99,27 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_library_data" />
         </service>
+
+        <!-- ResPartner Provider -->
+        <provider
+            android:name="com.odoo.addons.partners.providers.partners.PartnersProvider"
+            android:authorities="com.odoo.addons.partners.providers.partners"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Partners"
+            android:syncable="true" />
+        <!-- ResPartner Service -->
+        <service
+            android:name="com.odoo.addons.partners.sevices.PartnersService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_partners" />
+        </service>
     </application>
 
 </manifest>
