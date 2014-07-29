@@ -89,6 +89,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	/** The m odoo version. */
 	private OdooVersion mOdooVersion = null;
 
+	/** The offset. */
+	private Integer mOffset = 0;
+
+	/** The limit. */
+	private Integer mLimit = -1;
+
 	/**
 	 * The Enum Command.
 	 */
@@ -526,9 +532,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			String groupBy, String having, String orderBy) {
 		List<ODataRow> records = new ArrayList<ODataRow>();
 		SQLiteDatabase db = getReadableDatabase();
+		String limit = null;
+		if (mLimit > 0) {
+			limit = mOffset + ", " + mLimit;
+		}
 		Cursor cr = db.query(getTableName(), new String[] { "*" },
 				getWhereClause(where), getWhereArgs(where, whereArgs), groupBy,
-				having, orderBy);
+				having, orderBy, limit);
 		if (cr.moveToFirst()) {
 			do {
 				ODataRow row = new ODataRow();
@@ -1150,6 +1160,20 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	public OUser user() {
 		return mUser;
+	}
+
+	public OModel setLimit(Integer limit) {
+		mLimit = limit;
+		return this;
+	}
+
+	public OModel setOffset(Integer offset_index) {
+		mOffset = offset_index;
+		return this;
+	}
+
+	public Integer getNextOffset() {
+		return mOffset + mLimit;
 	}
 
 	public void setCreateWriteLocal(Boolean make_local) {

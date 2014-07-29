@@ -24,6 +24,7 @@ import java.util.List;
 
 import odoo.controls.OList;
 import odoo.controls.OList.BeforeListRowCreateListener;
+import odoo.controls.OList.OnListBottomReachedListener;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -45,6 +46,7 @@ import com.odoo.addons.idea.model.BookBook.BookStudent;
 import com.odoo.addons.idea.providers.library.LibraryProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OModel;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
@@ -57,7 +59,8 @@ import com.openerp.OETouchListener.OnPullListener;
  * The Class Idea.
  */
 public class Library extends BaseFragment implements OnPullListener,
-		OnRowClickListener, BeforeListRowCreateListener {
+		OnRowClickListener, BeforeListRowCreateListener,
+		OnListBottomReachedListener {
 
 	public static final String TAG = Library.class.getSimpleName();
 
@@ -72,6 +75,7 @@ public class Library extends BaseFragment implements OnPullListener,
 	DataLoader mDataLoader = null;
 	Keys mCurrentKey = Keys.Books;
 	Integer mLastPosition = -1;
+	Integer mLimit = 5;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -90,8 +94,10 @@ public class Library extends BaseFragment implements OnPullListener,
 		mListControl.setOnRowClickListener(this);
 		mListControl.setRowDraggable(true);
 		mListControl.setBeforeListRowCreateListener(this);
+		mListControl.setOnListBottomReachedListener(this);
+		mListControl.setRecordLimit(mLimit);
 		if (mLastPosition == -1) {
-			mDataLoader = new DataLoader();
+			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
 		} else {
 			showData();
@@ -116,6 +122,11 @@ public class Library extends BaseFragment implements OnPullListener,
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
+		Integer mOffset = 0;
+
+		public DataLoader(Integer offset) {
+			mOffset = offset;
+		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -126,24 +137,26 @@ public class Library extends BaseFragment implements OnPullListener,
 					if (db().isEmptyTable()) {
 						scope.main().requestSync(LibraryProvider.AUTHORITY);
 					}
-					mListRecords.clear();
+					OModel model = null;
+					if (mOffset == 0)
+						mListRecords.clear();
 					switch (mCurrentKey) {
 					case Books:
-						mListRecords.addAll(db().select());
+						model = db();
 						break;
 					case Authors:
-						BookAuthor author = new BookAuthor(getActivity());
-						mListRecords.addAll(author.select());
+						model = new BookAuthor(getActivity());
 						break;
 					case Category:
-						BookCategory category = new BookCategory(getActivity());
-						mListRecords.addAll(category.select());
+						model = new BookCategory(getActivity());
 						break;
 					case Students:
-						BookStudent student = new BookStudent(getActivity());
-						mListRecords.addAll(student.select());
+						model = new BookStudent(getActivity());
 						break;
 					}
+					mListRecords.addAll(model.setLimit(mLimit)
+							.setOffset(mOffset).select());
+					mListControl.setRecordOffset(model.getNextOffset());
 				}
 			});
 			return null;
@@ -237,7 +250,7 @@ public class Library extends BaseFragment implements OnPullListener,
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
-			mDataLoader = new DataLoader();
+			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
 		}
 	};
@@ -274,6 +287,20 @@ public class Library extends BaseFragment implements OnPullListener,
 	@Override
 	public void beforeListRowCreate(int position, ODataRow row, View view) {
 		// TODO: update view before displaying it.
+	}
+
+	@Override
+	public Boolean showLoader() {
+		return true;
+	}
+
+	@Override
+	public void onBottomReached(Integer limit, Integer offset) {
+		if (mDataLoader != null) {
+			mDataLoader.cancel(true);
+		}
+		mDataLoader = new DataLoader(offset);
+		mDataLoader.execute();
 	}
 
 }

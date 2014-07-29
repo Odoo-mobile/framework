@@ -439,6 +439,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 							mControlRecord.getString(mColumn.getName()),
 							"text/html; charset=UTF-8", "UTF-8");
 					mWebView.getSettings().setTextZoom(90);
+					mWebView.setBackgroundColor(Color.TRANSPARENT);
 					addView(mWebView);
 				} else {
 					createTextViewControl();

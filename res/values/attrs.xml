@@ -51,6 +51,8 @@
         <attr name="row_swipable" format="boolean" />
         <attr name="group_by" format="string" />
         <attr name="showDivider" format="boolean" />
+        <attr name="emptyListMessage" format="string" />
+        <attr name="emptyListIcon" format="reference" />
     </declare-styleable>
     <declare-styleable name="OForm">
         <attr name="background_selector" format="reference" />

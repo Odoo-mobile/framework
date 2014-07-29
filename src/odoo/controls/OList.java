@@ -31,13 +31,18 @@ import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.DragEvent;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.odoo.R;
 import com.odoo.orm.ODataRow;
@@ -50,11 +55,19 @@ import com.odoo.support.listview.OListAdapter;
 public class OList extends ScrollView implements View.OnClickListener,
 		View.OnLongClickListener, View.OnTouchListener, View.OnDragListener {
 
+	/** The Constant KEY_DATA_LOADER. */
+	private static final String KEY_DATA_LOADER = "data_loader_status";
 	/** The Constant KEY_CUSTOM_LAYOUT. */
 	public static final String KEY_CUSTOM_LAYOUT = "custome_layout";
 
 	/** The Constant KEY_SHOW_DIVIDER. */
 	public static final String KEY_SHOW_DIVIDER = "showDivider";
+
+	/** The Constant KEY_EMPTY_LIST_MESSAGE. */
+	public static final String KEY_EMPTY_LIST_MESSAGE = "emptyListMessage";
+
+	/** The Constant KEY_EMPTY_LIST_ICON. */
+	public static final String KEY_EMPTY_LIST_ICON = "emptyListIcon";
 
 	/** The context. */
 	Context mContext = null;
@@ -119,6 +132,20 @@ public class OList extends ScrollView implements View.OnClickListener,
 	/** The m before list row create listener. */
 	private BeforeListRowCreateListener mBeforeListRowCreateListener = null;
 
+	/** The on list bottom reached listener. */
+	private OnListBottomReachedListener mOnListBottomReachedListener = null;
+
+	/** The record limit. */
+	private Integer mRecordLimit = -1;
+
+	/** The record offset. */
+	private Integer mRecordOffset = 0;
+	/** The display metrics. */
+	DisplayMetrics mMetrics = null;
+
+	/** The scale factor. */
+	Float mScaleFactor = 0F;
+
 	/**
 	 * Instantiates a new list control.
 	 * 
@@ -170,6 +197,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 	 */
 	private void init(Context context, AttributeSet attrs, int defStyle) {
 		mContext = context;
+		mMetrics = getResources().getDisplayMetrics();
+		mScaleFactor = mMetrics.density;
 		if (attrs != null) {
 			mTypedArray = mContext.obtainStyledAttributes(attrs,
 					R.styleable.OList);
@@ -177,6 +206,10 @@ public class OList extends ScrollView implements View.OnClickListener,
 					R.styleable.OList_custom_layout, 0));
 			mAttr.put(KEY_SHOW_DIVIDER,
 					mTypedArray.getBoolean(R.styleable.OList_showDivider, true));
+			mAttr.put(KEY_EMPTY_LIST_MESSAGE,
+					mTypedArray.getString(R.styleable.OList_emptyListMessage));
+			mAttr.put(KEY_EMPTY_LIST_ICON, mTypedArray.getResourceId(
+					R.styleable.OList_emptyListIcon, -1));
 			mCustomLayout = mAttr.getResource(KEY_CUSTOM_LAYOUT, 0);
 			mTypedArray.recycle();
 		}
@@ -207,9 +240,15 @@ public class OList extends ScrollView implements View.OnClickListener,
 	 *            the records
 	 */
 	public void initListControl(List<ODataRow> records) {
+		if (findViewWithTag(KEY_DATA_LOADER) != null) {
+			removeView(findViewWithTag(KEY_DATA_LOADER));
+		}
 		mRecords.clear();
 		mRecords.addAll(records);
 		createAdapter();
+		if (mRecords.size() <= 0) {
+			showEmptyListView();
+		}
 	}
 
 	/**
@@ -251,6 +290,48 @@ public class OList extends ScrollView implements View.OnClickListener,
 			}
 		};
 		addRecordViews();
+	}
+
+	public void setEmptyListMessage(String message) {
+		mAttr.put(KEY_EMPTY_LIST_MESSAGE, message);
+	}
+
+	private void showEmptyListView() {
+		LinearLayout mEmptyListLayout = new LinearLayout(mContext);
+		mEmptyListLayout.setOrientation(LinearLayout.VERTICAL);
+		Integer padding = (int) (20 * mScaleFactor);
+		mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+				LayoutParams.MATCH_PARENT);
+		mEmptyListLayout.setLayoutParams(mLayoutParams);
+		mEmptyListLayout.setPadding(padding, padding * 4, padding, padding);
+		mEmptyListLayout.setGravity(Gravity.CENTER);
+		// Adding empty list icon
+		ImageView imgIcon = new ImageView(mContext);
+		int height = (int) (96 * mScaleFactor);
+		mLayoutParams = new LayoutParams(height, height);
+		imgIcon.setLayoutParams(mLayoutParams);
+		imgIcon.setImageResource(mAttr.getResource(KEY_EMPTY_LIST_ICON,
+				R.drawable.ic_action_exclamation_mark));
+		imgIcon.setColorFilter(mContext.getResources().getColor(
+				R.color.gray_light));
+		mEmptyListLayout.addView(imgIcon);
+
+		// Adding empty message
+		TextView txvEmptyMessage = new TextView(mContext);
+		mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+				LayoutParams.MATCH_PARENT);
+		txvEmptyMessage.setLayoutParams(mLayoutParams);
+		txvEmptyMessage.setTextAppearance(mContext,
+				android.R.style.TextAppearance_Large);
+		txvEmptyMessage.setTypeface(OControlHelper.boldFont());
+		txvEmptyMessage.setGravity(Gravity.CENTER);
+		txvEmptyMessage.setTextColor(mContext.getResources().getColor(
+				R.color.gray_light));
+		String empty_message = mAttr.getString(KEY_EMPTY_LIST_MESSAGE,
+				"No records found");
+		txvEmptyMessage.setText(empty_message);
+		mEmptyListLayout.addView(txvEmptyMessage);
+		mInnerLayout.addView(mEmptyListLayout);
 	}
 
 	/**
@@ -660,6 +741,70 @@ public class OList extends ScrollView implements View.OnClickListener,
 	}
 
 	/**
+	 * Sets the on list bottom reached listener.
+	 * 
+	 * @param listener
+	 *            the new on list bottom reached listener
+	 */
+	public void setOnListBottomReachedListener(
+			OnListBottomReachedListener listener) {
+		mOnListBottomReachedListener = listener;
+	}
+
+	/**
+	 * Sets the record offset.
+	 * 
+	 * @param offset
+	 *            the offset
+	 * @return the o list
+	 */
+	public OList setRecordOffset(Integer offset) {
+		mRecordOffset = offset;
+		return this;
+	}
+
+	/**
+	 * Sets the record limit.
+	 * 
+	 * @param limit
+	 *            the limit
+	 * @return the o list
+	 */
+	public OList setRecordLimit(Integer limit) {
+		mRecordLimit = limit;
+		return this;
+	}
+
+	@Override
+	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+		super.onScrollChanged(l, t, oldl, oldt);
+		if (getViewVisiblityDiff() == 0 && mOnListBottomReachedListener != null) {
+			if (mOnListBottomReachedListener.showLoader()) {
+				LinearLayout loaderLayout = new LinearLayout(mContext);
+				mLayoutParams = new LayoutParams(
+						LinearLayout.LayoutParams.MATCH_PARENT,
+						LinearLayout.LayoutParams.WRAP_CONTENT);
+				// Adding loader progress
+				ProgressBar mProgress = new ProgressBar(mContext);
+				loaderLayout.setGravity(Gravity.CENTER);
+				loaderLayout.addView(mProgress);
+				loaderLayout.setPadding(15, 15, 15, 15);
+				loaderLayout.setTag(KEY_DATA_LOADER);
+				mInnerLayout.addView(loaderLayout);
+			}
+			mOnListBottomReachedListener.onBottomReached(mRecordLimit,
+					mRecordOffset);
+		}
+	}
+
+	private Integer getViewVisiblityDiff() {
+		View view = (View) getChildAt(getChildCount() - 1);
+		if (view.findViewWithTag("data_loader_status") != null)
+			return -1;
+		return (view.getBottom() - (getHeight() + getScrollY()));
+	}
+
+	/**
 	 * The listener interface for receiving onListRowViewClick events. The class
 	 * that is interested in processing a onListRowViewClick event implements
 	 * this interface, and the object created with that class is registered with
@@ -770,5 +915,36 @@ public class OList extends ScrollView implements View.OnClickListener,
 		 *            the view
 		 */
 		public void beforeListRowCreate(int position, ODataRow row, View view);
+	}
+
+	/**
+	 * The listener interface for receiving onListBottomReached events. The
+	 * class that is interested in processing a onListBottomReached event
+	 * implements this interface, and the object created with that class is
+	 * registered with a component using the component's
+	 * <code>addOnListBottomReachedListener<code> method. When
+	 * the onListBottomReached event occurs, that object's appropriate
+	 * method is invoked.
+	 * 
+	 * @see OnListBottomReachedEvent
+	 */
+	public interface OnListBottomReachedListener {
+
+		/**
+		 * On bottom reached.
+		 * 
+		 * @param record_limit
+		 *            the record_limit
+		 * @param record_offset
+		 *            the record_offset
+		 */
+		public void onBottomReached(Integer record_limit, Integer record_offset);
+
+		/**
+		 * Show loader.
+		 * 
+		 * @return the boolean
+		 */
+		public Boolean showLoader();
 	}
 }
