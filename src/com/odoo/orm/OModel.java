@@ -555,10 +555,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						}
 					}
 				}
+				/*
+				 * Adding functional column values to record values
+				 */
+				for (OColumn col : mFunctionalColumns)
+					row.put(col.getName(), getFunctionalMethodValue(col, row));
 				if (row.getInt("id") == 0
-						|| row.getString("id").equals("false")) {
+						|| row.getString("id").equals("false"))
 					row.put("id", 0);
-				}
 				records.add(row);
 			} while (cr.moveToNext());
 		}
