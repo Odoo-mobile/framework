@@ -36,13 +36,13 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 
 	public static final String TAG = Partners.class.getSimpleName();
 
-	View mView = null;
-	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
-	OList mListcontrol = null;
-	OETouchListener mTouchListener = null;
-	DataLoader mDataLoader = null;
-	Bundle arg = null;
-	Integer mLimit = 10;
+	private View mView = null;
+	private List<ODataRow> mListRecords = new ArrayList<ODataRow>();
+	private OList mListcontrol = null;
+	private OETouchListener mTouchListener = null;
+	private DataLoader mDataLoader = null;
+	private Integer mLimit = 10;
+	private Integer mLastPosition = -1;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,10 +58,20 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		mListcontrol = (OList) mView.findViewById(R.id.listRecords);
 		mListcontrol.setOnRowClickListener(this);
 		mListcontrol.setOnListBottomReachedListener(this);
-		mDataLoader = new DataLoader(0);
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListcontrol, this);
-		mDataLoader.execute();
+		if (mLastPosition == -1) {
+			mDataLoader = new DataLoader(0);
+			mDataLoader.execute();
+		} else {
+			showData();
+		}
+	}
+
+	private void showData() {
+		mListcontrol.setCustomView(R.layout.partners_list_item);
+		mListcontrol.initListControl(mListRecords);
+		OControls.setGone(mView, R.id.loadingProgress);
 	}
 
 	@Override
@@ -104,7 +114,8 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 					if (mOffset == 0)
 						mListRecords.clear();
 					mListRecords.addAll(model.setLimit(mLimit)
-							.setOffset(mOffset).select());
+							.setOffset(mOffset)
+							.select(null, null, null, null, "local_id DESC"));
 					mListcontrol.setRecordOffset(model.getNextOffset());
 				}
 			});
@@ -114,9 +125,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			mListcontrol.setCustomView(R.layout.partners_list_item);
-			mListcontrol.initListControl(mListRecords);
-			OControls.setGone(mView, R.id.loadingProgress);
+			showData();
 		}
 	}
 
@@ -143,6 +152,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 
 	@Override
 	public void onRowItemClick(int position, View view, ODataRow row) {
+		mLastPosition = position;
 		PartnersDetail partner = new PartnersDetail();
 		Bundle arg = new Bundle();
 		arg.putAll(row.getPrimaryBundleData());

@@ -41,7 +41,7 @@ public class OdooHelper {
 
 	public OUser login(String username, String password, String database,
 			String serverURL) {
-		Log.d(TAG, "OEHelper->login()");
+		Log.d(TAG, "OHelper->login()");
 		OUser userObj = null;
 		try {
 			mOdoo = new Odoo(serverURL, mForceConnect);
@@ -64,7 +64,7 @@ public class OdooHelper {
 
 	public OUser instance_login(OdooInstance instance, String username,
 			String password) throws OdooAccountExpireException {
-		Log.d(TAG, "OEHelper->instance_login()");
+		Log.d(TAG, "OHelper->instance_login()");
 		OUser userObj = null;
 		try {
 			mOdoo = mApp.getOdoo();

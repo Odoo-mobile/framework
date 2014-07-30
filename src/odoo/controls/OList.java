@@ -209,7 +209,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 			mAttr.put(KEY_EMPTY_LIST_MESSAGE,
 					mTypedArray.getString(R.styleable.OList_emptyListMessage));
 			mAttr.put(KEY_EMPTY_LIST_ICON, mTypedArray.getResourceId(
-					R.styleable.OList_emptyListIcon, -1));
+					R.styleable.OList_emptyListIcon,
+					R.drawable.ic_action_exclamation_mark));
 			mCustomLayout = mAttr.getResource(KEY_CUSTOM_LAYOUT, 0);
 			mTypedArray.recycle();
 		}

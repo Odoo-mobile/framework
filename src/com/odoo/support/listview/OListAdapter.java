@@ -28,7 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
 public class OListAdapter extends ArrayAdapter<Object> {
-	public static final String TAG = "com.odoo.support.listview.OEListAdapter";
+	public static final String TAG = "com.odoo.support.listview.OListAdapter";
 	Context mContext = null;
 	List<Object> mObjects = null;
 	List<Object> mAllObjects = null;
@@ -38,7 +38,7 @@ public class OListAdapter extends ArrayAdapter<Object> {
 
 	public OListAdapter(Context context, int resource, List<Object> objects) {
 		super(context, resource, objects);
-		Log.d(TAG, "OEListAdapter->constructor()");
+		Log.d(TAG, "OListAdapter->constructor()");
 		mContext = context;
 		mObjects = new ArrayList<Object>(objects);
 		mAllObjects = new ArrayList<Object>(objects);
@@ -65,7 +65,7 @@ public class OListAdapter extends ArrayAdapter<Object> {
 	}
 
 	public void notifiyDataChange(List<Object> objects) {
-		Log.d(TAG, "OEListAdapter->notifiyDataChange()");
+		Log.d(TAG, "OListAdapter->notifiyDataChange()");
 		mAllObjects.clear();
 		mObjects.clear();
 		mAllObjects.addAll(objects);
