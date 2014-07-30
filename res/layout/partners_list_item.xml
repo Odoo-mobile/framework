@@ -11,37 +11,47 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="horizontal" >
 
         <odoo.controls.OField
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:field_textAppearance="?android:attr/textAppearanceMedium"
-            odoo:field_color="@color/odoo_purple"
-            odoo:field_name="display_name"
+            android:gravity="center_vertical"
+            odoo:imageWidthHeight="65"
+            android:layout_marginRight="10dp"
+            odoo:binaryType="round_image"
+            odoo:defaultImage="@drawable/avatar"
+            odoo:field_name="image_small"
             odoo:with_label="false" >
         </odoo.controls.OField>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="vertical" >
 
             <odoo.controls.OField
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                odoo:binaryType="image"
-                app:imageWidthHeight="65"
-                android:gravity="center_vertical"
-                odoo:defaultImage="@drawable/avatar"
-                odoo:field_name="image_small"
+                app:field_textAppearance="?android:attr/textAppearanceLarge"
+                odoo:field_color="@color/odoo_purple"
+                odoo:field_name="name"
+                odoo:with_label="false" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:field_color="#006400"
+                app:singleLine="true"
+                odoo:field_name="email"
                 odoo:with_label="false" >
             </odoo.controls.OField>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:orientation="horizontal" >
 
                 <odoo.controls.OField
                     android:layout_width="match_parent"
@@ -56,23 +66,15 @@
                     odoo:field_name="country_id"
                     odoo:with_label="false" >
                 </odoo.controls.OField>
-
-                <odoo.controls.OField
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:field_color="#006400"
-                    app:singleLine="true"
-                    odoo:field_name="email"
-                    odoo:with_label="false" >
-                </odoo.controls.OField>
             </LinearLayout>
-</LinearLayout>
-            <odoo.controls.OField
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                odoo:field_name="category_id"
-                odoo:with_label="false" >
-            </odoo.controls.OField>
         </LinearLayout>
+    </LinearLayout>
+
+    <odoo.controls.OField
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        odoo:field_name="category_id"
+        odoo:with_label="false" >
+    </odoo.controls.OField>
 
 </odoo.controls.OForm>

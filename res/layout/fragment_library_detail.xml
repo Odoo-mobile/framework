@@ -63,7 +63,18 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                odoo:field_name="total_categories" />
+                odoo:field_name="total_categories"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:customLayout="@layout/fragment_library_book_category_view"
+                odoo:customLayoutOriantation="vertical"
+                odoo:field_name="category_ids"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
 
             <odoo.controls.OField
                 android:layout_width="match_parent"

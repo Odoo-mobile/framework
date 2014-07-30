@@ -25,6 +25,13 @@ public class OControls {
 		return textView.getText().toString();
 	}
 
+	public static void toggleViewVisibility(View parent_view, int view_id,
+			Boolean visible) {
+		int view_visibility = (visible) ? View.VISIBLE : View.GONE;
+		parent_view.findViewById(view_id).setVisibility(view_visibility);
+
+	}
+
 	public static void setImage(View parent_view, int imageview_id,
 			Bitmap bitmap) {
 		ImageView imgView = (ImageView) parent_view.findViewById(imageview_id);

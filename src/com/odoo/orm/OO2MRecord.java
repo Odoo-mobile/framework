@@ -24,6 +24,7 @@ public class OO2MRecord {
 	OColumn mCol = null;
 	int mRecordId = 0;
 	OModel mDatabase = null;
+	String mOrderBy = null;
 
 	public OO2MRecord(OModel oModel, OColumn col, int id) {
 		mDatabase = oModel;
@@ -31,10 +32,16 @@ public class OO2MRecord {
 		mRecordId = id;
 	}
 
+	public OO2MRecord setOrder(String order_by) {
+		mOrderBy = order_by;
+		return this;
+	}
+
 	public List<ODataRow> browseEach() {
 		OModel rel = mDatabase.createInstance(mCol.getType());
 		String column = mCol.getRelatedColumn();
-		return rel.select(column + " = ? ", new String[] { mRecordId + "" });
+		return rel.select(column + " = ? ", new String[] { mRecordId + "" },
+				null, null, mOrderBy);
 	}
 
 	public ODataRow browseAt(int index) {

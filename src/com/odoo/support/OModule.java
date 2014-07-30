@@ -56,4 +56,8 @@ public class OModule {
 		OModuleHelper module = (OModuleHelper) newInstance();
 		return (OModel) module.databaseHelper(context);
 	}
+
+	public String toString() {
+		return module.getSimpleName();
+	}
 }

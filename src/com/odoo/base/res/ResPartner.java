@@ -20,16 +20,13 @@
 package com.odoo.base.res;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.odoo.addons.idea.model.BookBook.ResCountry;
 import com.odoo.addons.partners.model.ResPartnerCategory;
 import com.odoo.addons.partners.model.ResPartnerTitle;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
-import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
@@ -44,7 +41,7 @@ public class ResPartner extends OModel {
 
 	OColumn name = new OColumn("Name", OText.class);
 	OColumn is_company = new OColumn("Is Company", OText.class);
-	OColumn image_small = new OColumn("Image", OBlob.class);
+	OColumn image_small = new OColumn("Image", OBlob.class).setDefault(false);
 	OColumn street = new OColumn("Street", OText.class);
 	OColumn street2 = new OColumn("Street2", OText.class);
 	OColumn city = new OColumn("City", OText.class);
@@ -57,9 +54,6 @@ public class ResPartner extends OModel {
 			RelationType.ManyToOne);
 
 	// Extra Demo Module Columns
-	@Odoo.Functional(method = "displayName")
-	OColumn display_name = new OColumn("Name", OVarchar.class, 64)
-			.setRequired(true);
 	OColumn date = new OColumn("Date", ODateTime.class);
 	OColumn title = new OColumn("Title", ResPartnerTitle.class,
 			RelationType.ManyToOne);
@@ -87,13 +81,4 @@ public class ResPartner extends OModel {
 		super(context, "res.partner");
 	}
 
-	public String displayName(ODataRow row) {
-		ODataRow data = row.getM2ORecord("parent_id").browse();
-		if (data != null)
-			return row.getString("name") + " ("
-					+ data.getString("name")
-					+ ")";
-		else
-			return row.getString("name");
-	}
 }

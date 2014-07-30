@@ -34,6 +34,10 @@
         <attr name="defaultImage" format="reference" />
         <attr name="customLayout" format="reference" />
         <attr name="label_bottom_border_height" format="integer" />
+        <attr name="customLayoutOriantation">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
     </declare-styleable>
     <declare-styleable name="OLabel">
         <attr name="label" format="string" />
@@ -47,6 +51,8 @@
         <attr name="row_swipable" format="boolean" />
         <attr name="group_by" format="string" />
         <attr name="showDivider" format="boolean" />
+        <attr name="emptyListMessage" format="string" />
+        <attr name="emptyListIcon" format="reference" />
     </declare-styleable>
     <declare-styleable name="OForm">
         <attr name="background_selector" format="reference" />

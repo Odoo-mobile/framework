@@ -10,43 +10,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:padding="15dp"
         odoo:model="res.partner" >
 
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="name"
+            odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
 
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="parent_id"
+            odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
 
-        <odoo.controls.OField
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            odoo:field_name="user_id"
-            odoo:with_label="true" />
-
-        <odoo.controls.OField
+     <!--    <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="category_id"
+            odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
 
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:customLayout="@layout/partner_contacts"
+            odoo:customLayoutOriantation="vertical"
             odoo:field_name="child_ids"
+            odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
-
+-->
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="website"
+            odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
     </odoo.controls.OForm>
 

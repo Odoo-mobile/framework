@@ -22,18 +22,33 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Class OModulesHelper.
+ */
 public class OModulesHelper {
 
+	/** The modules. */
 	List<OModule> mModules = new ArrayList<OModule>();
+
+	/** The default module. */
 	OModule mDefaultModule = null;
 
+	/**
+	 * Gets the modules.
+	 * 
+	 * @return the modules
+	 */
 	public List<OModule> getModules() {
 		if (mModules.size() <= 0)
 			prepareModuleList();
 		return mModules;
 	}
 
+	/**
+	 * Prepare module list.
+	 */
 	private void prepareModuleList() {
+		mModules.clear();
 		for (Field module_col : getClass().getDeclaredFields()) {
 			if (module_col.getType().isAssignableFrom(OModule.class)) {
 				module_col.setAccessible(true);
@@ -41,8 +56,10 @@ public class OModulesHelper {
 					OModule module = (OModule) module_col.get(this);
 					if (module.isDefault()) {
 						mDefaultModule = module;
+						mModules.add(0, module);
+					} else {
+						mModules.add(module);
 					}
-					mModules.add(module);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -50,6 +67,11 @@ public class OModulesHelper {
 		}
 	}
 
+	/**
+	 * Gets the default module.
+	 * 
+	 * @return the default module
+	 */
 	public OModule getDefaultModule() {
 		return mDefaultModule;
 	}

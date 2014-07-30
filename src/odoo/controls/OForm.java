@@ -220,12 +220,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 						widget = OFieldType.MANY_TO_MANY_TAGS;
 					}
 					if (column.isFunctionalColumn()) {
-						Object value = "";
-						if (mRecord != null) {
-							value = mModel.getFunctionalMethodValue(column,
-									mRecord);
-							mRecord.put(column.getName(), value);
-						}
+						Object value = mRecord.get(column.getName());
 						if (column.getType() == null)
 							column.setType(value.getClass());
 						field.setColumn(column);

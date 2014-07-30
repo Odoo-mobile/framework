@@ -75,7 +75,7 @@ public class PartnersDetail extends BaseFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_library_detail_edit:
+		case R.id.menu_partner_detail_edit:
 			mEditMode = !mEditMode;
 			updateMenu(mEditMode);
 			mForm.setEditable(mEditMode);

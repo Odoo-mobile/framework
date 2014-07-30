@@ -37,6 +37,7 @@ public class LibraryService extends OService {
 			BookBook db = new BookBook(context);
 			db.setUser(user);
 			OSyncHelper sync = db.getSyncHelper();
+			sync.syncDataLimit(10);
 			if (sync.syncWithServer()) {
 				BookAuthor author = new BookAuthor(context);
 				author.setUser(user);

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.OList;
+import odoo.controls.OList.OnListBottomReachedListener;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +22,7 @@ import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OModel;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
@@ -31,7 +32,7 @@ import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
 public class Partners extends BaseFragment implements OnRowClickListener,
-		OnPullListener {
+		OnPullListener, OnListBottomReachedListener {
 
 	public static final String TAG = Partners.class.getSimpleName();
 
@@ -41,6 +42,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
 	Bundle arg = null;
+	Integer mLimit = 10;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,7 +57,8 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	public void init() {
 		mListcontrol = (OList) mView.findViewById(R.id.listRecords);
 		mListcontrol.setOnRowClickListener(this);
-		mDataLoader = new DataLoader();
+		mListcontrol.setOnListBottomReachedListener(this);
+		mDataLoader = new DataLoader(0);
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListcontrol, this);
 		mDataLoader.execute();
@@ -81,6 +84,11 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
+		Integer mOffset = 0;
+
+		public DataLoader(Integer offset) {
+			mOffset = offset;
+		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -91,8 +99,13 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 					if (db().isEmptyTable()) {
 						scope.main().requestSync(PartnersProvider.AUTHORITY);
 					}
-					mListRecords.clear();
-					mListRecords.addAll(db().select());
+					OModel model = db();
+					model.setOffset(mOffset);
+					if (mOffset == 0)
+						mListRecords.clear();
+					mListRecords.addAll(model.setLimit(mLimit)
+							.setOffset(mOffset).select());
+					mListcontrol.setRecordOffset(model.getNextOffset());
 				}
 			});
 			return null;
@@ -103,7 +116,6 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 			super.onPostExecute(result);
 			mListcontrol.setCustomView(R.layout.partners_list_item);
 			mListcontrol.initListControl(mListRecords);
-			Log.e("Size", mListRecords.size() + "");
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
 	}
@@ -159,8 +171,22 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
-			mDataLoader = new DataLoader();
+			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
 		}
 	};
+
+	@Override
+	public void onBottomReached(Integer record_limit, Integer record_offset) {
+		if (mDataLoader != null) {
+			mDataLoader.cancel(true);
+		}
+		mDataLoader = new DataLoader(record_offset);
+		mDataLoader.execute();
+	}
+
+	@Override
+	public Boolean showLoader() {
+		return true;
+	}
 }
