@@ -292,10 +292,29 @@ public class OList extends ScrollView implements View.OnClickListener,
 		addRecordViews();
 	}
 
+	/**
+	 * Sets the empty list message.
+	 * 
+	 * @param message
+	 *            the new empty list message
+	 */
 	public void setEmptyListMessage(String message) {
 		mAttr.put(KEY_EMPTY_LIST_MESSAGE, message);
 	}
 
+	/**
+	 * Sets the empty list icon.
+	 * 
+	 * @param icon
+	 *            the new empty list icon
+	 */
+	public void setEmptyListIcon(Integer icon) {
+		mAttr.put(KEY_EMPTY_LIST_ICON, icon);
+	}
+
+	/**
+	 * Show empty list view.
+	 */
 	private void showEmptyListView() {
 		LinearLayout mEmptyListLayout = new LinearLayout(mContext);
 		mEmptyListLayout.setOrientation(LinearLayout.VERTICAL);
@@ -791,6 +810,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 				loaderLayout.setPadding(15, 15, 15, 15);
 				loaderLayout.setTag(KEY_DATA_LOADER);
 				mInnerLayout.addView(loaderLayout);
+				fullScroll(View.FOCUS_DOWN);
 			}
 			mOnListBottomReachedListener.onBottomReached(mRecordLimit,
 					mRecordOffset);

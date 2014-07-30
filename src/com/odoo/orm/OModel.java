@@ -62,31 +62,34 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	/** The Constant TAG. */
 	public static final String TAG = OModel.class.getSimpleName();
 
-	/** The m context. */
+	/** The context. */
 	private Context mContext = null;
 
 	/** The _name. */
 	private String _name = null;
 
-	/** The m columns. */
+	/** The columns. */
 	private List<OColumn> mColumns = new ArrayList<OColumn>();
 
-	/** The m functional columns. */
+	/** The functional columns. */
 	private List<OColumn> mFunctionalColumns = new ArrayList<OColumn>();
 
-	/** The m user. */
+	/** The user. */
 	private OUser mUser = null;
 
-	/** The m sync helper. */
+	/** The sync helper. */
 	private OSyncHelper mSyncHelper = null;
 
-	/** The m check in active record. */
+	/** The syncing data. */
+	private Boolean mSyncingData = false;
+
+	/** The check in active record. */
 	private Boolean mCheckInActiveRecord = false;
 
-	/** The m app. */
+	/** The app. */
 	private App mApp = null;
 
-	/** The m odoo version. */
+	/** The odoo version. */
 	private OdooVersion mOdooVersion = null;
 
 	/** The offset. */
@@ -566,10 +569,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					}
 				}
 				/*
-				 * Adding functional column values to record values
+				 * Adding functional column values to record values if not
+				 * syncing
 				 */
-				for (OColumn col : mFunctionalColumns)
-					row.put(col.getName(), getFunctionalMethodValue(col, row));
+				if (!mSyncingData) {
+					for (OColumn col : mFunctionalColumns) {
+						row.put(col.getName(),
+								getFunctionalMethodValue(col, row));
+					}
+				}
 				if (row.getInt("id") == 0
 						|| row.getString("id").equals("false"))
 					row.put("id", 0);
@@ -1039,6 +1047,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	public OSyncHelper getSyncHelper() {
 		if (mSyncHelper == null)
 			mSyncHelper = new OSyncHelper(mContext, mUser, this);
+		mSyncingData = true;
 		return mSyncHelper;
 	}
 
@@ -1141,6 +1150,51 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	/**
+	 * Check for local update.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean checkForLocalUpdate() {
+		return true;
+	}
+
+	/**
+	 * Can update to server.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean canUpdateToServer() {
+		return true;
+	}
+
+	/**
+	 * Can delete from server.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean canDeleteFromServer() {
+		return true;
+	}
+
+	/**
+	 * Can delete from local.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean canDeleteFromLocal() {
+		return true;
+	}
+
+	/**
+	 * Can create on server.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean canCreateOnServer() {
+		return true;
+	}
+
+	/**
 	 * Check for write date.
 	 * 
 	 * @return the boolean
@@ -1155,6 +1209,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return the boolean
 	 */
 	public Boolean checkForCreateDate() {
+		return true;
+	}
+
+	public Boolean checkForLocalLatestUpdate() {
 		return true;
 	}
 
