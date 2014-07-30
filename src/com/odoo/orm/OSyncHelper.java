@@ -175,12 +175,10 @@ public class OSyncHelper {
 				Integer recId = row.getInt("id");
 				JSONObject values = createJSONValues(model, row);
 				if (values != null) {
-					mOdoo.debug(true);
 					mOdoo.updateValues(model.getModelName(), values, recId);
 					OValues vals = new OValues();
 					vals.put("is_dirty", "false");
 					model.update(vals, row.getInt("local_id"));
-					mOdoo.debug(false);
 				}
 			}
 		} catch (Exception e) {

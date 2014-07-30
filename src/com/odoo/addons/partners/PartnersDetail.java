@@ -26,7 +26,7 @@ public class PartnersDetail extends BaseFragment {
 	OForm mForm = null;
 	private Integer mId = null;
 	ODataRow mRecord = new ODataRow();
-	Boolean mEditMode = false;
+	Boolean mEditMode = true;
 	Menu mMenu = null;
 
 	@Override

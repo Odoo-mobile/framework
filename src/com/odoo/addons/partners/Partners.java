@@ -35,6 +35,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		OnPullListener, OnListBottomReachedListener {
 
 	public static final String TAG = Partners.class.getSimpleName();
+	public static final String KEY = "partner_type";
 
 	private View mView = null;
 	private List<ODataRow> mListRecords = new ArrayList<ODataRow>();
@@ -44,17 +45,31 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	private Integer mLimit = 10;
 	private Integer mLastPosition = -1;
 
+	public enum Type {
+		Customers, Suppliers, Companies
+	}
+
+	private Type mCurrentType = Type.Companies;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		scope = new AppScope(this);
+		initArgs();
 		mView = inflater.inflate(R.layout.partners_list, container, false);
 		init();
 		return mView;
 	}
 
-	public void init() {
+	private void initArgs() {
+		Bundle bundle = getArguments();
+		if (bundle.containsKey(KEY)) {
+			mCurrentType = Type.valueOf(bundle.getString(KEY));
+		}
+	}
+
+	private void init() {
 		mListcontrol = (OList) mView.findViewById(R.id.listRecords);
 		mListcontrol.setOnRowClickListener(this);
 		mListcontrol.setOnListBottomReachedListener(this);
@@ -88,8 +103,10 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		PartnersDetail partner = new PartnersDetail();
-		startFragment(partner, true);
+		if (item.getItemId() == R.id.menu_partner_create) {
+			PartnersDetail partner = new PartnersDetail();
+			startFragment(partner, true);
+		}
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -113,9 +130,12 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 					model.setOffset(mOffset);
 					if (mOffset == 0)
 						mListRecords.clear();
-					mListRecords.addAll(model.setLimit(mLimit)
+					Object[] args = new Object[] { true };
+					mListRecords.addAll(model
+							.setLimit(mLimit)
 							.setOffset(mOffset)
-							.select(null, null, null, null, "local_id DESC"));
+							.select(getWhere(mCurrentType), args, null, null,
+									"local_id DESC"));
 					mListcontrol.setRecordOffset(model.getNextOffset());
 				}
 			});
@@ -129,18 +149,46 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		}
 	}
 
+	private String getWhere(Type type) {
+		String where = null;
+		switch (type) {
+		case Companies:
+			where = "is_company = ?";
+			break;
+		case Customers:
+			where = "customer = ?";
+			break;
+		case Suppliers:
+			where = "supplier = ?";
+			break;
+		}
+		return where;
+
+	}
+
+	private int count(Context context, Type type) {
+		String where = getWhere(type);
+		Object[] args = new Object[] { true };
+		return new ResPartner(context).count(where, args);
+	}
+
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(TAG, "Detail", true));
-		menu.add(new DrawerItem(TAG, "Partner", 0, 0, object("partners")));
+		menu.add(new DrawerItem(TAG, "Partners", true));
+		menu.add(new DrawerItem(TAG, "Companies",
+				count(context, Type.Companies), 0, object(Type.Companies)));
+		menu.add(new DrawerItem(TAG, "Customers",
+				count(context, Type.Customers), 0, object(Type.Customers)));
+		menu.add(new DrawerItem(TAG, "Suppliers",
+				count(context, Type.Suppliers), 0, object(Type.Suppliers)));
 		return menu;
 	}
 
-	private Fragment object(String key) {
+	private Fragment object(Type type) {
 		Partners partners = new Partners();
 		Bundle args = new Bundle();
-		args.putString("partners", key);
+		args.putString(KEY, type.toString());
 		partners.setArguments(args);
 		return partners;
 	}

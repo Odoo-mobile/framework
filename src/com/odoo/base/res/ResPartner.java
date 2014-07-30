@@ -40,7 +40,7 @@ import com.odoo.orm.types.OVarchar;
 public class ResPartner extends OModel {
 
 	OColumn name = new OColumn("Name", OText.class);
-	OColumn is_company = new OColumn("Is Company", OText.class);
+	OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefault(false);
 	OColumn image_small = new OColumn("Image", OBlob.class).setDefault(false);
 	OColumn street = new OColumn("Street", OText.class);
 	OColumn street2 = new OColumn("Street2", OText.class);
@@ -63,12 +63,9 @@ public class ResPartner extends OModel {
 			RelationType.OneToMany).setRelatedColumn("parent_id");
 	OColumn ref = new OColumn("Contact Reference", OVarchar.class, 64);
 	OColumn lang = new OColumn("Language", OVarchar.class, 64);
-	OColumn user_id = new OColumn("SalesPerson", ResUsers.class,
-			RelationType.ManyToOne);
 	OColumn comment = new OColumn("Notes", OText.class);
 	OColumn category_id = new OColumn("Tags", ResPartnerCategory.class,
 			RelationType.ManyToMany);
-	OColumn credit_limit = new OColumn("Credit Limit", OInteger.class);
 	OColumn customer = new OColumn("Customer", OBoolean.class);
 	OColumn supplier = new OColumn("Supplier", OBoolean.class);
 	OColumn employee = new OColumn("Employee", OBoolean.class);
