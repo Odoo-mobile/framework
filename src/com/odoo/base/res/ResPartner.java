@@ -30,7 +30,6 @@ import com.odoo.orm.OModel;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
-import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 
@@ -61,14 +60,11 @@ public class ResPartner extends OModel {
 			RelationType.ManyToOne);
 	OColumn child_ids = new OColumn("Contacts", ResPartner.class,
 			RelationType.OneToMany).setRelatedColumn("parent_id");
-	OColumn ref = new OColumn("Contact Reference", OVarchar.class, 64);
-	OColumn lang = new OColumn("Language", OVarchar.class, 64);
 	OColumn comment = new OColumn("Notes", OText.class);
 	OColumn category_id = new OColumn("Tags", ResPartnerCategory.class,
 			RelationType.ManyToMany);
 	OColumn customer = new OColumn("Customer", OBoolean.class);
 	OColumn supplier = new OColumn("Supplier", OBoolean.class);
-	OColumn employee = new OColumn("Employee", OBoolean.class);
 	OColumn state_id = new OColumn("State", ResCountry.class,
 			RelationType.ManyToOne);
 	OColumn country_id = new OColumn("Country", ResCountry.class,

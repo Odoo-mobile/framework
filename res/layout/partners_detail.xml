@@ -50,7 +50,7 @@
                 odoo:label_color="@color/odoo_purple"
                 odoo:with_label="false" />
 
-           <odoo.controls.OField
+            <odoo.controls.OField
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 odoo:booleanWidget="checkbox_widget"
@@ -63,6 +63,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="parent_id"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="city"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="country_id"
             odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
         <!-- [Fix Me] Add after updating methods for this -->
@@ -83,6 +97,20 @@
             odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
         -->
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="comment"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="email"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
 
         <odoo.controls.OField
             android:layout_width="match_parent"
