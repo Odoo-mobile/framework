@@ -2,6 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_partner_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_action_search"
+        android:showAsAction="always|collapseActionView"
+        android:title="@string/label_search">
+    </item>
+    <item
         android:id="@+id/menu_partner_create"
         android:icon="@drawable/ic_action_content_new"
         android:showAsAction="always"

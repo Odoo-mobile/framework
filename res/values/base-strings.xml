@@ -85,6 +85,7 @@
     <string name="label_ok">OK</string>
     <string name="label_yes">Yes</string>
     <string name="label_no">No</string>
+    <string name="label_search">Search</string>
     <string name="label_login">Login</string>
     <string name="label_delete">Delete</string>
     <string name="label_cancel">Cancel</string>

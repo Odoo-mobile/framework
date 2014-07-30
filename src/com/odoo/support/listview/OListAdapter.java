@@ -27,15 +27,45 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
+/**
+ * The Class OListAdapter.
+ */
 public class OListAdapter extends ArrayAdapter<Object> {
-	public static final String TAG = "com.odoo.support.listview.OListAdapter";
-	Context mContext = null;
-	List<Object> mObjects = null;
-	List<Object> mAllObjects = null;
-	RowFilter mFilter = null;
-	int mResourceId = 0;
-	RowFilterTextListener mRowFilterTextListener = null;
 
+	/** The Constant TAG. */
+	public static final String TAG = "com.odoo.support.listview.OListAdapter";
+
+	/** The context. */
+	private Context mContext = null;
+
+	/** The objects. */
+	private List<Object> mObjects = null;
+
+	/** The all objects. */
+	private List<Object> mAllObjects = null;
+
+	/** The filter. */
+	private RowFilter mFilter = null;
+
+	/** The resource id. */
+	private int mResourceId = 0;
+
+	/** The row filter text listener. */
+	private RowFilterTextListener mRowFilterTextListener = null;
+
+	/** The on search change. */
+	private OnSearchChange mOnSearchChange = null;
+
+	/**
+	 * Instantiates a new o list adapter.
+	 * 
+	 * @param context
+	 *            the context
+	 * @param resource
+	 *            the resource
+	 * @param objects
+	 *            the objects
+	 */
 	public OListAdapter(Context context, int resource, List<Object> objects) {
 		super(context, resource, objects);
 		Log.d(TAG, "OListAdapter->constructor()");
@@ -45,6 +75,11 @@ public class OListAdapter extends ArrayAdapter<Object> {
 		mResourceId = resource;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.widget.ArrayAdapter#getFilter()
+	 */
 	@Override
 	public Filter getFilter() {
 		if (mFilter == null) {
@@ -53,10 +88,23 @@ public class OListAdapter extends ArrayAdapter<Object> {
 		return mFilter;
 	}
 
+	/**
+	 * Gets the resource.
+	 * 
+	 * @return the resource
+	 */
 	public int getResource() {
 		return mResourceId;
 	}
 
+	/**
+	 * Replace object at position.
+	 * 
+	 * @param position
+	 *            the position
+	 * @param object
+	 *            the object
+	 */
 	public void replaceObjectAtPosition(int position, Object object) {
 		mAllObjects.remove(position);
 		mAllObjects.add(position, object);
@@ -64,6 +112,12 @@ public class OListAdapter extends ArrayAdapter<Object> {
 		mObjects.add(position, object);
 	}
 
+	/**
+	 * Notifiy data change.
+	 * 
+	 * @param objects
+	 *            the objects
+	 */
 	public void notifiyDataChange(List<Object> objects) {
 		Log.d(TAG, "OListAdapter->notifiyDataChange()");
 		mAllObjects.clear();
@@ -73,8 +127,16 @@ public class OListAdapter extends ArrayAdapter<Object> {
 		notifyDataSetChanged();
 	}
 
+	/**
+	 * The Class RowFilter.
+	 */
 	class RowFilter extends Filter {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.widget.Filter#performFiltering(java.lang.CharSequence)
+		 */
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 			FilterResults result = new FilterResults();
@@ -95,6 +157,7 @@ public class OListAdapter extends ArrayAdapter<Object> {
 				}
 				result.count = filteredItems.size();
 				result.values = filteredItems;
+
 			} else {
 				synchronized (this) {
 					result.count = mAllObjects.size();
@@ -104,6 +167,12 @@ public class OListAdapter extends ArrayAdapter<Object> {
 			return result;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.widget.Filter#publishResults(java.lang.CharSequence,
+		 * android.widget.Filter.FilterResults)
+		 */
 		@SuppressWarnings("unchecked")
 		@Override
 		protected void publishResults(CharSequence constraint,
@@ -112,15 +181,67 @@ public class OListAdapter extends ArrayAdapter<Object> {
 			mObjects = (List<Object>) results.values;
 			addAll(mObjects);
 			notifyDataSetChanged();
+			if (mOnSearchChange != null) {
+				mOnSearchChange.onSearchChange(mObjects);
+			}
 		}
 	}
 
+	/**
+	 * Sets the on search change.
+	 * 
+	 * @param callback
+	 *            the new on search change
+	 */
+	public void setOnSearchChange(OnSearchChange callback) {
+		mOnSearchChange = callback;
+	}
+
+	/**
+	 * Sets the row filter text listener.
+	 * 
+	 * @param listener
+	 *            the new row filter text listener
+	 */
 	public void setRowFilterTextListener(RowFilterTextListener listener) {
 		mRowFilterTextListener = listener;
 	}
 
+	/**
+	 * The listener interface for receiving rowFilterText events. The class that
+	 * is interested in processing a rowFilterText event implements this
+	 * interface, and the object created with that class is registered with a
+	 * component using the component's
+	 * <code>addRowFilterTextListener<code> method. When
+	 * the rowFilterText event occurs, that object's appropriate
+	 * method is invoked.
+	 * 
+	 * @see RowFilterTextEvent
+	 */
 	public interface RowFilterTextListener {
+
+		/**
+		 * Filter compare with.
+		 * 
+		 * @param object
+		 *            the object
+		 * @return the string
+		 */
 		public String filterCompareWith(Object object);
+	}
+
+	/**
+	 * The Interface OnSearchChange.
+	 */
+	public interface OnSearchChange {
+
+		/**
+		 * On search change.
+		 * 
+		 * @param newRecords
+		 *            the new records
+		 */
+		public void onSearchChange(List<Object> newRecords);
 	}
 
 }

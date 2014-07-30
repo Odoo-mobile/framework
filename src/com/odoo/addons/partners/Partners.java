@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
@@ -99,15 +100,21 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		super.onCreateOptionsMenu(menu, inflater);
 		menu.clear();
 		inflater.inflate(R.menu.menu_partners, menu);
+		SearchView mSearchView = (SearchView) menu.findItem(
+				R.id.menu_partner_search).getActionView();
+		mSearchView.setOnQueryTextListener(mListcontrol.getQueryListener());
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_partner_create) {
+		switch (item.getItemId()) {
+		case R.id.menu_partner_create:
 			PartnersDetail partner = new PartnersDetail();
 			startFragment(partner, true);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
