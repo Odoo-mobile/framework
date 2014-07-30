@@ -392,7 +392,6 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			if (annotations.length > 0) {
 				int versions = 0;
 				for (Annotation annotation : annotations) {
-					versions = 0;
 					if (annotation.annotationType().getDeclaringClass()
 							.isAssignableFrom(Odoo.api.class)) {
 						switch (mOdooVersion.getVersion_number()) {

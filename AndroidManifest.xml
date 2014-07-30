@@ -79,17 +79,17 @@
                 android:resource="@xml/contacts" />
         </service>
 
-        <!-- Idea Library Provider -->
+        <!-- ResPartner Provider -->
         <provider
-            android:name="com.odoo.addons.idea.providers.library.LibraryProvider"
-            android:authorities="com.odoo.addons.idea.providers.library"
+            android:name="com.odoo.addons.partners.providers.partners.PartnersProvider"
+            android:authorities="com.odoo.addons.partners.providers.partners"
             android:enabled="true"
             android:exported="true"
-            android:label="Library Data"
+            android:label="Partners"
             android:syncable="true" />
-        <!-- Idea Library Provider -->
+        <!-- ResPartner Service -->
         <service
-            android:name="com.odoo.addons.idea.services.LibraryService"
+            android:name="com.odoo.addons.partners.sevices.PartnersService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -97,7 +97,7 @@
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_library_data" />
+                android:resource="@xml/sync_partners" />
         </service>
     </application>
 

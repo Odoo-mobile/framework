@@ -15,9 +15,7 @@
     <odoo.controls.OList
         android:id="@+id/listRecords"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        odoo:custom_layout="@layout/fragment_library_book_view"
-        odoo:emptyListMessage="No Books found" >
+        android:layout_height="match_parent" >
     </odoo.controls.OList>
 
 </LinearLayout>

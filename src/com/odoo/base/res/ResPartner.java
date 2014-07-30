@@ -21,10 +21,14 @@ package com.odoo.base.res;
 
 import android.content.Context;
 
+import com.odoo.addons.partners.model.ResPartnerCategory;
+import com.odoo.addons.partners.model.ResPartnerTitle;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.OBlob;
+import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 
@@ -34,8 +38,8 @@ import com.odoo.orm.types.OVarchar;
 public class ResPartner extends OModel {
 
 	OColumn name = new OColumn("Name", OText.class);
-	OColumn is_company = new OColumn("Is Company", OText.class);
-	OColumn image_small = new OColumn("Image", OBlob.class);
+	OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefault(false);
+	OColumn image_small = new OColumn("Image", OBlob.class).setDefault(false);
 	OColumn street = new OColumn("Street", OText.class);
 	OColumn street2 = new OColumn("Street2", OText.class);
 	OColumn city = new OColumn("City", OText.class);
@@ -45,6 +49,24 @@ public class ResPartner extends OModel {
 	OColumn mobile = new OColumn("Mobile", OText.class);
 	OColumn email = new OColumn("Email", OText.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
+			RelationType.ManyToOne);
+
+	// Extra Demo Module Columns
+	OColumn date = new OColumn("Date", ODateTime.class);
+	OColumn title = new OColumn("Title", ResPartnerTitle.class,
+			RelationType.ManyToOne);
+	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
+			RelationType.ManyToOne);
+	OColumn child_ids = new OColumn("Contacts", ResPartner.class,
+			RelationType.OneToMany).setRelatedColumn("parent_id");
+	OColumn comment = new OColumn("Notes", OText.class);
+	OColumn category_id = new OColumn("Tags", ResPartnerCategory.class,
+			RelationType.ManyToMany);
+	OColumn customer = new OColumn("Customer", OBoolean.class);
+	OColumn supplier = new OColumn("Supplier", OBoolean.class);
+	OColumn state_id = new OColumn("State", ResCountry.class,
+			RelationType.ManyToOne);
+	OColumn country_id = new OColumn("Country", ResCountry.class,
 			RelationType.ManyToOne);
 
 	public ResPartner(Context context) {

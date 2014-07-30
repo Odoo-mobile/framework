@@ -1,0 +1,123 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:odoo="http://schemas.android.com/apk/res/com.odoo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:paddingTop="?android:attr/actionBarSize" >
+
+    <odoo.controls.OForm
+        android:id="@+id/partnerDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="15dp"
+        odoo:model="res.partner" >
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="name"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OLabel
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:bottom_border_height="5"
+            odoo:label="Type"
+            odoo:textAppearance="?android:attr/textAppearanceMedium"
+            odoo:color="@color/odoo_purple" >
+        </odoo.controls.OLabel>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <odoo.controls.OField
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                odoo:booleanWidget="checkbox_widget"
+                odoo:field_name="is_company"
+                odoo:label_color="@color/odoo_purple"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                odoo:booleanWidget="checkbox_widget"
+                odoo:field_name="customer"
+                odoo:label_color="@color/odoo_purple"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                odoo:booleanWidget="checkbox_widget"
+                odoo:field_name="supplier"
+                odoo:label_color="@color/odoo_purple"
+                odoo:with_label="false" />
+        </LinearLayout>
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="parent_id"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="city"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="country_id"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+        <!-- [Fix Me] Add after updating methods for this -->
+        <!--
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="category_id"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:customLayout="@layout/partner_contacts"
+            odoo:customLayoutOriantation="vertical"
+            odoo:field_name="child_ids"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+        -->
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="comment"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="email"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="website"
+            odoo:label_color="@color/odoo_purple"
+            odoo:with_label="true" />
+    </odoo.controls.OForm>
+
+</ScrollView>

@@ -1,0 +1,82 @@
+<odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/odooFormBooks"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="15dp"
+    odoo:background_selector="@drawable/oe_listview_background_selector"
+    odoo:model="res.partner" >
+
+    <odoo.controls.OField
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginRight="10dp"
+        android:gravity="center_vertical"
+        odoo:binaryType="round_image"
+        odoo:defaultImage="@drawable/avatar"
+        odoo:field_name="image_small"
+        odoo:imageWidthHeight="65"
+        odoo:with_label="false" >
+    </odoo.controls.OField>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <odoo.controls.OField
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                odoo:fieldTextStyle="bold"
+                odoo:field_color="@color/odoo_purple"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:with_label="false" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_color="#006400"
+                odoo:field_name="email"
+                odoo:singleLine="true"
+                odoo:with_label="false" >
+            </odoo.controls.OField>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    odoo:field_name="city"
+                    odoo:with_label="false" >
+                </odoo.controls.OField>
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    odoo:field_name="country_id"
+                    odoo:with_label="false" >
+                </odoo.controls.OField>
+            </LinearLayout>
+        </LinearLayout>
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="category_id"
+            odoo:with_label="false" >
+        </odoo.controls.OField>
+    </LinearLayout>
+
+</odoo.controls.OForm>

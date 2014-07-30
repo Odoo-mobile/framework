@@ -1,19 +1,20 @@
 <odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    xmlns:odoo="http://schemas.android.com/apk/res/com.odoo"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="15dp"
-    odoo:background_selector="@drawable/oe_listview_background_selector"
-    odoo:model="book.category" >
+    odoo:model="res.partner" >
 
     <odoo.controls.OField
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        odoo:fieldTextStyle="bold"
         odoo:field_name="name"
-        odoo:field_textAppearance="?android:attr/textAppearanceLarge"
-        odoo:with_label="false" >
-    </odoo.controls.OField>
+        odoo:with_label="false" />
+
+    <odoo.controls.OField
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        odoo:field_name="email"
+        odoo:with_label="false" />
 
 </odoo.controls.OForm>
