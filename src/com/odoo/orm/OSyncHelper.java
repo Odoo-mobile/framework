@@ -81,7 +81,6 @@ public class OSyncHelper {
 				// Adding default domain to domain
 				domain.append(model.defaultDomain());
 				if (checkForCreateWriteDate) {
-
 					if (model.checkForCreateDate()) {
 						// Adding Old data limit
 						mPref = new PreferenceManager(mContext);
@@ -109,16 +108,26 @@ public class OSyncHelper {
 				JSONObject result = mOdoo.search_read(model.getModelName(),
 						getFields(model), domain.get(), 0, mSyndDataLimit,
 						null, null);
-				if (checkForCreateWriteDate)
+				if (checkForCreateWriteDate
+						&& model.checkForLocalLatestUpdate()) {
 					handleResult(model,
 							checkForLocalLatestUpdate(model, result));
-				else
+				} else {
 					handleResult(model, result);
+				}
 				handleRelationRecords(model);
-				createRecordOnserver(model);
-				updateToServer(model);
-				deleteRecordFromServer(model);
-				deleteRecordInLocal(model);
+				// Creating record on server if model allows true
+				if (model.canCreateOnServer())
+					createRecordOnserver(model);
+				// Updating dirty record on server if model allows true
+				if (model.canUpdateToServer())
+					updateToServer(model);
+				// Deleting record from server if model allows true
+				if (model.canDeleteFromServer())
+					deleteRecordFromServer(model);
+				// Deleting record from local if model allows true
+				if (model.canDeleteFromLocal())
+					deleteRecordInLocal(model);
 				return syncFinish(model);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -369,7 +378,9 @@ public class OSyncHelper {
 				mFinishedRelModels.add(key);
 				ORelationRecords rel = mRelationRecordList.get(key);
 				OModel base_model = rel.getBaseModel();
+				base_model.setSyncingDataFlag(true);
 				OModel rel_model = rel.getRelModel();
+				rel_model.setSyncingDataFlag(true);
 				ODomain rel_domain = new ODomain();
 				boolean syncFlag = false;
 				if (rel.getRelIds().size() > 0) {
