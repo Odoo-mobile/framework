@@ -86,15 +86,15 @@ public class PartnersDetail extends BaseFragment {
 			if (values != null) {
 				updateMenu(mEditMode);
 				if (mId != null) {
-					new ResPartner(getActivity()).update(values, mId);
+					db().update(values, mId);
 				} else {
-					new ResPartner(getActivity()).create(values);
+					db().create(values);
 				}
 			}
 			getActivity().getSupportFragmentManager().popBackStack();
 			break;
 		case R.id.menu_partner_detail_delete:
-			new ResPartner(getActivity()).delete(mId);
+			db().delete(mId);
 			getActivity().getSupportFragmentManager().popBackStack();
 			break;
 		}
@@ -108,7 +108,7 @@ public class PartnersDetail extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return null;
+		return new ResPartner(context);
 	}
 
 	@Override
