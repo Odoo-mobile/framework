@@ -376,7 +376,9 @@ public class OSyncHelper {
 				mFinishedRelModels.add(key);
 				ORelationRecords rel = mRelationRecordList.get(key);
 				OModel base_model = rel.getBaseModel();
+				base_model.setSyncingDataFlag(true);
 				OModel rel_model = rel.getRelModel();
+				rel_model.setSyncingDataFlag(true);
 				ODomain rel_domain = new ODomain();
 				boolean syncFlag = false;
 				if (rel.getRelIds().size() > 0) {

@@ -1052,6 +1052,18 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	/**
+	 * Sets the syncing data flag.
+	 * 
+	 * @param syncingData
+	 *            the syncing data
+	 * @return the o model
+	 */
+	public OModel setSyncingDataFlag(Boolean syncingData) {
+		mSyncingData = syncingData;
+		return this;
+	}
+
+	/**
 	 * Gets the model values.
 	 * 
 	 * @param model
