@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             odoo:bottom_border_height="5"
             odoo:label="Type"
-            odoo:textAppearance="?android:attr/textAppearanceLarge"
+            odoo:textAppearance="?android:attr/textAppearanceMedium"
             odoo:color="@color/odoo_purple" >
         </odoo.controls.OLabel>
 

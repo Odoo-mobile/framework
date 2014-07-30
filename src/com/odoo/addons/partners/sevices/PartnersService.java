@@ -33,7 +33,7 @@ public class PartnersService extends OService {
 			Intent intent= new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
 			ResPartner resPartner= new ResPartner(context);
-			sync= resPartner.getSyncHelper();
+			sync= resPartner.getSyncHelper().syncDataLimit(30);
 			if(sync.syncWithServer()){
 				context.sendBroadcast(intent);
 			}

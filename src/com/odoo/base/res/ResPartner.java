@@ -21,7 +21,6 @@ package com.odoo.base.res;
 
 import android.content.Context;
 
-import com.odoo.addons.idea.model.BookBook.ResCountry;
 import com.odoo.addons.partners.model.ResPartnerCategory;
 import com.odoo.addons.partners.model.ResPartnerTitle;
 import com.odoo.orm.OColumn;
