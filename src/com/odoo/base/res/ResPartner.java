@@ -38,7 +38,8 @@ import com.odoo.orm.types.OVarchar;
 public class ResPartner extends OModel {
 
 	OColumn name = new OColumn("Name", OText.class);
-	OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefault(false);
+	OColumn is_company = new OColumn("Is Company", OBoolean.class)
+			.setDefault(false);
 	OColumn image_small = new OColumn("Image", OBlob.class).setDefault(false);
 	OColumn street = new OColumn("Street", OText.class);
 	OColumn street2 = new OColumn("Street2", OText.class);
@@ -49,14 +50,14 @@ public class ResPartner extends OModel {
 	OColumn mobile = new OColumn("Mobile", OText.class);
 	OColumn email = new OColumn("Email", OText.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
-			RelationType.ManyToOne);
+			RelationType.ManyToOne).addDomain("is_company", "=", true);
 
 	// Extra Demo Module Columns
 	OColumn date = new OColumn("Date", ODateTime.class);
 	OColumn title = new OColumn("Title", ResPartnerTitle.class,
 			RelationType.ManyToOne);
 	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
-			RelationType.ManyToOne);
+			RelationType.ManyToOne).addDomain("is_company", "=", true);
 	OColumn child_ids = new OColumn("Contacts", ResPartner.class,
 			RelationType.OneToMany).setRelatedColumn("parent_id");
 	OColumn comment = new OColumn("Notes", OText.class);

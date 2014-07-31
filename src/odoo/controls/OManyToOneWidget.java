@@ -19,6 +19,7 @@
 package odoo.controls;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import android.content.Context;
@@ -35,6 +36,7 @@ import android.widget.Spinner;
 
 import com.odoo.R;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.OColumn.ColumnDomain;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.support.listview.OListAdapter;
@@ -186,8 +188,15 @@ public class OManyToOneWidget extends LinearLayout implements
 	 * @return the o many to one widget
 	 */
 	public OManyToOneWidget setModel(OModel model, String column) {
+		return setModel(model, column,
+				new LinkedHashMap<String, OColumn.ColumnDomain>());
+	}
+
+	public OManyToOneWidget setModel(OModel model, String column,
+			LinkedHashMap<String, ColumnDomain> domains) {
 		mModel = model;
 		mColumn = mModel.getColumn(column);
+		mColumn.cloneDomain(domains);
 		return this;
 	}
 
@@ -232,7 +241,28 @@ public class OManyToOneWidget extends LinearLayout implements
 		select_row.put("id", 0);
 		select_row.put(mColumn.getName(), "Select " + mColumn.getLabel());
 		mSpinnerObjects.add(select_row);
-		for (ODataRow row : mModel.select()) {
+		StringBuffer whr = new StringBuffer();
+		List<Object> args_list = new ArrayList<Object>();
+		for (String key : mColumn.getDomains().keySet()) {
+			ColumnDomain domain = mColumn.getDomains().get(key);
+			if (domain.getConditionalOperator() != null) {
+				whr.append(domain.getConditionalOperator());
+			} else {
+				whr.append(" ");
+				whr.append(domain.getColumn());
+				whr.append(" ");
+				whr.append(domain.getOperator());
+				whr.append(" ? ");
+				args_list.add(domain.getValue());
+			}
+		}
+		String where = null;
+		Object[] args = null;
+		if (args_list.size() > 0) {
+			where = whr.toString();
+			args = args_list.toArray(new Object[args_list.size()]);
+		}
+		for (ODataRow row : mModel.select(where, args)) {
 			mSpinnerObjects.add(row);
 			if (mCurrentId > 0 && mCurrentId == row.getInt(OColumn.ROW_ID)) {
 				mSelectedPosition = mSpinnerObjects.indexOf(row);

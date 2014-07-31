@@ -19,13 +19,21 @@
 package com.odoo.orm;
 
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 
 /**
  * The Class OColumn.
  */
 public class OColumn {
 
+	/** The Constant ROW_ID. */
 	public static final String ROW_ID = "local_id";
+
+	/** The column domains. */
+	private LinkedHashMap<String, ColumnDomain> columnDomains = new LinkedHashMap<String, OColumn.ColumnDomain>();
+
+	/** The condition_operator_index. */
+	private Integer condition_operator_index = 0;
 
 	/**
 	 * The Enum RelationType.
@@ -79,6 +87,7 @@ public class OColumn {
 	/** The functional_method. */
 	private Method functional_method = null;
 
+	/** The use_annotation. */
 	private Boolean use_annotation = true;
 
 	/*
@@ -86,6 +95,7 @@ public class OColumn {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		StringBuffer str = new StringBuffer();
 		str.append("{");
@@ -448,6 +458,194 @@ public class OColumn {
 	 */
 	public Boolean isAccessible() {
 		return use_annotation;
+	}
+
+	/**
+	 * Adds the domain.
+	 * 
+	 * @param column_name
+	 *            the column_name
+	 * @param operator
+	 *            the operator
+	 * @param value
+	 *            the value
+	 * @return the o column
+	 */
+	public OColumn addDomain(String column_name, String operator, Object value) {
+		columnDomains.put(column_name, new ColumnDomain(column_name, operator,
+				value));
+		return this;
+	}
+
+	/**
+	 * Adds the domain.
+	 * 
+	 * @param condition_operator
+	 *            the condition_operator
+	 * @return the o column
+	 */
+	public OColumn addDomain(String condition_operator) {
+		columnDomains.put("condition_operator_" + (condition_operator_index++)
+				+ condition_operator, new ColumnDomain(condition_operator));
+		return this;
+	}
+
+	/**
+	 * Gets the domains.
+	 * 
+	 * @return the domains
+	 */
+	public LinkedHashMap<String, ColumnDomain> getDomains() {
+		return columnDomains;
+	}
+
+	/**
+	 * Clone domain.
+	 * 
+	 * @param domains
+	 *            the domains
+	 * @return the o column
+	 */
+	public OColumn cloneDomain(LinkedHashMap<String, ColumnDomain> domains) {
+		columnDomains.putAll(domains);
+		return this;
+	}
+
+	/**
+	 * The Class ColumnDomain.
+	 */
+	public class ColumnDomain {
+
+		/** The column. */
+		String column = null;
+
+		/** The operator. */
+		String operator = null;
+
+		/** The value. */
+		Object value = null;
+
+		/** The conditional_operator. */
+		String conditional_operator = null;
+
+		/**
+		 * Instantiates a new column domain.
+		 * 
+		 * @param conditional_operator
+		 *            the conditional_operator
+		 */
+		public ColumnDomain(String conditional_operator) {
+			this.conditional_operator = conditional_operator;
+		}
+
+		/**
+		 * Instantiates a new column domain.
+		 * 
+		 * @param column
+		 *            the column
+		 * @param operator
+		 *            the operator
+		 * @param value
+		 *            the value
+		 */
+		public ColumnDomain(String column, String operator, Object value) {
+			this.column = column;
+			this.operator = operator;
+			this.value = value;
+		}
+
+		/**
+		 * Gets the column.
+		 * 
+		 * @return the column
+		 */
+		public String getColumn() {
+			return column;
+		}
+
+		/**
+		 * Sets the column.
+		 * 
+		 * @param column
+		 *            the new column
+		 */
+		public void setColumn(String column) {
+			this.column = column;
+		}
+
+		/**
+		 * Gets the operator.
+		 * 
+		 * @return the operator
+		 */
+		public String getOperator() {
+			return operator;
+		}
+
+		/**
+		 * Sets the operator.
+		 * 
+		 * @param operator
+		 *            the new operator
+		 */
+		public void setOperator(String operator) {
+			this.operator = operator;
+		}
+
+		/**
+		 * Gets the value.
+		 * 
+		 * @return the value
+		 */
+		public Object getValue() {
+			return value;
+		}
+
+		/**
+		 * Sets the value.
+		 * 
+		 * @param value
+		 *            the new value
+		 */
+		public void setValue(Object value) {
+			this.value = value;
+		}
+
+		/**
+		 * Gets the conditional operator.
+		 * 
+		 * @return the conditional operator
+		 */
+		public String getConditionalOperator() {
+			return conditional_operator;
+		}
+
+		/**
+		 * Sets the conditional operator.
+		 * 
+		 * @param conditional_operator
+		 *            the new conditional operator
+		 */
+		public void setConditionalOperator(String conditional_operator) {
+			this.conditional_operator = conditional_operator;
+		}
+
+		@Override
+		public String toString() {
+			StringBuffer domain = new StringBuffer();
+			domain.append("[");
+			if (this.conditional_operator == null) {
+				domain.append(this.column);
+				domain.append(", ");
+				domain.append(this.operator);
+				domain.append(", ");
+				domain.append(this.value);
+			} else {
+				domain.append(this.conditional_operator);
+			}
+			domain.append("]");
+			return domain.toString();
+		}
 	}
 
 }

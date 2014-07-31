@@ -595,7 +595,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
 					LayoutParams.WRAP_CONTENT);
 			mManyToOne.setLayoutParams(mLayoutParams);
-			mManyToOne.setModel(mModel, ref_column);
+			mManyToOne.setModel(mModel, ref_column, mColumn.getDomains());
 			if (mControlRecord != null)
 				mManyToOne.setRecordId((Integer) mControlRecord.getM2ORecord(
 						mColumn.getName()).getId());
