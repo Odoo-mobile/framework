@@ -102,7 +102,8 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		inflater.inflate(R.menu.menu_partners, menu);
 		SearchView mSearchView = (SearchView) menu.findItem(
 				R.id.menu_partner_search).getActionView();
-		mSearchView.setOnQueryTextListener(mListcontrol.getQueryListener());
+		if (mListcontrol != null)
+			mSearchView.setOnQueryTextListener(mListcontrol.getQueryListener());
 	}
 
 	@Override

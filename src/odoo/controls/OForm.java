@@ -302,17 +302,16 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			values = new OValues();
 			for (String key : mFields) {
 				OField field = (OField) findViewWithTag(key);
-				if (field.getValue() != null) {
-					values.put(field.getFieldName(), field.getValue());
+				if (field != null) {
+					if (field.getValue() != null) {
+						values.put(field.getFieldName(), field.getValue());
+					}
 				}
 			}
 			if (mRecord != null) {
-				values.put("local_record",
-						Boolean.parseBoolean(mRecord.getString("local_record")));
-				if (values.getBoolean("local_record")) {
-					values.put("local_id", mRecord.getInt("local_id"));
-					values.put("is_dirty", true);
-				}
+				values.put("id", mRecord.getInt("id"));
+				values.put("local_id", mRecord.getInt(OColumn.ROW_ID));
+				values.put("is_dirty", true);
 			}
 		}
 		return values;
@@ -326,11 +325,13 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 	private boolean validateForm() {
 		for (String key : mFields) {
 			OField field = (OField) findViewWithTag(key);
-			OColumn col = mFieldColumns.get(field.getFieldName());
-			field.setError(null);
-			if (col.isRequired() && field.isEmpty()) {
-				field.setError(col.getLabel() + " is required");
-				return false;
+			if (field != null) {
+				OColumn col = mFieldColumns.get(field.getFieldName());
+				field.setError(null);
+				if (col.isRequired() && field.isEmpty()) {
+					field.setError(col.getLabel() + " is required");
+					return false;
+				}
 			}
 		}
 		return true;

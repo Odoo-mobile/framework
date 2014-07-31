@@ -22,10 +22,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import odoo.controls.OField.TextStyle;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -54,40 +56,43 @@ public class OManyToOneWidget extends LinearLayout implements
 	public static final String KEY_COLUMN_NAME = "column_name";
 
 	/** The context. */
-	Context mContext = null;
+	private Context mContext = null;
 
 	/** The typed array. */
-	TypedArray mTypedArray = null;
+	private TypedArray mTypedArray = null;
 
 	/** The attrs. */
-	OControlAttributes mAttrs = new OControlAttributes();
+	private OControlAttributes mAttrs = new OControlAttributes();
 
 	/** The model. */
-	OModel mModel = null;
+	private OModel mModel = null;
 
 	/** The column. */
-	OColumn mColumn = null;
+	private OColumn mColumn = null;
 
 	/** The spinner. */
-	Spinner mSpinner = null;
+	private Spinner mSpinner = null;
 
 	/** The params. */
-	LayoutParams mParams = null;
+	private LayoutParams mParams = null;
 
 	/** The spinner adapter. */
-	OListAdapter mSpinnerAdapter = null;
+	private OListAdapter mSpinnerAdapter = null;
 
 	/** The spinner objects. */
-	List<Object> mSpinnerObjects = new ArrayList<Object>();
+	private List<Object> mSpinnerObjects = new ArrayList<Object>();
 
 	/** The selected position. */
-	Integer mSelectedPosition = -1;
+	private Integer mSelectedPosition = -1;
 
 	/** The current id. */
-	Integer mCurrentId = -1;
+	private Integer mCurrentId = -1;
 
 	/** The many to one item change listener. */
-	ManyToOneItemChangeListener mManyToOneItemChangeListener = null;
+	private ManyToOneItemChangeListener mManyToOneItemChangeListener = null;
+
+	/** The custom_layout. */
+	private Integer custom_layout = null;
 
 	/**
 	 * Instantiates a new many to one widget.
@@ -160,6 +165,16 @@ public class OManyToOneWidget extends LinearLayout implements
 	 */
 	public void reInit() {
 		initControls();
+	}
+
+	/**
+	 * Sets the custom layout.
+	 * 
+	 * @param layout
+	 *            the new custom layout
+	 */
+	public void setCustomLayout(Integer layout) {
+		custom_layout = layout;
 	}
 
 	/**
@@ -282,24 +297,32 @@ public class OManyToOneWidget extends LinearLayout implements
 	private OForm getRowForm(ODataRow row) {
 		AbsListView.LayoutParams mParams = new AbsListView.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		OForm form = new OForm(mContext);
-		form.setOrientation(LinearLayout.VERTICAL);
-		form.setLayoutParams(mParams);
+		OForm form = null;
+		if (custom_layout != null) {
+			form = (OForm) LayoutInflater.from(mContext).inflate(custom_layout,
+					null);
+		} else {
+			form = new OForm(mContext);
+			form.setLayoutParams(mParams);
+			form.setOrientation(LinearLayout.VERTICAL);
+		}
 		form.setModel(mModel);
 
-		this.mParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.WRAP_CONTENT);
-		// Creating name field
-		OField field = new OField(mContext);
-		field.setFieldName(mColumn.getName());
-		field.showLabel(false);
-		field.setLayoutParams(this.mParams);
-		field.setPadding(8, 8, 8, 8);
-		field.reInit();
-		field.setTextStyle(10);
-		form.addView(field);
+		if (custom_layout == null) {
+			this.mParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+					LayoutParams.WRAP_CONTENT);
+			// Creating name field
+			OField field = new OField(mContext);
+			field.setFieldName(mColumn.getName());
+			field.showLabel(false);
+			field.setLayoutParams(this.mParams);
+			field.setPadding(8, 8, 8, 8);
+			field.reInit();
+			field.setTextAppearance(android.R.style.TextAppearance_Medium);
+			field.setTextStyle(TextStyle.NORMAL);
+			form.addView(field);
+		}
 		form.initForm(row);
-
 		return form;
 	}
 

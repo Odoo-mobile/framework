@@ -41,6 +41,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.odoo.App;
+import com.odoo.orm.ORelIds.RelData;
 import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.OBoolean;
@@ -552,7 +553,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						case ManyToMany:
 							row.put(col.getName(),
 									new OM2MRecord(this, col, cr.getInt(cr
-											.getColumnIndex("id"))));
+											.getColumnIndex(OColumn.ROW_ID))));
 							break;
 						case OneToMany:
 							row.put(col.getName(),
@@ -605,8 +606,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		String base_col = base.getTableName() + "_id";
 		String rel_col = rel.getTableName() + "_id";
 		SQLiteDatabase db = getReadableDatabase();
-		String where = base_col + " = ?";
-		Object[] whereArgs = new Object[] { base_id };
+		String where = base_col + " = ? and odoo_name = ?";
+		Object[] whereArgs = new Object[] { base_id, mUser.getAndroidName() };
 		Cursor cr = db.query(table, new String[] { "*" },
 				getWhereClause(where), getWhereArgs(where, whereArgs), null,
 				null, null);
@@ -731,6 +732,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				ids.add(create(values));
 			else {
 				ids.add(selectRowId(values.getInt("id")));
+				values.put(OColumn.ROW_ID, selectRowId(values.getInt("id")));
 				update(values, "id = ?", new Object[] { values.getInt("id") });
 			}
 		}
@@ -765,8 +767,99 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		db.insert(getTableName(), null, createValues(db, values));
 		db.close();
 		int newId = getCreateId();
+		values.put(OColumn.ROW_ID, newId);
+		updateRelationColumns(values);
 		sendDatasetChangeBroadcast(newId);
 		return newId;
+	}
+
+	/**
+	 * Update relation columns values for ManyToMany and OneToMany
+	 * 
+	 * @param vals
+	 * @param newId
+	 * @return
+	 */
+	private boolean updateRelationColumns(OValues values) {
+		SQLiteDatabase db = getWritableDatabase();
+		for (OColumn column : getColumns()) {
+			if (column.getRelationType() != null
+					&& values.contains(column.getName())) {
+				switch (column.getRelationType()) {
+				case ManyToMany:
+					OModel rel_model = createInstance(column.getType());
+					Command command = Command.Replace;
+					List<Integer> rel_ids = new ArrayList<Integer>();
+					if (values.get(column.getName()) instanceof ORelIds) {
+						ORelIds rel_objs = (ORelIds) values.get(column
+								.getName());
+						Integer base_id = rel_objs.getBaseId();
+						if (base_id == null) {
+							base_id = values.getInt(OColumn.ROW_ID);
+						}
+						for (String key : rel_objs.keys()) {
+							RelData data = rel_objs.get(key);
+							command = data.getCommand();
+							rel_ids = new ArrayList<Integer>();
+							rel_ids.addAll(data.getIds());
+							if (command == Command.Add) {
+								manageManyToManyRecords(db, rel_model, rel_ids,
+										base_id, Command.Replace);
+							}
+						}
+					} else {
+						rel_ids = (List<Integer>) values.get(column.getName());
+						if (rel_ids == null) {
+							rel_ids = new ArrayList<Integer>();
+						}
+						manageManyToManyRecords(db, rel_model, rel_ids,
+								values.getInt(OColumn.ROW_ID), command);
+					}
+					break;
+				case OneToMany:
+					rel_model = createInstance(column.getType());
+					command = Command.Replace;
+					Integer rec_id = 0;
+					if (values.get(column.getName()) instanceof ORelIds) {
+						ORelIds rel_objs = (ORelIds) values.get(column
+								.getName());
+						rec_id = rel_objs.getBaseId();
+						if (rec_id == null) {
+							rec_id = values.getInt(OColumn.ROW_ID);
+						}
+						for (String key : rel_objs.keys()) {
+							RelData data = rel_objs.get(key);
+							command = data.getCommand();
+							rel_ids = new ArrayList<Integer>();
+							rel_ids.addAll(data.getIds());
+							OValues rel_vals = new OValues();
+							switch (command) {
+							case Add:
+								rel_vals.put(column.getRelatedColumn(), rec_id);
+								break;
+							case Delete:
+								rel_vals.put(column.getRelatedColumn(), false);
+								break;
+							default:
+								break;
+							}
+							String whr = OColumn.ROW_ID
+									+ " IN ("
+									+ StringUtils.repeat(" ?, ",
+											rel_ids.size() - 1) + "?)";
+							Object[] args = new Object[] { rel_ids };
+							if (rel_ids.size() > 0)
+								rel_model.update(rel_vals, whr, args);
+						}
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		db.close();
+		return true;
 	}
 
 	private void sendDatasetChangeBroadcast(Integer newId) {
@@ -828,6 +921,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		affectedRows = db.update(getTableName(), values, getWhereClause(where),
 				getWhereArgs(where, whereArgs));
 		db.close();
+		updateRelationColumns(updateValues);
 		return affectedRows;
 	}
 
@@ -887,7 +981,6 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return deleted;
 	}
 
-	// createValues : used by create and update methods
 	/**
 	 * Creates the values.
 	 * 
@@ -911,26 +1004,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						vals.put(column.getName(), values.get(column.getName())
 								.toString());
 						break;
-					case ManyToMany:
-						OModel rel_model = createInstance(column.getType());
-						List<Integer> rel_ids = (List<Integer>) values
-								.get(column.getName());
-						/*
-						 * FIXME: When syncing data and getting records from
-						 * server it contains only id not ROW_ID
-						 * 
-						 * But, when we are updating locally it contains ROW_ID
-						 * and we need to update each record with ROW_ID.
-						 */
-						manageManyToManyRecords(db, rel_model, rel_ids,
-								values.getInt("id"), Command.Replace);
-						// (6,false,[new ids]) - will replace with given
-						break;
-					case OneToMany:
-						// (0, false {fields}) - will going to create/add new
-						// line
-						// (1, id, {fields}) - will going to update given id.
-						// (2, id, false) - will going to delete record.
+					default:
 						break;
 					}
 				}
@@ -969,17 +1043,20 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			break;
 		case Replace:
 			// Removing old entries
-			String where = base_column + " = ? ";
-			String[] args = new String[] { base_id + "" };
-			db.delete(table, getWhereClause(where), getWhereArgs(where, args));
-			// Creating new entries
-			for (int id : ids) {
-				ContentValues values = new ContentValues();
-				values.put(base_column, base_id);
-				values.put(rel_column, id);
-				values.put("odoo_name", mUser.getAndroidName());
-				values.put("local_write_date", ODate.getDate());
-				db.insert(table, null, values);
+			if (ids.size() > 0) {
+				String where = base_column + " = ? ";
+				String[] args = new String[] { base_id + "" };
+				db.delete(table, getWhereClause(where),
+						getWhereArgs(where, args));
+				// Creating new entries
+				for (int id : ids) {
+					ContentValues values = new ContentValues();
+					values.put(base_column, base_id);
+					values.put(rel_column, id);
+					values.put("odoo_name", mUser.getAndroidName());
+					values.put("local_write_date", ODate.getDate());
+					db.insert(table, null, values);
+				}
 			}
 			break;
 		}

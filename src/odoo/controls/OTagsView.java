@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.util.tags;
+package odoo.controls;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,14 +29,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TagsView extends MultiTagsTextView {
+public class OTagsView extends MultiTagsTextView {
 
 	HashMap<String, Object> selectedTags = new HashMap<String, Object>();
 	Context mContext = null;
 	CustomTagViewListener mCustomTagView = null;
 	NewTokenCreateListener mNewTokenListener = null;
 
-	public TagsView(Context context, AttributeSet attrs) {
+	public OTagsView(Context context) {
+		super(context, null);
+		mContext = context;
+	}
+
+	public OTagsView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		mContext = context;
 	}
@@ -53,7 +58,7 @@ public class TagsView extends MultiTagsTextView {
 	@Override
 	protected View getViewForObject(Object object) {
 		View view = null;
-		ViewGroup tagsParentView = (ViewGroup) TagsView.this.getParent();
+		ViewGroup tagsParentView = (ViewGroup) OTagsView.this.getParent();
 		LayoutInflater l = (LayoutInflater) getContext().getSystemService(
 				Activity.LAYOUT_INFLATER_SERVICE);
 		if (mCustomTagView != null) {

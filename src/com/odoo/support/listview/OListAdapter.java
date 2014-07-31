@@ -146,8 +146,8 @@ public class OListAdapter extends ArrayAdapter<Object> {
 				for (Object item : mAllObjects) {
 					String filterText = "";
 					if (mRowFilterTextListener != null) {
-						filterText = mRowFilterTextListener
-								.filterCompareWith(item);
+						filterText = mRowFilterTextListener.filterCompareWith(
+								item).toLowerCase();
 					} else {
 						filterText = item.toString().toLowerCase();
 					}

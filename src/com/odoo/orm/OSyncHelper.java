@@ -460,10 +460,38 @@ public class OSyncHelper {
 							values.put(col.getName(), m2o.getInt("id"));
 						break;
 					case OneToMany:
-						// FIXME : ?
+						JSONArray o2mRecords = new JSONArray();
+						List<ODataRow> o2mRecordList = row.getO2MRecord(
+								col.getName()).browseEach();
+						if (o2mRecordList.size() > 0) {
+							JSONArray rec_ids = new JSONArray();
+							for (ODataRow o2mR : o2mRecordList) {
+								if (o2mR.getInt("id") != 0)
+									rec_ids.put(o2mR.getInt("id"));
+							}
+							o2mRecords.put(6);
+							o2mRecords.put(false);
+							o2mRecords.put(rec_ids);
+							values.put(col.getName(),
+									new JSONArray().put(o2mRecords));
+						}
 						break;
 					case ManyToMany:
-						// FIXME : ?
+						JSONArray m2mRecords = new JSONArray();
+						List<ODataRow> m2mRecordList = row.getM2MRecord(
+								col.getName()).browseEach();
+						if (m2mRecordList.size() > 0) {
+							JSONArray rec_ids = new JSONArray();
+							for (ODataRow o2mR : m2mRecordList) {
+								if (o2mR.getInt("id") != 0)
+									rec_ids.put(o2mR.getInt("id"));
+							}
+							m2mRecords.put(6);
+							m2mRecords.put(false);
+							m2mRecords.put(rec_ids);
+							values.put(col.getName(),
+									new JSONArray().put(m2mRecords));
+						}
 						break;
 					}
 				}
@@ -569,6 +597,8 @@ public class OSyncHelper {
 										OValues vals = new OValues();
 										vals.put(rel.getRefColumn(), rel_id);
 										vals.put("is_dirty", false);
+										vals.put(OColumn.ROW_ID,
+												row.get(OColumn.ROW_ID));
 										base_model.update(vals,
 												row.getInt(OColumn.ROW_ID));
 									} else {
@@ -581,6 +611,8 @@ public class OSyncHelper {
 								vals.put(rel.getRefColumn(), mM2mIds);
 								vals.put("is_dirty", false);
 								vals.put("id", row.getInt("id"));
+								vals.put(OColumn.ROW_ID,
+										row.getInt(OColumn.ROW_ID));
 								base_model.update(vals,
 										row.getInt(OColumn.ROW_ID));
 							}

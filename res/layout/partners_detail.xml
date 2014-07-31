@@ -79,11 +79,12 @@
             odoo:field_name="country_id"
             odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
-        <!-- [Fix Me] Add after updating methods for this -->
-        <!--
+
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            odoo:customLayout="@layout/partners_tags"
+            odoo:customLayoutOriantation="vertical"
             odoo:field_name="category_id"
             odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
@@ -91,12 +92,11 @@
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            odoo:customLayout="@layout/partner_contacts"
+            odoo:customLayout="@layout/partners_contacts"
             odoo:customLayoutOriantation="vertical"
             odoo:field_name="child_ids"
             odoo:label_color="@color/odoo_purple"
             odoo:with_label="true" />
-        -->
 
         <odoo.controls.OField
             android:layout_width="match_parent"

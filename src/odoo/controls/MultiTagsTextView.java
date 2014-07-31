@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.util.tags;
+package odoo.controls;
 
 import java.io.Serializable;
 import java.util.ArrayList;
