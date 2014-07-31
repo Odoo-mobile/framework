@@ -10,3 +10,8 @@ One of the most widely used mobile OS these days is ANDROID. Android is a softwa
 Odoo Mobile framework is an open source mobile application development framework with Odoo integration. With the help of mobile framework we can rapidly develop almost all Odoo supported application as faster as we can develop in Odoo Framework.
 
 This framework contains its own ORM to handle mobile’s local database. So you do not have to worry about data comming from Odoo Server. It has pre-developed services and providers to make your application data synchronized with Odoo.
+
+Documentation:
+--------------
+
+http://mobile.openerp.co.in/
