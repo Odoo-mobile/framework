@@ -39,4 +39,5 @@ public interface OModuleHelper {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
 
 	public List<DrawerItem> drawerMenus(Context context);
+
 }

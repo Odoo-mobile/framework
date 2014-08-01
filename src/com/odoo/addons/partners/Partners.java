@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
@@ -26,7 +27,7 @@ import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
-import com.odoo.support.BaseFragment;
+import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.openerp.OETouchListener;
@@ -71,6 +72,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	private void init() {
+		OControls.setVisible(mView, R.id.loadingProgress);
 		mListcontrol = (OList) mView.findViewById(R.id.listRecords);
 		mListcontrol.setOnRowClickListener(this);
 		mListcontrol.setOnListBottomReachedListener(this);
@@ -127,6 +129,11 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 
 		@Override
 		protected Void doInBackground(Void... params) {
+			try {
+				Thread.sleep(500);
+			} catch (Exception e) {
+
+			}
 			scope.main().runOnUiThread(new Runnable() {
 
 				@Override
@@ -203,7 +210,14 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 
 	@Override
 	public void onPullStarted(View arg0) {
-		scope.main().requestSync(PartnersProvider.AUTHORITY);
+		if (app().inNetwork())
+			scope.main().requestSync(PartnersProvider.AUTHORITY);
+		else {
+			mTouchListener.setPullComplete();
+			Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_LONG)
+					.show();
+		}
+
 	}
 
 	@Override

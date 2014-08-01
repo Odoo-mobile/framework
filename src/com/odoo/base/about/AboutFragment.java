@@ -31,7 +31,7 @@ import android.widget.TextView;
 
 import com.odoo.R;
 import com.odoo.support.AppScope;
-import com.odoo.support.BaseFragment;
+import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.drawer.DrawerItem;
 
 public class AboutFragment extends BaseFragment {

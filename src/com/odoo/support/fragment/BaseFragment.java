@@ -16,16 +16,20 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.support;
+package com.odoo.support.fragment;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView.OnQueryTextListener;
 
+import com.odoo.App;
 import com.odoo.orm.OModel;
-import com.odoo.support.fragment.FragmentListener;
-import com.odoo.support.fragment.OModuleHelper;
+import com.odoo.support.AppScope;
 
 /**
  * The Class BaseFragment.
@@ -37,6 +41,7 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 	private OModel mDb = null;
 	/** The list search adapter. */
 	private ArrayAdapter<Object> listSearchAdapter;
+	private String mTitle = "";
 
 	/**
 	 * Gets the query listener.
@@ -87,4 +92,16 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 		mDb = (OModel) databaseHelper(getActivity());
 		return mDb;
 	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		mTitle = getActivity().getTitle().toString();
+		return super.onCreateView(inflater, container, savedInstanceState);
+	}
+
+	public App app() {
+		return (App) getActivity().getApplicationContext();
+	}
+
 }

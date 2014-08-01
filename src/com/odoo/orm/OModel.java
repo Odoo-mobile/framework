@@ -168,13 +168,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		_name = model_name;
 		mUser = OUser.current(mContext);
 		mApp = (App) context.getApplicationContext();
-		if (mApp.getOdooVersion() == null)
-			mApp.createInstance();
 		if (mUser != null) {
 			mOdooVersion = new OdooVersion();
 			mOdooVersion.setVersion_number(mUser.getVersion_number());
 			mOdooVersion.setServer_serie(mUser.getVersion_serie());
 		} else {
+			mApp.createInstance();
 			mOdooVersion = mApp.getOdooVersion();
 		}
 		createFieldList();
