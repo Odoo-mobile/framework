@@ -179,6 +179,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		createFieldList();
 	}
 
+	public OModel newInstance(OModel model) {
+		try {
+			return model.getClass().newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	/**
 	 * Sets the user.
 	 * 
@@ -301,6 +310,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			OColumn column = getColumn(key);
 			if (column != null) {
 				if (column.isFunctionalColumn()) {
+					if (column.canFunctionalStore()) {
+						mColumns.add(column);
+					}
 					mFunctionalColumns.add(column);
 				} else {
 					mColumns.add(column);
@@ -331,6 +343,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					column.setName(name);
 					if (method != null) {
 						column.setFunctionalMethod(method);
+						column.setFunctionalStore(checkForFunctionalStore(field));
 					}
 				} else
 					return null;
@@ -351,8 +364,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					Method method = checkForFunctionalColumn(field);
 					column = (OColumn) field.get(this);
 					column.setName(name);
-					if (method != null)
+					if (method != null) {
 						column.setFunctionalMethod(method);
+						column.setFunctionalStore(checkForFunctionalStore(field));
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -374,12 +389,31 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			Odoo.Functional functional = (Functional) annotation;
 			String method_name = functional.method();
 			try {
-				return getClass().getMethod(method_name, ODataRow.class);
+				if (functional.store())
+					return getClass().getMethod(method_name, OValues.class);
+				else
+					return getClass().getMethod(method_name, ODataRow.class);
 			} catch (NoSuchMethodException e) {
 				Log.e(TAG, "No Such Method: " + e.getMessage());
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Check for functional store.
+	 * 
+	 * @param field
+	 *            the field
+	 * @return the boolean
+	 */
+	private Boolean checkForFunctionalStore(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+		if (annotation != null) {
+			Odoo.Functional functional = (Functional) annotation;
+			return functional.store();
+		}
+		return false;
 	}
 
 	public OdooVersion getOdooVersion() {
@@ -436,7 +470,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the record
 	 * @return the functional method value
 	 */
-	public Object getFunctionalMethodValue(OColumn column, ODataRow record) {
+	public Object getFunctionalMethodValue(OColumn column, Object record) {
 		if (column.isFunctionalColumn()) {
 			Method method = column.getMethod();
 			OModel model = this;
@@ -573,8 +607,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				 */
 				if (!mSyncingData) {
 					for (OColumn col : mFunctionalColumns) {
-						row.put(col.getName(),
-								getFunctionalMethodValue(col, row));
+						if (!col.canFunctionalStore()) {
+							row.put(col.getName(),
+									getFunctionalMethodValue(col, row));
+						}
 					}
 				}
 				if (row.getInt("id") == 0
@@ -762,8 +798,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		if (!values.contains("odoo_name")) {
 			values.put("odoo_name", mUser.getAndroidName());
 		}
+		ContentValues vals = createValues(values);
 		SQLiteDatabase db = getWritableDatabase();
-		db.insert(getTableName(), null, createValues(db, values));
+		db.insert(getTableName(), null, vals);
 		db.close();
 		int newId = getCreateId();
 		values.put(OColumn.ROW_ID, newId);
@@ -913,8 +950,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 */
 	public int update(OValues updateValues, String where, Object[] whereArgs) {
 		int affectedRows = 0;
+		ContentValues values = createValues(updateValues);
 		SQLiteDatabase db = getWritableDatabase();
-		ContentValues values = createValues(db, updateValues);
 		if (!updateValues.contains("is_dirty"))
 			values.put("is_dirty", "true");
 		affectedRows = db.update(getTableName(), values, getWhereClause(where),
@@ -989,14 +1026,21 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the values
 	 * @return the content values
 	 */
-	private ContentValues createValues(SQLiteDatabase db, OValues values) {
+	private ContentValues createValues(OValues values) {
 		ContentValues vals = new ContentValues();
 		for (OColumn column : getColumns()) {
+			if (values.contains(OColumn.ROW_ID) && column.isFunctionalColumn()
+					&& column.canFunctionalStore()) {
+				// Getting functional value before create or update
+				vals.put(column.getName(),
+						getFunctionalMethodValue(column, values).toString());
+			}
 			if (values.contains(column.getName())) {
 				if (column.getRelationType() == null) {
-					if (values.get(column.getName()) != null)
+					if (values.get(column.getName()) != null) {
 						vals.put(column.getName(), values.get(column.getName())
 								.toString());
+					}
 				} else {
 					switch (column.getRelationType()) {
 					case ManyToOne:

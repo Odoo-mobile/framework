@@ -90,6 +90,9 @@ public class OColumn {
 	/** The use_annotation. */
 	private Boolean use_annotation = true;
 
+	/** The functional_store. */
+	private Boolean functional_store = false;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -509,6 +512,25 @@ public class OColumn {
 	public OColumn cloneDomain(LinkedHashMap<String, ColumnDomain> domains) {
 		columnDomains.putAll(domains);
 		return this;
+	}
+
+	/**
+	 * Sets the functional store.
+	 * 
+	 * @param store
+	 *            the new functional store
+	 */
+	public void setFunctionalStore(Boolean store) {
+		functional_store = store;
+	}
+
+	/**
+	 * Gets the functional store.
+	 * 
+	 * @return the functional store
+	 */
+	public Boolean canFunctionalStore() {
+		return functional_store;
 	}
 
 	/**

@@ -42,6 +42,14 @@ public @interface Odoo {
 		 * @return the string
 		 */
 		String method() default "";
+
+		/**
+		 * If true, system create column for this functional field and store
+		 * value (on create and update) given by this function
+		 * 
+		 * @return true, if successful
+		 */
+		boolean store() default false;
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)

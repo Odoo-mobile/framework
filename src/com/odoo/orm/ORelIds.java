@@ -26,6 +26,10 @@ public class ORelIds {
 		return keys;
 	}
 
+	public Integer validCount() {
+		return mRelationIds.get("KEY_" + Command.Add).ids.size();
+	}
+
 	public RelData get(String key) {
 		if (mRelationIds.containsKey(key)) {
 			return mRelationIds.get(key);
