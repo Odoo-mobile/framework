@@ -149,7 +149,7 @@ public class Base64Helper {
 		// draw border
 		paint.setColor(Color.parseColor("#cccccc"));
 		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeWidth(2F * mScaleFactor);
+		paint.setStrokeWidth(0.5F * mScaleFactor);
 		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 		return output;
 	}

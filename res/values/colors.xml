@@ -4,5 +4,6 @@
     <color name="gray_text">#a09f9f</color>
     <color name="gray_light">#d1d0d0</color>
     <color name="list_divider">#ddd</color>
+    <color name="card_view_parent_background">#e5e5e5</color>
 
 </resources>

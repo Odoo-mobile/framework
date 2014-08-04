@@ -43,6 +43,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.AbsListView.LayoutParams;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 
@@ -72,6 +73,9 @@ public class OList extends ScrollView implements View.OnClickListener,
 
 	/** The Constant KEY_EMPTY_LIST_ICON. */
 	public static final String KEY_EMPTY_LIST_ICON = "emptyListIcon";
+
+	/** The Constant KEY_SHOW_AS_CARD. */
+	public static final String KEY_SHOW_AS_CARD = "showAsCard";
 
 	/** The context. */
 	Context mContext = null;
@@ -215,6 +219,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 			mAttr.put(KEY_EMPTY_LIST_ICON, mTypedArray.getResourceId(
 					R.styleable.OList_emptyListIcon,
 					R.drawable.ic_action_exclamation_mark));
+			mAttr.put(KEY_SHOW_AS_CARD,
+					mTypedArray.getBoolean(R.styleable.OList_showAsCard, false));
 			mCustomLayout = mAttr.getResource(KEY_CUSTOM_LAYOUT, 0);
 			mTypedArray.recycle();
 		}
@@ -379,11 +385,48 @@ public class OList extends ScrollView implements View.OnClickListener,
 			if (mRowDroppable) {
 				view.setOnDragListener(this);
 			}
-			mInnerLayout.addView(view);
-			if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true))
-				mInnerLayout.addView(divider());
+			if (mAttr.getBoolean(KEY_SHOW_AS_CARD, false)) {
+				ViewGroup card = cardOuterView();
+				card.addView(view);
+				mInnerLayout.addView(card);
+				mInnerLayout
+						.setBackgroundResource(R.color.card_view_parent_background);
+			} else {
+				mInnerLayout.addView(view);
+				if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true))
+					mInnerLayout.addView(divider());
+			}
 		}
 		addView(mInnerLayout);
+	}
+
+	/**
+	 * Show as card.
+	 * 
+	 * @param showAsCard
+	 *            the show as card
+	 */
+	public void showAsCard(boolean showAsCard) {
+		mAttr.put(KEY_SHOW_AS_CARD, showAsCard);
+	}
+
+	/**
+	 * Card outer view.
+	 * 
+	 * @return the view
+	 */
+	private LinearLayout cardOuterView() {
+		LinearLayout cardView = new LinearLayout(mContext);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.MATCH_PARENT);
+		int left_right_margin = (int) (10 * mScaleFactor);
+		int top_margin = (int) (6 * mScaleFactor);
+		params.setMargins(left_right_margin, top_margin, left_right_margin, 0);
+		cardView.setLayoutParams(params);
+		cardView.setOrientation(LinearLayout.VERTICAL);
+		cardView.setBackgroundResource(R.drawable.card);
+		return cardView;
 	}
 
 	/**

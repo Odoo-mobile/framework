@@ -47,9 +47,9 @@
     </declare-styleable>
     <declare-styleable name="OList">
         <attr name="custom_layout" format="reference" />
-        <attr name="pullable" format="boolean" />
-        <attr name="row_swipable" format="boolean" />
-        <attr name="group_by" format="string" />
+        <attr name="rowSwipable" format="boolean" />
+        <attr name="showAsCard" format="boolean" />
+        <attr name="groupBy" format="string" />
         <attr name="showDivider" format="boolean" />
         <attr name="emptyListMessage" format="string" />
         <attr name="emptyListIcon" format="reference" />
