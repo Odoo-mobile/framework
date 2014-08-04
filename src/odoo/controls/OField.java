@@ -191,84 +191,86 @@ public class OField extends LinearLayout implements
 	}
 
 	/** The context. */
-	Context mContext = null;
+	private Context mContext = null;
 
 	/** The typed array. */
-	TypedArray mTypedArray = null;
+	private TypedArray mTypedArray = null;
 
 	/** The field value. */
-	Object mFieldValue = null;
+	private Object mFieldValue = null;
 
 	/** The model used with widget controls. */
-	OModel mModel = null;
+	private OModel mModel = null;
 
 	/** The control record. */
-	ODataRow mControlRecord = null;
+	private ODataRow mControlRecord = null;
 
 	/** The column object. */
-	OColumn mColumn = null;
+	private OColumn mColumn = null;
 
 	/** The control attributes. */
-	OControlAttributes mAttributes = new OControlAttributes();
+	private OControlAttributes mAttributes = new OControlAttributes();
 
 	/** The control field type. */
-	OFieldMode mFieldType = OFieldMode.READONLY;
+	private OFieldMode mFieldType = OFieldMode.READONLY;
 
 	/** The field widget if any. */
-	OFieldType mFieldWidget = null;
+	private OFieldType mFieldWidget = null;
 
 	/** The layout params. */
-	LayoutParams mLayoutParams = null;
+	private LayoutParams mLayoutParams = null;
 
 	/** The field label. */
-	OLabel mFieldLabel = null;
+	private OLabel mFieldLabel = null;
 
 	/** The field text view. */
-	TextView mFieldTextView = null;
+	private TextView mFieldTextView = null;
 
 	/** The field edit text. */
-	EditText mFieldEditText = null;
+	private EditText mFieldEditText = null;
 
 	/** The many to one widget. */
-	OManyToOneWidget mManyToOne = null;
+	private OManyToOneWidget mManyToOne = null;
 
 	/** The many to many tags. */
-	OTagsView mManyToManyTags = null;
+	private OTagsView mManyToManyTags = null;
 
 	/** The many to many adapter. */
-	OListAdapter mManyToManyAdapter = null;
+	private OListAdapter mManyToManyAdapter = null;
 
 	/** The many to many records. */
-	List<Object> mM2MRecords = new ArrayList<Object>();
+	private List<Object> mM2MRecords = new ArrayList<Object>();
 
 	/** The new added records. */
-	HashMap<String, ODataRow> mM2MAddedRecords = new HashMap<String, ODataRow>();
+	private HashMap<String, ODataRow> mM2MAddedRecords = new HashMap<String, ODataRow>();
 	/** The removed records. */
-	HashMap<String, ODataRow> mM2MRemovedRecords = new HashMap<String, ODataRow>();
+	private HashMap<String, ODataRow> mM2MRemovedRecords = new HashMap<String, ODataRow>();
 
+	/** The m many to many object editable. */
+	private Boolean mManyToManyObjectEditable = true;
 	/** The radio group. */
-	RadioGroup mRadioGroup = null;
+	private RadioGroup mRadioGroup = null;
 
 	/** The true radio button. */
-	RadioButton mTrueRadioButton = null;
+	private RadioButton mTrueRadioButton = null;
 
 	/** The false radio button. */
-	RadioButton mFalseRadioButton = null;
+	private RadioButton mFalseRadioButton = null;
 
 	/** The check box. */
-	CheckBox mCheckBox = null;
+	private CheckBox mCheckBox = null;
 
 	/** The switch. */
-	Switch mSwitch = null;
+	private Switch mSwitch = null;
 
 	/** The web view. */
-	WebView mWebView = null;
+	private WebView mWebView = null;
 
 	/** The display metrics. */
-	DisplayMetrics mMetrics = null;
+	private DisplayMetrics mMetrics = null;
 
 	/** The scale factor. */
-	Float mScaleFactor = 0F;
+	private Float mScaleFactor = 0F;
 
 	/**
 	 * Instantiates a new field.
@@ -390,6 +392,18 @@ public class OField extends LinearLayout implements
 	}
 
 	/**
+	 * Sets the object editable.
+	 * 
+	 * @param editable
+	 *            the editable
+	 * @return the o field
+	 */
+	public OField setObjectEditable(Boolean editable) {
+		mManyToManyObjectEditable = editable;
+		return this;
+	}
+
+	/**
 	 * Creates the many to many tags.
 	 */
 	private void createManyToManyTags() {
@@ -431,7 +445,8 @@ public class OField extends LinearLayout implements
 						+ StringUtils.repeat(" ?, ", ids.size() - 1) + "?)";
 				args = new Object[] { ids };
 			}
-			records.addAll(mModel.select(whr, args));
+			if (mManyToManyObjectEditable)
+				records.addAll(mModel.select(whr, args));
 			records.addAll(mSelectedObjects);
 			mManyToManyTags = new OTagsView(mContext);
 			mManyToManyTags.setCustomTagView(this);
@@ -554,7 +569,7 @@ public class OField extends LinearLayout implements
 
 	@Override
 	public void onTokenAdded(Object token, View view) {
-		if (token != null) {
+		if (token != null && mManyToManyObjectEditable) {
 			ODataRow row = (ODataRow) token;
 			String key = "KEY_" + row.getString(OColumn.ROW_ID);
 			mM2MAddedRecords.put(key, row);
@@ -571,13 +586,15 @@ public class OField extends LinearLayout implements
 
 	@Override
 	public void onTokenRemoved(Object token) {
-		if (token != null) {
+		if (token != null && mManyToManyObjectEditable) {
 			ODataRow row = (ODataRow) token;
 			String key = "KEY_" + row.getString(OColumn.ROW_ID);
 			if (mM2MAddedRecords.containsKey(key)) {
 				mM2MAddedRecords.remove(key);
 			}
 			mM2MRemovedRecords.put(key, row);
+		} else {
+			mManyToManyTags.addObject(token);
 		}
 	}
 
