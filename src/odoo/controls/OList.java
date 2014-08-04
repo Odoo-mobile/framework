@@ -390,6 +390,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 				mInnerLayout.addView(card);
 				mInnerLayout
 						.setBackgroundResource(R.color.card_view_parent_background);
+				setBackgroundResource(R.color.card_view_parent_background);
 			} else {
 				mInnerLayout.addView(view);
 				if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true))
