@@ -43,7 +43,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.AbsListView.LayoutParams;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 
@@ -386,7 +385,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 				view.setOnDragListener(this);
 			}
 			if (mAttr.getBoolean(KEY_SHOW_AS_CARD, false)) {
-				ViewGroup card = cardOuterView();
+				ViewGroup card = cardOuterView(i);
 				card.addView(view);
 				mInnerLayout.addView(card);
 				mInnerLayout
@@ -415,15 +414,23 @@ public class OList extends ScrollView implements View.OnClickListener,
 	 * 
 	 * @return the view
 	 */
-	private LinearLayout cardOuterView() {
+	private LinearLayout cardOuterView(int position) {
 		LinearLayout cardView = new LinearLayout(mContext);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.MATCH_PARENT,
 				LinearLayout.LayoutParams.MATCH_PARENT);
 		int left_right_margin = (int) (10 * mScaleFactor);
 		int top_margin = (int) (6 * mScaleFactor);
-		params.setMargins(left_right_margin, top_margin, left_right_margin, 0);
+		if (position == mListAdapter.getCount() - 1) {
+			params.setMargins(left_right_margin, top_margin, left_right_margin,
+					left_right_margin);
+		} else {
+			params.setMargins(left_right_margin, top_margin, left_right_margin,
+					0);
+		}
 		cardView.setLayoutParams(params);
+		int padding = (int) (2 * mScaleFactor);
+		cardView.setPadding(padding, padding, padding, padding);
 		cardView.setOrientation(LinearLayout.VERTICAL);
 		cardView.setBackgroundResource(R.drawable.card);
 		return cardView;
