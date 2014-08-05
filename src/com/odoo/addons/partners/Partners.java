@@ -78,6 +78,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		mListcontrol.setOnListBottomReachedListener(this);
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListcontrol, this);
+		mListcontrol.setRecordOffset(mListRecords.size());
 		if (mLastPosition == -1) {
 			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
@@ -143,8 +144,6 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 					}
 					OModel model = db();
 					model.setOffset(mOffset);
-					if (mOffset == 0)
-						mListRecords.clear();
 					Object[] args = new Object[] { true };
 					mListRecords.addAll(model
 							.setLimit(mLimit)
