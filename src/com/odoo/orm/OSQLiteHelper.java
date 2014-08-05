@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.odoo.base.account.BaseAccount;
 import com.odoo.base.ir.IrAttachment;
 import com.odoo.base.ir.IrModel;
 import com.odoo.base.mail.MailFollowers;
@@ -39,6 +40,7 @@ public class OSQLiteHelper extends SQLiteOpenHelper {
 		models.add(new ResPartner(mContext));
 		models.add(new IrAttachment(mContext));
 		models.add(new MailFollowers(mContext));
+		models.add(new BaseAccount(mContext));
 		return models;
 	}
 

@@ -50,7 +50,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		mView = inflater.inflate(R.layout.login_signup_account_create_layout,
+		mView = inflater.inflate(R.layout.base_login_signup_account_create_layout,
 				container, false);
 		getActivity().getActionBar().hide();
 		mApp = (App) getActivity().getApplicationContext();
@@ -62,7 +62,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 
 	private void init() {
 		mListAdapter = new OListAdapter(getActivity(),
-				R.layout.login_signup_instance_view, mInstanceList) {
+				R.layout.base_login_signup_instance_view, mInstanceList) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View mView = convertView;

@@ -186,7 +186,7 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void initTouchListener() {
-		OETouchListener.DEFAULT_HEADER_LAYOUT = R.layout.default_header;
+		OETouchListener.DEFAULT_HEADER_LAYOUT = R.layout.base_default_header;
 		OETouchListener.DEFAULT_ANIM_HEADER_IN = R.anim.fade_in;
 		OETouchListener.DEFAULT_ANIM_HEADER_OUT = R.anim.fade_out;
 		OETouchListener.ptr_progress = R.id.ptr_progress;
@@ -229,7 +229,7 @@ public class MainActivity extends FragmentActivity implements
 		mDrawerTitle = user.getName();
 		mDrawerSubtitle = (user.isOAauthLogin()) ? user.getInstanceUrl() : user
 				.getHost();
-		View v = getLayoutInflater().inflate(R.layout.drawer_header,
+		View v = getLayoutInflater().inflate(R.layout.base_drawer_header,
 				mDrawerListView, false);
 		TextView mUserName, mUserURL;
 		ImageView imgUserPic = (ImageView) v
@@ -274,8 +274,8 @@ public class MainActivity extends FragmentActivity implements
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		mDrawerListItems.addAll(DrawerHelper.drawerItems(mContext));
 		mDrawerListItems.addAll(setSettingMenu());
-		mDrawerAdatper = new DrawerAdatper(this, R.layout.drawer_item_layout,
-				R.layout.drawer_item_group_layout, mDrawerListItems);
+		mDrawerAdatper = new DrawerAdatper(this, R.layout.base_drawer_item_layout,
+				R.layout.base_drawer_item_group_layout, mDrawerListItems);
 		mDrawerListView.setAdapter(mDrawerAdatper);
 		mDrawerAdatper.notifyDataSetChanged();
 		if (mDrawerItemSelectedPosition >= 0) {

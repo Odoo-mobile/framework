@@ -47,7 +47,7 @@ public class AboutFragment extends BaseFragment {
 		getActivity().getActionBar().setHomeButtonEnabled(true);
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		rootView = inflater.inflate(R.layout.fragment_about_company, container,
+		rootView = inflater.inflate(R.layout.base_about, container,
 				false);
 		versionName = (TextView) rootView.findViewById(R.id.txvVersionName);
 

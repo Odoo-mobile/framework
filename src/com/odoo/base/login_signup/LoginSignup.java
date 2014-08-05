@@ -56,7 +56,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		scope = new AppScope(this);
 		scope.main().lockDrawer(true);
 		mView = inflater
-				.inflate(R.layout.login_signup_layout, container, false);
+				.inflate(R.layout.base_login_signup_layout, container, false);
 		init();
 		return mView;
 	}

@@ -60,7 +60,7 @@ public class UserProfile extends BaseFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		rootView = inflater.inflate(R.layout.fragment_account_user_profile,
+		rootView = inflater.inflate(R.layout.base_account_user_profile,
 				container, false);
 		scope = new AppScope(this);
 		scope.main().setTitle(R.string.title_user_profile);

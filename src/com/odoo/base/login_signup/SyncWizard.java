@@ -63,7 +63,7 @@ public class SyncWizard extends BaseFragment {
 		setHasOptionsMenu(true);
 		context = (MainActivity) getActivity();
 		scope = new AppScope(this);
-		rootView = inflater.inflate(R.layout.fragment_sync_wizard, container,
+		rootView = inflater.inflate(R.layout.base_login_signup_sync_wizard, container,
 				false);
 		getActivity().setTitle(R.string.title_configuration);
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);

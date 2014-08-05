@@ -1,15 +1,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.odoo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <GridView
+    <odoo.controls.OList
         android:id="@+id/gridAccounts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:numColumns="1"
-        android:paddingTop="?android:attr/actionBarSize" >
-    </GridView>
+        android:paddingTop="?android:attr/actionBarSize"
+        app:custom_layout="@layout/base_account_row_item"
+        app:showAsCard="true" >
+    </odoo.controls.OList>
 
 </LinearLayout>
