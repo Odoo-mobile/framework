@@ -253,7 +253,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 	 *            the records
 	 */
 	public void initListControl(List<ODataRow> records) {
-		if (mRecords.size() > 0) {
+		if (mRecords.size() > 0 && mRecords.size() > records.size()) {
 			appendRecords(records.subList(mRecords.size(), records.size()));
 		} else {
 			mRecords.clear();

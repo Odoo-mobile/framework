@@ -449,6 +449,16 @@ public class OColumn {
 	}
 
 	/**
+	 * Sets the local column.
+	 * 
+	 * @param local
+	 *            the new local column
+	 */
+	public void setLocalColumn(Boolean local) {
+		local_column = local;
+	}
+
+	/**
 	 * Sets the accessible.
 	 * 
 	 * @param accessible

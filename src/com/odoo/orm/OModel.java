@@ -345,6 +345,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						column.setFunctionalMethod(method);
 						column.setFunctionalStore(checkForFunctionalStore(field));
 						if (column.canFunctionalStore()) {
+							column.setLocalColumn(false);
 							column.setFunctionalStoreDepends(getFunctionalDepends(field));
 						}
 					}
