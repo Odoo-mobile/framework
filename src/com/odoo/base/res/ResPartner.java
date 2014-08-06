@@ -31,6 +31,7 @@ import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.util.ODate;
 
 /**
  * The Class Res_PartnerDBHelper.
@@ -53,7 +54,8 @@ public class ResPartner extends OModel {
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
 
 	// Extra Demo Module Columns
-	OColumn date = new OColumn("Date", ODateTime.class);
+	OColumn date = new OColumn("Date", ODateTime.class)
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn title = new OColumn("Title", ResPartnerTitle.class,
 			RelationType.ManyToOne);
 	OColumn parent_id = new OColumn("Related Company", ResPartner.class,

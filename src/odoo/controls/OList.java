@@ -253,14 +253,24 @@ public class OList extends ScrollView implements View.OnClickListener,
 	 *            the records
 	 */
 	public void initListControl(List<ODataRow> records) {
-		if (mRecords.size() > 0 && mRecords.size() > records.size()) {
-			appendRecords(records.subList(mRecords.size(), records.size()));
+		if (mRecords.size() > 0 && mRecords.size() < records.size()) {
+			List<ODataRow> appendRecords = new ArrayList<ODataRow>();
+			if (records.size() > 0) {
+				appendRecords.addAll(records.subList(mRecords.size(),
+						records.size()));
+			}
+			appendRecords(appendRecords);
 		} else {
-			mRecords.clear();
-			mRecords.addAll(records);
-			createAdapter();
-			if (mRecords.size() <= 0) {
-				showEmptyListView();
+			if (mRecords.size() != records.size()) {
+				mRecords.clear();
+				mRecords.addAll(records);
+				createAdapter();
+				if (mRecords.size() <= 0) {
+					showEmptyListView();
+				}
+			} else {
+				mLoadNewRecords = false;
+				removeDataLoaderProgress();
 			}
 		}
 	}
@@ -402,6 +412,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 		if (position == 0) {
 			removeAllViews();
 			mInnerLayout.removeAllViews();
+			addView(mInnerLayout);
 		} else {
 			mInnerLayout = (LinearLayout) findViewWithTag("list_parent_view");
 			removeDataLoaderProgress();
@@ -433,8 +444,6 @@ public class OList extends ScrollView implements View.OnClickListener,
 					mInnerLayout.addView(divider());
 			}
 		}
-		if (position == 0)
-			addView(mInnerLayout);
 	}
 
 	/**

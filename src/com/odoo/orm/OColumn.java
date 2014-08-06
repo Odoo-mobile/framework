@@ -346,7 +346,7 @@ public class OColumn {
 	 *            the pattern
 	 * @return the o column
 	 */
-	public OColumn setParsePatter(String pattern) {
+	public OColumn setParsePattern(String pattern) {
 		this.parse_pattern = pattern;
 		return this;
 	}

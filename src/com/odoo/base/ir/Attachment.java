@@ -49,6 +49,8 @@ import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OModel;
+import com.odoo.orm.OSyncHelper;
 import com.odoo.orm.OValues;
 import com.odoo.orm.OdooHelper;
 import com.odoo.support.OUser;
@@ -60,23 +62,23 @@ import com.odoo.util.Base64Helper;
 public class Attachment implements OnClickListener {
 	public static final String TAG = Attachment.class.getSimpleName();
 
-	Context mContext = null;
-	Notification mNotification = null;
-	Builder mNotificationBuilder = null;
-	PendingIntent mNotificationResultIntent = null;
-	NotificationManager mNotificationManager = null;
+	private Context mContext = null;
+	private Notification mNotification = null;
+	private Builder mNotificationBuilder = null;
+	private PendingIntent mNotificationResultIntent = null;
+	private NotificationManager mNotificationManager = null;
 
-	List<Long> mNewAttachmentIds = new ArrayList<Long>();
+	private List<Long> mNewAttachmentIds = new ArrayList<Long>();
 
-	public static int NOTIFICATION_ID = 0;
+	public static int NOTIFICATION_ID = 458;
 
 	public enum Types {
 		CAPTURE_IMAGE, IMAGE, IMAGE_OR_CAPTURE_IMAGE, AUDIO, FILE, OTHER
 	}
 
-	String[] mOptions = null;
-	Types mDialogType = null;
-	IrAttachment mDb = null;
+	private String[] mOptions = null;
+	private Types mDialogType = null;
+	private IrAttachment mDb = null;
 
 	public static final int REQUEST_CAMERA = 111;
 	public static final int REQUEST_IMAGE = 112;
@@ -236,96 +238,86 @@ public class Attachment implements OnClickListener {
 	}
 
 	public void removeAttachment(int attachment_id) {
-		// TODO: Need to update remove attachment
-		// RemoveAttachment remove = new RemoveAttachment(mDb, attachment_id);
-		// remove.execute();
+		RemoveAttachment remove = new RemoveAttachment(mDb, attachment_id);
+		remove.execute();
 	}
 
 	class RemoveAttachment extends AsyncTask<Void, Void, Void> {
 
-		boolean mConnection = false;
-		OdooHelper mOdoo = null;
 		int mId = 0;
+		IrAttachment mModel = null;
 
-		public RemoveAttachment(OdooHelper odoo, int id) {
-			if (odoo != null) {
-				mConnection = true;
-				mId = id;
-				mOdoo = odoo;
-			}
+		public RemoveAttachment(OModel db, int id) {
+			mId = id;
+			mModel = (IrAttachment) db;
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			if (mConnection) {
-				// mOdoo.delete(mId);
-			}
 			return null;
 		}
 
 	}
 
-	public void updateAttachments(String model, int id, List<Object> attachments) {
+	public void updateAttachments(String model, int id,
+			List<ODataRow> attachments) {
 		updateAttachments(model, id, attachments, true);
 	}
 
 	public void updateAttachments(String model, int id,
-			List<Object> attachments, boolean asBackgroundTask) {
+			List<ODataRow> attachments, boolean asBackgroundTask) {
 		List<OValues> values = new ArrayList<OValues>();
-		for (Object attachment : attachments) {
-			ODataRow row = (ODataRow) attachment;
-			if (row.get("id") == null) {
+//		for (ODataRow row : attachments) {
+//			if (row.getInt("id") == 0) {
+//				String name = "";
+//				String base64 = "";
+//				String file_type = "";
+//				int company_id = Integer.parseInt(OUser.current(mContext)
+//						.getCompany_id());
+//				base64 = Base64Helper.fileUriToBase64(
+//						Uri.parse(row.getString("file_uri")),
+//						mContext.getContentResolver());
+//				name = row.getString("name");
+//				file_type = row.getString("file_type");
+//				OValues value = new OValues();
+//				value.put("name", name);
+//				value.put("datas_fname", name);
+//				value.put("db_datas", base64);
+//				value.put("file_type", file_type);
+//				value.put("res_model", model);
+//				value.put("res_id", id);
+//				value.put("company_id", company_id);
+//				value.put("type", "binary");
+//				value.put("size", 0);
+//				value.put("file_uri", row.getString("file_uri"));
+//				values.add(value);
+//			}
+//		}
+//		if (values.size() > 0) {
+			if (asBackgroundTask) {
+				CreateAttachment attachment = new CreateAttachment(
+						mDb.getSyncHelper(), values);
+				attachment.execute();
+			} else {
+				OSyncHelper helper = mDb.getSyncHelper();
+				mNewAttachmentIds.clear();
+				for (OValues value : values) {
+					long a_id = 0;//helper.create(data_row);
+					Log.i(TAG, "Attachment created #" + a_id);
+					mNewAttachmentIds.add(a_id);
+				}
 
-				String name = "";
-				String base64 = "";
-				String file_type = "";
-				int company_id = Integer.parseInt(OUser.current(mContext)
-						.getCompany_id());
-				base64 = Base64Helper.fileUriToBase64(
-						Uri.parse(row.getString("file_uri")),
-						mContext.getContentResolver());
-				name = row.getString("name");
-				file_type = row.getString("file_type");
-				OValues value = new OValues();
-				value.put("name", name);
-				value.put("datas_fname", name);
-				value.put("db_datas", base64);
-				value.put("file_type", file_type);
-				value.put("res_model", model);
-				value.put("res_id", id);
-				value.put("company_id", company_id);
-				value.put("type", "binary");
-				value.put("size", 0);
-				value.put("file_uri", row.getString("file_uri"));
-				values.add(value);
-			}
-		}
-		if (values.size() > 0) {
-			// if (asBackgroundTask) {
-			// CreateAttachment attachment = new CreateAttachment(
-			// mDb.getOEInstance(), values);
-			// attachment.execute();
-			// } else {
-			// OEHelper oe = mDb.getOEInstance();
-			// mNewAttachmentIds.clear();
-			// if (oe != null) {
-			// for (OEValues value : values) {
-			// long a_id = oe.create(value);
-			// Log.i(TAG, "Attachment created #" + a_id);
-			// mNewAttachmentIds.add(a_id);
-			// }
-			// }
-			// }
+//			}
 		}
 	}
 
 	class CreateAttachment extends AsyncTask<Void, Void, Void> {
 
 		boolean mConnection = false;
-		OdooHelper mOdoo = null;
+		OSyncHelper mOdoo = null;
 		List<OValues> mAttachments = null;
 
-		public CreateAttachment(OdooHelper odoo, List<OValues> row) {
+		public CreateAttachment(OSyncHelper odoo, List<OValues> row) {
 			if (odoo != null) {
 				mConnection = true;
 				mOdoo = odoo;
@@ -429,35 +421,24 @@ public class Attachment implements OnClickListener {
 			if (!mAttachmentInfo.getString("file_uri").equals("false")) {
 				return null;
 			} else {
-				//FIXME: replaced OEHelper with OdooHelper ??
-			/*	if (mOdoo.odoo() != null) {
-					try {
-						OEFieldsHelper fields = new OEFieldsHelper(
-								new String[] { "name", "datas", "file_type",
-										"res_model", "res_id" });
-						OEDomain domain = new OEDomain();
-						domain.add("id", "=", mAttachmentInfo.getInt("id"));
-						JSONObject result = mOdoo.odoo().search_read(
-								mDb.getModelName(), fields.get(), domain.get());
-						if (result.getJSONArray("records").length() > 0) {
-							JSONObject row = result.getJSONArray("records")
-									.getJSONObject(0);
-							String file_path = createFile(
-									row.getString("name"),
-									row.getString("datas"),
-									row.getString("file_type"));
-							Uri uri = Uri.fromFile(new File(file_path));
-							mNotification = setFileIntent(uri);
-							OEValues values = new OEValues();
-							values.put("file_uri", uri.toString());
-							// mDb.update(values, mAttachmentInfo.getInt("id"));
-						} else {
-							error = true;
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}*/
+				// FIXME: replaced OEHelper with OdooHelper ??
+				/*
+				 * if (mOdoo.odoo() != null) { try { OEFieldsHelper fields = new
+				 * OEFieldsHelper( new String[] { "name", "datas", "file_type",
+				 * "res_model", "res_id" }); OEDomain domain = new OEDomain();
+				 * domain.add("id", "=", mAttachmentInfo.getInt("id"));
+				 * JSONObject result = mOdoo.odoo().search_read(
+				 * mDb.getModelName(), fields.get(), domain.get()); if
+				 * (result.getJSONArray("records").length() > 0) { JSONObject
+				 * row = result.getJSONArray("records") .getJSONObject(0);
+				 * String file_path = createFile( row.getString("name"),
+				 * row.getString("datas"), row.getString("file_type")); Uri uri
+				 * = Uri.fromFile(new File(file_path)); mNotification =
+				 * setFileIntent(uri); OEValues values = new OEValues();
+				 * values.put("file_uri", uri.toString()); // mDb.update(values,
+				 * mAttachmentInfo.getInt("id")); } else { error = true; } }
+				 * catch (Exception e) { e.printStackTrace(); } }
+				 */
 			}
 			return null;
 		}

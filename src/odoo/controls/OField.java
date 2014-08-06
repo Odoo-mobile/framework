@@ -430,7 +430,6 @@ public class OField extends LinearLayout implements
 		else
 			mlayout.setOrientation(LinearLayout.HORIZONTAL);
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
-			// TODO
 			List<ODataRow> mSelectedObjects = new ArrayList<ODataRow>();
 			mSelectedObjects.addAll(records);
 			List<Integer> ids = new ArrayList<Integer>();
@@ -450,6 +449,10 @@ public class OField extends LinearLayout implements
 			records.addAll(mSelectedObjects);
 			mManyToManyTags = new OTagsView(mContext);
 			mManyToManyTags.setCustomTagView(this);
+			mManyToManyTags.setTypeface(OControlHelper.lightFont());
+			mManyToManyTags.setHintTextColor(mContext.getResources().getColor(
+					R.color.gray_text));
+			mManyToManyTags.setHint(mColumn.getLabel());
 			mManyToManyTags
 					.setAdapter(getManyToManyAdapter(records, ref_column));
 			mManyToManyTags.setTokenListener(this);
@@ -921,7 +924,21 @@ public class OField extends LinearLayout implements
 	 */
 	public boolean isEmpty() {
 		if (mFieldWidget != null) {
-			return ((Integer) mFieldValue == 0);
+			switch (mFieldWidget) {
+			case MANY_TO_MANY_TAGS:
+				if (mManyToManyTags.getObjects().size() == 0) {
+					return true;
+				}
+				break;
+			case WEB_VIEW:
+				return TextUtils.isEmpty(getValue().toString());
+			case MANY_TO_ONE:
+				if (mFieldValue != null)
+					return ((Integer) mFieldValue == 0);
+			default:
+				return false;
+			}
+			return false;
 		} else {
 			return TextUtils.isEmpty(getValue().toString());
 		}

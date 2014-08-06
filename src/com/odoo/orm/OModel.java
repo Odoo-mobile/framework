@@ -122,13 +122,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	@Odoo.api.v8
 	@Odoo.api.v9alpha
 	public OColumn create_date = new OColumn("Created On", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 
 	/** The write_date. */
 	@Odoo.api.v8
 	@Odoo.api.v9alpha
 	public OColumn write_date = new OColumn("Last Updated On", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 
 	// Local Base Columns
 	/** The local_id. */

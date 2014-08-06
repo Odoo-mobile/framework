@@ -90,8 +90,8 @@ public class PartnersDetail extends BaseFragment {
 				} else {
 					db().create(values);
 				}
+				getActivity().getSupportFragmentManager().popBackStack();
 			}
-			getActivity().getSupportFragmentManager().popBackStack();
 			break;
 		case R.id.menu_partner_detail_delete:
 			db().delete(mId);
