@@ -50,6 +50,13 @@ public @interface Odoo {
 		 * @return true, if successful
 		 */
 		boolean store() default false;
+
+		/**
+		 * Depends.
+		 * 
+		 * @return the string[]
+		 */
+		String[] depends() default {};
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)

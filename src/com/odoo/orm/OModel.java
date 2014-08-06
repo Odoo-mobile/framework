@@ -344,6 +344,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					if (method != null) {
 						column.setFunctionalMethod(method);
 						column.setFunctionalStore(checkForFunctionalStore(field));
+						if (column.canFunctionalStore()) {
+							column.setFunctionalStoreDepends(getFunctionalDepends(field));
+						}
 					}
 				} else
 					return null;
@@ -367,6 +370,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					if (method != null) {
 						column.setFunctionalMethod(method);
 						column.setFunctionalStore(checkForFunctionalStore(field));
+						if (column.canFunctionalStore()) {
+							column.setFunctionalStoreDepends(getFunctionalDepends(field));
+						}
 					}
 				}
 			}
@@ -414,6 +420,24 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			return functional.store();
 		}
 		return false;
+	}
+
+	/**
+	 * Gets the functional depends.
+	 * 
+	 * @param field
+	 *            the field
+	 * @return the functional depends
+	 */
+	private String[] getFunctionalDepends(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+		if (annotation != null) {
+			Odoo.Functional functional = (Functional) annotation;
+			if (functional.store()) {
+				return functional.depends();
+			}
+		}
+		return null;
 	}
 
 	public OdooVersion getOdooVersion() {
@@ -1029,11 +1053,19 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	private ContentValues createValues(OValues values) {
 		ContentValues vals = new ContentValues();
 		for (OColumn column : getColumns()) {
+			// Checking for functional store column
 			if (values.contains(OColumn.ROW_ID) && column.isFunctionalColumn()
 					&& column.canFunctionalStore()) {
-				// Getting functional value before create or update
-				vals.put(column.getName(),
-						getFunctionalMethodValue(column, values).toString());
+				int contains = 0;
+				// getting depends column from values
+				for (String col : column.getFunctionalStoreDepends())
+					if (values.contains(col))
+						contains++;
+				if (contains == column.getFunctionalStoreDepends().size()) {
+					// Getting functional value before create or update
+					vals.put(column.getName(),
+							getFunctionalMethodValue(column, values).toString());
+				}
 			}
 			if (values.contains(column.getName())) {
 				if (column.getRelationType() == null) {

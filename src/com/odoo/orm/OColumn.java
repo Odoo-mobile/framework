@@ -19,7 +19,10 @@
 package com.odoo.orm;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * The Class OColumn.
@@ -92,6 +95,9 @@ public class OColumn {
 
 	/** The functional_store. */
 	private Boolean functional_store = false;
+
+	/** The functional_store_depends. */
+	private String[] functional_store_depends = null;
 
 	/*
 	 * (non-Javadoc)
@@ -531,6 +537,29 @@ public class OColumn {
 	 */
 	public Boolean canFunctionalStore() {
 		return functional_store;
+	}
+
+	/**
+	 * Sets the functional store depends.
+	 * 
+	 * @param depends
+	 *            the depends
+	 * @return the o column
+	 */
+	public OColumn setFunctionalStoreDepends(String[] depends) {
+		functional_store_depends = depends;
+		return this;
+	}
+
+	/**
+	 * Gets the functional store depends.
+	 * 
+	 * @return the functional store depends
+	 */
+	public List<String> getFunctionalStoreDepends() {
+		if (functional_store_depends != null)
+			return Arrays.asList(functional_store_depends);
+		return new ArrayList<String>();
 	}
 
 	/**
