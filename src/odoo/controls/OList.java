@@ -300,7 +300,26 @@ public class OList extends ScrollView implements View.OnClickListener,
 			int lastPosition = mRecords.size();
 			mRecords.addAll(lastPosition, newRecords);
 			mListAdapter.notifiyDataChange(mRecords);
-			addRecordViews(lastPosition);
+			addRecordViews(lastPosition, -1);
+		} else {
+			mLoadNewRecords = false;
+			removeDataLoaderProgress();
+		}
+	}
+
+	/**
+	 * Append records at position.
+	 * 
+	 * @param index
+	 *            the index
+	 * @param newRecords
+	 *            the new records
+	 */
+	public void appendRecords(Integer index, List<ODataRow> newRecords) {
+		if (newRecords.size() > 0) {
+			mRecords.addAll(index, newRecords);
+			mListAdapter.notifiyDataChange(mRecords);
+			addRecordViews(index, newRecords.size());
 		} else {
 			mLoadNewRecords = false;
 			removeDataLoaderProgress();
@@ -348,7 +367,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 		};
 		mListAdapter.setOnSearchChange(this);
 		mAdapterCreated = true;
-		addRecordViews(0);
+		addRecordViews(0, -1);
 	}
 
 	/**
@@ -375,6 +394,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 	 * Show empty list view.
 	 */
 	private void showEmptyListView() {
+		mInnerLayout.removeAllViews();
 		LinearLayout mEmptyListLayout = new LinearLayout(mContext);
 		mEmptyListLayout.setOrientation(LinearLayout.VERTICAL);
 		Integer padding = (int) (20 * mScaleFactor);
@@ -415,8 +435,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 	/**
 	 * Adds the record views.
 	 */
-	private void addRecordViews(Integer position) {
-		if (position == 0) {
+	private void addRecordViews(Integer start, Integer end) {
+		if (start == 0 && end == -1) {
 			removeAllViews();
 			mInnerLayout.removeAllViews();
 			addView(mInnerLayout);
@@ -424,7 +444,10 @@ public class OList extends ScrollView implements View.OnClickListener,
 			mInnerLayout = (LinearLayout) findViewWithTag("list_parent_view");
 			removeDataLoaderProgress();
 		}
-		for (int i = position; i < mListAdapter.getCount(); i++) {
+		if (end == -1) {
+			end = mListAdapter.getCount();
+		}
+		for (int i = start; i < end; i++) {
 			OForm view = (OForm) mListAdapter.getView(i, null, null);
 			view.setTag(i);
 			if (mOnRowClickListener != null) {
@@ -963,7 +986,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 		}
 		mRecords.clear();
 		mRecords.addAll(newRecords);
-		addRecordViews(0);
+		addRecordViews(0, -1);
 		if (mRecords.size() <= 0) {
 			showEmptyListView();
 		}

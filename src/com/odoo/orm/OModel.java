@@ -1112,10 +1112,28 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 		switch (command) {
 		case Add:
+			// Adding records to relation model
+			if (ids.size() > 0) {
+				for (int id : ids) {
+					ContentValues values = new ContentValues();
+					values.put(base_column, base_id);
+					values.put(rel_column, id);
+					values.put("odoo_name", mUser.getAndroidName());
+					values.put("local_write_date", ODate.getDate());
+					db.insert(table, null, values);
+				}
+			}
 			break;
 		case Update:
 			break;
 		case Delete:
+			// Deleting records to relation model
+			if (ids.size() > 0) {
+				for (int id : ids) {
+					db.delete(table, base_column + " = ? AND  " + rel_column
+							+ " = ?", new String[] { base_id + "", id + "" });
+				}
+			}
 			break;
 		case Replace:
 			// Removing old entries
@@ -1125,14 +1143,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				db.delete(table, getWhereClause(where),
 						getWhereArgs(where, args));
 				// Creating new entries
-				for (int id : ids) {
-					ContentValues values = new ContentValues();
-					values.put(base_column, base_id);
-					values.put(rel_column, id);
-					values.put("odoo_name", mUser.getAndroidName());
-					values.put("local_write_date", ODate.getDate());
-					db.insert(table, null, values);
-				}
+				manageManyToManyRecords(db, rel_model, ids, base_id,
+						Command.Add);
 			}
 			break;
 		}
