@@ -319,7 +319,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 		if (newRecords.size() > 0) {
 			mRecords.addAll(index, newRecords);
 			mListAdapter.notifiyDataChange(mRecords);
-			addRecordViews(index, newRecords.size());
+			addRecordViews(index, newRecords.size() + 1);
 		} else {
 			mLoadNewRecords = false;
 			removeDataLoaderProgress();
@@ -447,6 +447,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 		if (end == -1) {
 			end = mListAdapter.getCount();
 		}
+		int listLen = mListAdapter.getCount();
 		for (int i = start; i < end; i++) {
 			OForm view = (OForm) mListAdapter.getView(i, null, null);
 			view.setTag(i);
@@ -464,14 +465,21 @@ public class OList extends ScrollView implements View.OnClickListener,
 			if (mAttr.getBoolean(KEY_SHOW_AS_CARD, false)) {
 				ViewGroup card = cardOuterView(i);
 				card.addView(view);
-				mInnerLayout.addView(card);
+				if (end == listLen)
+					mInnerLayout.addView(card);
+				else
+					mInnerLayout.addView(card, i);
 				mInnerLayout
 						.setBackgroundResource(R.color.card_view_parent_background);
 				setBackgroundResource(R.color.card_view_parent_background);
 			} else {
 				mInnerLayout.addView(view);
-				if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true))
-					mInnerLayout.addView(divider());
+				if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true)) {
+					if (end == listLen)
+						mInnerLayout.addView(divider());
+					else
+						mInnerLayout.addView(divider(), i);
+				}
 			}
 		}
 	}
