@@ -77,31 +77,31 @@ public class OList extends ScrollView implements View.OnClickListener,
 	public static final String KEY_SHOW_AS_CARD = "showAsCard";
 
 	/** The context. */
-	Context mContext = null;
+	private Context mContext = null;
 
 	/** The typed array. */
-	TypedArray mTypedArray = null;
+	private TypedArray mTypedArray = null;
 
 	/** The list adapter. */
-	OListAdapter mListAdapter = null;
+	private OListAdapter mListAdapter = null;
 
 	/** The records. */
-	List<Object> mRecords = new ArrayList<Object>();
+	private List<Object> mRecords = new ArrayList<Object>();
 
 	/** The attr. */
-	OControlAttributes mAttr = new OControlAttributes();
+	private OControlAttributes mAttr = new OControlAttributes();
 
 	/** The custom layout. */
-	Integer mCustomLayout = 0;
+	private Integer mCustomLayout = 0;
 
 	/** The inner layout. */
-	LinearLayout mInnerLayout = null;
+	private LinearLayout mInnerLayout = null;
 
 	/** The layout params. */
-	LayoutParams mLayoutParams = null;
+	private LayoutParams mLayoutParams = null;
 
 	/** The on row click listener. */
-	OnRowClickListener mOnRowClickListener = null;
+	private OnRowClickListener mOnRowClickListener = null;
 
 	/** The row draggable. */
 	private Boolean mRowDraggable = false;
@@ -155,6 +155,9 @@ public class OList extends ScrollView implements View.OnClickListener,
 
 	/** The m load new records. */
 	private Boolean mLoadNewRecords = true;
+
+	/** The adapter created. */
+	private Boolean mAdapterCreated = false;
 
 	/**
 	 * Instantiates a new list control.
@@ -265,13 +268,16 @@ public class OList extends ScrollView implements View.OnClickListener,
 				mRecords.clear();
 				mRecords.addAll(records);
 				createAdapter();
-				if (mRecords.size() <= 0) {
-					showEmptyListView();
-				}
 			} else {
 				mLoadNewRecords = false;
 				removeDataLoaderProgress();
 			}
+		}
+		if (!mAdapterCreated) {
+			createAdapter();
+		}
+		if (mRecords.size() <= 0) {
+			showEmptyListView();
 		}
 	}
 
@@ -341,6 +347,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 			}
 		};
 		mListAdapter.setOnSearchChange(this);
+		mAdapterCreated = true;
 		addRecordViews(0);
 	}
 

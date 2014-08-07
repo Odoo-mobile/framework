@@ -1253,6 +1253,9 @@ public class OField extends LinearLayout implements
 
 				return rel_obj;
 
+			case WEB_VIEW:
+				return "<p>" + getText().replaceAll("(\r\n|\n)", "<br />")
+						+ "</p>";
 			default:
 				return getText();
 			}

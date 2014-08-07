@@ -18,12 +18,9 @@
  */
 package com.odoo.support.fragment;
 
-import android.os.Bundle;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView.OnQueryTextListener;
 
@@ -41,7 +38,6 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 	private OModel mDb = null;
 	/** The list search adapter. */
 	private ArrayAdapter<Object> listSearchAdapter;
-	private String mTitle = "";
 
 	/**
 	 * Gets the query listener.
@@ -93,11 +89,81 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 		return mDb;
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		mTitle = getActivity().getTitle().toString();
-		return super.onCreateView(inflater, container, savedInstanceState);
+	/**
+	 * Gets the resource string values
+	 * 
+	 * @param res_id
+	 *            the res_id
+	 * @return the string
+	 */
+	public String _s(int res_id) {
+		return getActivity().getResources().getString(res_id);
+	}
+
+	/**
+	 * gets the strings array from the resource value.
+	 * 
+	 * @param res_id
+	 *            the res_id
+	 * @return the string[]
+	 */
+	public String[] _sArray(int res_id) {
+		return getActivity().getResources().getStringArray(res_id);
+	}
+
+	/**
+	 * gets the drawable from resource values
+	 * 
+	 * @param res_id
+	 *            the res_id
+	 * @return the drawable
+	 */
+	public Drawable _d(int res_id) {
+		return getActivity().getResources().getDrawable(res_id);
+	}
+
+	/**
+	 * gets the integer value from resource values
+	 * 
+	 * @param res_id
+	 *            the res_id
+	 * @return the integer
+	 */
+	public Integer _i(int res_id) {
+		return getActivity().getResources().getInteger(res_id);
+	}
+
+	/**
+	 * gets the integer array from resource values.
+	 * 
+	 * @param res_id
+	 *            the res_id
+	 * @return the int[]
+	 */
+	public int[] _iArray(int res_id) {
+		return getActivity().getResources().getIntArray(res_id);
+	}
+
+	/**
+	 * gets the color from resource values
+	 * 
+	 * @param res_id
+	 *            the res_id
+	 * @return the int
+	 */
+	public int _c(int res_id) {
+		return getActivity().getResources().getColor(res_id);
+	}
+
+	/**
+	 * gets the dimension from resource values
+	 * 
+	 * @param res_id
+	 *            the res_id
+	 * @return the float
+	 */
+	public Float _dim(int res_id) {
+		return getActivity().getResources().getDimension(res_id);
 	}
 
 	public App app() {

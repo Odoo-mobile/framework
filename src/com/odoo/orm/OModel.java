@@ -1420,7 +1420,6 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			getSyncHelper().syncWithServer();
 			return null;
 		}
-
 	}
 }
 

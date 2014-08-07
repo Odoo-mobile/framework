@@ -743,7 +743,12 @@ public class OSyncHelper {
 						rel_key = m2m.getTableName() + "_" + column.getName();
 						JSONArray ids_list = record.getJSONArray(column
 								.getName());
-						for (int i = 0; i < ids_list.length(); i++) {
+						int len = ids_list.length();
+						// limiting sync limit for many to many
+						int record_len = column.getRecordSyncLimit();
+						if (record_len != -1 && len > record_len)
+							len = record_len;
+						for (int i = 0; i < len; i++) {
 							r_ids.add(ids_list.getInt(i));
 						}
 						values.put(column.getName(), r_ids);
@@ -1005,14 +1010,32 @@ public class OSyncHelper {
 	 */
 	public Object callMethod(String method, OArguments args,
 			JSONObject context, JSONObject kwargs) {
+		return callMethod(mModel.getModelName(), method, args, context, kwargs);
+	}
+
+	/**
+	 * Call method.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param args
+	 *            the args
+	 * @param context
+	 *            the context
+	 * @param kwargs
+	 *            the kwargs
+	 * @return the object
+	 */
+	public Object callMethod(String model, String method, OArguments args,
+			JSONObject context, JSONObject kwargs) {
 		try {
 			if (kwargs == null)
 				kwargs = new JSONObject();
 			if (context != null) {
 				args.add(mOdoo.updateContext(context));
 			}
-			JSONObject result = mOdoo.call_kw(mModel.getModelName(), method,
-					args.getArray(), kwargs);
+			JSONObject result = mOdoo.call_kw(model, method, args.getArray(),
+					kwargs);
 			if (result.has("result")) {
 				return result.get("result");
 			}

@@ -99,6 +99,9 @@ public class OColumn {
 	/** The functional_store_depends. */
 	private String[] functional_store_depends = null;
 
+	/** The sync limit. */
+	private Integer mSyncLimit = -1;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -570,6 +573,29 @@ public class OColumn {
 		if (functional_store_depends != null)
 			return Arrays.asList(functional_store_depends);
 		return new ArrayList<String>();
+	}
+
+	/**
+	 * Sets the record sync limit.
+	 * 
+	 * 
+	 * @default -1
+	 * @param limit
+	 *            the limit
+	 * @return the column
+	 */
+	public OColumn setRecordSyncLimit(Integer limit) {
+		mSyncLimit = limit;
+		return this;
+	}
+
+	/**
+	 * Gets the record sync limit.
+	 * 
+	 * @return the record sync limit
+	 */
+	public Integer getRecordSyncLimit() {
+		return mSyncLimit;
 	}
 
 	/**

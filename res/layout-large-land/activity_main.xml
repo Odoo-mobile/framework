@@ -18,11 +18,6 @@
             android:layout_height="match_parent"
             android:layout_weight="0.8"
             android:background="#ffffff" >
-
-            <include
-                android:id="@+id/application_loader"
-                layout="@layout/application_preloader"
-                android:visibility="gone" />
         </FrameLayout>
 
         <FrameLayout
