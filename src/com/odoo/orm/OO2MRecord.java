@@ -21,10 +21,11 @@ package com.odoo.orm;
 import java.util.List;
 
 public class OO2MRecord {
-	OColumn mCol = null;
-	int mRecordId = 0;
-	OModel mDatabase = null;
-	String mOrderBy = null;
+	private OColumn mCol = null;
+	private int mRecordId = 0;
+	private OModel mDatabase = null;
+	private OModel rel_model = null;
+	private String mOrderBy = null;
 
 	public OO2MRecord(OModel oModel, OColumn col, int id) {
 		mDatabase = oModel;
@@ -37,11 +38,21 @@ public class OO2MRecord {
 		return this;
 	}
 
+	public List<Integer> getIds() {
+		rel_model = mDatabase.createInstance(mCol.getType());
+		return getIds(rel_model);
+	}
+
+	public List<Integer> getIds(OModel rel_model) {
+		return mDatabase.selecto2MRelIds(mDatabase, rel_model, mRecordId,
+				mCol.getRelatedColumn());
+	}
+
 	public List<ODataRow> browseEach() {
-		OModel rel = mDatabase.createInstance(mCol.getType());
+		rel_model = mDatabase.createInstance(mCol.getType());
 		String column = mCol.getRelatedColumn();
-		return rel.select(column + " = ? ", new String[] { mRecordId + "" },
-				null, null, mOrderBy);
+		return rel_model.select(column + " = ? ",
+				new String[] { mRecordId + "" }, null, null, mOrderBy);
 	}
 
 	public ODataRow browseAt(int index) {

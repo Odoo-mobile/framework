@@ -85,7 +85,8 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 	}
 
 	public OModel db() {
-		mDb = (OModel) databaseHelper(getActivity());
+		if (mDb == null)
+			mDb = (OModel) databaseHelper(getActivity());
 		return mDb;
 	}
 

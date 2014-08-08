@@ -18,29 +18,36 @@
  */
 package com.odoo.orm;
 
-
-
 public class OM2ORecord {
 	private OColumn mCol = null;
-	private String record_id = "false";
+	private Integer record_id = 0;
 	private OModel base_model = null;
+	private OModel rel_model = null;
 
-	public OM2ORecord(OModel base, OColumn col, String value) {
+	public OM2ORecord(OModel base, OColumn col, Integer rec_id) {
 		base_model = base;
 		mCol = col;
-		record_id = value;
+		record_id = rec_id;
 	}
 
-	public Object getId() {
-		if (record_id == null || record_id.equals("false"))
-			return 0;
-		return Integer.parseInt(record_id);
+	public Integer getId() {
+		return record_id;
+	}
+
+	public String getName() {
+		rel_model = base_model.createInstance(mCol.getType());
+		return rel_model.getName(record_id);
+	}
+
+	public ODataRow browse(OModel rel_model) {
+		if (record_id != null) {
+			return rel_model.select(record_id);
+		}
+		return null;
 	}
 
 	public ODataRow browse() {
-		OModel rel = base_model.createInstance(mCol.getType());
-		if (record_id == null || record_id.equals("false"))
-			return null;
-		return rel.select(Integer.parseInt(record_id));
+		rel_model = base_model.createInstance(mCol.getType());
+		return browse(rel_model);
 	}
 }

@@ -102,6 +102,9 @@ public class OColumn {
 	/** The sync limit. */
 	private Integer mSyncLimit = -1;
 
+	/** The check row id. */
+	private Boolean checkRowId = true;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -448,7 +451,6 @@ public class OColumn {
 	public void setFunctionalMethod(Method method) {
 		functional_method = method;
 		is_functional_column = true;
-		setLocalColumn();
 	}
 
 	/**
@@ -596,6 +598,27 @@ public class OColumn {
 	 */
 	public Integer getRecordSyncLimit() {
 		return mSyncLimit;
+	}
+
+	/**
+	 * Check row id.
+	 * 
+	 * @param check
+	 *            the check
+	 * @return the o column
+	 */
+	public OColumn checkRowId(Boolean check) {
+		checkRowId = check;
+		return this;
+	}
+
+	/**
+	 * Check row id.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean checkRowId() {
+		return checkRowId;
 	}
 
 	/**

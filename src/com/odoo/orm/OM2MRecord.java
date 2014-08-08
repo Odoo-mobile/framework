@@ -21,9 +21,10 @@ package com.odoo.orm;
 import java.util.List;
 
 public class OM2MRecord {
-	OColumn mCol = null;
-	int mId = 0;
-	OModel mDatabase = null;
+	private OColumn mCol = null;
+	private int mId = 0;
+	private OModel mDatabase = null;
+	private OModel rel_model = null;
 
 	public OM2MRecord(OModel model, OColumn col, int id) {
 		mDatabase = model;
@@ -31,9 +32,14 @@ public class OM2MRecord {
 		mId = id;
 	}
 
+	public List<Integer> getRelIds() {
+		rel_model = mDatabase.createInstance(mCol.getType());
+		return mDatabase.selectM2MRelIds(mDatabase, rel_model, mId);
+	}
+
 	public List<ODataRow> browseEach() {
-		OModel rel = mDatabase.createInstance(mCol.getType());
-		return mDatabase.selectM2MRecords(mDatabase, rel, mId);
+		rel_model = mDatabase.createInstance(mCol.getType());
+		return mDatabase.selectM2MRecords(mDatabase, rel_model, mId);
 	}
 
 	public ODataRow browseAt(int index) {
