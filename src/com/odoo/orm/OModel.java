@@ -41,6 +41,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.odoo.App;
+import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ORelIds.RelData;
 import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.annotations.Odoo.Functional;
@@ -1197,6 +1198,128 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		}
 		vals.put("local_write_date", ODate.getDate());
 		return vals;
+	}
+
+	/**
+	 * Adds the many to many record.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_id
+	 *            the relation_record_id
+	 */
+	public void addManyToManyRecord(String column, Integer base_id,
+			Integer relation_record_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(relation_record_id);
+		addManyToManyRecords(column, base_id, ids);
+	}
+
+	/**
+	 * Adds the many to many records.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_ids
+	 *            the relation_record_ids
+	 */
+	public void addManyToManyRecords(String column, Integer base_id,
+			List<Integer> relation_record_ids) {
+		handleManyToManyData(column, base_id, relation_record_ids, Command.Add);
+	}
+
+	/**
+	 * Delete many to many record.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_id
+	 *            the relation_record_id
+	 */
+	public void deleteManyToManyRecord(String column, Integer base_id,
+			Integer relation_record_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		deleteManyToManyRecords(column, base_id, ids);
+	}
+
+	/**
+	 * Delete many to many records.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_ids
+	 *            the relation_record_ids
+	 */
+	public void deleteManyToManyRecords(String column, Integer base_id,
+			List<Integer> relation_record_ids) {
+		handleManyToManyData(column, base_id, relation_record_ids,
+				Command.Delete);
+	}
+
+	/**
+	 * Replace many to many record.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_id
+	 *            the relation_record_id
+	 */
+	public void replaceManyToManyRecord(String column, Integer base_id,
+			Integer relation_record_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(relation_record_id);
+		replaceManyToManyRecords(column, base_id, ids);
+
+	}
+
+	/**
+	 * Replace many to many records.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_ids
+	 *            the relation_record_ids
+	 */
+	public void replaceManyToManyRecords(String column, Integer base_id,
+			List<Integer> relation_record_ids) {
+		handleManyToManyData(column, base_id, relation_record_ids,
+				Command.Replace);
+	}
+
+	/**
+	 * Handle many to many data.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_ids
+	 *            the relation_record_ids
+	 * @param command
+	 *            the command
+	 */
+	private void handleManyToManyData(String column, Integer base_id,
+			List<Integer> relation_record_ids, Command command) {
+		OColumn col = getColumn(column);
+		if (col.getRelationType() == RelationType.ManyToMany) {
+			SQLiteDatabase db = getWritableDatabase();
+			OModel rel_model = createInstance(col.getType());
+			manageManyToManyRecords(db, rel_model, relation_record_ids,
+					base_id, command);
+			db.close();
+		}
 	}
 
 	/**
