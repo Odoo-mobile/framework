@@ -25,7 +25,6 @@ import com.odoo.addons.partners.model.ResPartnerCategory;
 import com.odoo.addons.partners.model.ResPartnerTitle;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
@@ -72,10 +71,6 @@ public class ResPartner extends OModel {
 			RelationType.ManyToOne);
 	OColumn country_id = new OColumn("Country", ResCountry.class,
 			RelationType.ManyToOne);
-
-	public String getTest(ODataRow row) {
-		return "Working functional with join";
-	}
 
 	public ResPartner(Context context) {
 		super(context, "res.partner");
