@@ -1245,6 +1245,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	public void deleteManyToManyRecord(String column, Integer base_id,
 			Integer relation_record_id) {
 		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(relation_record_id);
 		deleteManyToManyRecords(column, base_id, ids);
 	}
 
