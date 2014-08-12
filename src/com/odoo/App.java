@@ -39,8 +39,6 @@ public class App extends Application {
 	public void onCreate() {
 		Log.d(TAG, "App->onCreate()");
 		super.onCreate();
-//		Intent intent=new Intent(this, PartnersService.class);
-//		startService(intent);
 	}
 
 	public OdooVersion getOdooVersion() {
