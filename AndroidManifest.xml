@@ -32,6 +32,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:logo="@drawable/ic_odoo_o"
         android:theme="@style/AppTheme" >
 
         <!-- Android Account Authentication Service -->

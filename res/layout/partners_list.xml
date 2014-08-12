@@ -12,10 +12,16 @@
         android:paddingBottom="5dp"
         android:paddingTop="5dp" />
 
-    <odoo.controls.OList
-        android:id="@+id/listRecords"
+    <android.widgets.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-    </odoo.controls.OList>
+
+        <odoo.controls.OList
+            android:id="@+id/listRecords"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </odoo.controls.OList>
+    </android.widgets.SwipeRefreshLayout>
 
 </LinearLayout>
