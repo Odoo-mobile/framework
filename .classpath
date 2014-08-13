@@ -6,6 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/pull_swipe_library.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/odoo-v2.jar"/>
+	<classpathentry kind="lib" path="libs/android-widgets.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>

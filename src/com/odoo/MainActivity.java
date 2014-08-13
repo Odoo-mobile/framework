@@ -274,7 +274,8 @@ public class MainActivity extends FragmentActivity implements
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		mDrawerListItems.addAll(DrawerHelper.drawerItems(mContext));
 		mDrawerListItems.addAll(setSettingMenu());
-		mDrawerAdatper = new DrawerAdatper(this, R.layout.base_drawer_item_layout,
+		mDrawerAdatper = new DrawerAdatper(this,
+				R.layout.base_drawer_item_layout,
 				R.layout.base_drawer_item_group_layout, mDrawerListItems);
 		mDrawerListView.setAdapter(mDrawerAdatper);
 		mDrawerAdatper.notifyDataSetChanged();

@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
+import android.widgets.SwipeRefreshLayout;
+import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
@@ -30,11 +33,9 @@ import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
-import com.openerp.OETouchListener;
-import com.openerp.OETouchListener.OnPullListener;
 
 public class Partners extends BaseFragment implements OnRowClickListener,
-		OnPullListener, OnListBottomReachedListener {
+		OnListBottomReachedListener, OnRefreshListener {
 
 	public static final String TAG = Partners.class.getSimpleName();
 	public static final String KEY = "partner_type";
@@ -42,10 +43,10 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	private View mView = null;
 	private List<ODataRow> mListRecords = new ArrayList<ODataRow>();
 	private OList mListcontrol = null;
-	private OETouchListener mTouchListener = null;
 	private DataLoader mDataLoader = null;
 	private Integer mLimit = 10;
 	private Integer mLastPosition = -1;
+	private SwipeRefreshLayout mSwipeRefresh = null;
 
 	public enum Type {
 		Customers, Suppliers, Companies
@@ -72,12 +73,17 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	private void init() {
+		mSwipeRefresh = (SwipeRefreshLayout) mView
+				.findViewById(R.id.swipe_container);
+		mSwipeRefresh.setOnRefreshListener(this);
+		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
 		OControls.setVisible(mView, R.id.loadingProgress);
 		mListcontrol = (OList) mView.findViewById(R.id.listRecords);
 		mListcontrol.setOnRowClickListener(this);
 		mListcontrol.setOnListBottomReachedListener(this);
-		mTouchListener = scope.main().getTouchAttacher();
-		mTouchListener.setPullableView(mListcontrol, this);
 		mListcontrol.setRecordOffset(mListRecords.size());
 		if (mLastPosition == -1) {
 			mDataLoader = new DataLoader(0);
@@ -208,18 +214,6 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	@Override
-	public void onPullStarted(View arg0) {
-		if (app().inNetwork())
-			scope.main().requestSync(PartnersProvider.AUTHORITY);
-		else {
-			mTouchListener.setPullComplete();
-			Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_LONG)
-					.show();
-		}
-
-	}
-
-	@Override
 	public void onRowItemClick(int position, View view, ODataRow row) {
 		mLastPosition = position;
 		PartnersDetail partner = new PartnersDetail();
@@ -246,7 +240,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
 			scope.main().refreshDrawer(TAG);
-			mTouchListener.setPullComplete();
+			hideRefreshingProgress();
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
@@ -267,5 +261,25 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	@Override
 	public Boolean showLoader() {
 		return true;
+	}
+
+	@Override
+	public void onRefresh() {
+		if (app().inNetwork()) {
+			scope.main().requestSync(PartnersProvider.AUTHORITY);
+		} else {
+			hideRefreshingProgress();
+			Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_LONG)
+					.show();
+		}
+	}
+
+	private void hideRefreshingProgress() {
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				mSwipeRefresh.setRefreshing(false);
+			}
+		}, 1000);
 	}
 }
