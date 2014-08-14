@@ -45,6 +45,8 @@ import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ORelIds.RelData;
 import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.annotations.Odoo.Functional;
+import com.odoo.orm.sql.OQuery;
+import com.odoo.orm.sql.OQuery.QueryType;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OInteger;
@@ -99,6 +101,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	/** The limit. */
 	private Integer mLimit = -1;
+
+	/** The with functional columns. */
+	private Boolean mWithFunctionalColumns = false;
 
 	/**
 	 * The Enum Command.
@@ -666,6 +671,53 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		cr.close();
 		db.close();
 		return records;
+	}
+
+	public List<ODataRow> query(String sql, String[] args) {
+		List<ODataRow> records = new ArrayList<ODataRow>();
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cr = db.rawQuery(sql, args);
+		if (cr.moveToFirst()) {
+			do {
+				ODataRow row = createRowFromCursor(cr);
+				if (mWithFunctionalColumns) {
+					for (OColumn col : mFunctionalColumns) {
+						if (!col.canFunctionalStore()) {
+							row.put(col.getName(),
+									getFunctionalMethodValue(col, row));
+						}
+					}
+				}
+				records.add(row);
+			} while (cr.moveToNext());
+		}
+		cr.close();
+		db.close();
+		return records;
+	}
+
+	public OModel withFunctionalColumns() {
+		return withFunctionalColumns(true);
+	}
+
+	public OModel withFunctionalColumns(Boolean withFunctionalColumns) {
+		mWithFunctionalColumns = withFunctionalColumns;
+		if (withFunctionalColumns) {
+			prepareColumns();
+		}
+		return this;
+	}
+
+	public ODataRow createRowFromCursor(Cursor cr) {
+		ODataRow row = new ODataRow();
+		for (String col_name : cr.getColumnNames()) {
+			OColumn col = new OColumn(col_name).setDefault(false);
+			col.setName(col_name);
+			row.put(col_name, createRecordRow(col, cr));
+		}
+		if (row.getInt("id") == 0 || row.getString("id").equals("false"))
+			row.put("id", 0);
+		return row;
 	}
 
 	/**
@@ -1649,6 +1701,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			write_date.setLocalColumn();
 			create_date.setLocalColumn();
 		}
+	}
+
+	/**
+	 * browse, New API
+	 * 
+	 * @return OQuery object
+	 */
+	public OQuery browse() {
+		return new OQuery(mContext, this, QueryType.Select);
 	}
 
 	/**

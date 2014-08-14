@@ -227,7 +227,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	public boolean onSettingItemSelected(SettingKeys key) {
 		switch (key) {
 		case GLOBAL_SETTING:
-			Intent i = new Intent(this, Settings.class);
+			Intent i = new Intent(this, BaseSettings.class);
 			startActivityForResult(i, RESULT_SETTINGS);
 			return true;
 		case ACCOUNTS:

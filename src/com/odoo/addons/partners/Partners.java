@@ -27,7 +27,7 @@ import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.ODataRow;
-import com.odoo.orm.OModel;
+import com.odoo.orm.sql.OQuery;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
@@ -45,8 +45,8 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	private OList mListcontrol = null;
 	private DataLoader mDataLoader = null;
 	private Integer mLimit = 10;
-	private Integer mLastPosition = -1;
 	private Integer mOffset = 0;
+	private Integer mLastPosition = -1;
 	private SwipeRefreshLayout mSwipeRefresh = null;
 
 	public enum Type {
@@ -150,19 +150,37 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 						mSwipeRefresh.setRefreshing(true);
 						scope.main().requestSync(PartnersProvider.AUTHORITY);
 					}
-					if (offset == 0) {
+					if (offset == 0)
 						mListRecords.clear();
+
+					// Using Join
+					OQuery query = db().browse();
+					if (mCurrentType != Type.Companies) {
+						query.columns("*", "country_id.name", "parent_id.name");
+					} else {
+						query.columns("*", "country_id.name");
 					}
-					OModel model = db();
-					model.setOffset(offset);
-					Object[] args = new Object[] { true };
-					mListRecords.addAll(model
-							.setLimit(mLimit)
-							.setOffset(offset)
-							.select(getWhere(mCurrentType), args, null, null,
-									"local_id DESC"));
-					mOffset = model.getNextOffset();
+					query.addWhere(getWhere(mCurrentType), "=", true);
+					query.setOffset(offset);
+					query.setLimit(mLimit);
+					query.setOrder("local_id", "DESC");
+					mListRecords.addAll(query.fetch());
+					mOffset = query.getNextOffset();
 					mListcontrol.setRecordOffset(mOffset);
+
+					// Using Simple Query
+
+					// OModel model = db();
+					// model.setOffset(offset);
+					// Object[] args = new Object[] { true };
+					// mListRecords.addAll(model
+					// .setLimit(mLimit)
+					// .setOffset(offset)
+					// .select(getWhere(mCurrentType) + " = ?", args,
+					// null, null, "local_id DESC"));
+					// mOffset = model.getNextOffset();
+					// mListcontrol.setRecordOffset(mOffset);
+
 				}
 			});
 			return null;
@@ -179,13 +197,13 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		String where = null;
 		switch (type) {
 		case Companies:
-			where = "is_company = ?";
+			where = "is_company";
 			break;
 		case Customers:
-			where = "customer = ?";
+			where = "customer";
 			break;
 		case Suppliers:
-			where = "supplier = ?";
+			where = "supplier";
 			break;
 		}
 		return where;
@@ -193,7 +211,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	private int count(Context context, Type type) {
-		String where = getWhere(type);
+		String where = getWhere(type) + " = ?";
 		Object[] args = new Object[] { true };
 		return new ResPartner(context).count(where, args);
 	}
@@ -252,6 +270,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
+			mOffset = 0;
 			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
 		}

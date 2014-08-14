@@ -36,7 +36,7 @@ import com.odoo.base.about.About;
 import com.odoo.support.OUser;
 import com.odoo.util.Base64Helper;
 
-public class Settings extends PreferenceActivity implements
+public class BaseSettings extends PreferenceActivity implements
 		OnPreferenceClickListener {
 
 	public static final String ACTION_GENERAL_CONFIG = "com.odoo.ACTION_ACCOUNT_GENERAL_CONFIG";

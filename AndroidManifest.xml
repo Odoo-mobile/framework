@@ -57,7 +57,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.odoo.Settings" >
+        <activity android:name="com.odoo.BaseSettings" >
             <intent-filter>
                 <action android:name="com.odoo.ACTION_ACCOUNT_BASE_CONFIG" />
 

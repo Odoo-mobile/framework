@@ -196,58 +196,75 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 				OField field = (OField) v;
 				OColumn column = mModel.getColumn(field.getFieldName());
 				OModel ref_model = null;
-				if (column.getRelationType() != null) {
-					ref_model = mModel.createInstance(column.getType());
-				}
-				OColumn ref_column = null;
-				if (field.getRefColumn() != null) {
-					ref_column = ref_model.getColumn(field.getRefColumn());
-				}
-				field.setColumn(column);
-				OFieldType widget = null;
-				String label = field.getFieldName();
 				if (column != null) {
-					mFieldColumns.put(field.getFieldName(), column);
-					mFields.add(field.getTag().toString());
-					label = column.getLabel();
-					if (column.getRelationType() != null
-							&& column.getRelationType() == RelationType.ManyToOne) {
-						widget = OFieldType.MANY_TO_ONE;
+					if (column.getRelationType() != null) {
+						ref_model = mModel.createInstance(column.getType());
 					}
-					if (column.getRelationType() != null
-							&& (column.getRelationType() == RelationType.ManyToMany || column
-									.getRelationType() == RelationType.OneToMany)) {
-						widget = OFieldType.MANY_TO_MANY_TAGS;
+					OColumn ref_column = null;
+					if (field.getRefColumn() != null) {
+						ref_column = ref_model.getColumn(field.getRefColumn());
 					}
-					if (column.isFunctionalColumn()) {
-						Object value = mRecord.get(column.getName());
-						if (column.getType() == null)
-							column.setType(value.getClass());
-						field.setColumn(column);
+					field.setColumn(column);
+					OFieldType widget = null;
+					String label = field.getFieldName();
+					if (column != null) {
+						mFieldColumns.put(field.getFieldName(), column);
+						mFields.add(field.getTag().toString());
+						label = column.getLabel();
+						if (column.getRelationType() != null
+								&& column.getRelationType() == RelationType.ManyToOne) {
+							widget = OFieldType.MANY_TO_ONE;
+						}
+						if (column.getRelationType() != null
+								&& (column.getRelationType() == RelationType.ManyToMany || column
+										.getRelationType() == RelationType.OneToMany)) {
+							widget = OFieldType.MANY_TO_MANY_TAGS;
+						}
+						if (column.isFunctionalColumn()) {
+							Object value = mRecord.get(column.getName());
+							if (column.getType() == null)
+								column.setType(value.getClass());
+							field.setColumn(column);
+						}
+						if (column.getType().isAssignableFrom(OBlob.class)
+								|| (ref_column != null && ref_column.getType()
+										.isAssignableFrom(OBlob.class))) {
+							widget = OFieldType.BINARY;
+						}
+						if (column.getType().isAssignableFrom(OBoolean.class)) {
+							widget = OFieldType.BOOLEAN_WIDGET;
+						}
+						if (column.getType().isAssignableFrom(OHtml.class)) {
+							widget = OFieldType.WEB_VIEW;
+						}
 					}
-					if (column.getType().isAssignableFrom(OBlob.class)
-							|| (ref_column != null && ref_column.getType()
-									.isAssignableFrom(OBlob.class))) {
-						widget = OFieldType.BINARY;
+					if (widget != null) {
+						if (mRecord != null
+								&& mRecord.contains(column.getName())) {
+							field.createControl(widget, column, mRecord);
+							field.setEditable(editable);
+						} else {
+							if (mRecord != null
+									&& !mRecord.contains(column.getName()))
+								field.setVisibility(View.GONE);
+							else {
+								field.createControl(widget, column, mRecord);
+								field.setEditable(editable);
+							}
+						}
+					} else {
+						field.setEditable(editable);
+						if (mRecord != null)
+							field.setText(mRecord.getString(field
+									.getFieldName()));
+						else
+							field.setText("");
 					}
-					if (column.getType().isAssignableFrom(OBoolean.class)) {
-						widget = OFieldType.BOOLEAN_WIDGET;
-					}
-					if (column.getType().isAssignableFrom(OHtml.class)) {
-						widget = OFieldType.WEB_VIEW;
-					}
-				}
-				if (widget != null) {
-					field.createControl(widget, column, mRecord);
-					field.setEditable(editable);
+					field.setLabel(label);
 				} else {
-					field.setEditable(editable);
 					if (mRecord != null)
 						field.setText(mRecord.getString(field.getFieldName()));
-					else
-						field.setText("");
 				}
-				field.setLabel(label);
 			}
 		}
 	}
