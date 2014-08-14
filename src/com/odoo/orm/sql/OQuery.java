@@ -10,7 +10,6 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
-import com.odoo.util.logger.OLog;
 
 /**
  * The Class OQuery. SQL Statement generator
@@ -130,7 +129,6 @@ public class OQuery {
 			if (rel_model.getTableName().equals(model.getTableName()))
 				table_alias += "_" + parts[1];
 		}
-		OLog.log(table_name + " : " + table_alias);
 		relationColumns.put(column,
 				new RelationColumnAlias(table_name, table_alias, parts[1],
 						parts[0], rel_model, col.getRelationType()));
@@ -238,10 +236,16 @@ public class OQuery {
 		String base_alias = createAlias(model);
 		if (columns.size() == 0) {
 			if (isJoin()) {
-				cols.append(base_alias);
-				cols.append(".");
+				for (OColumn c : model.getColumns()) {
+					cols.append(base_alias);
+					cols.append(".");
+					cols.append(c.getName());
+					cols.append(", ");
+				}
+				cols.deleteCharAt(cols.lastIndexOf(", "));
+			} else {
+				cols.append("*");
 			}
-			cols.append("*");
 		} else {
 			for (String column : columns) {
 				if (isJoin()) {
@@ -254,7 +258,7 @@ public class OQuery {
 							column_name = col.getRelationColumnName();
 						}
 						rel_alias = col.getTable_alias();
-						if (model.getTableName().equals(col.getTable())) {
+						if (base_alias.equals(col.getTable_alias())) {
 							rel_alias += "_" + col.getColumnName();
 						}
 						cols.append(rel_alias);
@@ -263,11 +267,23 @@ public class OQuery {
 						cols.append(" AS ");
 						cols.append(column.replaceAll("\\.", "_"));
 					} else {
-						cols.append(base_alias);
-						cols.append(".");
-						cols.append(column);
-						cols.append(" AS ");
-						cols.append(column);
+						if (column.equals("*")) {
+							for (OColumn c : model.getColumns()) {
+								if (c.getRelationType() == null) {
+									cols.append(base_alias);
+									cols.append(".");
+									cols.append(c.getName());
+									cols.append(", ");
+								}
+							}
+							cols.deleteCharAt(cols.lastIndexOf(", "));
+						} else {
+							cols.append(base_alias);
+							cols.append(".");
+							cols.append(column);
+							cols.append(" AS ");
+							cols.append(column);
+						}
 					}
 					cols.append(", ");
 				} else {
@@ -490,6 +506,15 @@ public class OQuery {
 		orderBy = column;
 		this.order = order;
 		return this;
+	}
+
+	/**
+	 * Gets the next offset.
+	 * 
+	 * @return the next offset
+	 */
+	public Integer getNextOffset() {
+		return mOffset + mLimit;
 	}
 
 	/**

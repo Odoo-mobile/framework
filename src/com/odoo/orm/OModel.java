@@ -800,7 +800,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		if (cr.moveToFirst()) {
 			do {
 				int rel_id = cr.getInt(cr.getColumnIndex(rel_col));
-				ids.add(rel_id);
+				if (rel.count(OColumn.ROW_ID + " = ?", new Object[] { rel_id }) > 0)
+					ids.add(rel_id);
 			} while (cr.moveToNext());
 		}
 		cr.close();
@@ -1297,6 +1298,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	public void deleteManyToManyRecord(String column, Integer base_id,
 			Integer relation_record_id) {
 		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(relation_record_id);
 		deleteManyToManyRecords(column, base_id, ids);
 	}
 

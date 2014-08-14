@@ -30,75 +30,39 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SyncAdapterType;
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.auth.OdooAccountManager;
-import com.odoo.base.about.AboutFragment;
 import com.odoo.base.account.AccountsDetail;
 import com.odoo.base.account.UserProfile;
 import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
 import com.odoo.support.OUser;
-import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.FragmentListener;
-import com.odoo.util.Base64Helper;
-import com.odoo.util.OAppRater;
 import com.odoo.util.PreferenceManager;
-import com.odoo.util.drawer.DrawerAdatper;
-import com.odoo.util.drawer.DrawerHelper;
 import com.odoo.util.drawer.DrawerItem;
-import com.odoo.util.drawer.DrawerListener;
-import com.openerp.OETouchListener;
 
 /**
  * The Class MainActivity.
  */
-public class MainActivity extends FragmentActivity implements
-		DrawerItem.DrawerItemClickListener, FragmentListener, DrawerListener {
+public class MainActivity extends BaseActivity implements FragmentListener {
 
 	private static final String TAG = "com.odoo.MainActivity";
 	private static final int RESULT_SETTINGS = 1;
 	private Context mContext = null;
-
-	private DrawerLayout mDrawerLayout = null;
-	private ActionBarDrawerToggle mDrawerToggle = null;
-	private List<DrawerItem> mDrawerListItems = new ArrayList<DrawerItem>();
-	private DrawerAdatper mDrawerAdatper = null;
-	private String mAppTitle = "", mDrawerTitle = "", mDrawerSubtitle = "";
-	private int mDrawerItemSelectedPosition = -1;
-	private ListView mDrawerListView = null;
 	private boolean mNewFragment = false;
-
 	private FragmentManager mFragment = null;
-
-	private enum SettingKeys {
-		GLOBAL_SETTING, PROFILE, ACCOUNTS, ABOUT_US
-	}
-
-	private CharSequence mTitle;
-	private OETouchListener mTouchAttacher;
+	private OTouchListener mTouchAttacher;
 	private boolean mTwoPane;
-
 	private OUser mAccount = null;
 
 	@Override
@@ -122,12 +86,25 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void updateAccount() {
-		AccountCreate account = new AccountCreate();
-		Bundle args = new Bundle();
-		args.putBoolean("no_config_wizard", true);
-		args.putAll(OUser.current(mContext).getAsBundle());
-		account.setArguments(args);
-		startMainFragment(account, false);
+		OUser userdata = OUser.current(mContext);
+		if (userdata != null) {
+			AccountCreate account = new AccountCreate();
+			Bundle args = new Bundle();
+			args.putBoolean("no_config_wizard", true);
+			args.putAll(userdata.getAsBundle());
+			account.setArguments(args);
+			startMainFragment(account, false);
+		} else {
+			List<OUser> accounts = OdooAccountManager.fetchAllAccounts(this);
+			if (accounts.size() <= 0) {
+				getActionBar().setDisplayHomeAsUpEnabled(false);
+				getActionBar().setHomeButtonEnabled(false);
+				initDrawerControls();
+				lockDrawer(true);
+				LoginSignup loginSignUp = new LoginSignup();
+				startMainFragment(loginSignUp, false);
+			}
+		}
 	}
 
 	public void onTaskDone(Bundle savedInstanceState) {
@@ -138,37 +115,36 @@ public class MainActivity extends FragmentActivity implements
 					View.GONE);
 			mTwoPane = true;
 		}
-		if (savedInstanceState != null) {
-			mDrawerItemSelectedPosition = savedInstanceState
-					.getInt("current_drawer_item");
-			if (OdooAccountManager.isAnyUser(mContext)) {
-				setDrawerItems();
-				initDrawerListeners();
-			}
-			return;
-		}
 		init();
 	}
 
-	private void checkForRateApplication() {
-		OAppRater.app_launched(this);
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		if (OUser.current(mContext) != null && savedInstanceState != null
+				&& !isNewAccountRequest()) {
+			setDrawerItemPosition(savedInstanceState
+					.getInt("current_drawer_item"));
+			if (OdooAccountManager.isAnyUser(mContext)) {
+				setDrawerItemPosition((getDrawerItemPosition() < 0) ? 0
+						: getDrawerItemPosition());
+				onNavDrawerItemClicked(getDrawerItem(getDrawerItemPosition()));
+			}
+			return;
+		}
 	}
 
 	private void init() {
 		Log.d(TAG, "MainActivity->init()");
-		initDrawerControls();
-		boolean reqForNewAccount = getIntent().getBooleanExtra(
-				"create_new_account", false);
 		/**
 		 * checks for available account related to Odoo
 		 */
-		if (!OdooAccountManager.hasAccounts(this) || reqForNewAccount) {
+		if (!OdooAccountManager.hasAccounts(this) || isNewAccountRequest()) {
 			getActionBar().setDisplayHomeAsUpEnabled(false);
 			getActionBar().setHomeButtonEnabled(false);
 			lockDrawer(true);
 			LoginSignup loginSignUp = new LoginSignup();
 			startMainFragment(loginSignUp, false);
-
 		} else {
 			lockDrawer(false);
 			/**
@@ -178,154 +154,12 @@ public class MainActivity extends FragmentActivity implements
 			if (!OdooAccountManager.isAnyUser(mContext)) {
 				accountSelectionDialog(
 						OdooAccountManager.fetchAllAccounts(mContext)).show();
-			} else {
-				initDrawer();
 			}
 		}
-		checkForRateApplication();
 	}
 
 	private void initTouchListener() {
-		OETouchListener.DEFAULT_HEADER_LAYOUT = R.layout.base_default_header;
-		OETouchListener.DEFAULT_ANIM_HEADER_IN = R.anim.fade_in;
-		OETouchListener.DEFAULT_ANIM_HEADER_OUT = R.anim.fade_out;
-		OETouchListener.ptr_progress = R.id.ptr_progress;
-		OETouchListener.ptr_text = R.id.ptr_text;
-		OETouchListener.refresh_pull_label = R.string.pull_to_refresh_pull_label;
-		OETouchListener.refreshing_label = R.string.pull_to_refresh_refreshing_label;
-		OETouchListener.release_label = R.string.pull_to_refresh_release_label;
-		OETouchListener.contentView = R.id.ptr_content;
-		OETouchListener.opaqueBackground = R.id.ptr_text_opaque_bg;
-		mTouchAttacher = new OETouchListener(this);
-	}
-
-	private void initDrawerControls() {
-		Log.d(TAG, "MainActivity->initDrawerControls()");
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
-
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_navigation_drawer, R.string.drawer_open,
-				R.string.app_name) {
-
-			@Override
-			public void onDrawerClosed(View drawerView) {
-				super.onDrawerClosed(drawerView);
-				getActionBar().setIcon(R.drawable.ic_odoo_o);
-				setTitle(mAppTitle, null);
-			}
-
-			@Override
-			public void onDrawerOpened(View drawerView) {
-				super.onDrawerOpened(drawerView);
-				setTitle(R.string.app_name);
-			}
-		};
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
-	}
-
-	private void setDrawerHeader() {
-		OUser user = OUser.current(mContext);
-		mDrawerTitle = user.getName();
-		mDrawerSubtitle = (user.isOAauthLogin()) ? user.getInstanceUrl() : user
-				.getHost();
-		View v = getLayoutInflater().inflate(R.layout.base_drawer_header,
-				mDrawerListView, false);
-		TextView mUserName, mUserURL;
-		ImageView imgUserPic = (ImageView) v
-				.findViewById(R.id.imgUserProfilePic);
-		mUserName = (TextView) v.findViewById(R.id.txvUserProfileName);
-		mUserURL = (TextView) v.findViewById(R.id.txvUserServerURL);
-		mUserName.setText(mDrawerTitle);
-		mUserURL.setText(mDrawerSubtitle);
-		if (OUser.current(mContext) != null
-				&& !OUser.current(mContext).getAvatar().equals("false")) {
-			Bitmap profPic = Base64Helper.getRoundedCornerBitmap(this,
-					Base64Helper.getBitmapImage(this, OUser.current(mContext)
-							.getAvatar()), true);
-			if (profPic != null)
-				imgUserPic.setImageBitmap(profPic);
-		}
-		v.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				onSettingItemSelected(SettingKeys.PROFILE);
-				mDrawerLayout.closeDrawers();
-			}
-		});
-		v.findViewById(R.id.imgBtnSetting).setOnClickListener(
-				new View.OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						onSettingItemSelected(SettingKeys.GLOBAL_SETTING);
-						mDrawerLayout.closeDrawers();
-					}
-				});
-		mDrawerListView.addHeaderView(v, null, false);
-	}
-
-	private void setDrawerItems() {
-		Log.d(TAG, "MainActivity->setDrawerItems()");
-		if (OUser.current(mContext) != null)
-			setDrawerHeader();
-		getActionBar().setHomeButtonEnabled(true);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		mDrawerListItems.addAll(DrawerHelper.drawerItems(mContext));
-		mDrawerListItems.addAll(setSettingMenu());
-		mDrawerAdatper = new DrawerAdatper(this, R.layout.base_drawer_item_layout,
-				R.layout.base_drawer_item_group_layout, mDrawerListItems);
-		mDrawerListView.setAdapter(mDrawerAdatper);
-		mDrawerAdatper.notifyDataSetChanged();
-		if (mDrawerItemSelectedPosition >= 0) {
-			mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
-		}
-	}
-
-	private int initDrawerListeners() {
-		mDrawerListView.setOnItemClickListener(this);
-		int position = 1;
-		if (mDrawerListItems.size() > 0) {
-			if (!mDrawerListItems.get(1).isGroupTitle()) {
-				mDrawerListView.setItemChecked(1 + 1, true);
-				position = 1;
-			} else {
-				mDrawerListView.setItemChecked(2 + 1, true);
-				position = 2;
-			}
-		}
-		if (mDrawerItemSelectedPosition >= 0) {
-			position = mDrawerItemSelectedPosition;
-		}
-		mAppTitle = mDrawerListItems.get(position).getTitle();
-		setTitle(mAppTitle);
-		return position;
-	}
-
-	private void initDrawer() {
-		Log.d(TAG, "MainActivity->initDrawer()");
-		setDrawerItems();
-		int position = initDrawerListeners();
-
-		/**
-		 * TODO: handle intent request from outside
-		 */
-		if (getIntent().getAction() != null
-				&& !getIntent().getAction().toString()
-						.equalsIgnoreCase("android.intent.action.MAIN")) {
-
-			/**
-			 * TODO: handle widget fragment requests.
-			 */
-
-		} else {
-			if (position > 0) {
-				if (position != mDrawerItemSelectedPosition) {
-					loadFragment(mDrawerListItems.get(position));
-				}
-			}
-		}
+		mTouchAttacher = new OTouchListener(this);
 	}
 
 	private String[] accountList(List<OUser> accounts) {
@@ -370,6 +204,7 @@ public class MainActivity extends FragmentActivity implements
 								if (mAccount != null) {
 									OdooAccountManager.loginUser(mContext,
 											mAccount.getAndroidName());
+									onPostCreate(null);
 								} else {
 									Toast.makeText(mContext,
 											"Please select account",
@@ -389,60 +224,11 @@ public class MainActivity extends FragmentActivity implements
 		return builder.create();
 	}
 
-	@Override
-	public void refreshDrawer(String tag_key) {
-		Log.d(TAG, "MainActivity->DrawerListener->refreshDrawer()");
-		int start_index = -1;
-		List<DrawerItem> updated_menus = new ArrayList<DrawerItem>();
-		for (int i = 0; i < mDrawerListItems.size(); i++) {
-			DrawerItem item = mDrawerListItems.get(i);
-			if (item.getKey().equals(tag_key) && !item.isGroupTitle()) {
-				if (start_index < 0) {
-					start_index = i - 1;
-					BaseFragment instance = (BaseFragment) item
-							.getFragmentInstace();
-					updated_menus.addAll(instance.drawerMenus(mContext));
-					break;
-				}
-			}
-		}
-		for (DrawerItem item : updated_menus) {
-			mDrawerAdatper.updateDrawerItem(start_index, item);
-			start_index++;
-		}
-	}
-
-	@Override
-	public void setTitle(CharSequence title) {
-		mTitle = title;
-		getActionBar().setTitle(mTitle);
-	}
-
-	public void setTitle(CharSequence title, CharSequence subtitle) {
-		mTitle = title;
-		this.setTitle(mTitle);
-		getActionBar().setSubtitle(subtitle);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	private boolean onSettingItemSelected(SettingKeys key) {
+	public boolean onSettingItemSelected(SettingKeys key) {
 		switch (key) {
 		case GLOBAL_SETTING:
-			Intent i = new Intent(this, AppSettingsActivity.class);
+			Intent i = new Intent(this, BaseSettings.class);
 			startActivityForResult(i, RESULT_SETTINGS);
-			return true;
-		case ABOUT_US:
-			getActionBar().setDisplayHomeAsUpEnabled(false);
-			getActionBar().setHomeButtonEnabled(false);
-			AboutFragment about = new AboutFragment();
-			startMainFragment(about, true);
 			return true;
 		case ACCOUNTS:
 			AccountsDetail acFragment = new AccountsDetail();
@@ -508,31 +294,7 @@ public class MainActivity extends FragmentActivity implements
 		return super.onPrepareOptionsMenu(menu);
 	}
 
-	/**
-	 * When using the ActionBarDrawerToggle, you must call it during
-	 * onPostCreate() and onConfigurationChanged()...
-	 */
-
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		// Sync the toggle state after onRestoreInstanceState has occurred.
-		if (mDrawerToggle != null) {
-			mDrawerToggle.syncState();
-		}
-	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-		// Pass any configuration change to the drawer toggls
-		if (mDrawerToggle != null) {
-			mDrawerToggle.onConfigurationChanged(newConfig);
-		}
-	}
-
-	// PullToRefresh
-	public OETouchListener getTouchAttacher() {
+	public OTouchListener getTouchAttacher() {
 		return mTouchAttacher;
 	}
 
@@ -625,24 +387,20 @@ public class MainActivity extends FragmentActivity implements
 		ContentResolver.cancelSync(account, authority);
 	}
 
+	/*
+	 * @Override public void onItemClick(AdapterView<?> adapter, View view, int
+	 * position, long id) { int item_position = position - 1; DrawerItem item =
+	 * mDrawerListItems.get(item_position); if (!item.isGroupTitle()) { if
+	 * (!item.getKey().equals("com.odoo.settings")) {
+	 * mDrawerItemSelectedPosition = item_position + 1; } mAppTitle =
+	 * item.getTitle(); loadFragment(item); mDrawerLayout.closeDrawers(); }
+	 * mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
+	 * 
+	 * }
+	 */
+
 	@Override
-	public void onItemClick(AdapterView<?> adapter, View view, int position,
-			long id) {
-		int item_position = position - 1;
-		DrawerItem item = mDrawerListItems.get(item_position);
-		if (!item.isGroupTitle()) {
-			if (!item.getKey().equals("com.odoo.settings")) {
-				mDrawerItemSelectedPosition = item_position + 1;
-			}
-			mAppTitle = item.getTitle();
-			loadFragment(item);
-			mDrawerLayout.closeDrawers();
-		}
-		mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
-
-	}
-
-	private void loadFragment(DrawerItem item) {
+	public void loadFragment(DrawerItem item) {
 
 		Fragment fragment = (Fragment) item.getFragmentInstace();
 		if (item.getTagColor() != null
@@ -671,44 +429,15 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	private List<DrawerItem> setSettingMenu() {
-		List<DrawerItem> sys = new ArrayList<DrawerItem>();
-		String key = "com.odoo.settings";
-		Resources r = getResources();
-		sys.add(new DrawerItem(key, r.getString(R.string.title_settings), true));
-		sys.add(new DrawerItem(key, r.getString(R.string.title_profile), 0,
-				R.drawable.ic_action_user, getFragBundle(new Fragment(),
-						"settings", SettingKeys.PROFILE)));
-
-		sys.add(new DrawerItem(key, r.getString(R.string.title_accounts), 0,
-				R.drawable.ic_action_accounts, getFragBundle(new Fragment(),
-						"settings", SettingKeys.ACCOUNTS)));
-		sys.add(new DrawerItem(key, r.getString(R.string.title_about_us), 0,
-				R.drawable.ic_action_about, getFragBundle(new Fragment(),
-						"settings", SettingKeys.ABOUT_US)));
-		return sys;
-	}
-
-	private Fragment getFragBundle(Fragment fragment, String key,
-			SettingKeys val) {
-		Bundle bundle = new Bundle();
-		bundle.putString(key, val.toString());
-		fragment.setArguments(bundle);
-		return fragment;
-	}
-
-	public void lockDrawer(boolean flag) {
-		if (!flag) {
-			mDrawerLayout.setDrawerLockMode(DrawerLayout.STATE_IDLE);
-		} else {
-			mDrawerLayout
-					.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-		}
+	public DrawerItem getNavItem() {
+		if (getCurrentPosition() != -1)
+			return getDrawerItem(getCurrentPosition());
+		return null;
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putInt("current_drawer_item", mDrawerItemSelectedPosition);
+		outState.putInt("current_drawer_item", getDrawerItemPosition());
 		super.onSaveInstanceState(outState);
 	}
 
@@ -778,5 +507,29 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public boolean isTwoPane() {
 		return mTwoPane;
+	}
+
+	@Override
+	protected void intentRequests() {
+		int position = getCurrentPosition();
+		/**
+		 * TODO: handle intent request from outside
+		 */
+		if (getIntent().getAction() != null
+				&& !getIntent().getAction().toString()
+						.equalsIgnoreCase("android.intent.action.MAIN")) {
+
+			/**
+			 * TODO: handle widget fragment requests.
+			 */
+
+		} else {
+			if (position > 0) {
+				if (position != getDrawerItemPosition()) {
+					loadFragment(getDrawerItem(position));
+				}
+			}
+		}
+
 	}
 }

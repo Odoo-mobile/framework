@@ -32,6 +32,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:logo="@drawable/ic_odoo_o"
         android:theme="@style/AppTheme" >
 
         <!-- Android Account Authentication Service -->
@@ -56,9 +57,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.odoo.AppSettingsActivity" >
+        <activity android:name="com.odoo.BaseSettings" >
             <intent-filter>
-                <action android:name="com.odoo.ACTION_ACCOUNT_CONFIG" />
+                <action android:name="com.odoo.ACTION_ACCOUNT_BASE_CONFIG" />
+
+                <category android:name="android.intent.category.PREFERENCE" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.odoo.GeneralSettings" >
+            <intent-filter>
+                <action android:name="com.odoo.ACTION_ACCOUNT_GENERAL_CONFIG" />
+
+                <category android:name="android.intent.category.PREFERENCE" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.odoo.base.about.About" >
+            <intent-filter>
+                <action android:name="com.odoo.ACTION_ABOUT" />
             </intent-filter>
         </activity>
 

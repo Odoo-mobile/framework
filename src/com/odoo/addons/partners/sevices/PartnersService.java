@@ -12,33 +12,35 @@ import android.util.Log;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
+import com.odoo.support.OUser;
 import com.odoo.support.service.OService;
 
 public class PartnersService extends OService {
-	
+
 	public static final String TAG = PartnersService.class.getSimpleName();
-	
+
 	@Override
 	public Service getService() {
 		return this;
 	}
 
 	@Override
-	public void performSync(Context context, Account account, Bundle extras,
-			String authority, ContentProviderClient provider,
+	public void performSync(Context context, OUser user, Account account,
+			Bundle extras, String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
-		Log.v(TAG, "PartnersService:performSync()");	
-		try{
+		Log.v(TAG, "PartnersService:performSync()");
+		try {
 			OSyncHelper sync = null;
-			Intent intent= new Intent();
+			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-			ResPartner resPartner= new ResPartner(context);
-			sync= resPartner.getSyncHelper().syncDataLimit(30);
-			if(sync.syncWithServer()){
+			ResPartner resPartner = new ResPartner(context);
+			resPartner.setUser(user);
+			sync = resPartner.getSyncHelper().syncDataLimit(30);
+			if (sync.syncWithServer()) {
 				context.sendBroadcast(intent);
 			}
-			
-		}catch(Exception e){
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

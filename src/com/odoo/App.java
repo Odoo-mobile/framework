@@ -34,11 +34,29 @@ public class App extends Application {
 
 	private static final String TAG = App.class.getSimpleName();
 	private static Odoo mOdooInstance = null;
+	private static OUser mUser = null;
+	private static OUser mSyncUser = null;
 
 	@Override
 	public void onCreate() {
 		Log.d(TAG, "App->onCreate()");
 		super.onCreate();
+	}
+
+	public void setSyncUser(OUser user) {
+		mSyncUser = user;
+	}
+
+	public OUser getSyncUser() {
+		return mSyncUser;
+	}
+
+	public void setUser(OUser user) {
+		mUser = user;
+	}
+
+	public OUser getUser() {
+		return mUser;
 	}
 
 	public OdooVersion getOdooVersion() {

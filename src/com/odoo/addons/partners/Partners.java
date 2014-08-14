@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,22 +20,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
+import android.widgets.SwipeRefreshLayout;
+import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.ODataRow;
-import com.odoo.orm.OModel;
+import com.odoo.orm.sql.OQuery;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
-import com.openerp.OETouchListener;
-import com.openerp.OETouchListener.OnPullListener;
 
 public class Partners extends BaseFragment implements OnRowClickListener,
-		OnPullListener, OnListBottomReachedListener {
+		OnListBottomReachedListener, OnRefreshListener {
 
 	public static final String TAG = Partners.class.getSimpleName();
 	public static final String KEY = "partner_type";
@@ -42,10 +43,11 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	private View mView = null;
 	private List<ODataRow> mListRecords = new ArrayList<ODataRow>();
 	private OList mListcontrol = null;
-	private OETouchListener mTouchListener = null;
 	private DataLoader mDataLoader = null;
 	private Integer mLimit = 10;
+	private Integer mOffset = 0;
 	private Integer mLastPosition = -1;
+	private SwipeRefreshLayout mSwipeRefresh = null;
 
 	public enum Type {
 		Customers, Suppliers, Companies
@@ -72,15 +74,20 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	private void init() {
+		mSwipeRefresh = (SwipeRefreshLayout) mView
+				.findViewById(R.id.swipe_container);
+		mSwipeRefresh.setOnRefreshListener(this);
+		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
 		OControls.setVisible(mView, R.id.loadingProgress);
 		mListcontrol = (OList) mView.findViewById(R.id.listRecords);
 		mListcontrol.setOnRowClickListener(this);
 		mListcontrol.setOnListBottomReachedListener(this);
-		mTouchListener = scope.main().getTouchAttacher();
-		mTouchListener.setPullableView(mListcontrol, this);
 		mListcontrol.setRecordOffset(mListRecords.size());
 		if (mLastPosition == -1) {
-			mDataLoader = new DataLoader(0);
+			mDataLoader = new DataLoader(mOffset);
 			mDataLoader.execute();
 		} else {
 			showData();
@@ -122,10 +129,10 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
-		Integer mOffset = 0;
+		Integer offset = 0;
 
 		public DataLoader(Integer offset) {
-			mOffset = offset;
+			this.offset = offset;
 		}
 
 		@Override
@@ -140,17 +147,40 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 				@Override
 				public void run() {
 					if (db().isEmptyTable()) {
+						mSwipeRefresh.setRefreshing(true);
 						scope.main().requestSync(PartnersProvider.AUTHORITY);
 					}
-					OModel model = db();
-					model.setOffset(mOffset);
-					Object[] args = new Object[] { true };
-					mListRecords.addAll(model
-							.setLimit(mLimit)
-							.setOffset(mOffset)
-							.select(getWhere(mCurrentType), args, null, null,
-									"local_id DESC"));
-					mListcontrol.setRecordOffset(model.getNextOffset());
+					if (offset == 0)
+						mListRecords.clear();
+
+					// Using Join
+					OQuery query = db().browse();
+					if (mCurrentType != Type.Companies) {
+						query.columns("*", "country_id.name", "parent_id.name");
+					} else {
+						query.columns("*", "country_id.name");
+					}
+					query.addWhere(getWhere(mCurrentType), "=", true);
+					query.setOffset(offset);
+					query.setLimit(mLimit);
+					query.setOrder("local_id", "DESC");
+					mListRecords.addAll(query.fetch());
+					mOffset = query.getNextOffset();
+					mListcontrol.setRecordOffset(mOffset);
+
+					// Using Simple Query
+
+					// OModel model = db();
+					// model.setOffset(offset);
+					// Object[] args = new Object[] { true };
+					// mListRecords.addAll(model
+					// .setLimit(mLimit)
+					// .setOffset(offset)
+					// .select(getWhere(mCurrentType) + " = ?", args,
+					// null, null, "local_id DESC"));
+					// mOffset = model.getNextOffset();
+					// mListcontrol.setRecordOffset(mOffset);
+
 				}
 			});
 			return null;
@@ -167,13 +197,13 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		String where = null;
 		switch (type) {
 		case Companies:
-			where = "is_company = ?";
+			where = "is_company";
 			break;
 		case Customers:
-			where = "customer = ?";
+			where = "customer";
 			break;
 		case Suppliers:
-			where = "supplier = ?";
+			where = "supplier";
 			break;
 		}
 		return where;
@@ -181,7 +211,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	private int count(Context context, Type type) {
-		String where = getWhere(type);
+		String where = getWhere(type) + " = ?";
 		Object[] args = new Object[] { true };
 		return new ResPartner(context).count(where, args);
 	}
@@ -189,13 +219,15 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(TAG, "Partners", true));
 		menu.add(new DrawerItem(TAG, "Companies",
-				count(context, Type.Companies), 0, object(Type.Companies)));
+				count(context, Type.Companies), R.drawable.ic_action_company,
+				object(Type.Companies)));
 		menu.add(new DrawerItem(TAG, "Customers",
-				count(context, Type.Customers), 0, object(Type.Customers)));
+				count(context, Type.Customers), R.drawable.ic_action_user,
+				object(Type.Customers)));
 		menu.add(new DrawerItem(TAG, "Suppliers",
-				count(context, Type.Suppliers), 0, object(Type.Suppliers)));
+				count(context, Type.Suppliers), R.drawable.ic_action_suppliers,
+				object(Type.Suppliers)));
 		return menu;
 	}
 
@@ -205,18 +237,6 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		args.putString(KEY, type.toString());
 		partners.setArguments(args);
 		return partners;
-	}
-
-	@Override
-	public void onPullStarted(View arg0) {
-		if (app().inNetwork())
-			scope.main().requestSync(PartnersProvider.AUTHORITY);
-		else {
-			mTouchListener.setPullComplete();
-			Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_LONG)
-					.show();
-		}
-
 	}
 
 	@Override
@@ -246,10 +266,11 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
 			scope.main().refreshDrawer(TAG);
-			mTouchListener.setPullComplete();
+			hideRefreshingProgress();
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
+			mOffset = 0;
 			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
 		}
@@ -267,5 +288,25 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	@Override
 	public Boolean showLoader() {
 		return true;
+	}
+
+	@Override
+	public void onRefresh() {
+		if (app().inNetwork()) {
+			scope.main().requestSync(PartnersProvider.AUTHORITY);
+		} else {
+			hideRefreshingProgress();
+			Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_LONG)
+					.show();
+		}
+	}
+
+	private void hideRefreshingProgress() {
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				mSwipeRefresh.setRefreshing(false);
+			}
+		}, 1000);
 	}
 }

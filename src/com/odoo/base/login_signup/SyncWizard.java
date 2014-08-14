@@ -63,14 +63,12 @@ public class SyncWizard extends BaseFragment {
 		setHasOptionsMenu(true);
 		context = (MainActivity) getActivity();
 		scope = new AppScope(this);
-		rootView = inflater.inflate(R.layout.base_login_signup_sync_wizard, container,
-				false);
+		rootView = inflater.inflate(R.layout.base_login_signup_sync_wizard,
+				container, false);
 		getActivity().setTitle(R.string.title_configuration);
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		getActivity().getActionBar().setHomeButtonEnabled(false);
-
 		generateLayout();
-
 		return rootView;
 	}
 
@@ -149,13 +147,6 @@ public class SyncWizard extends BaseFragment {
 		inflater.inflate(R.menu.menu_fragment_sync_wizard, menu);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem
-	 * )
-	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// handle item selection
