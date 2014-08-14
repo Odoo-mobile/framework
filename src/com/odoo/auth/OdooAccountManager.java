@@ -39,7 +39,6 @@ public class OdooAccountManager {
 
 	/** The Constant PARAM_AUTHTOKEN_TYPE. */
 	private static final String PARAM_AUTHTOKEN_TYPE = "com.odoo.auth";
-	public static OUser current_user = null;
 
 	/**
 	 * Fetch all accounts.
@@ -49,7 +48,7 @@ public class OdooAccountManager {
 	 * @return the list
 	 */
 	public static List<OUser> fetchAllAccounts(Context context) {
-		List<OUser> userObjs = null;
+		List<OUser> userObjs = new ArrayList<OUser>();
 		AccountManager accMgr = AccountManager.get(context);
 		Account[] accounts = accMgr.getAccountsByType(PARAM_AUTHTOKEN_TYPE);
 		if (accounts.length > 0) {
@@ -109,18 +108,13 @@ public class OdooAccountManager {
 	 */
 	public static boolean isAnyUser(Context context) {
 		boolean flag = false;
-		if (current_user != null) {
-			flag = true;
-		} else {
-			List<OUser> accounts = OdooAccountManager
-					.fetchAllAccounts(context);
-			if (accounts != null) {
-				for (OUser user : accounts) {
-					if (user.isIsactive()) {
-						flag = true;
-						current_user = user;
-						break;
-					}
+
+		List<OUser> accounts = OdooAccountManager.fetchAllAccounts(context);
+		if (accounts != null) {
+			for (OUser user : accounts) {
+				if (user.isIsactive()) {
+					flag = true;
+					break;
 				}
 			}
 		}
@@ -135,17 +129,15 @@ public class OdooAccountManager {
 	 * @return the user object
 	 */
 	public static OUser currentUser(Context context) {
-		if (current_user != null) {
-			return current_user;
-		} else {
-			if (OdooAccountManager.isAnyUser(context)) {
-				List<OUser> accounts = OdooAccountManager
-						.fetchAllAccounts(context);
-				for (OUser user : accounts) {
-
-					if (user.isIsactive()) {
-						return user;
-					}
+		App app = (App) context.getApplicationContext();
+		if (app.getUser() != null) {
+			return app.getUser();
+		}
+		if (OdooAccountManager.isAnyUser(context)) {
+			List<OUser> accounts = OdooAccountManager.fetchAllAccounts(context);
+			for (OUser user : accounts) {
+				if (user.isIsactive()) {
+					return user;
 				}
 			}
 		}
@@ -215,14 +207,14 @@ public class OdooAccountManager {
 		OUser user = OdooAccountManager.getAccountDetail(context, username);
 		Account account = OdooAccountManager.getAccount(context,
 				user.getAndroidName());
-
+		App app = (App) context.getApplicationContext();
 		if (user != null) {
 			if (cancelAllSync(account)) {
 				AccountManager accMgr = AccountManager.get(context);
 				user.setIsactive(false);
 				accMgr.setUserData(account, "isactive", "0");
 				flag = true;
-				current_user = null;
+				app.setUser(null);
 			}
 		}
 		return flag;
@@ -262,7 +254,8 @@ public class OdooAccountManager {
 					OdooAccountManager.getAccount(context,
 							userData.getAndroidName()), "isactive", "true");
 		}
-		current_user = userData;
+		App app = (App) context.getApplicationContext();
+		app.setUser(userData);
 		return userData;
 	}
 
@@ -280,11 +273,10 @@ public class OdooAccountManager {
 				null, null);
 		App app = (App) context.getApplicationContext();
 		app.setOdooInstance(null);
-		current_user = null;
+		app.setUser(null);
 	}
 
-	public static boolean updateAccountDetails(Context context,
-			OUser userObject) {
+	public static boolean updateAccountDetails(Context context, OUser userObject) {
 
 		boolean flag = false;
 		OUser user = OdooAccountManager.getAccountDetail(context,

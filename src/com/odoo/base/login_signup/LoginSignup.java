@@ -52,11 +52,11 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		getActivity().getActionBar().hide();
+		showActionBar(false);
 		scope = new AppScope(this);
 		scope.main().lockDrawer(true);
-		mView = inflater
-				.inflate(R.layout.base_login_signup_layout, container, false);
+		mView = inflater.inflate(R.layout.base_login_signup_layout, container,
+				false);
 		init();
 		return mView;
 	}
@@ -417,5 +417,11 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 				});
 		builder.setNegativeButton(R.string.label_cancel, null);
 		builder.show();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		getActivity().getActionBar().hide();
 	}
 }

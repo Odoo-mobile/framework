@@ -18,6 +18,9 @@
  */
 package com.odoo.support.service;
 
+import com.odoo.auth.OdooAccountManager;
+import com.odoo.support.OUser;
+
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
@@ -58,7 +61,9 @@ public abstract class OService extends Service implements OServiceListener {
 				String authority, ContentProviderClient provider,
 				SyncResult syncResult) {
 			mService = (OServiceListener) mServiceContext;
-			mService.performSync(mContext, account, extras, authority,
+			OUser user = OdooAccountManager.getAccountDetail(mContext,
+					account.name);
+			mService.performSync(mContext, user, account, extras, authority,
 					provider, syncResult);
 		}
 	}

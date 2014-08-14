@@ -29,6 +29,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,8 +57,8 @@ public class AccountsDetail extends BaseFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		rootView = inflater.inflate(R.layout.base_account_list,
-				container, false);
+		rootView = inflater.inflate(R.layout.base_account_list, container,
+				false);
 		scope = new AppScope(this);
 		scope.main().setTitle(R.string.title_accounts);
 		setupGrid();
@@ -154,9 +155,15 @@ public class AccountsDetail extends BaseFragment implements
 								// the dialog
 								OdooAccountManager.removeAccount(
 										scope.context(), accountName);
-								scope.main().finish();
-								scope.main().startActivity(
-										scope.main().getIntent());
+								new Handler().postDelayed(new Runnable() {
+
+									@Override
+									public void run() {
+										scope.main().finish();
+										scope.main().startActivity(
+												scope.main().getIntent());
+									}
+								}, 1000);
 							}
 						}).setNegativeButton(R.string.label_cancel, null);
 
@@ -204,5 +211,13 @@ public class AccountsDetail extends BaseFragment implements
 			break;
 		}
 
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		getActivity().setTitle("Accounts");
+		getActivity().getActionBar().show();
+		scope.main().lockDrawer(false);
 	}
 }

@@ -739,6 +739,7 @@ public class OSyncHelper {
 						}
 						break;
 					case ManyToMany:
+						r_ids.clear();
 						OModel m2m = model.createInstance(column.getType());
 						rel_key = m2m.getTableName() + "_" + column.getName();
 						JSONArray ids_list = record.getJSONArray(column

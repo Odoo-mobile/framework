@@ -25,10 +25,12 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 
+import com.odoo.support.OUser;
+
 public interface OServiceListener {
 	public Service getService();
 
-	public void performSync(Context context, Account account, Bundle extras,
-			String authority, ContentProviderClient provider,
+	public void performSync(Context context, OUser user, Account account,
+			Bundle extras, String authority, ContentProviderClient provider,
 			SyncResult syncResult);
 }
