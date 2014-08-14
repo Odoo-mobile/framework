@@ -27,7 +27,7 @@ import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.ODataRow;
-import com.odoo.orm.OModel;
+import com.odoo.orm.sql.OQuery;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
@@ -148,15 +148,19 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 					if (db().isEmptyTable()) {
 						scope.main().requestSync(PartnersProvider.AUTHORITY);
 					}
-					OModel model = db();
-					model.setOffset(mOffset);
-					Object[] args = new Object[] { true };
-					mListRecords.addAll(model
-							.setLimit(mLimit)
-							.setOffset(mOffset)
-							.select(getWhere(mCurrentType), args, null, null,
-									"local_id DESC"));
-					mListcontrol.setRecordOffset(model.getNextOffset());
+					// Using Join
+					OQuery query = db().browse().columns("name", "image_small",
+							"email", "city", "country_id.name",
+							"parent_id.name");
+					query.setOffset(mOffset);
+					query.setLimit(mLimit);
+					query.setOrder("local_id", "DESC");
+					query.addWhere("parent_id", "=", "5");
+					query.addWhere("country_id", "=", "2");
+					mListRecords.addAll(query.fetch());
+
+					// Using Simple Query
+					// mListRecords.addAll(db().select());
 				}
 			});
 			return null;

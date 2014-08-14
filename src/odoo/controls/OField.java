@@ -58,6 +58,7 @@ import com.odoo.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OM2ORecord;
 import com.odoo.orm.OModel;
 import com.odoo.orm.OModel.Command;
 import com.odoo.orm.ORelIds;
@@ -350,10 +351,12 @@ public class OField extends LinearLayout implements
 		setOrientation(LinearLayout.VERTICAL);
 		setTag("field_tag_" + mAttributes.getString(KEY_FIELD_NAME, ""));
 		createLabel();
-		if (mFieldWidget == null)
+		if (mFieldWidget == null) {
 			createTextViewControl();
-		else
+		} else {
 			createWidget(mFieldWidget);
+		}
+
 	}
 
 	/**
@@ -792,13 +795,18 @@ public class OField extends LinearLayout implements
 		} else {
 			createTextViewControl();
 			if (mControlRecord != null) {
-				ODataRow row = mControlRecord.getM2ORecord(mColumn.getName())
-						.browse();
-				if (row != null)
-					setText(row.getString(ref_column));
-				else
-					setText("No " + mColumn.getLabel());
+				if (mControlRecord.get(mColumn.getName()).getClass() == OM2ORecord.class) {
+					ODataRow row = mControlRecord.getM2ORecord(
+							mColumn.getName()).browse();
+					if (row != null)
+						setText(row.getString(ref_column));
+					else
+						setText("No " + mColumn.getLabel());
+				} else {
+					setText(mControlRecord.getString(mColumn.getName()));
+				}
 			}
+
 		}
 	}
 

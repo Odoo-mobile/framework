@@ -31,15 +31,28 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <odoo.controls.OField
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                odoo:fieldTextStyle="bold"
-                odoo:field_color="@color/odoo_purple"
-                odoo:field_name="name"
-                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
-                odoo:with_label="false" >
-            </odoo.controls.OField>
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    odoo:fieldTextStyle="bold"
+                    odoo:field_color="@color/odoo_purple"
+                    odoo:field_name="name"
+                    odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                    odoo:with_label="false" >
+                </odoo.controls.OField>
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    odoo:fieldTextStyle="bold"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="0dp"
+                    odoo:field_color="@color/odoo_purple"
+                    odoo:field_name="parent_id_name"
+                    odoo:field_textAppearance="?android:attr/textAppearanceSmall"
+                    odoo:with_label="false" >
+                </odoo.controls.OField>
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
@@ -65,18 +78,20 @@
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    odoo:field_name="country_id"
+                    odoo:field_name="country_id_name"
                     odoo:with_label="false" >
                 </odoo.controls.OField>
             </LinearLayout>
         </LinearLayout>
 
+        <!--
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="category_id"
             odoo:with_label="false" >
         </odoo.controls.OField>
+        -->
     </LinearLayout>
 
 </odoo.controls.OForm>

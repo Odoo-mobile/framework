@@ -10,7 +10,6 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
-import com.odoo.util.logger.OLog;
 
 /**
  * The Class OQuery. SQL Statement generator
@@ -130,7 +129,6 @@ public class OQuery {
 			if (rel_model.getTableName().equals(model.getTableName()))
 				table_alias += "_" + parts[1];
 		}
-		OLog.log(table_name + " : " + table_alias);
 		relationColumns.put(column,
 				new RelationColumnAlias(table_name, table_alias, parts[1],
 						parts[0], rel_model, col.getRelationType()));
@@ -254,7 +252,7 @@ public class OQuery {
 							column_name = col.getRelationColumnName();
 						}
 						rel_alias = col.getTable_alias();
-						if (model.getTableName().equals(col.getTable())) {
+						if (base_alias.equals(col.getTable_alias())) {
 							rel_alias += "_" + col.getColumnName();
 						}
 						cols.append(rel_alias);
