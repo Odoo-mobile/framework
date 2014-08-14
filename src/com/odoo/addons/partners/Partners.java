@@ -153,7 +153,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 					if (offset == 0)
 						mListRecords.clear();
 
-					// // Using Join
+					// Using Join
 					OQuery query = db().browse();
 					if (mCurrentType != Type.Companies) {
 						query.columns("*", "country_id.name", "parent_id.name");
@@ -167,15 +167,19 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 					mListRecords.addAll(query.fetch());
 					mOffset = query.getNextOffset();
 					mListcontrol.setRecordOffset(mOffset);
+
 					// Using Simple Query
-					/*
-					 * OModel model = db(); model.setOffset(offset); Object[]
-					 * args = new Object[] { true }; mListRecords.addAll(model
-					 * .setLimit(mLimit) .setOffset(offset)
-					 * .select(getWhere(mCurrentType) + " = ?", args, null,
-					 * null, "local_id DESC")); mOffset = model.getNextOffset();
-					 * mListcontrol.setRecordOffset(mOffset);
-					 */
+
+					// OModel model = db();
+					// model.setOffset(offset);
+					// Object[] args = new Object[] { true };
+					// mListRecords.addAll(model
+					// .setLimit(mLimit)
+					// .setOffset(offset)
+					// .select(getWhere(mCurrentType) + " = ?", args,
+					// null, null, "local_id DESC"));
+					// mOffset = model.getNextOffset();
+					// mListcontrol.setRecordOffset(mOffset);
 
 				}
 			});

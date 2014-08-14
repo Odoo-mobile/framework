@@ -239,11 +239,18 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 						}
 					}
 					if (widget != null) {
-						if (mRecord.contains(column.getName())) {
+						if (mRecord != null
+								&& mRecord.contains(column.getName())) {
 							field.createControl(widget, column, mRecord);
 							field.setEditable(editable);
 						} else {
-							field.setVisibility(View.GONE);
+							if (mRecord != null
+									&& !mRecord.contains(column.getName()))
+								field.setVisibility(View.GONE);
+							else {
+								field.createControl(widget, column, mRecord);
+								field.setEditable(editable);
+							}
 						}
 					} else {
 						field.setEditable(editable);
