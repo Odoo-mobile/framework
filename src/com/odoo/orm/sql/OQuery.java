@@ -236,10 +236,16 @@ public class OQuery {
 		String base_alias = createAlias(model);
 		if (columns.size() == 0) {
 			if (isJoin()) {
-				cols.append(base_alias);
-				cols.append(".");
+				for (OColumn c : model.getColumns()) {
+					cols.append(base_alias);
+					cols.append(".");
+					cols.append(c.getName());
+					cols.append(", ");
+				}
+				cols.deleteCharAt(cols.lastIndexOf(", "));
+			} else {
+				cols.append("*");
 			}
-			cols.append("*");
 		} else {
 			for (String column : columns) {
 				if (isJoin()) {
@@ -261,11 +267,23 @@ public class OQuery {
 						cols.append(" AS ");
 						cols.append(column.replaceAll("\\.", "_"));
 					} else {
-						cols.append(base_alias);
-						cols.append(".");
-						cols.append(column);
-						cols.append(" AS ");
-						cols.append(column);
+						if (column.equals("*")) {
+							for (OColumn c : model.getColumns()) {
+								if (c.getRelationType() == null) {
+									cols.append(base_alias);
+									cols.append(".");
+									cols.append(c.getName());
+									cols.append(", ");
+								}
+							}
+							cols.deleteCharAt(cols.lastIndexOf(", "));
+						} else {
+							cols.append(base_alias);
+							cols.append(".");
+							cols.append(column);
+							cols.append(" AS ");
+							cols.append(column);
+						}
 					}
 					cols.append(", ");
 				} else {
@@ -488,6 +506,15 @@ public class OQuery {
 		orderBy = column;
 		this.order = order;
 		return this;
+	}
+
+	/**
+	 * Gets the next offset.
+	 * 
+	 * @return the next offset
+	 */
+	public Integer getNextOffset() {
+		return mOffset + mLimit;
 	}
 
 	/**

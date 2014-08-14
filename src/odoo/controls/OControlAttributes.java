@@ -52,8 +52,6 @@ public class OControlAttributes extends HashMap<String, Object> {
 	 *            the def value
 	 * @return the string
 	 */
-	public static int count = 0;
-
 	public String getString(String key, String defValue) {
 		if (containsKey(key) && get(key) != null)
 			return get(key).toString();

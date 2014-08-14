@@ -795,7 +795,7 @@ public class OField extends LinearLayout implements
 		} else {
 			createTextViewControl();
 			if (mControlRecord != null) {
-				if (mControlRecord.get(mColumn.getName()).getClass() == OM2ORecord.class) {
+				if (mControlRecord.get(mColumn.getName()) instanceof OM2ORecord) {
 					ODataRow row = mControlRecord.getM2ORecord(
 							mColumn.getName()).browse();
 					if (row != null)

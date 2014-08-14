@@ -239,8 +239,12 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 						}
 					}
 					if (widget != null) {
-						field.createControl(widget, column, mRecord);
-						field.setEditable(editable);
+						if (mRecord.contains(column.getName())) {
+							field.createControl(widget, column, mRecord);
+							field.setEditable(editable);
+						} else {
+							field.setVisibility(View.GONE);
+						}
 					} else {
 						field.setEditable(editable);
 						if (mRecord != null)
@@ -251,7 +255,8 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 					}
 					field.setLabel(label);
 				} else {
-					field.setText(mRecord.getString(field.getFieldName()));
+					if (mRecord != null)
+						field.setText(mRecord.getString(field.getFieldName()));
 				}
 			}
 		}
