@@ -11,16 +11,8 @@
         android:background="#ffffff" >
     </FrameLayout>
 
-    <ListView
-        android:id="@+id/left_drawer"
-        android:layout_width="280dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start|bottom"
-        android:layout_marginTop="?android:attr/actionBarSize"
-        android:background="#ffffff"
-        android:choiceMode="singleChoice"
-        android:divider="#E3E9E3"
-        android:dividerHeight="1dp"
-        android:smoothScrollbar="true" />
+    <!-- Nav drawer -->
+
+    <include layout="@layout/base_navdrawer_for_ab_overlay" />
 
 </android.support.v4.widget.DrawerLayout>

@@ -3,6 +3,18 @@
 
     <string name="app_name">Odoo</string>
     <string name="label_odoo">Odoo</string>
+    <!-- Settings -->
+    <string name="general_settings">General Settings</string>
+    <string name="application_settings">Application Settings</string>
+    <string name="application_settings_summary">Sync settings, Interval settings, sync data limit, and more</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="add_account">Add Account</string>
+    <string name="summary_about_odoo_mobile">Odoo Mobile</string>
+    <string name="build_version">Build Version</string>
+    <string name="label_powered_by">Powered by</string>
+    <string name="odoo_mobile_framework">Odoo Mobile framework</string>
+    <string name="supported_versions">Supported versions</string>
+    <string name="supported_versions_names">Odoo 7.0+</string>
     <!-- Account -->
     <string name="account_user_dp">Account User Display Picture</string>
     <string name="logo_description">Odoo</string>
@@ -66,7 +78,7 @@
     <string name="title_profile">Profile</string>
     <string name="title_general_settings">General Settings</string>
     <string name="title_accounts">Accounts</string>
-    <string name="title_about_us">About Us</string>
+    <string name="title_about">About</string>
     <string name="title_connecting">Connecting&#8230;</string>
     <string name="title_loggin_in">Logging in&#8230;</string>
     <string name="title_account_create">Creating account&#8230;</string>

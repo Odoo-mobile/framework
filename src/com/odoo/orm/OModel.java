@@ -748,7 +748,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		if (cr.moveToFirst()) {
 			do {
 				int rel_id = cr.getInt(cr.getColumnIndex(rel_col));
-				ids.add(rel_id);
+				if (rel.count(OColumn.ROW_ID + " = ?", new Object[] { rel_id }) > 0)
+					ids.add(rel_id);
 			} while (cr.moveToNext());
 		}
 		cr.close();

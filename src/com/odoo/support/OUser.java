@@ -537,7 +537,7 @@ public class OUser {
 
 	public static String getDBName(Context context) {
 		String db_name = "OdooSQLite";
-		OUser user = current(context);
+		OUser user = OUser.current(context);
 		if (user != null) {
 			db_name += "_" + user.getUsername();
 			db_name += "_" + user.getDatabase();

@@ -1,0 +1,100 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:iosched="http://schemas.android.com/apk/res-auto" >
+
+    <FrameLayout
+        android:id="@+id/chosen_account_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/navdrawer_chosen_account_height"
+        android:foreground="?android:attr/selectableItemBackground" >
+
+        <ImageView
+            android:id="@+id/profile_cover_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/odoo_purple"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_cover" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/keyline_1"
+            android:paddingRight="@dimen/keyline_1"
+            android:paddingTop="@dimen/keyline_1" >
+
+            <odoo.controls.BezelImageView
+                android:id="@+id/profile_image"
+                android:layout_width="@dimen/navdrawer_profile_image_size"
+                android:layout_height="@dimen/navdrawer_profile_image_size"
+                android:scaleType="centerCrop"
+                android:src="@drawable/avatar"
+                iosched:maskDrawable="@drawable/circle_mask" />
+
+            <ImageView
+                android:id="@+id/expand_account_box_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginLeft="16dp"
+                android:paddingBottom="16dp"
+                android:scaleType="center"
+                android:src="@drawable/ic_drawer_accounts_expand"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/profile_email_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/profile_image"
+                android:layout_alignParentBottom="true"
+                android:layout_toLeftOf="@id/expand_account_box_indicator"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingBottom="16dp"
+                android:singleLine="true"
+                android:textColor="@color/body_text_1_inverse"
+                android:textSize="@dimen/text_size_medium" />
+
+            <TextView
+                android:id="@+id/profile_name_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/profile_email_text"
+                android:layout_alignLeft="@id/profile_image"
+                android:layout_toLeftOf="@id/expand_account_box_indicator"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/body_text_1_inverse"
+                android:textSize="@dimen/text_size_large"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <!-- Account items -->
+
+        <LinearLayout
+            android:id="@+id/account_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="invisible" />
+
+        <!-- Drawer items -->
+
+        <LinearLayout
+            android:id="@+id/navdrawer_items_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical" />
+    </FrameLayout>
+
+</merge>

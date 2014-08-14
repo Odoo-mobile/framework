@@ -46,6 +46,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	private DataLoader mDataLoader = null;
 	private Integer mLimit = 10;
 	private Integer mLastPosition = -1;
+	private Integer mOffset = 0;
 	private SwipeRefreshLayout mSwipeRefresh = null;
 
 	public enum Type {
@@ -86,7 +87,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		mListcontrol.setOnListBottomReachedListener(this);
 		mListcontrol.setRecordOffset(mListRecords.size());
 		if (mLastPosition == -1) {
-			mDataLoader = new DataLoader(0);
+			mDataLoader = new DataLoader(mOffset);
 			mDataLoader.execute();
 		} else {
 			showData();
@@ -128,10 +129,10 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
-		Integer mOffset = 0;
+		Integer offset = 0;
 
 		public DataLoader(Integer offset) {
-			mOffset = offset;
+			this.offset = offset;
 		}
 
 		@Override
@@ -146,17 +147,22 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 				@Override
 				public void run() {
 					if (db().isEmptyTable()) {
+						mSwipeRefresh.setRefreshing(true);
 						scope.main().requestSync(PartnersProvider.AUTHORITY);
 					}
+					if (offset == 0) {
+						mListRecords.clear();
+					}
 					OModel model = db();
-					model.setOffset(mOffset);
+					model.setOffset(offset);
 					Object[] args = new Object[] { true };
 					mListRecords.addAll(model
 							.setLimit(mLimit)
-							.setOffset(mOffset)
+							.setOffset(offset)
 							.select(getWhere(mCurrentType), args, null, null,
 									"local_id DESC"));
-					mListcontrol.setRecordOffset(model.getNextOffset());
+					mOffset = model.getNextOffset();
+					mListcontrol.setRecordOffset(mOffset);
 				}
 			});
 			return null;
@@ -195,13 +201,15 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(TAG, "Partners", true));
 		menu.add(new DrawerItem(TAG, "Companies",
-				count(context, Type.Companies), 0, object(Type.Companies)));
+				count(context, Type.Companies), R.drawable.ic_action_company,
+				object(Type.Companies)));
 		menu.add(new DrawerItem(TAG, "Customers",
-				count(context, Type.Customers), 0, object(Type.Customers)));
+				count(context, Type.Customers), R.drawable.ic_action_user,
+				object(Type.Customers)));
 		menu.add(new DrawerItem(TAG, "Suppliers",
-				count(context, Type.Suppliers), 0, object(Type.Suppliers)));
+				count(context, Type.Suppliers), R.drawable.ic_action_suppliers,
+				object(Type.Suppliers)));
 		return menu;
 	}
 

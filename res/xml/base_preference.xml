@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="account_dummy"
+        android:title="" >
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="account_dummy2"
+        android:title="" >
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="general_settings"
+        android:title="@string/general_settings" >
+        <Preference android:summary="@string/application_settings_summary" >
+            <intent android:action="com.odoo.ACTION_ACCOUNT_GENERAL_CONFIG" />
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="account_settings"
+        android:title="@string/account_settings" >
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="application_about"
+        android:title="@string/title_about" >
+        <Preference
+            android:icon="@drawable/ic_odoo_o"
+            android:title="@string/summary_about_odoo_mobile" >
+            <intent android:action="com.odoo.ACTION_ABOUT" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -267,47 +267,47 @@ public class Attachment implements OnClickListener {
 	public void updateAttachments(String model, int id,
 			List<ODataRow> attachments, boolean asBackgroundTask) {
 		List<OValues> values = new ArrayList<OValues>();
-//		for (ODataRow row : attachments) {
-//			if (row.getInt("id") == 0) {
-//				String name = "";
-//				String base64 = "";
-//				String file_type = "";
-//				int company_id = Integer.parseInt(OUser.current(mContext)
-//						.getCompany_id());
-//				base64 = Base64Helper.fileUriToBase64(
-//						Uri.parse(row.getString("file_uri")),
-//						mContext.getContentResolver());
-//				name = row.getString("name");
-//				file_type = row.getString("file_type");
-//				OValues value = new OValues();
-//				value.put("name", name);
-//				value.put("datas_fname", name);
-//				value.put("db_datas", base64);
-//				value.put("file_type", file_type);
-//				value.put("res_model", model);
-//				value.put("res_id", id);
-//				value.put("company_id", company_id);
-//				value.put("type", "binary");
-//				value.put("size", 0);
-//				value.put("file_uri", row.getString("file_uri"));
-//				values.add(value);
-//			}
-//		}
-//		if (values.size() > 0) {
-			if (asBackgroundTask) {
-				CreateAttachment attachment = new CreateAttachment(
-						mDb.getSyncHelper(), values);
-				attachment.execute();
-			} else {
-				OSyncHelper helper = mDb.getSyncHelper();
-				mNewAttachmentIds.clear();
-				for (OValues value : values) {
-					long a_id = 0;//helper.create(data_row);
-					Log.i(TAG, "Attachment created #" + a_id);
-					mNewAttachmentIds.add(a_id);
-				}
+		// for (ODataRow row : attachments) {
+		// if (row.getInt("id") == 0) {
+		// String name = "";
+		// String base64 = "";
+		// String file_type = "";
+		// int company_id = Integer.parseInt(OUser.current(mContext)
+		// .getCompany_id());
+		// base64 = Base64Helper.fileUriToBase64(
+		// Uri.parse(row.getString("file_uri")),
+		// mContext.getContentResolver());
+		// name = row.getString("name");
+		// file_type = row.getString("file_type");
+		// OValues value = new OValues();
+		// value.put("name", name);
+		// value.put("datas_fname", name);
+		// value.put("db_datas", base64);
+		// value.put("file_type", file_type);
+		// value.put("res_model", model);
+		// value.put("res_id", id);
+		// value.put("company_id", company_id);
+		// value.put("type", "binary");
+		// value.put("size", 0);
+		// value.put("file_uri", row.getString("file_uri"));
+		// values.add(value);
+		// }
+		// }
+		// if (values.size() > 0) {
+		if (asBackgroundTask) {
+			CreateAttachment attachment = new CreateAttachment(
+					mDb.getSyncHelper(), values);
+			attachment.execute();
+		} else {
+			OSyncHelper helper = mDb.getSyncHelper();
+			mNewAttachmentIds.clear();
+			for (OValues value : values) {
+				long a_id = 0;// helper.create(data_row);
+				Log.i(TAG, "Attachment created #" + a_id);
+				mNewAttachmentIds.add(a_id);
+			}
 
-//			}
+			// }
 		}
 	}
 
@@ -349,7 +349,7 @@ public class Attachment implements OnClickListener {
 		mNotificationBuilder = new NotificationCompat.Builder(mContext);
 		mNotificationBuilder.setContentTitle("Downloading attachment");
 		mNotificationBuilder.setContentText("Download in progress");
-		mNotificationBuilder.setSmallIcon(R.drawable.ic_oe_notification);
+		mNotificationBuilder.setSmallIcon(R.drawable.ic_odoo_o);
 		mNotificationBuilder.setVibrate(new long[] { 1000, 1000 });
 		mNotificationBuilder.setAutoCancel(true);
 		mNotificationBuilder.setOngoing(true);
@@ -364,7 +364,7 @@ public class Attachment implements OnClickListener {
 		intent.setDataAndType(uri, mimeType);
 		mNotificationResultIntent = PendingIntent.getActivity(mContext, 0,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		mNotificationBuilder.addAction(R.drawable.ic_oe_notification,
+		mNotificationBuilder.addAction(R.drawable.ic_odoo_o,
 				"Download attachment", mNotificationResultIntent);
 		mNotificationBuilder.setOngoing(false);
 		mNotificationBuilder.setAutoCancel(true);
