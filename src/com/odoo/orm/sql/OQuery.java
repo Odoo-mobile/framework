@@ -92,7 +92,7 @@ public class OQuery {
 			this.columns.add("id");
 		for (String col : columns) {
 			if (col.contains(".")) {
-				createRelColumn(col, true);
+				createRelColumn(col);
 			}
 			this.columns.add(col);
 		}
@@ -107,7 +107,7 @@ public class OQuery {
 	 * @param fromColumns
 	 *            the from columns
 	 */
-	private void createRelColumn(String column, boolean fromColumns) {
+	private void createRelColumn(String column) {
 		String[] parts = column.split("\\.");
 		OColumn col = model.getColumn(parts[0]);
 		OModel rel_model = model.createInstance(col.getType());
@@ -117,14 +117,12 @@ public class OQuery {
 			table_name = model.getTableName() + "_" + rel_model.getTableName()
 					+ "_rel";
 			table_alias = table_name + "_alias";
-			if (fromColumns) {
-				OModel rel_base_model = model.createInstance(col.getType());
-				String rel_base_alias = createAlias(rel_base_model);
-				relationColumns.put(column + ".base", new RelationColumnAlias(
-						rel_base_model.getTableName(), rel_base_alias,
-						rel_base_model.getTableName() + "_id", parts[1],
-						rel_base_model, null));
-			}
+			OModel rel_base_model = model.createInstance(col.getType());
+			String rel_base_alias = createAlias(rel_base_model);
+			relationColumns.put(column + ".base", new RelationColumnAlias(
+					rel_base_model.getTableName(), rel_base_alias,
+					rel_base_model.getTableName() + "_id", parts[1],
+					rel_base_model, null));
 		} else {
 			if (rel_model.getTableName().equals(model.getTableName()))
 				table_alias += "_" + parts[1];
@@ -166,7 +164,7 @@ public class OQuery {
 	public OQuery addWhere(String column, String operator, Object value,
 			String conditional_operator) {
 		if (column.contains(".")) {
-			createRelColumn(column, false);
+			createRelColumn(column);
 		}
 		wheres.add(new OWhere(column, operator, value, conditional_operator));
 		return this;
@@ -312,24 +310,29 @@ public class OQuery {
 	 * @return the string
 	 */
 	private String tableNames() {
+		List<String> mAsLists = new ArrayList<String>();
 		switch (type) {
 		case Insert:
 		case Select:
 			if (!isJoin())
 				return "FROM " + model.getTableName();
 			else {
+				String alias = createAlias(model);
 				StringBuffer tables = new StringBuffer();
 				tables.append("FROM ");
 				tables.append(model.getTableName());
 				tables.append(" AS ");
-				tables.append(createAlias(model));
+				tables.append(alias);
 				tables.append(", ");
 				for (String col_name : relationColumns.keySet()) {
 					RelationColumnAlias col = relationColumns.get(col_name);
-					tables.append(col.getTable());
-					tables.append(" AS ");
-					tables.append(col.getTable_alias());
-					tables.append(", ");
+					if (!mAsLists.contains(col.getTable_alias())) {
+						tables.append(col.getTable());
+						tables.append(" AS ");
+						tables.append(col.getTable_alias());
+						tables.append(", ");
+						mAsLists.add(col.getTable_alias());
+					}
 				}
 				tables.deleteCharAt(tables.lastIndexOf(", "));
 				return tables.toString();
@@ -369,6 +372,7 @@ public class OQuery {
 					String alias_name = base_alias;
 					if (alias.getRelationType() == RelationType.ManyToMany) {
 						alias = relationColumns.get(col + ".base");
+
 						alias_name = model.getTableName() + "_"
 								+ alias.getRelationModel().getTableName()
 								+ "_rel_alias";

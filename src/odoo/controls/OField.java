@@ -714,7 +714,6 @@ public class OField extends LinearLayout implements
 	 */
 	private void createBinaryControl(OFieldType binary_type,
 			boolean roundedImage) {
-
 		ODataRow record = null;
 		String column_name = getRefColumn();
 		if (mControlRecord != null) {
@@ -725,7 +724,11 @@ public class OField extends LinearLayout implements
 				}
 			} else {
 				record = mControlRecord;
-				column_name = mColumn.getName();
+				if (mColumn != null)
+					column_name = mColumn.getName();
+				else {
+					column_name = mAttributes.getString(KEY_FIELD_NAME, null);
+				}
 			}
 		}
 
@@ -747,7 +750,6 @@ public class OField extends LinearLayout implements
 			break;
 		case BINARY_ROUND_IMAGE:
 		case BINARY_IMAGE:
-
 			Bitmap binary_image = BitmapFactory
 					.decodeResource(mContext.getResources(),
 							(default_image < 0) ? R.drawable.attachment
@@ -760,10 +762,10 @@ public class OField extends LinearLayout implements
 				if (!roundedImage)
 					imgBinary.setScaleType(ScaleType.CENTER_CROP);
 			}
-			if (roundedImage)
+			if (roundedImage) {
 				imgBinary.setImageBitmap(Base64Helper.getRoundedCornerBitmap(
 						mContext, binary_image, true));
-			else
+			} else
 				imgBinary.setImageBitmap(binary_image);
 			break;
 		default:
@@ -1076,12 +1078,6 @@ public class OField extends LinearLayout implements
 		return mFieldType;
 	}
 
-	/**
-	 * Sets the text.
-	 * 
-	 * @param text
-	 *            the new text
-	 */
 	public void setText(String text) {
 		text = (text.equals("false")) ? "" : text;
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
@@ -1096,6 +1092,10 @@ public class OField extends LinearLayout implements
 			}
 			mFieldTextView.setText(text);
 		}
+	}
+
+	public OFieldType getWidget() {
+		return mFieldWidget;
 	}
 
 	/**
@@ -1210,8 +1210,9 @@ public class OField extends LinearLayout implements
 		if (type != OFieldType.BINARY && type != OFieldType.BOOLEAN_WIDGET
 				&& type != OFieldType.WEB_VIEW) {
 			mFieldWidget = type;
-			mModel = new OModel(mContext, null)
-					.createInstance(column.getType());
+			if (column.getType() != null)
+				mModel = new OModel(mContext, null).createInstance(column
+						.getType());
 		}
 		if (type == OFieldType.WEB_VIEW) {
 			mFieldWidget = type;

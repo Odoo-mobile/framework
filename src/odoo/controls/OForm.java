@@ -262,8 +262,15 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 					}
 					field.setLabel(label);
 				} else {
-					if (mRecord != null)
-						field.setText(mRecord.getString(field.getFieldName()));
+					if (mRecord != null) {
+						if (field.getWidget() != null) {
+							OColumn col = new OColumn("");
+							col.setName(field.getFieldName());
+							field.createControl(field.getWidget(), col, mRecord);
+						} else
+							field.setText(mRecord.getString(field
+									.getFieldName()));
+					}
 				}
 			}
 		}
