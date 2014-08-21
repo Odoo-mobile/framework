@@ -53,14 +53,12 @@ import com.odoo.orm.OModel;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.orm.OValues;
 import com.odoo.orm.OdooHelper;
-import com.odoo.support.OUser;
-import com.odoo.util.Base64Helper;
 
 /**
  * The Class AttachmentFragment.
  */
-public class Attachment implements OnClickListener {
-	public static final String TAG = Attachment.class.getSimpleName();
+public class AttachmentDepricated implements OnClickListener {
+	public static final String TAG = AttachmentDepricated.class.getSimpleName();
 
 	private Context mContext = null;
 	private Notification mNotification = null;
@@ -85,7 +83,7 @@ public class Attachment implements OnClickListener {
 	public static final int REQUEST_FILE = 115;
 	public static final int REQUEST_AUDIO = 113;
 
-	public Attachment(Context context) {
+	public AttachmentDepricated(Context context) {
 		mContext = context;
 		mDb = new IrAttachment(mContext);
 	}
@@ -421,24 +419,20 @@ public class Attachment implements OnClickListener {
 			if (!mAttachmentInfo.getString("file_uri").equals("false")) {
 				return null;
 			} else {
-				// FIXME: replaced OEHelper with OdooHelper ??
-				/*
-				 * if (mOdoo.odoo() != null) { try { OEFieldsHelper fields = new
-				 * OEFieldsHelper( new String[] { "name", "datas", "file_type",
-				 * "res_model", "res_id" }); OEDomain domain = new OEDomain();
-				 * domain.add("id", "=", mAttachmentInfo.getInt("id"));
-				 * JSONObject result = mOdoo.odoo().search_read(
-				 * mDb.getModelName(), fields.get(), domain.get()); if
-				 * (result.getJSONArray("records").length() > 0) { JSONObject
-				 * row = result.getJSONArray("records") .getJSONObject(0);
-				 * String file_path = createFile( row.getString("name"),
-				 * row.getString("datas"), row.getString("file_type")); Uri uri
-				 * = Uri.fromFile(new File(file_path)); mNotification =
-				 * setFileIntent(uri); OEValues values = new OEValues();
-				 * values.put("file_uri", uri.toString()); // mDb.update(values,
-				 * mAttachmentInfo.getInt("id")); } else { error = true; } }
-				 * catch (Exception e) { e.printStackTrace(); } }
-				 */
+				 
+					
+					 
+						  
+//						  String file_path = createFile( row.getString("name"),
+//						  row.getString("datas"), row.getString("file_type")); 
+//						  
+//						  Uri uri
+//						  = Uri.fromFile(new File(file_path)); mNotification =
+//						  setFileIntent(uri); OEValues values = new OEValues();
+//						  values.put("file_uri", uri.toString()); // mDb.update(values,
+//						  mAttachmentInfo.getInt("id")); } else { error = true; } 
+						   				
+				 
 			}
 			return null;
 		}
