@@ -130,7 +130,6 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 						: getDrawerItemPosition());
 				onNavDrawerItemClicked(getDrawerItem(getDrawerItemPosition()));
 			}
-			return;
 		}
 	}
 
@@ -386,18 +385,6 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 				OUser.current(mContext).getAndroidName());
 		ContentResolver.cancelSync(account, authority);
 	}
-
-	/*
-	 * @Override public void onItemClick(AdapterView<?> adapter, View view, int
-	 * position, long id) { int item_position = position - 1; DrawerItem item =
-	 * mDrawerListItems.get(item_position); if (!item.isGroupTitle()) { if
-	 * (!item.getKey().equals("com.odoo.settings")) {
-	 * mDrawerItemSelectedPosition = item_position + 1; } mAppTitle =
-	 * item.getTitle(); loadFragment(item); mDrawerLayout.closeDrawers(); }
-	 * mDrawerListView.setItemChecked(mDrawerItemSelectedPosition, true);
-	 * 
-	 * }
-	 */
 
 	@Override
 	public void loadFragment(DrawerItem item) {

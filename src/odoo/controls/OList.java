@@ -319,7 +319,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 		if (newRecords.size() > 0) {
 			mRecords.addAll(index, newRecords);
 			mListAdapter.notifiyDataChange(mRecords);
-			addRecordViews(index, newRecords.size() + 1);
+			int end_index = newRecords.size() + 1;
+			addRecordViews(index, end_index);
 		} else {
 			mLoadNewRecords = false;
 			removeDataLoaderProgress();

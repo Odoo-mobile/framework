@@ -10,6 +10,7 @@ import java.net.URLConnection;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -81,7 +82,12 @@ public class Attachments {
 		FileNameMap mime = URLConnection.getFileNameMap();
 		String mimeType = mime.getContentTypeFor(uri.getPath());
 		intent.setDataAndType(uri, mimeType);
-		mContext.startActivity(intent);
+		try {
+			mContext.startActivity(intent);
+		} catch (ActivityNotFoundException e) {
+			Toast.makeText(mContext, "No activity found to handle file",
+					Toast.LENGTH_LONG).show();
+		}
 	}
 
 	private void _download(ODataRow attachment) {
