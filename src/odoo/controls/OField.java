@@ -41,7 +41,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -273,6 +272,8 @@ public class OField extends LinearLayout implements
 	/** The scale factor. */
 	private Float mScaleFactor = 0F;
 
+	private OForm.OnViewClickListener mOForm_OnViewClickListener = null;
+
 	/**
 	 * Instantiates a new field.
 	 * 
@@ -474,7 +475,8 @@ public class OField extends LinearLayout implements
 				if (records.size() > 0) {
 					for (ODataRow row : records) {
 						if (custom_layout > -1) {
-							mlayout = (LinearLayout) getManyToManyRowView(row);
+							LinearLayout rowView = (LinearLayout) getManyToManyRowView(row);
+							mlayout.addView(rowView);
 						} else {
 							TextView mtag = new TextView(mContext);
 							mLayoutParams = new LayoutParams(
@@ -518,28 +520,28 @@ public class OField extends LinearLayout implements
 		}
 	}
 
-	private View getManyToManyRowView(ODataRow row) {
-		int customLayoutOriantation = mAttributes.getResource(
-				KEY_CUSTOM_LAYOUT_ORIANTATION, -1);
+	private View getManyToManyRowView(final ODataRow row) {
 		int custom_layout = mAttributes.getResource(KEY_CUSTOM_LAYOUT, -1);
-		AbsListView.LayoutParams params = new AbsListView.LayoutParams(
-				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		LinearLayout mlayout = new LinearLayout(mContext);
-		mlayout.setLayoutParams(params);
-		if (customLayoutOriantation == 1)
-			mlayout.setOrientation(LinearLayout.VERTICAL);
-		else
-			mlayout.setOrientation(LinearLayout.HORIZONTAL);
 		if (custom_layout > -1) {
 			LayoutInflater inflater = LayoutInflater.from(mContext);
-			OForm form = (OForm) inflater.inflate(custom_layout, null);
+			final OForm form = (OForm) inflater.inflate(custom_layout, null);
 			form.initForm(row);
-			mlayout.addView(form);
+			if (mOForm_OnViewClickListener != null) {
+				form.setClickable(true);
+				form.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						form.setId(getId());
+						mOForm_OnViewClickListener.onFormViewClick(form, row);
+					}
+				});
+			}
+			return form;
 		} else {
 			throw new NullPointerException("No Custom layout found for field "
 					+ mColumn.getName() + " (" + mColumn.getLabel() + ")");
 		}
-		return mlayout;
 	}
 
 	@Override
@@ -1310,4 +1312,7 @@ public class OField extends LinearLayout implements
 		return mAttributes.getString(KEY_REF_COLUMN, null);
 	}
 
+	public void setOnItemClickListener(OForm.OnViewClickListener listener) {
+		mOForm_OnViewClickListener = listener;
+	}
 }

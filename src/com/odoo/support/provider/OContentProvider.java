@@ -92,7 +92,6 @@ public abstract class OContentProvider extends ContentProvider implements
 	public int delete(Uri uri, String where, String[] whereArgs) {
 		// TODO Auto-generated method stub
 		int count = db.getWritableDatabase().delete(TABLE, where, whereArgs);
-
 		getContext().getContentResolver().notifyChange(uri, null);
 
 		return (count);

@@ -342,22 +342,27 @@ public class OList extends ScrollView implements View.OnClickListener,
 				}
 				final ODataRow record = (ODataRow) mRecords.get(position);
 				final OForm form = (OForm) mView;
-				form.initForm(record);
 				for (final ViewClickListeners listener : mViewClickListener) {
 					for (final String key : listener.getKeys()) {
-						form.setOnViewClickListener(listener.getViewId(key),
-								new OForm.OnViewClickListener() {
+						OForm.OnViewClickListener itemClick = new OForm.OnViewClickListener() {
 
-									@Override
-									public void onFormViewClick(View view,
-											ODataRow row) {
-										listener.getListener(key)
-												.onRowViewClick(form, view,
-														position, record);
-									}
-								});
+							@Override
+							public void onFormViewClick(View view, ODataRow row) {
+								listener.getListener(key).onRowViewClick(form,
+										view, position, row);
+							}
+						};
+						if (form.findViewById(listener.getViewId(key)) instanceof OField) {
+							OField field = (OField) form.findViewById(listener
+									.getViewId(key));
+							field.setOnItemClickListener(itemClick);
+						} else {
+							form.setOnViewClickListener(
+									listener.getViewId(key), itemClick);
+						}
 					}
 				}
+				form.initForm(record);
 				if (mBeforeListRowCreateListener != null) {
 					mBeforeListRowCreateListener.beforeListRowCreate(position,
 							record, mView);
