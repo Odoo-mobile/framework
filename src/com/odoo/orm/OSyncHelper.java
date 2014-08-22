@@ -36,12 +36,10 @@ import android.util.Log;
 
 import com.odoo.App;
 import com.odoo.base.ir.IrModel;
-import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ORelationRecordList.ORelationRecords;
 import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
-import com.odoo.util.StringUtils;
 
 /**
  * The Class OSyncHelper.
@@ -590,61 +588,9 @@ public class OSyncHelper {
 				OModel rel_model = rel.getRelModel();
 				rel_model.setSyncingDataFlag(true);
 				ODomain rel_domain = new ODomain();
-				boolean syncFlag = false;
 				if (rel.getRelIds().size() > 0) {
-					List<Integer> syncIds = new ArrayList<Integer>();
-					for (int id : rel.getRelIds())
-						if (!rel_model.hasRecord(id))
-							syncIds.add(id);
-					rel_domain.add("id", "in", syncIds);
-					if (syncIds.size() > 0) {
-						syncFlag = syncWithServer(rel_model, rel_domain, false);
-					} else
-						syncFlag = true;
-				}
-				if (syncFlag) {
-					if (rel.getRefColumn() != null) {
-						List<Integer> base_ids = new ArrayList<Integer>();
-						base_ids.addAll(rel.getBaseIds());
-						String where = "id in ("
-								+ StringUtils.repeat(" ?, ",
-										base_ids.size() - 1) + "?)";
-						List<ODataRow> base_records = base_model.select(where,
-								new Object[] { base_ids });
-						for (ODataRow row : base_records) {
-							String base_key = base_model.getTableName()
-									+ "_base_" + row.getInt("id");
-							List<Integer> rel_ids = rel.getRelIds(base_key);
-							List<Integer> mM2mIds = new ArrayList<Integer>();
-							for (Integer r_id : rel_ids) {
-								Integer rel_id = rel_model.selectRowId(r_id);
-								if (rel_id != null) {
-									if (rel.getRelationType() != RelationType.ManyToMany) {
-										OValues vals = new OValues();
-										vals.put(rel.getRefColumn(), rel_id);
-										vals.put("is_dirty", false);
-										vals.put(OColumn.ROW_ID,
-												row.get(OColumn.ROW_ID));
-										base_model.update(vals,
-												row.getInt(OColumn.ROW_ID));
-									} else {
-										mM2mIds.add(rel_id);
-									}
-								}
-							}
-							if (rel.getRelationType() == RelationType.ManyToMany) {
-								OValues vals = new OValues();
-								vals.put(rel.getRefColumn(), mM2mIds);
-								vals.put("is_dirty", false);
-								vals.put("id", row.getInt("id"));
-								vals.put(OColumn.ROW_ID,
-										row.getInt(OColumn.ROW_ID));
-								base_model.update(vals,
-										row.getInt(OColumn.ROW_ID));
-							}
-
-						}
-					}
+					rel_domain.add("id", "in", rel.getRelIds());
+					syncWithServer(rel_model, rel_domain, false);
 				}
 			}
 		}
@@ -704,20 +650,10 @@ public class OSyncHelper {
 							// Local table contains only id and name so not
 							// required
 							// to request on server
-							if (m2o.getColumns(false).size() == 2
-									|| (m2o.getColumns(false).size() == 4 && model
+							if (m2o.getColumns(false).size() > 2
+									|| (m2o.getColumns(false).size() > 4 && model
 											.getOdooVersion()
 											.getVersion_number() > 7)) {
-								OValues m2oVals = new OValues();
-								m2oVals.put("id", m2oRecord.get(0));
-								m2oVals.put("name", m2oRecord.get(1));
-								m2oVals.put("is_dirty", false);
-								Integer row_id = m2o.createORReplace(m2oVals);
-								// Replacing original id with row_id to maintain
-								// relation for local
-								m2oRecord.put(0, row_id);
-								record.put(column.getName(), m2oRecord);
-							} else {
 								// Need to create list of ids for model
 								ORelationRecords rel_record = mRelationRecordList.new ORelationRecords();
 								if (mRelationRecordList.contains(rel_key)) {
@@ -732,9 +668,19 @@ public class OSyncHelper {
 										.getRelationType());
 								rel_record.addBaseRelId(record.getInt("id"),
 										m2oRecord.getInt(0));
+
 								// Creating relation ids list for relation model
 								mRelationRecordList.add(rel_key, rel_record);
 							}
+							OValues m2oVals = new OValues();
+							m2oVals.put("id", m2oRecord.get(0));
+							m2oVals.put("name", m2oRecord.get(1));
+							m2oVals.put("is_dirty", false);
+							Integer row_id = m2o.createORReplace(m2oVals);
+							// Replacing original id with row_id to maintain
+							// relation for local
+							m2oRecord.put(0, row_id);
+							record.put(column.getName(), m2oRecord);
 							values.put(column.getName(), m2oRecord.get(0));
 						}
 						break;
@@ -749,10 +695,16 @@ public class OSyncHelper {
 						int record_len = column.getRecordSyncLimit();
 						if (record_len != -1 && len > record_len)
 							len = record_len;
+						List<Integer> row_ids = new ArrayList<Integer>();
 						for (int i = 0; i < len; i++) {
-							r_ids.add(ids_list.getInt(i));
+							int server_id = ids_list.getInt(i);
+							r_ids.add(server_id);
+							OValues vals = new OValues();
+							vals.put("id", server_id);
+							int row_id = m2m.createORReplace(vals);
+							row_ids.add(row_id);
 						}
-						values.put(column.getName(), r_ids);
+						values.put(column.getName(), row_ids);
 						ORelationRecords mrel_record = mRelationRecordList.new ORelationRecords();
 						if (mRelationRecordList.contains(rel_key)) {
 							mrel_record = mRelationRecordList.get(rel_key);
