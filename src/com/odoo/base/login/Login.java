@@ -241,7 +241,7 @@ public class Login extends BaseFragment {
 		 */
 		@Override
 		protected void onPreExecute() {
-			pdialog = new OEDialog(getActivity(), false, getResources()
+			pdialog = new OEDialog(context, false, context.getResources()
 					.getString(R.string.title_loggin_in));
 			pdialog.show();
 			edtPassword.setError(null);
@@ -279,6 +279,7 @@ public class Login extends BaseFragment {
 		 */
 		@Override
 		protected void onPostExecute(final Boolean success) {
+			pdialog.dismiss();
 			if (success) {
 				Log.v("Creating Account For Username :",
 						userData.getAndroidName());
@@ -291,7 +292,6 @@ public class Login extends BaseFragment {
 				}
 				if (OdooAccountManager.createAccount(getActivity(), userData)) {
 					loginUserASync.cancel(true);
-					pdialog.hide();
 					SyncWizard syncWizard = new SyncWizard();
 					FragmentListener mFragment = (FragmentListener) getActivity();
 					mFragment.startMainFragment(syncWizard, false);
@@ -301,7 +301,6 @@ public class Login extends BaseFragment {
 				edtPassword.setError(errorMsg);
 			}
 			loginUserASync.cancel(true);
-			pdialog.hide();
 		}
 
 		/*

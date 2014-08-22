@@ -256,7 +256,7 @@ public class AccountFragment extends BaseFragment {
 		 */
 		@Override
 		protected void onPostExecute(final Boolean success) {
-			pdialog.hide();
+			pdialog.dismiss();
 			if (success) {
 				// Start New Fragment for Login
 				Login loginFragment = new Login();
