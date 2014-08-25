@@ -378,14 +378,15 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 					// Relation columns
 					switch (col.getRelationType()) {
 					case ManyToOne:
+						OModel rel_model = model.createInstance(col.getType());
 						Object val = model.createRecordRow(col, c);
 						if (val instanceof Integer) {
-							val = model.selectServerId((Integer) val);
+							val = rel_model.selectServerId((Integer) val);
 						}
 						values.put(col.getName(), val);
 						break;
 					case OneToMany:
-						OModel rel_model = model.createInstance(col.getType());
+						rel_model = model.createInstance(col.getType());
 						JSONArray o2mRecords = new JSONArray();
 						List<ODataRow> o2mRecordList = rel_model.select(
 								col.getRelatedColumn() + " = ?",
