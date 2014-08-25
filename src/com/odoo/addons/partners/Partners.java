@@ -171,8 +171,8 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 					OModel model = db();
 					model.setOffset(offset).setLimit(mLimit);
 					Object[] args = new Object[] { true };
-					List<ODataRow> records = model.select();
-					mListRecords.addAll(records);
+					mListRecords.addAll(model.select(getWhere(mCurrentType)
+							+ " = ?", args, null, null, "local_id DESC"));
 					mOffset = model.getNextOffset();
 					mListcontrol.setRecordOffset(mOffset);
 
