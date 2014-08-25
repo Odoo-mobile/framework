@@ -102,6 +102,22 @@
             android:exported="true"
             android:label="Partners"
             android:syncable="true" />
+        <provider
+            android:name="com.odoo.base.ir.providers.ir.ModelProvider"
+            android:authorities="com.odoo.base.ir.providers.ir"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.country.CountryProvider"
+            android:authorities="com.odoo.base.res.providers.country"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.company.CompanyProvider"
+            android:authorities="com.odoo.base.res.providers.company"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.addons.partners.providers.partners_category.PartnerCategoryProvider"
+            android:authorities="com.odoo.addons.partners.providers.partners_category"
+            android:multiprocess="true" />
         <!-- ResPartner Service -->
         <service
             android:name="com.odoo.addons.partners.sevices.PartnersService"

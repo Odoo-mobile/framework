@@ -1,36 +1,36 @@
-package com.odoo.addons.partners.providers.partners;
+package com.odoo.base.ir.providers.ir;
 
 import android.content.Context;
 import android.net.Uri;
 
-import com.odoo.base.res.ResPartner;
+import com.odoo.base.ir.IrModel;
 import com.odoo.orm.OModel;
 import com.odoo.support.provider.OContentProvider;
 
-public class PartnersProvider extends OContentProvider {
-
-	public static final String AUTHORITY = "com.odoo.addons.partners.providers.partners";
-	public static final String PATH = "res_partner";
+public class ModelProvider extends OContentProvider {
+	public static final String AUTHORITY = "com.odoo.base.res.providers.company";
+	public static final String PATH = "res_company";
 	public static final Uri CONTENT_URI = OContentProvider.buildURI(AUTHORITY,
 			PATH);
 
 	@Override
 	public OModel model(Context context) {
-		return new ResPartner(context);
+		return new IrModel(context);
 	}
 
 	@Override
 	public String authority() {
-		return AUTHORITY;
+		return ModelProvider.AUTHORITY;
 	}
 
 	@Override
 	public String path() {
-		return PATH;
+		return ModelProvider.PATH;
 	}
 
 	@Override
 	public Uri uri() {
-		return PartnersProvider.CONTENT_URI;
+		return ModelProvider.CONTENT_URI;
 	}
+
 }

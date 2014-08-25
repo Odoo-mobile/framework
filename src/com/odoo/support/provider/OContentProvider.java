@@ -21,188 +21,166 @@ package com.odoo.support.provider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteQueryBuilder;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.provider.BaseColumns;
-import android.text.TextUtils;
+import android.util.Log;
 
-import com.odoo.orm.OSQLiteHelper;
+import com.odoo.orm.OColumn;
+import com.odoo.orm.OModel;
+import com.odoo.orm.SelectionBuilder;
+import com.odoo.support.OUser;
+import com.odoo.util.ODate;
 
 /**
- * The Class OEContentProvider.
+ * The Class OContentProvider.
  */
 public abstract class OContentProvider extends ContentProvider implements
-		OEContentProviderHelper {
+		OContentProviderHelper {
 
-	/** The Constant CONSTANTS. */
-	private static final int CONSTANTS = 1;
+	private final int COLLECTION = 1;
 
-	/** The authority. */
-	public static String AUTHORITY = "";
+	private final int SINGLE_ROW = 2;
 
-	/** The Constant CONSTANT_ID. */
-	private static final int CONSTANT_ID = 2;
+	private UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+	private OUser user = null;
 
-	/** The Constant MATCHER. */
-	private static final UriMatcher MATCHER;
+	/** The database model. */
+	private OModel model = null;
 
-	/** The Constant TABLE. */
-	private static final String TABLE = "constants";
-
-	/** The contenturi. */
-	public static String CONTENTURI = "";
-
-	/** The db. */
-	OSQLiteHelper db = null;
-
-	/**
-	 * The Class Constants.
-	 */
-	public static final class Constants implements BaseColumns {
-
-		/** The Constant CONTENT_URI. */
-		public static final Uri CONTENT_URI = Uri.parse("content://"
-				+ CONTENTURI + "/constants");
-
-		/** The Constant DEFAULT_SORT_ORDER. */
-		public static final String DEFAULT_SORT_ORDER = "title";
-
-		/** The Constant TITLE. */
-		public static final String TITLE = "title";
-
-		/** The Constant VALUE. */
-		public static final String VALUE = "value";
+	public static Uri buildURI(String authority, String path) {
+		Uri.Builder uriBuilder = new Uri.Builder();
+		uriBuilder.authority(authority);
+		uriBuilder.appendPath(path);
+		uriBuilder.scheme("content");
+		return uriBuilder.build();
 	}
 
-	static {
-		MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-		MATCHER.addURI(CONTENTURI, "constants", CONSTANTS);
-		MATCHER.addURI(CONTENTURI, "constants/#", CONSTANT_ID);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#delete(android.net.Uri,
-	 * java.lang.String, java.lang.String[])
-	 */
 	@Override
 	public int delete(Uri uri, String where, String[] whereArgs) {
-		// TODO Auto-generated method stub
-		int count = db.getWritableDatabase().delete(TABLE, where, whereArgs);
-
-		getContext().getContentResolver().notifyChange(uri, null);
-
-		return (count);
+		final SQLiteDatabase db = model.getWritableDatabase();
+		assert db != null;
+		final int match = matcher.match(uri);
+		int count = 0;
+		SelectionBuilder builder = new SelectionBuilder();
+		switch (match) {
+		case COLLECTION:
+			count = builder.table(model.getTableName()).where(where, whereArgs)
+					.delete(db);
+			break;
+		case SINGLE_ROW:
+			String id = uri.getLastPathSegment();
+			count = builder.table(model.getTableName())
+					.where(OColumn.ROW_ID + "=?", id).where(where, whereArgs)
+					.delete(db);
+			break;
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+		// Send broadcast to registered ContentObservers, to refresh UI.
+		Context ctx = getContext();
+		assert ctx != null;
+		ctx.getContentResolver().notifyChange(uri, null, false);
+		return count;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#getType(android.net.Uri)
-	 */
 	@Override
 	public String getType(Uri uri) {
-		// TODO Auto-generated method stub
-		if (isCollectionUri(uri)) {
-
-			return (CONTENTURI + "/constant");
-		}
-
-		return (CONTENTURI + "/constant");
+		return uri().toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#insert(android.net.Uri,
-	 * android.content.ContentValues)
-	 */
 	@Override
 	public Uri insert(Uri uri, ContentValues initialValues) {
-		return null;
+		initialValues.put("local_write_date", ODate.getDate());
+		initialValues.put("odoo_name", user.getAndroidName());
+		final SQLiteDatabase db = model.getWritableDatabase();
+		assert db != null;
+		final int match = matcher.match(uri);
+		Uri result;
+		switch (match) {
+		case COLLECTION:
+			long id = db.insertOrThrow(model.getTableName(), null,
+					initialValues);
+			result = Uri.parse(uri() + "/" + id);
+			break;
+		case SINGLE_ROW:
+			throw new UnsupportedOperationException(
+					"Insert not supported on URI: " + uri);
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+		// Send broadcast to registered ContentObservers, to refresh UI.
+		Context ctx = getContext();
+		assert ctx != null;
+		ctx.getContentResolver().notifyChange(uri, null, false);
+		Log.v("", result.toString());
+		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#onCreate()
-	 */
 	@Override
 	public boolean onCreate() {
-		db = new OSQLiteHelper(getContext());
-		AUTHORITY = authority();
-		CONTENTURI = contentUri();
-		return ((db == null) ? false : true);
+		model = model(getContext());
+		user = model.getUser();
+		matcher.addURI(authority(), path(), COLLECTION);
+		matcher.addURI(authority(), path() + "/#", SINGLE_ROW);
+		return ((model == null) ? false : true);
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#query(android.net.Uri,
-	 * java.lang.String[], java.lang.String, java.lang.String[],
-	 * java.lang.String)
-	 */
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sort) {
-		// TODO Auto-generated method stub
-		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-
-		qb.setTables(TABLE);
-
-		String orderBy;
-
-		if (TextUtils.isEmpty(sort)) {
-			orderBy = Constants.DEFAULT_SORT_ORDER;
-		} else {
-			orderBy = sort;
+		SQLiteDatabase db = model.getReadableDatabase();
+		SelectionBuilder builder = new SelectionBuilder();
+		int uriMatch = matcher.match(uri);
+		switch (uriMatch) {
+		case SINGLE_ROW:
+			// Return a single entry, by ID.
+			String id = uri.getLastPathSegment();
+			builder.where(OColumn.ROW_ID + "=?", id);
+		case COLLECTION:
+			// Return all known entries.
+			builder.table(model.getTableName()).where(selection, selectionArgs);
+			Cursor c = builder.query(db, projection, sort);
+			Context ctx = getContext();
+			assert ctx != null;
+			c.setNotificationUri(ctx.getContentResolver(), uri);
+			return c;
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
 		}
-
-		Cursor c = qb.query(db.getReadableDatabase(), projection, selection,
-				selectionArgs, null, null, orderBy);
-
-		c.setNotificationUri(getContext().getContentResolver(), uri);
-
-		return (c);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#update(android.net.Uri,
-	 * android.content.ContentValues, java.lang.String, java.lang.String[])
-	 */
 	@Override
 	public int update(Uri uri, ContentValues values, String where,
 			String[] whereArgs) {
-		// TODO Auto-generated method stub
-		int count = db.getWritableDatabase().update(TABLE, values, where,
-				whereArgs);
-
-		getContext().getContentResolver().notifyChange(uri, null);
-
-		return (count);
+		values.put("local_write_date", ODate.getDate());
+		values.put("odoo_name", user.getAndroidName());
+		SelectionBuilder builder = new SelectionBuilder();
+		final SQLiteDatabase db = model.getWritableDatabase();
+		final int match = matcher.match(uri);
+		int count;
+		switch (match) {
+		case COLLECTION:
+			count = builder.table(model.getTableName()).where(where, whereArgs)
+					.update(db, values);
+			break;
+		case SINGLE_ROW:
+			String id = uri.getLastPathSegment();
+			count = builder.table(model.getTableName()).where(where, whereArgs)
+					.where(OColumn.ROW_ID + "=?", id).where(where, whereArgs)
+					.update(db, values);
+			break;
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+		Log.v("", uri + " UPDATED");
+		Context ctx = getContext();
+		assert ctx != null;
+		ctx.getContentResolver().notifyChange(uri, null, false);
+		return count;
 	}
 
-	/**
-	 * Checks if is collection uri.
-	 * 
-	 * @param url
-	 *            the url
-	 * @return true, if is collection uri
-	 */
-	private boolean isCollectionUri(Uri url) {
-		return (MATCHER.match(url) == CONSTANTS);
-	}
-
-}
-
-interface OEContentProviderHelper {
-	public String authority();
-
-	public String contentUri();
 }

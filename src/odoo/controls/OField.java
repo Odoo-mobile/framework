@@ -33,6 +33,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
@@ -41,7 +42,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -273,6 +273,8 @@ public class OField extends LinearLayout implements
 	/** The scale factor. */
 	private Float mScaleFactor = 0F;
 
+	private OForm.OnViewClickListener mOForm_OnViewClickListener = null;
+
 	/**
 	 * Instantiates a new field.
 	 * 
@@ -474,7 +476,8 @@ public class OField extends LinearLayout implements
 				if (records.size() > 0) {
 					for (ODataRow row : records) {
 						if (custom_layout > -1) {
-							mlayout = (LinearLayout) getManyToManyRowView(row);
+							LinearLayout rowView = (LinearLayout) getManyToManyRowView(row);
+							mlayout.addView(rowView);
 						} else {
 							TextView mtag = new TextView(mContext);
 							mLayoutParams = new LayoutParams(
@@ -518,28 +521,28 @@ public class OField extends LinearLayout implements
 		}
 	}
 
-	private View getManyToManyRowView(ODataRow row) {
-		int customLayoutOriantation = mAttributes.getResource(
-				KEY_CUSTOM_LAYOUT_ORIANTATION, -1);
+	private View getManyToManyRowView(final ODataRow row) {
 		int custom_layout = mAttributes.getResource(KEY_CUSTOM_LAYOUT, -1);
-		AbsListView.LayoutParams params = new AbsListView.LayoutParams(
-				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		LinearLayout mlayout = new LinearLayout(mContext);
-		mlayout.setLayoutParams(params);
-		if (customLayoutOriantation == 1)
-			mlayout.setOrientation(LinearLayout.VERTICAL);
-		else
-			mlayout.setOrientation(LinearLayout.HORIZONTAL);
 		if (custom_layout > -1) {
 			LayoutInflater inflater = LayoutInflater.from(mContext);
-			OForm form = (OForm) inflater.inflate(custom_layout, null);
+			final OForm form = (OForm) inflater.inflate(custom_layout, null);
 			form.initForm(row);
-			mlayout.addView(form);
+			if (mOForm_OnViewClickListener != null) {
+				form.setClickable(true);
+				form.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						form.setId(getId());
+						mOForm_OnViewClickListener.onFormViewClick(form, row);
+					}
+				});
+			}
+			return form;
 		} else {
 			throw new NullPointerException("No Custom layout found for field "
 					+ mColumn.getName() + " (" + mColumn.getLabel() + ")");
 		}
-		return mlayout;
 	}
 
 	@Override
@@ -712,27 +715,9 @@ public class OField extends LinearLayout implements
 	 * @param roundedImage
 	 *            the rounded image
 	 */
-	private void createBinaryControl(OFieldType binary_type,
-			boolean roundedImage) {
-		ODataRow record = null;
-		String column_name = getRefColumn();
-		if (mControlRecord != null) {
-			if (column_name != null) {
-				if (mColumn.getRelationType() == RelationType.ManyToOne) {
-					record = mControlRecord.getM2ORecord(mColumn.getName())
-							.browse();
-				}
-			} else {
-				record = mControlRecord;
-				if (mColumn != null)
-					column_name = mColumn.getName();
-				else {
-					column_name = mAttributes.getString(KEY_FIELD_NAME, null);
-				}
-			}
-		}
-
-		ImageView imgBinary = new ImageView(mContext);
+	private void createBinaryControl(final OFieldType binary_type,
+			final boolean roundedImage) {
+		final ImageView imgBinary = new ImageView(mContext);
 		int heightWidth = mAttributes.getResource(KEY_ROUND_IMAGE_WIDTH_HEIGHT,
 				-1);
 		if (heightWidth > -1) {
@@ -740,37 +725,69 @@ public class OField extends LinearLayout implements
 			mLayoutParams = new LayoutParams(heightWidth, heightWidth);
 			imgBinary.setLayoutParams(mLayoutParams);
 		}
-		int default_image = mAttributes.getResource(KEY_DEFAULT_IMAGE,
+		final int default_image = mAttributes.getResource(KEY_DEFAULT_IMAGE,
 				R.drawable.attachment);
-		switch (binary_type) {
-		case BINARY_FILE:
-			imgBinary
-					.setImageResource((default_image < 0) ? R.drawable.attachment
-							: default_image);
-			break;
-		case BINARY_ROUND_IMAGE:
-		case BINARY_IMAGE:
-			Bitmap binary_image = BitmapFactory
-					.decodeResource(mContext.getResources(),
-							(default_image < 0) ? R.drawable.attachment
+		final Bitmap binary_image = BitmapFactory.decodeResource(mContext
+				.getResources(), (default_image < 0) ? R.drawable.attachment
+				: default_image);
+		if (roundedImage) {
+			imgBinary.setImageBitmap(Base64Helper.getRoundedCornerBitmap(
+					mContext, binary_image, true));
+		} else
+			imgBinary.setImageBitmap(binary_image);
+		new Handler().postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				ODataRow record = null;
+				String column_name = getRefColumn();
+				if (mControlRecord != null) {
+					if (column_name != null) {
+						if (mColumn.getRelationType() == RelationType.ManyToOne) {
+							record = mControlRecord.getM2ORecord(
+									mColumn.getName()).browse();
+						}
+					} else {
+						record = mControlRecord;
+						if (mColumn != null)
+							column_name = mColumn.getName();
+						else {
+							column_name = mAttributes.getString(KEY_FIELD_NAME,
+									null);
+						}
+					}
+				}
+
+				switch (binary_type) {
+				case BINARY_FILE:
+					imgBinary
+							.setImageResource((default_image < 0) ? R.drawable.attachment
 									: default_image);
-			if (record != null
-					&& !record.getString(column_name).equals("false")
-					&& !record.getString(column_name).equals("null")) {
-				binary_image = Base64Helper.getBitmapImage(mContext,
-						record.getString(column_name));
-				if (!roundedImage)
-					imgBinary.setScaleType(ScaleType.CENTER_CROP);
+					break;
+				case BINARY_ROUND_IMAGE:
+				case BINARY_IMAGE:
+					Bitmap newBitmap = binary_image;
+					if (record != null
+							&& !record.getString(column_name).equals("false")
+							&& !record.getString(column_name).equals("null")
+							&& !record.getString(column_name).equals("0")) {
+						newBitmap = Base64Helper.getBitmapImage(mContext,
+								record.getString(column_name));
+						if (!roundedImage)
+							imgBinary.setScaleType(ScaleType.CENTER_CROP);
+					}
+					if (roundedImage) {
+						imgBinary.setImageBitmap(Base64Helper
+								.getRoundedCornerBitmap(mContext, newBitmap,
+										true));
+					} else
+						imgBinary.setImageBitmap(newBitmap);
+					break;
+				default:
+					break;
+				}
 			}
-			if (roundedImage) {
-				imgBinary.setImageBitmap(Base64Helper.getRoundedCornerBitmap(
-						mContext, binary_image, true));
-			} else
-				imgBinary.setImageBitmap(binary_image);
-			break;
-		default:
-			break;
-		}
+		}, 300);
 		addView(imgBinary);
 	}
 
@@ -797,6 +814,7 @@ public class OField extends LinearLayout implements
 		} else {
 			createTextViewControl();
 			if (mControlRecord != null) {
+
 				if (mControlRecord.get(mColumn.getName()) instanceof OM2ORecord) {
 					ODataRow row = mControlRecord.getM2ORecord(
 							mColumn.getName()).browse();
@@ -805,6 +823,11 @@ public class OField extends LinearLayout implements
 					else
 						setText("No " + mColumn.getLabel());
 				} else {
+					Integer id = mControlRecord.getInt(mColumn.getName());
+					if (id != null && id > 0 && ref_column != null) {
+						mControlRecord.put(mColumn.getName(), mModel.select(id)
+								.getString(ref_column));
+					}
 					setText(mControlRecord.getString(mColumn.getName()));
 				}
 			}
@@ -1310,4 +1333,7 @@ public class OField extends LinearLayout implements
 		return mAttributes.getString(KEY_REF_COLUMN, null);
 	}
 
+	public void setOnItemClickListener(OForm.OnViewClickListener listener) {
+		mOForm_OnViewClickListener = listener;
+	}
 }

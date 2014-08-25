@@ -20,9 +20,11 @@ package com.odoo.base.res;
 
 import android.content.Context;
 
+import com.odoo.base.res.providers.company.CompanyProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.provider.OContentProvider;
 
 /**
  * The Class ResCompany.
@@ -35,4 +37,8 @@ public class ResCompany extends OModel {
 		super(context, "res.company");
 	}
 
+	@Override
+	public OContentProvider getContentProvider() {
+		return new CompanyProvider();
+	}
 }

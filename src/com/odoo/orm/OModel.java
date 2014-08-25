@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -54,9 +55,12 @@ import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 import com.odoo.receivers.DataSetChangeReceiver;
 import com.odoo.support.OUser;
+import com.odoo.support.provider.OContentProvider;
+import com.odoo.support.provider.OContentProviderHelper;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.StringUtils;
+import com.odoo.util.logger.OLog;
 
 /**
  * The Class OModel.
@@ -138,7 +142,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	// Local Base Columns
 	/** The local_id. */
-	OColumn local_id = new OColumn("Local ID", OInteger.class)
+	OColumn _id = new OColumn("Local ID", OInteger.class)
 			.setAutoIncrement(true).setLocalColumn();
 
 	/** The odoo_name. */
@@ -194,6 +198,44 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return null;
 	}
 
+	public OContentProvider getContentProvider() {
+		return null;
+	}
+
+	/**
+	 * Generate content Uri.
+	 * 
+	 * @return the uri
+	 */
+	public Uri uri() {
+		return OContentProvider.buildURI(authority(), path());
+	}
+
+	public String path() {
+		OContentProviderHelper provider = (OContentProviderHelper) getContentProvider();
+		if (provider != null)
+			return provider.path();
+		else
+			OLog.log("Override getContentProvider() method in "
+					+ getClass().getSimpleName());
+		return null;
+	}
+
+	/**
+	 * Generate content Authority.
+	 * 
+	 * @return the string
+	 */
+	public String authority() {
+		OContentProviderHelper provider = (OContentProviderHelper) getContentProvider();
+		if (provider != null)
+			return provider.authority();
+		else
+			OLog.log("Override getContentProvider() method in "
+					+ getClass().getSimpleName());
+		return null;
+	}
+
 	/**
 	 * Sets the user.
 	 * 
@@ -202,6 +244,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 */
 	public void setUser(OUser user) {
 		mUser = user;
+	}
+
+	public OUser getUser() {
+		return mUser;
 	}
 
 	/**
@@ -553,6 +599,22 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	/**
+	 * Generate columns string array used as Projection in ContentProvider.
+	 * 
+	 * @return the string[]
+	 */
+	public String[] projection() {
+		List<String> projection = new ArrayList<String>();
+		for (OColumn col : getColumns()) {
+			if (col.getRelationType() == null
+					|| (col.getRelationType() != null && col.getRelationType() == RelationType.ManyToOne)) {
+				projection.add(col.getName());
+			}
+		}
+		return projection.toArray(new String[projection.size()]);
+	}
+
+	/**
 	 * Select.
 	 * 
 	 * @return the list
@@ -581,6 +643,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		List<ODataRow> records = select("id = ? ", new Object[] { server_id });
 		if (records.size() > 0) {
 			return records.get(0).getInt(OColumn.ROW_ID);
+		}
+		return null;
+	}
+
+	public Integer selectServerId(Integer row_id) {
+		List<ODataRow> records = browse().columns("id", OColumn.ROW_ID, "name")
+				.addWhere(OColumn.ROW_ID, "=", row_id).fetch();
+		if (records.size() > 0) {
+			return records.get(0).getInt("id");
 		}
 		return null;
 	}
@@ -856,7 +927,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the cr
 	 * @return the object
 	 */
-	private Object createRecordRow(OColumn column, Cursor cr) {
+	public Object createRecordRow(OColumn column, Cursor cr) {
 		Object value = false;
 		if (column.getDefaultValue() != null) {
 			value = column.getDefaultValue();
@@ -911,6 +982,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return the int
 	 */
 	public int count(String where, Object[] whereArgs) {
+
 		int count = 0;
 		SQLiteDatabase db = getReadableDatabase();
 		String whr = getWhereClause(where);
@@ -991,6 +1063,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		values.put(OColumn.ROW_ID, newId);
 		updateRelationColumns(values);
 		sendDatasetChangeBroadcast(newId);
+		notifyDataChange(newId);
 		return newId;
 	}
 
@@ -1083,6 +1156,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return true;
 	}
 
+	private void notifyDataChange(Integer id) {
+		Uri uri = uri();
+		if (id != null)
+			uri.buildUpon().appendPath(id + "");
+		mContext.getContentResolver().notifyChange(uri, null, false);
+	}
+
 	private void sendDatasetChangeBroadcast(Integer newId) {
 		Intent intent = new Intent();
 		intent.setAction(DataSetChangeReceiver.DATA_CHANGED);
@@ -1143,6 +1223,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				getWhereArgs(where, whereArgs));
 		db.close();
 		updateRelationColumns(updateValues);
+		notifyDataChange(null);
 		return affectedRows;
 	}
 
@@ -1728,6 +1809,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			return null;
 		}
 	}
+
 }
 
 /**

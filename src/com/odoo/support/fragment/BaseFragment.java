@@ -18,15 +18,24 @@
  */
 package com.odoo.support.fragment;
 
+import android.content.ContentResolver;
+import android.content.SyncStatusObserver;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widgets.SwipeRefreshLayout;
 
 import com.odoo.App;
+import com.odoo.auth.OdooAccountManager;
 import com.odoo.orm.OModel;
 import com.odoo.support.AppScope;
+import com.odoo.support.OUser;
 
 /**
  * The Class BaseFragment.
@@ -39,6 +48,14 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 	/** The list search adapter. */
 	private ArrayAdapter<Object> listSearchAdapter;
 	private Boolean showActionbar = true;
+	private SyncStatusObserverListener mSyncStatusObserverListener = null;
+	final int mask = ContentResolver.SYNC_OBSERVER_TYPE_PENDING
+			| ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE;
+	private Object mSyncObserverHandle;
+	private OModel syncOberserverModel = null;
+	private SearchView mSearchView = null;
+	private OnSearchViewChangeListener mOnSearchViewChangeListener = null;
+	private SwipeRefreshLayout mSwipeRefresh = null;
 
 	/**
 	 * Gets the query listener.
@@ -190,6 +207,111 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 		scope = new AppScope(getActivity());
 		if (scope.main().getNavItem() != null)
 			scope.main().setTitle(scope.main().getNavItem().getTitle());
+		if (mSyncStatusObserverListener != null) {
+			mSyncStatusObserver.onStatusChanged(0);
+			mSyncObserverHandle = ContentResolver.addStatusChangeListener(mask,
+					mSyncStatusObserver);
+		}
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (mSyncObserverHandle != null) {
+			ContentResolver.removeStatusChangeListener(mSyncObserverHandle);
+			mSyncObserverHandle = null;
+		}
+	}
+
+	public void setHasSyncStatusObserver(
+			SyncStatusObserverListener syncStatusObserver, OModel model) {
+		mSyncStatusObserverListener = syncStatusObserver;
+		syncOberserverModel = model;
+	}
+
+	private SyncStatusObserver mSyncStatusObserver = new SyncStatusObserver() {
+		/** Callback invoked with the sync adapter status changes. */
+		@Override
+		public void onStatusChanged(int which) {
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+
+					boolean syncActive = ContentResolver.isSyncActive(
+							OdooAccountManager.getAccount(getActivity(), OUser
+									.current(getActivity()).getAndroidName()),
+							syncOberserverModel.authority());
+					boolean syncPending = ContentResolver.isSyncPending(
+							OdooAccountManager.getAccount(getActivity(), OUser
+									.current(getActivity()).getAndroidName()),
+							syncOberserverModel.authority());
+					mSyncStatusObserverListener.onStatusChange(syncActive
+							| syncPending);
+				}
+			});
+		}
+	};
+
+	public void setHasSearchView(OnSearchViewChangeListener listener,
+			Menu menu, int menu_id) {
+		mOnSearchViewChangeListener = listener;
+		mSearchView = (SearchView) menu.findItem(menu_id).getActionView();
+		mSearchView.setOnCloseListener(closeListener);
+		mSearchView.setOnQueryTextListener(searchViewQueryListener);
+		mSearchView.setIconifiedByDefault(true);
+	}
+
+	private SearchView.OnCloseListener closeListener = new SearchView.OnCloseListener() {
+
+		@Override
+		public boolean onClose() {
+			// Restore the SearchView if a query was entered
+			if (!TextUtils.isEmpty(mSearchView.getQuery())) {
+				mSearchView.setQuery(null, true);
+			}
+			mOnSearchViewChangeListener.onSearchViewClose();
+			return true;
+		}
+	};
+
+	private OnQueryTextListener searchViewQueryListener = new OnQueryTextListener() {
+
+		public boolean onQueryTextChange(String newText) {
+			String newFilter = !TextUtils.isEmpty(newText) ? newText : null;
+			return mOnSearchViewChangeListener
+					.onSearchViewTextChange(newFilter);
+		}
+
+		@Override
+		public boolean onQueryTextSubmit(String query) {
+			// Don't care about this.
+			return true;
+		}
+	};
+
+	public void setHasSwipeRefreshView(View parent, int resource_id,
+			SwipeRefreshLayout.OnRefreshListener listener) {
+		mSwipeRefresh = (SwipeRefreshLayout) parent.findViewById(resource_id);
+		mSwipeRefresh.setOnRefreshListener(listener);
+		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
+	}
+
+	public void setSwipeRefreshing(Boolean refreshing) {
+		if (mSwipeRefresh != null)
+			mSwipeRefresh.setRefreshing(refreshing);
+	}
+
+	public void hideRefreshingProgress() {
+		if (mSwipeRefresh != null) {
+			new Handler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mSwipeRefresh.setRefreshing(false);
+				}
+			}, 1000);
+		}
+	}
 }

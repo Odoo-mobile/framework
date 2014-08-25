@@ -8,10 +8,12 @@ import odoo.controls.OList.OnListBottomReachedListener;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,14 +22,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
-import android.widgets.SwipeRefreshLayout;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.ODataRow;
-import com.odoo.orm.sql.OQuery;
+import com.odoo.orm.OModel;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
@@ -35,7 +36,8 @@ import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class Partners extends BaseFragment implements OnRowClickListener,
-		OnListBottomReachedListener, OnRefreshListener {
+		OnListBottomReachedListener, OnRefreshListener,
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	public static final String TAG = Partners.class.getSimpleName();
 	public static final String KEY = "partner_type";
@@ -47,7 +49,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	private Integer mLimit = 10;
 	private Integer mOffset = 0;
 	private Integer mLastPosition = -1;
-	private SwipeRefreshLayout mSwipeRefresh = null;
+	private Boolean mSync = false;
 
 	public enum Type {
 		Customers, Suppliers, Companies
@@ -63,6 +65,8 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		initArgs();
 		mView = inflater.inflate(R.layout.partners_list, container, false);
 		init();
+		getActivity().getSupportLoaderManager().initLoader(1, null, this);
+		setHasSwipeRefreshView(mView, R.id.swipe_container, this);
 		return mView;
 	}
 
@@ -74,13 +78,6 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	private void init() {
-		mSwipeRefresh = (SwipeRefreshLayout) mView
-				.findViewById(R.id.swipe_container);
-		mSwipeRefresh.setOnRefreshListener(this);
-		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
-				android.R.color.holo_green_light,
-				android.R.color.holo_orange_light,
-				android.R.color.holo_red_light);
 		OControls.setVisible(mView, R.id.loadingProgress);
 		mListcontrol = (OList) mView.findViewById(R.id.listRecords);
 		mListcontrol.setOnRowClickListener(this);
@@ -146,40 +143,38 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 
 				@Override
 				public void run() {
-					if (db().isEmptyTable()) {
-						mSwipeRefresh.setRefreshing(true);
+					if (db().isEmptyTable() && !mSync) {
+						mSync = true;
+						setSwipeRefreshing(true);
 						scope.main().requestSync(PartnersProvider.AUTHORITY);
 					}
 					if (offset == 0)
 						mListRecords.clear();
 
 					// Using Join
-					OQuery query = db().browse();
-					if (mCurrentType != Type.Companies) {
-						query.columns("*", "country_id.name", "parent_id.name");
-					} else {
-						query.columns("*", "country_id.name");
-					}
-					query.addWhere(getWhere(mCurrentType), "=", true);
-					query.setOffset(offset);
-					query.setLimit(mLimit);
-					query.setOrder("local_id", "DESC");
-					mListRecords.addAll(query.fetch());
-					mOffset = query.getNextOffset();
-					mListcontrol.setRecordOffset(mOffset);
+					// OQuery query = db().browse();
+					// if (mCurrentType != Type.Companies) {
+					// query.columns("*", "country_id.name", "parent_id.name");
+					// } else {
+					// query.columns("*", "country_id.name");
+					// }
+					// query.addWhere(getWhere(mCurrentType), "=", true);
+					// // query.setOffset(offset);
+					// // query.setLimit(mLimit);
+					// query.setOrder("local_id", "DESC");
+					// mListRecords.addAll(query.fetch());
+					// mOffset = query.getNextOffset();
+					// mListcontrol.setRecordOffset(mOffset);
 
 					// Using Simple Query
 
-					// OModel model = db();
-					// model.setOffset(offset);
-					// Object[] args = new Object[] { true };
-					// mListRecords.addAll(model
-					// .setLimit(mLimit)
-					// .setOffset(offset)
-					// .select(getWhere(mCurrentType) + " = ?", args,
-					// null, null, "local_id DESC"));
-					// mOffset = model.getNextOffset();
-					// mListcontrol.setRecordOffset(mOffset);
+					OModel model = db();
+					model.setOffset(offset).setLimit(mLimit);
+					Object[] args = new Object[] { true };
+					List<ODataRow> records = model.select();
+					mListRecords.addAll(records);
+					mOffset = model.getNextOffset();
+					mListcontrol.setRecordOffset(mOffset);
 
 				}
 			});
@@ -242,9 +237,9 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	@Override
 	public void onRowItemClick(int position, View view, ODataRow row) {
 		mLastPosition = position;
-		PartnersDetail partner = new PartnersDetail();
 		Bundle arg = new Bundle();
 		arg.putAll(row.getPrimaryBundleData());
+		PartnersDetail partner = new PartnersDetail();
 		partner.setArguments(arg);
 		startFragment(partner, true);
 	}
@@ -273,6 +268,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 			mOffset = 0;
 			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
+			mSync = true;
 		}
 	};
 
@@ -301,12 +297,19 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		}
 	}
 
-	private void hideRefreshingProgress() {
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				mSwipeRefresh.setRefreshing(false);
-			}
-		}, 1000);
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		return null;
 	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
+
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+
+	}
+
 }

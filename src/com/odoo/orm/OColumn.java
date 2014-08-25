@@ -30,7 +30,7 @@ import java.util.List;
 public class OColumn {
 
 	/** The Constant ROW_ID. */
-	public static final String ROW_ID = "local_id";
+	public static final String ROW_ID = "_id";
 
 	/** The column domains. */
 	private LinkedHashMap<String, ColumnDomain> columnDomains = new LinkedHashMap<String, OColumn.ColumnDomain>();
