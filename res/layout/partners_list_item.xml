@@ -65,8 +65,7 @@
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    odoo:field_name="country_id"
-                    odoo:ref_column="name"
+                    odoo:field_name="country_id_name"
                     odoo:with_label="false" >
                 </odoo.controls.OField>
             </LinearLayout>

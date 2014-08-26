@@ -26,6 +26,7 @@ import com.odoo.R;
 import com.odoo.addons.partners.providers.partners.PartnersProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OColumn;
+import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.OnSearchViewChangeListener;
 import com.odoo.support.fragment.SyncStatusObserverListener;
@@ -60,6 +61,7 @@ public class PartnersCursorLoader extends BaseFragment implements
 		setHasOptionsMenu(true);
 		setHasSyncStatusObserver(this, db());
 		initArgs();
+		scope = new AppScope(this);
 		return inflater.inflate(R.layout.partners_listview, container, false);
 	}
 
@@ -138,6 +140,10 @@ public class PartnersCursorLoader extends BaseFragment implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		if (db().isEmptyTable()) {
+			scope.main().requestSync(PartnersProvider.AUTHORITY);
+			setSwipeRefreshing(true);
+		}
 		String selection = null;
 		String[] args = null;
 		if (mCurFilter != null) {
@@ -147,7 +153,8 @@ public class PartnersCursorLoader extends BaseFragment implements
 			selection = getWhere(mCurrentType) + " = ?";
 			args = new String[] { "true" };
 		}
-		return new CursorLoader(getActivity(), db().uri(), db().projection(),
+		return new CursorLoader(getActivity(), db().uri(), new String[] {
+				"image_small", "name", "email", "city", "country_id.name" },
 				selection, args, OColumn.ROW_ID + " DESC");
 	}
 

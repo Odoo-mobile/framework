@@ -240,7 +240,6 @@ public abstract class BaseActivity extends FragmentActivity implements
 		String title = item.getTitle();
 		Integer counter = item.getCounter();
 		// set icon and text
-		iconView.setVisibility(iconId > 0 ? View.VISIBLE : View.GONE);
 		if (iconId > 0) {
 			iconView.setImageResource(iconId);
 		}
@@ -249,7 +248,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 			String ctr = (counter > 99) ? "99+" : counter + "";
 			counterView.setText(ctr);
 		} else {
-			counterView.setVisibility(View.GONE);
+			counterView.setText("");
 		}
 		formatNavDrawerItem(view, item, selected);
 

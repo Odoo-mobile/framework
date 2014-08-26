@@ -19,12 +19,19 @@
 
 package com.odoo.support.provider;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
@@ -132,25 +139,12 @@ public abstract class OContentProvider extends ContentProvider implements
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sort) {
-		SQLiteDatabase db = model.getReadableDatabase();
-		SelectionBuilder builder = new SelectionBuilder();
-		int uriMatch = matcher.match(uri);
-		switch (uriMatch) {
-		case SINGLE_ROW:
-			// Return a single entry, by ID.
-			String id = uri.getLastPathSegment();
-			builder.where(OColumn.ROW_ID + "=?", id);
-		case COLLECTION:
-			// Return all known entries.
-			builder.table(model.getTableName()).where(selection, selectionArgs);
-			Cursor c = builder.query(db, projection, sort);
-			Context ctx = getContext();
-			assert ctx != null;
-			c.setNotificationUri(ctx.getContentResolver(), uri);
-			return c;
-		default:
-			throw new UnsupportedOperationException("Unknown uri: " + uri);
-		}
+		projection = validateProjections(projection);
+		Cursor c = createQuery(uri, projection, selection, selectionArgs, sort);
+		Context ctx = getContext();
+		assert ctx != null;
+		c.setNotificationUri(ctx.getContentResolver(), uri);
+		return c;
 	}
 
 	@Override
@@ -183,4 +177,99 @@ public abstract class OContentProvider extends ContentProvider implements
 		return count;
 	}
 
+	private String[] validateProjections(String[] projection) {
+		List<String> columns = new ArrayList<String>();
+		columns.addAll(Arrays.asList(projection));
+		columns.add(OColumn.ROW_ID);
+		if (model.getColumn("id") != null)
+			columns.add("id");
+		return columns.toArray(new String[columns.size()]);
+	}
+
+	private Cursor createQuery(Uri uri, String[] projection, String selection,
+			String[] selectionArgs, String sort) {
+		SQLiteQueryBuilder query = new SQLiteQueryBuilder();
+		int total_column = model.getColumns().size();
+		boolean withAlias = (projection.length < total_column - 1);
+		StringBuffer joins = new StringBuffer();
+		String base_table = model.getTableName();
+		String base_alias = base_table + "_base";
+		HashMap<String, String> projectionMap = new HashMap<String, String>();
+		for (String col_name : projection) {
+			String col = col_name;
+			if (col_name.contains(".")) {
+				col = col_name.split("\\.")[0];
+			}
+			OColumn column = model.getColumn(col);
+			String display_col = col;
+			if (withAlias) {
+				display_col = base_alias + "." + col + " AS " + col;
+				if (column.getRelationType() != null) {
+					OModel rel_model = model.createInstance(column.getType());
+					String table = rel_model.getTableName();
+					String alias = table;
+					alias = table + "_self";
+					table += " AS " + alias;
+					joins.append(" JOIN ");
+					joins.append(table);
+					joins.append(" ON ");
+					joins.append(base_alias + "." + column.getName());
+					joins.append(" = ");
+					joins.append(alias + "." + OColumn.ROW_ID);
+					joins.append(" ");
+					String rel_col = col;
+					String rel_col_name = "";
+					if (col_name.contains(".")) {
+						rel_col += "_" + col_name.split("\\.")[1];
+						rel_col_name = col_name.split("\\.")[1];
+					}
+					projectionMap.put(rel_col, alias + "." + rel_col_name
+							+ " AS " + rel_col);
+				}
+			}
+			projectionMap.put(col, display_col);
+		}
+		StringBuffer tables = new StringBuffer();
+		tables.append(base_table + ((withAlias) ? " AS " + base_alias : " "));
+		tables.append(joins.toString());
+		query.setTables(tables.toString());
+		query.setProjectionMap(projectionMap);
+		StringBuffer whr = new StringBuffer();
+		if (withAlias) {
+			// Check for and
+			Pattern pattern = Pattern.compile("and|AND");
+			String[] data = pattern.split(selection);
+			for (String token : data) {
+				whr.append(base_alias + "." + token.trim());
+				whr.append(" AND ");
+			}
+			whr.delete(whr.length() - 5, whr.length());
+			// Check for or
+			pattern = Pattern.compile("or|OR");
+			data = pattern.split(whr.toString());
+			whr = new StringBuffer();
+			for (String token : data) {
+				whr.append((!token.contains(base_alias)) ? base_alias + "."
+						+ token.trim() : token.trim());
+				whr.append(" OR ");
+			}
+			whr.delete(whr.length() - 4, whr.length());
+		} else {
+			whr.append(selection);
+		}
+		Cursor c = null;
+		int uriMatch = matcher.match(uri);
+		switch (uriMatch) {
+		case SINGLE_ROW:
+			// Return a single entry, by ID.
+			String id = uri.getLastPathSegment();
+			query.appendWhere(base_alias + "." + OColumn.ROW_ID + " = " + id);
+		case COLLECTION:
+			c = query.query(model.getReadableDatabase(), null, whr.toString(),
+					selectionArgs, null, null, sort);
+			return c;
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+	}
 }
