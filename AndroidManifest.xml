@@ -103,8 +103,16 @@
             android:label="Partners"
             android:syncable="true" />
         <provider
-            android:name="com.odoo.base.ir.providers.ir.ModelProvider"
-            android:authorities="com.odoo.base.ir.providers.ir"
+            android:name="com.odoo.base.ir.providers.model.ModelProvider"
+            android:authorities="com.odoo.base.ir.providers.model"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.users.UsersProvider"
+            android:authorities="com.odoo.base.res.providers.users"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.ir.providers.attachments.AttachmentProvider"
+            android:authorities="com.odoo.base.ir.providers.attachments"
             android:multiprocess="true" />
         <provider
             android:name="com.odoo.base.res.providers.country.CountryProvider"

@@ -575,6 +575,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		batch.withValue("local_write_date", ODate.getDate());
 		batch.withValue("odoo_name", account.name);
 		return batch.build();
 	}

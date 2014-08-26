@@ -33,13 +33,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.util.Log;
 
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OModel;
 import com.odoo.orm.SelectionBuilder;
-import com.odoo.support.OUser;
-import com.odoo.util.ODate;
 
 /**
  * The Class OContentProvider.
@@ -52,7 +49,6 @@ public abstract class OContentProvider extends ContentProvider implements
 	private final int SINGLE_ROW = 2;
 
 	private UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-	private OUser user = null;
 
 	/** The database model. */
 	private OModel model = null;
@@ -100,8 +96,6 @@ public abstract class OContentProvider extends ContentProvider implements
 
 	@Override
 	public Uri insert(Uri uri, ContentValues initialValues) {
-		initialValues.put("local_write_date", ODate.getDate());
-		initialValues.put("odoo_name", user.getAndroidName());
 		final SQLiteDatabase db = model.getWritableDatabase();
 		assert db != null;
 		final int match = matcher.match(uri);
@@ -122,14 +116,12 @@ public abstract class OContentProvider extends ContentProvider implements
 		Context ctx = getContext();
 		assert ctx != null;
 		ctx.getContentResolver().notifyChange(uri, null, false);
-		Log.v("", result.toString());
 		return result;
 	}
 
 	@Override
 	public boolean onCreate() {
 		model = model(getContext());
-		user = model.getUser();
 		matcher.addURI(authority(), path(), COLLECTION);
 		matcher.addURI(authority(), path() + "/#", SINGLE_ROW);
 		return ((model == null) ? false : true);
@@ -150,8 +142,6 @@ public abstract class OContentProvider extends ContentProvider implements
 	@Override
 	public int update(Uri uri, ContentValues values, String where,
 			String[] whereArgs) {
-		values.put("local_write_date", ODate.getDate());
-		values.put("odoo_name", user.getAndroidName());
 		SelectionBuilder builder = new SelectionBuilder();
 		final SQLiteDatabase db = model.getWritableDatabase();
 		final int match = matcher.match(uri);
@@ -170,7 +160,6 @@ public abstract class OContentProvider extends ContentProvider implements
 		default:
 			throw new UnsupportedOperationException("Unknown uri: " + uri);
 		}
-		Log.v("", uri + " UPDATED");
 		Context ctx = getContext();
 		assert ctx != null;
 		ctx.getContentResolver().notifyChange(uri, null, false);

@@ -2,7 +2,7 @@ package com.odoo.base.ir;
 
 import android.content.Context;
 
-import com.odoo.base.ir.providers.ir.ModelProvider;
+import com.odoo.base.ir.providers.model.ModelProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.ODateTime;
