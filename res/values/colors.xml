@@ -16,7 +16,7 @@
     <color name="body_text_1_inverse">#deffffff</color>
     <color name="body_text_2_inverse">#8affffff</color>
     <color name="navdrawer_background">#ffffffff</color>
-    <color name="navdrawer_text_color">@color/body_text_1</color>
+    <color name="navdrawer_text_color">#676767</color>
     <color name="navdrawer_text_color_selected">@color/theme_primary</color>
     <color name="navdrawer_icon_tint">#808080</color>
     <color name="navdrawer_icon_tint_selected">@color/theme_primary</color>

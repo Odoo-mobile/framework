@@ -342,9 +342,18 @@ public abstract class BaseActivity extends FragmentActivity implements
 			++i;
 		}
 		if (mDrawerItemSelectedPosition == -1) {
-			onNavDrawerItemClicked(mNavDrawerItems.get(0));
+			selectDrawerItem();
 		}
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+	}
+
+	private void selectDrawerItem() {
+		for (DrawerItem item : mNavDrawerItems) {
+			if (!item.isGroupTitle()) {
+				onNavDrawerItemClicked(item);
+				break;
+			}
+		}
 	}
 
 	private View makeNavDrawerItem(final DrawerItem item, ViewGroup container) {
@@ -359,6 +368,8 @@ public abstract class BaseActivity extends FragmentActivity implements
 		View view = getLayoutInflater().inflate(layoutToInflate, container,
 				false);
 		if (item.isGroupTitle()) {
+			OControls
+					.setText(view, R.id.navdrawer_group_title, item.getTitle());
 			return view;
 		}
 		view.setTag(item.getKey());
@@ -413,10 +424,12 @@ public abstract class BaseActivity extends FragmentActivity implements
 		for (int i = startIndex; i < newItems.size(); i++) {
 			ViewGroup v = (ViewGroup) mDrawerItemsListContainer.getChildAt(i);
 			DrawerItem item = newItems.get(itemIndex);
-			String counter = (item.getCounter() > 99) ? "99+" : (item
-					.getCounter() == 0) ? "" : item.getCounter() + "";
-			OControls.setText(v, R.id.counter, counter);
-			itemIndex++;
+			if (!item.isGroupTitle()) {
+				String counter = (item.getCounter() > 99) ? "99+" : (item
+						.getCounter() == 0) ? "" : item.getCounter() + "";
+				OControls.setText(v, R.id.counter, counter);
+				itemIndex++;
+			}
 		}
 
 	}
