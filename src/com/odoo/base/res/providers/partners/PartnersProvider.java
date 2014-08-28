@@ -1,4 +1,4 @@
-package com.odoo.addons.partners.providers.partners;
+package com.odoo.base.res.providers.partners;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,7 +9,7 @@ import com.odoo.support.provider.OContentProvider;
 
 public class PartnersProvider extends OContentProvider {
 
-	public static final String AUTHORITY = "com.odoo.addons.partners.providers.partners";
+	public static final String AUTHORITY = "com.odoo.base.res.providers.partners";
 	public static final String PATH = "res_partner";
 	public static final Uri CONTENT_URI = OContentProvider.buildURI(AUTHORITY,
 			PATH);

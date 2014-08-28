@@ -49,7 +49,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	private Boolean checkForWriteCreateDate = true;
 	/** The relation record list. */
 	private ORelationRecordList mRelationRecordList = new ORelationRecordList();
-	private ContentResolver contentResolver = null;
 	private OSyncHelper mSync = null;
 
 	/** The finished models. */
@@ -67,7 +66,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		mModel = model;
 		mContentResolver = context.getContentResolver();
 		mApp = (App) mContext.getApplicationContext();
-		mOdoo = mApp.getOdoo();
 		init();
 	}
 
@@ -82,9 +80,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	}
 
 	private void init() {
-		contentResolver = getContext().getContentResolver();
 		mPref = new PreferenceManager(mContext);
 		mSync = mModel.getSyncHelper();
+		mOdoo = mApp.getOdoo();
 	}
 
 	public OSyncAdapter setDomain(ODomain domain) {
@@ -184,21 +182,21 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 				batch.add(createBatch(account, model, record));
 				mContentResolver.applyBatch(model.authority(), batch);
 			}
-//			mContentResolver.applyBatch(model.authority(), batch);
+			// mContentResolver.applyBatch(model.authority(), batch);
 			// Updating relation records for master record
 			updateRelationRecords(account, syncResult);
 			// Creating record on server if model allows true
 			if (model.canCreateOnServer())
 				createRecordOnserver(account, model, syncResult);
-			// Updating dirty record on server if model allows true
-			if (model.canUpdateToServer())
-				updateToServer(account, model, syncResult);
 			// Deleting record from server if model allows true
 			if (model.canDeleteFromServer())
 				deleteRecordFromServer(account, model, syncResult);
 			// Deleting record from local if model allows true
 			if (model.canDeleteFromLocal())
 				deleteRecordInLocal(model, syncResult);
+			// Updating dirty record on server if model allows true
+			if (model.canUpdateToServer())
+				updateToServer(account, model, syncResult);
 			syncFinish(model, syncResult);
 			mContentResolver.notifyChange(model.uri(), null, false);
 		} catch (Exception e) {
@@ -267,7 +265,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 								.appendPath(Integer.toString(localId)).build());
 				batch.add(builder.build());
 			}
-			contentResolver.applyBatch(model.authority(), batch);
+			mContentResolver.applyBatch(model.authority(), batch);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -275,8 +273,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 
 	private void deleteRecordFromServer(Account account, OModel model,
 			SyncResult syncResult) {
-		Cursor c = contentResolver.query(model.uri(), model.projection(),
-				"is_active = ? and is_dirty = ? and odoo_name = ?",
+		Cursor c = mContentResolver.query(model.uri(), model.projection(),
+				"is_active = ? or is_active = 0 and is_dirty = ? or is_dirty = 0 and odoo_name = ?",
 				new String[] { "false", "true", account.name }, null);
 		assert c != null;
 		Log.i(TAG, "Found " + c.getCount()
@@ -292,7 +290,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 									.appendPath(Integer.toString(localId))
 									.build());
 					batch.add(builder.build());
-					contentResolver.applyBatch(model.authority(), batch);
+					mContentResolver.applyBatch(model.authority(), batch);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -303,7 +301,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 
 	private void updateToServer(Account account, OModel model,
 			SyncResult syncResult) {
-		Cursor c = contentResolver.query(model.uri(), model.projection(),
+		Cursor c = mContentResolver.query(model.uri(), model.projection(),
 				"is_dirty = ? and odoo_name = ?", new String[] { "true",
 						account.name }, null);
 		assert c != null;
@@ -335,7 +333,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 
 	private void createRecordOnserver(Account account, OModel model,
 			SyncResult syncResult) {
-		Cursor c = contentResolver.query(model.uri(), model.projection(),
+		Cursor c = mContentResolver.query(model.uri(), model.projection(),
 				"id = ? and odoo_name = ?", new String[] { "0", account.name },
 				null);
 		assert c != null;

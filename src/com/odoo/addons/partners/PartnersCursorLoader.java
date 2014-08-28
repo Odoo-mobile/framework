@@ -23,10 +23,9 @@ import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.R;
-import com.odoo.addons.partners.providers.partners.PartnersProvider;
 import com.odoo.base.res.ResPartner;
+import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.OColumn;
-import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.OnSearchViewChangeListener;
 import com.odoo.support.fragment.SyncStatusObserverListener;
@@ -59,9 +58,8 @@ public class PartnersCursorLoader extends BaseFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		setHasSyncStatusObserver(this, db());
+		setHasSyncStatusObserver(TAG, this, db());
 		initArgs();
-		scope = new AppScope(this);
 		return inflater.inflate(R.layout.partners_listview, container, false);
 	}
 

@@ -142,7 +142,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			.setParsePattern(ODate.DEFAULT_FORMAT);
 
 	// Local Base Columns
-	/** The local_id. */
+	/** The _id. */
 	OColumn _id = new OColumn("Local ID", OInteger.class)
 			.setAutoIncrement(true).setLocalColumn();
 
@@ -1265,7 +1265,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return true, if successful
 	 */
 	public boolean delete(int id) {
-		return delete("local_id  = ? ", new Object[] { id });
+		return delete(OColumn.ROW_ID + " = ? ", new Object[] { id });
 	}
 
 	/**

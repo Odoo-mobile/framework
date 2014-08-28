@@ -77,31 +77,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Contact service -->
-        <service
-            android:name="com.odoo.base.res.services.ContactSyncService"
-            android:exported="true"
-            android:process=":contacts" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_contacts" />
-            <meta-data
-                android:name="android.provider.CONTACTS_STRUCTURE"
-                android:resource="@xml/contacts" />
-        </service>
-
-        <!-- ResPartner Provider -->
-        <provider
-            android:name="com.odoo.addons.partners.providers.partners.PartnersProvider"
-            android:authorities="com.odoo.addons.partners.providers.partners"
-            android:enabled="true"
-            android:exported="false"
-            android:label="Partners"
-            android:syncable="true" />
+        <!-- Base Providers (Note: update authority as per your app package) -->
         <provider
             android:name="com.odoo.base.ir.providers.model.ModelProvider"
             android:authorities="com.odoo.base.ir.providers.model"
@@ -127,6 +103,33 @@
             android:authorities="com.odoo.base.res.providers.company"
             android:exported="false"
             android:multiprocess="true" />
+
+        <!-- /Base Providers -->
+        <!-- Contact service -->
+        <service
+            android:name="com.odoo.base.res.services.ContactSyncService"
+            android:exported="true"
+            android:process=":contacts" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_contacts" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
+
+        <!-- ResPartner Provider -->
+        <provider
+            android:name="com.odoo.base.res.providers.partners.PartnersProvider"
+            android:authorities="com.odoo.base.res.providers.partners"
+            android:enabled="true"
+            android:exported="false"
+            android:label="Partners"
+            android:syncable="true" />
         <provider
             android:name="com.odoo.addons.partners.providers.partners_category.PartnerCategoryProvider"
             android:authorities="com.odoo.addons.partners.providers.partners_category"

@@ -21,6 +21,7 @@ package com.odoo.support.fragment;
 import android.content.ContentResolver;
 import android.content.SyncStatusObserver;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -56,6 +57,7 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 	private SearchView mSearchView = null;
 	private OnSearchViewChangeListener mOnSearchViewChangeListener = null;
 	private SwipeRefreshLayout mSwipeRefresh = null;
+	private String drawer_tag = null;
 
 	/**
 	 * Gets the query listener.
@@ -228,8 +230,9 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 		}
 	}
 
-	public void setHasSyncStatusObserver(
+	public void setHasSyncStatusObserver(String drawer_tag,
 			SyncStatusObserverListener syncStatusObserver, OModel model) {
+		this.drawer_tag = drawer_tag;
 		mSyncStatusObserverListener = syncStatusObserver;
 		syncOberserverModel = model;
 	}
@@ -250,8 +253,11 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 							OdooAccountManager.getAccount(getActivity(), OUser
 									.current(getActivity()).getAndroidName()),
 							syncOberserverModel.authority());
-					mSyncStatusObserverListener.onStatusChange(syncActive
-							| syncPending);
+					boolean refreshing = syncActive | syncPending;
+					if (!refreshing) {
+						scope.main().refreshDrawer(drawer_tag);
+					}
+					mSyncStatusObserverListener.onStatusChange(refreshing);
 				}
 			});
 		}
@@ -318,5 +324,11 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 				}
 			}, 1000);
 		}
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		scope = new AppScope(getActivity());
 	}
 }
