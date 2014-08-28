@@ -376,7 +376,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 		}
 		titleView.setText(title);
 		if (counter > 0) {
-			String ctr = /* (counter > 99) ? "99+" : */counter + "";
+			String ctr = (counter > 99) ? "99+" : counter + "";
 			counterView.setText(ctr);
 		} else {
 			counterView.setText("");

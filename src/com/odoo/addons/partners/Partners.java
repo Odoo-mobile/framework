@@ -25,8 +25,8 @@ import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.R;
-import com.odoo.addons.partners.providers.partners.PartnersProvider;
 import com.odoo.base.res.ResPartner;
+import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.receivers.SyncFinishReceiver;

@@ -22,8 +22,7 @@ package com.odoo.base.res;
 import android.content.Context;
 
 import com.odoo.addons.partners.model.ResPartnerCategory;
-import com.odoo.addons.partners.model.ResPartnerTitle;
-import com.odoo.addons.partners.providers.partners.PartnersProvider;
+import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
@@ -58,8 +57,6 @@ public class ResPartner extends OModel {
 	// Extra Demo Module Columns
 	OColumn date = new OColumn("Date", ODateTime.class)
 			.setParsePattern(ODate.DEFAULT_FORMAT);
-	OColumn title = new OColumn("Title", ResPartnerTitle.class,
-			RelationType.ManyToOne);
 	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
 	OColumn child_ids = new OColumn("Contacts", ResPartner.class,
