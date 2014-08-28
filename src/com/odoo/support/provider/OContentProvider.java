@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.json.JSONArray;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,8 +37,11 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import com.odoo.orm.OColumn;
+import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
+import com.odoo.orm.OModel.Command;
 import com.odoo.orm.SelectionBuilder;
+import com.odoo.util.JSONUtils;
 
 /**
  * The Class OContentProvider.
@@ -63,6 +68,7 @@ public abstract class OContentProvider extends ContentProvider implements
 
 	@Override
 	public int delete(Uri uri, String where, String[] whereArgs) {
+		reInitModel();
 		final SQLiteDatabase db = model.getWritableDatabase();
 		assert db != null;
 		final int match = matcher.match(uri);
@@ -94,8 +100,45 @@ public abstract class OContentProvider extends ContentProvider implements
 		return uri().toString();
 	}
 
+	private void handleManyToMany(HashMap<String, List<Integer>> record_ids,
+			int _id) {
+		if (record_ids.size() > 0) {
+			for (String key : record_ids.keySet()) {
+				List<Integer> ids = record_ids.get(key);
+				OColumn column = model.getColumn(key);
+				OModel rel_model = model.createInstance(column.getType());
+				model.manageManyToManyRecords(model.getWritableDatabase(),
+						rel_model, ids, _id, Command.Replace);
+			}
+		}
+	}
+
+	private HashMap<String, List<Integer>> getManyToManyRecords(
+			ContentValues values) {
+		HashMap<String, List<Integer>> ids = new HashMap<String, List<Integer>>();
+		for (OColumn col : model.getRelationColumns()) {
+			if (col.getRelationType() == RelationType.ManyToMany) {
+				if (values.containsKey(col.getName())) {
+					List<Integer> record_ids = new ArrayList<Integer>();
+					try {
+						record_ids.addAll(JSONUtils
+								.<Integer> toList(new JSONArray(values.get(
+										col.getName()).toString())));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					ids.put(col.getName(), record_ids);
+					values.remove(col.getName());
+				}
+			}
+		}
+		return ids;
+	}
+
 	@Override
 	public Uri insert(Uri uri, ContentValues initialValues) {
+		reInitModel();
+		HashMap<String, List<Integer>> manyToManyIds = getManyToManyRecords(initialValues);
 		final SQLiteDatabase db = model.getWritableDatabase();
 		assert db != null;
 		final int match = matcher.match(uri);
@@ -104,6 +147,7 @@ public abstract class OContentProvider extends ContentProvider implements
 		case COLLECTION:
 			long id = db.insertOrThrow(model.getTableName(), null,
 					initialValues);
+			handleManyToMany(manyToManyIds, (int) id);
 			result = Uri.parse(uri() + "/" + id);
 			break;
 		case SINGLE_ROW:
@@ -125,7 +169,12 @@ public abstract class OContentProvider extends ContentProvider implements
 		matcher.addURI(authority(), path(), COLLECTION);
 		matcher.addURI(authority(), path() + "/#", SINGLE_ROW);
 		return ((model == null) ? false : true);
+	}
 
+	private void reInitModel() {
+		if (model.getDatabaseName().length() == 0) {
+			onCreate();
+		}
 	}
 
 	@Override
@@ -142,17 +191,28 @@ public abstract class OContentProvider extends ContentProvider implements
 	@Override
 	public int update(Uri uri, ContentValues values, String where,
 			String[] whereArgs) {
+		reInitModel();
 		SelectionBuilder builder = new SelectionBuilder();
 		final SQLiteDatabase db = model.getWritableDatabase();
 		final int match = matcher.match(uri);
 		int count;
 		switch (match) {
 		case COLLECTION:
+
+			Cursor cr = query(uri, new String[] { OColumn.ROW_ID }, where,
+					whereArgs, null);
+			while (cr.moveToNext()) {
+				int id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+				handleManyToMany(getManyToManyRecords(values), id);
+			}
+			cr.close();
+
 			count = builder.table(model.getTableName()).where(where, whereArgs)
 					.update(db, values);
 			break;
 		case SINGLE_ROW:
 			String id = uri.getLastPathSegment();
+			handleManyToMany(getManyToManyRecords(values), Integer.parseInt(id));
 			count = builder.table(model.getTableName()).where(where, whereArgs)
 					.where(OColumn.ROW_ID + "=?", id).where(where, whereArgs)
 					.update(db, values);
@@ -177,13 +237,14 @@ public abstract class OContentProvider extends ContentProvider implements
 
 	private Cursor createQuery(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sort) {
+		reInitModel();
 		SQLiteQueryBuilder query = new SQLiteQueryBuilder();
-		int total_column = model.getColumns().size();
-		boolean withAlias = (projection.length < total_column - 1);
+		boolean withAlias = (projection.length < model.projection().length);
 		StringBuffer joins = new StringBuffer();
 		String base_table = model.getTableName();
 		String base_alias = base_table + "_base";
 		HashMap<String, String> projectionMap = new HashMap<String, String>();
+		List<String> mJoinTables = new ArrayList<String>();
 		for (String col_name : projection) {
 			String col = col_name;
 			if (col_name.contains(".")) {
@@ -199,13 +260,16 @@ public abstract class OContentProvider extends ContentProvider implements
 					String alias = table;
 					alias = table + "_self";
 					table += " AS " + alias;
-					joins.append(" JOIN ");
-					joins.append(table);
-					joins.append(" ON ");
-					joins.append(base_alias + "." + column.getName());
-					joins.append(" = ");
-					joins.append(alias + "." + OColumn.ROW_ID);
-					joins.append(" ");
+					if (!mJoinTables.contains(alias)) {
+						mJoinTables.add(alias);
+						joins.append(" JOIN ");
+						joins.append(table);
+						joins.append(" ON ");
+						joins.append(base_alias + "." + column.getName());
+						joins.append(" = ");
+						joins.append(alias + "." + OColumn.ROW_ID);
+						joins.append(" ");
+					}
 					String rel_col = col;
 					String rel_col_name = "";
 					if (col_name.contains(".")) {
@@ -224,27 +288,31 @@ public abstract class OContentProvider extends ContentProvider implements
 		query.setTables(tables.toString());
 		query.setProjectionMap(projectionMap);
 		StringBuffer whr = new StringBuffer();
-		if (withAlias) {
-			// Check for and
-			Pattern pattern = Pattern.compile("and|AND");
-			String[] data = pattern.split(selection);
-			for (String token : data) {
-				whr.append(base_alias + "." + token.trim());
-				whr.append(" AND ");
+		String where = null;
+		if (selection != null && selectionArgs != null) {
+			if (withAlias) {
+				// Check for and
+				Pattern pattern = Pattern.compile("and|AND");
+				String[] data = pattern.split(selection);
+				for (String token : data) {
+					whr.append(base_alias + "." + token.trim());
+					whr.append(" AND ");
+				}
+				whr.delete(whr.length() - 5, whr.length());
+				// Check for or
+				pattern = Pattern.compile("or|OR");
+				data = pattern.split(whr.toString());
+				whr = new StringBuffer();
+				for (String token : data) {
+					whr.append((!token.contains(base_alias)) ? base_alias + "."
+							+ token.trim() : token.trim());
+					whr.append(" OR ");
+				}
+				whr.delete(whr.length() - 4, whr.length());
+			} else {
+				whr.append(selection);
 			}
-			whr.delete(whr.length() - 5, whr.length());
-			// Check for or
-			pattern = Pattern.compile("or|OR");
-			data = pattern.split(whr.toString());
-			whr = new StringBuffer();
-			for (String token : data) {
-				whr.append((!token.contains(base_alias)) ? base_alias + "."
-						+ token.trim() : token.trim());
-				whr.append(" OR ");
-			}
-			whr.delete(whr.length() - 4, whr.length());
-		} else {
-			whr.append(selection);
+			where = whr.toString();
 		}
 		Cursor c = null;
 		int uriMatch = matcher.match(uri);
@@ -254,11 +322,12 @@ public abstract class OContentProvider extends ContentProvider implements
 			String id = uri.getLastPathSegment();
 			query.appendWhere(base_alias + "." + OColumn.ROW_ID + " = " + id);
 		case COLLECTION:
-			c = query.query(model.getReadableDatabase(), null, whr.toString(),
+			c = query.query(model.getReadableDatabase(), null, where,
 					selectionArgs, null, null, sort);
 			return c;
 		default:
 			throw new UnsupportedOperationException("Unknown uri: " + uri);
 		}
 	}
+
 }

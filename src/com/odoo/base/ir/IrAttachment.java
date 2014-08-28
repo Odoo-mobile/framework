@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import android.content.Context;
 
 import com.odoo.App;
+import com.odoo.base.ir.providers.attachments.AttachmentProvider;
 import com.odoo.base.res.ResCompany;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
@@ -34,6 +35,7 @@ import com.odoo.orm.OModel;
 import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.provider.OContentProvider;
 
 /**
  * The Class IrAttachment
@@ -77,5 +79,10 @@ public class IrAttachment extends OModel {
 			e.printStackTrace();
 		}
 		return data;
+	}
+
+	@Override
+	public OContentProvider getContentProvider() {
+		return new AttachmentProvider();
 	}
 }

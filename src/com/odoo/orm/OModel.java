@@ -81,6 +81,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	/** The functional columns. */
 	private List<OColumn> mFunctionalColumns = new ArrayList<OColumn>();
+	private List<OColumn> mRelationColumns = new ArrayList<OColumn>();
 
 	/** The user. */
 	private OUser mUser = null;
@@ -164,6 +165,23 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	/** The declared fields. */
 	private HashMap<String, Field> mDeclaredFields = new HashMap<String, Field>();
 
+	public static String getSyncUserDB(Context context) {
+		OUser user = OModel.getSyncUser(context);
+		if (user != null) {
+			return user.getDBName();
+		}
+		return "";
+	}
+
+	public static OUser getSyncUser(Context context) {
+		App app = (App) context.getApplicationContext();
+		OUser user = app.getSyncUser();
+		if (user == null) {
+			user = OUser.current(context);
+		}
+		return user;
+	}
+
 	/**
 	 * Instantiates a new o model.
 	 * 
@@ -173,7 +191,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the model_name
 	 */
 	public OModel(Context context, String model_name) {
-		super(context);
+		super(context, OModel.getSyncUserDB(context));
 		mContext = context;
 		_name = model_name;
 		mUser = OUser.current(mContext);
@@ -361,6 +379,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		for (String key : mDeclaredFields.keySet()) {
 			OColumn column = getColumn(key);
 			if (column != null) {
+				if (column.getRelationType() != null) {
+					mRelationColumns.add(column);
+				}
 				if (column.isFunctionalColumn()) {
 					if (column.canFunctionalStore()) {
 						mColumns.add(column);
@@ -371,6 +392,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				}
 			}
 		}
+	}
+
+	public List<OColumn> getRelationColumns() {
+		return mRelationColumns;
+	}
+
+	public List<OColumn> getFunctionalColumns() {
+		return mFunctionalColumns;
 	}
 
 	/**
@@ -468,7 +497,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the field
 	 * @return the boolean
 	 */
-	private Boolean checkForFunctionalStore(Field field) {
+	public Boolean checkForFunctionalStore(Field field) {
 		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
 		if (annotation != null) {
 			Odoo.Functional functional = (Functional) annotation;
@@ -500,7 +529,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the field
 	 * @return the functional depends
 	 */
-	private String[] getFunctionalDepends(Field field) {
+	public String[] getFunctionalDepends(Field field) {
 		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
 		if (annotation != null) {
 			Odoo.Functional functional = (Functional) annotation;
@@ -1157,10 +1186,11 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	private void notifyDataChange(Integer id) {
-		Uri uri = uri();
-		if (id != null)
-			uri.buildUpon().appendPath(id + "");
-		mContext.getContentResolver().notifyChange(uri, null, false);
+		// FIXME: remove method after content provider ready
+		/*
+		 * Uri uri = uri(); if (id != null) uri.buildUpon().appendPath(id + "");
+		 * mContext.getContentResolver().notifyChange(uri, null, false);
+		 */
 	}
 
 	private void sendDatasetChangeBroadcast(Integer newId) {

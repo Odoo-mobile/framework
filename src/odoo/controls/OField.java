@@ -620,13 +620,15 @@ public class OField extends LinearLayout implements
 		} else {
 			if (mControlRecord != null) {
 				if (!showAsText) {
+					String content = mControlRecord
+							.getString(mColumn.getName());
+					content = content.replaceAll("(\r\n|\n)", "<br />");
 					mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
 							LayoutParams.WRAP_CONTENT);
 					mWebView = new WebView(mContext);
 					mWebView.setLayoutParams(mLayoutParams);
-					mWebView.loadData(
-							mControlRecord.getString(mColumn.getName()),
-							"text/html; charset=UTF-8", "UTF-8");
+					mWebView.loadData(content, "text/html; charset=UTF-8",
+							"UTF-8");
 					mWebView.getSettings().setTextZoom(90);
 					mWebView.setBackgroundColor(Color.TRANSPARENT);
 					addView(mWebView);

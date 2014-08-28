@@ -26,7 +26,7 @@ public class PartnersService extends OSyncService {
 	@Override
 	public OSyncAdapter getSyncAdapter() {
 		return new OSyncAdapter(getApplicationContext(), new ResPartner(
-				getApplicationContext()), true).syncDataLimit(30);
+				getApplicationContext()), true).syncDataLimit(50);
 	}
 
 }

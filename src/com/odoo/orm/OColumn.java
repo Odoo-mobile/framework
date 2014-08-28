@@ -105,6 +105,8 @@ public class OColumn {
 	/** The check row id. */
 	private Boolean checkRowId = true;
 
+	private Boolean mSyncMasterRecord = true;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -756,6 +758,15 @@ public class OColumn {
 			domain.append("]");
 			return domain.toString();
 		}
+	}
+
+	public boolean canSyncMasterRecord() {
+		return mSyncMasterRecord;
+	}
+
+	public OColumn syncMasterRecord(boolean syncMasterRecord) {
+		mSyncMasterRecord = syncMasterRecord;
+		return this;
 	}
 
 }

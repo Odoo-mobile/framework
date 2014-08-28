@@ -110,9 +110,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		Log.v(TAG, "Performing sync for :" + mModel.getModelName());
 		Log.v(TAG, "User : " + user.getAndroidName());
 		Log.v(TAG, mModel.uri().toString());
-		mModel.setUser(OdooAccountManager.getAccountDetail(mContext,
-				account.name));
-		performSync(mModel, null, account, syncResult, true);
+		mModel.setUser(user);
+		mApp.setSyncUser(user);
+		performSync(mModel, mDomain, account, syncResult, true);
 	}
 
 	private void performSync(OModel model, ODomain domain, Account account,
@@ -152,8 +152,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 						domain.add("write_date", ">", last_sync_date);
 					}
 				}
-				if (mDomain != null)
-					domain.append(mDomain);
 
 				/**
 				 * Getting data from server
@@ -182,20 +180,22 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 					.getJSONArray("result") : result.getJSONArray("records");
 			for (int i = 0; i < records.length(); i++) {
 				JSONObject record = records.getJSONObject(i);
+				batch.clear();
 				batch.add(createBatch(account, model, record));
+				mContentResolver.applyBatch(model.authority(), batch);
 			}
-			mContentResolver.applyBatch(model.authority(), batch);
+//			mContentResolver.applyBatch(model.authority(), batch);
 			// Updating relation records for master record
 			updateRelationRecords(account, syncResult);
 			// Creating record on server if model allows true
 			if (model.canCreateOnServer())
-				createRecordOnserver(model, syncResult);
+				createRecordOnserver(account, model, syncResult);
 			// Updating dirty record on server if model allows true
 			if (model.canUpdateToServer())
-				updateToServer(model, syncResult);
+				updateToServer(account, model, syncResult);
 			// Deleting record from server if model allows true
 			if (model.canDeleteFromServer())
-				deleteRecordFromServer(model, syncResult);
+				deleteRecordFromServer(account, model, syncResult);
 			// Deleting record from local if model allows true
 			if (model.canDeleteFromLocal())
 				deleteRecordInLocal(model, syncResult);
@@ -215,6 +215,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		values.put("last_synced", finish_date_time);
 		irmodel.update(values, "model = ?",
 				new Object[] { model.getModelName() });
+		mApp.setSyncUser(null);
 		return true;
 	}
 
@@ -232,6 +233,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 				ODomain rel_domain = new ODomain();
 				if (rel.getRelIds().size() > 0) {
 					rel_domain.add("id", "in", rel.getRelIds());
+					// Removing from finished sync to sync new data
+					int model_index = mFinishedModels.indexOf(rel_model
+							.getModelName());
+					if (model_index > -1)
+						mFinishedModels.remove(model_index);
 					performSync(rel_model, rel_domain, account, syncResult,
 							false);
 				}
@@ -267,10 +273,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		}
 	}
 
-	private void deleteRecordFromServer(OModel model, SyncResult syncResult) {
+	private void deleteRecordFromServer(Account account, OModel model,
+			SyncResult syncResult) {
 		Cursor c = contentResolver.query(model.uri(), model.projection(),
-				"is_active = ? and is_dirty = ?", new String[] { "false",
-						"true" }, null);
+				"is_active = ? and is_dirty = ? and odoo_name = ?",
+				new String[] { "false", "true", account.name }, null);
 		assert c != null;
 		Log.i(TAG, "Found " + c.getCount()
 				+ " local entries for delete on server");
@@ -294,9 +301,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		c.close();
 	}
 
-	private void updateToServer(OModel model, SyncResult syncResult) {
+	private void updateToServer(Account account, OModel model,
+			SyncResult syncResult) {
 		Cursor c = contentResolver.query(model.uri(), model.projection(),
-				"is_dirty = ?", new String[] { "true" }, null);
+				"is_dirty = ? and odoo_name = ?", new String[] { "true",
+						account.name }, null);
 		assert c != null;
 		Log.i(TAG, "Found " + c.getCount()
 				+ " local dirty entries for upload to server");
@@ -324,9 +333,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		c.close();
 	}
 
-	private void createRecordOnserver(OModel model, SyncResult syncResult) {
+	private void createRecordOnserver(Account account, OModel model,
+			SyncResult syncResult) {
 		Cursor c = contentResolver.query(model.uri(), model.projection(),
-				"id = ?", new String[] { "0" }, null);
+				"id = ? and odoo_name = ?", new String[] { "0", account.name },
+				null);
 		assert c != null;
 		Log.i(TAG, "Found " + c.getCount()
 				+ " local entries for upload to server");
@@ -438,13 +449,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		ContentProviderOperation.Builder batch = null;
 		try {
 			int id = original_record.getInt("id");
-			batch = (model.hasRecord(id)) ? ContentProviderOperation
-					.newUpdate(model
-							.uri()
-							.buildUpon()
-							.appendPath(Integer.toString(model.selectRowId(id)))
-							.build())
-					: ContentProviderOperation.newInsert(model.uri());
+			boolean update = model.hasRecord(id);
+			batch = (update) ? ContentProviderOperation.newUpdate(model.uri()
+					.buildUpon()
+					.appendPath(Integer.toString(model.selectRowId(id)))
+					.build()) : ContentProviderOperation.newInsert(model.uri());
 			List<Integer> r_ids = new ArrayList<Integer>();
 			for (OColumn column : model.getColumns(false)) {
 				JSONObject record = model.beforeCreateRow(column,
@@ -465,10 +474,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 							// Local table contains only id and name so not
 							// required
 							// to request on server
-							if (m2o.getColumns(false).size() > 2
-									|| (m2o.getColumns(false).size() > 4 && model
+							if (column.canSyncMasterRecord()
+									&& (m2o.getColumns(false).size() > 2 || (m2o
+											.getColumns(false).size() > 4 && model
 											.getOdooVersion()
-											.getVersion_number() > 7)) {
+											.getVersion_number() > 7))) {
 								// Need to create list of ids for model
 								ORelationRecords rel_record = mRelationRecordList.new ORelationRecords();
 								if (mRelationRecordList.contains(rel_key)) {
@@ -522,6 +532,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 						// FIXME: What with many to many record in
 						// ContentProvider ???
 						// values.put(column.getName(), row_ids);
+						// batch.withValue("xyz", row_ids);
+						batch.withValue(column.getName(), row_ids.toString());
 						ORelationRecords mrel_record = mRelationRecordList.new ORelationRecords();
 						if (mRelationRecordList.contains(rel_key)) {
 							mrel_record = mRelationRecordList.get(rel_key);
@@ -537,7 +549,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 
 						break;
 					case OneToMany:
-
 						OModel o2m = model.createInstance(column.getType());
 						rel_key = o2m.getTableName() + "_" + column.getName();
 						JSONArray o2m_ids_list = record.getJSONArray(column
@@ -572,9 +583,25 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 					batch.withValue(column.getName(), value);
 				}
 			}
+
+			for (OColumn col : model.getFunctionalColumns()) {
+				if (col.canFunctionalStore()) {
+					OValues values = new OValues();
+					if (!col.isLocal())
+						values.put(col.getName(),
+								original_record.get(col.getName()));
+					for (String dCol : col.getFunctionalStoreDepends()) {
+						Object data = original_record.get(dCol);
+						values.put(dCol, data);
+					}
+					Object value = model.getFunctionalMethodValue(col, values);
+					batch.withValue(col.getName(), value);
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		batch.withValue("is_dirty", "false");
 		batch.withValue("local_write_date", ODate.getDate());
 		batch.withValue("odoo_name", account.name);
 		return batch.build();

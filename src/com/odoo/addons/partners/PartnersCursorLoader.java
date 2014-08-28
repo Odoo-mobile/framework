@@ -82,6 +82,7 @@ public class PartnersCursorLoader extends BaseFragment implements
 				R.layout.partners_list_item);
 		listView.setAdapter(mAdapter);
 		listView.setOnItemClickListener(this);
+		scope.main().setActionbarAutoHide(listView);
 		getLoaderManager().initLoader(0, null, this);
 	}
 

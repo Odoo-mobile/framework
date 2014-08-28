@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.odoo.base.ir.IrAttachment;
-import com.odoo.base.ir.providers.model.ModelProvider;
 import com.odoo.orm.OModel;
 import com.odoo.support.provider.OContentProvider;
 
@@ -16,17 +15,17 @@ public class AttachmentProvider extends OContentProvider {
 
 	@Override
 	public String authority() {
-		return ModelProvider.AUTHORITY;
+		return AttachmentProvider.AUTHORITY;
 	}
 
 	@Override
 	public String path() {
-		return ModelProvider.PATH;
+		return AttachmentProvider.PATH;
 	}
 
 	@Override
 	public Uri uri() {
-		return ModelProvider.CONTENT_URI;
+		return AttachmentProvider.CONTENT_URI;
 	}
 
 	@Override

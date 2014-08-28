@@ -93,6 +93,7 @@ public class App extends Application {
 			}
 		}
 		setOdooInstance(odoo);
+		setUser(user);
 		return odoo;
 	}
 

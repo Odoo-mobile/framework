@@ -945,22 +945,9 @@ public class OSyncHelper {
 	 * @return the object
 	 */
 	public Object callMethod(String method, OArguments args, JSONObject context) {
-		return callMethod(method, args, context, null);
+		return callMethod(mModel.getModelName(), method, args, context, null);
 	}
 
-	/**
-	 * Call method.
-	 * 
-	 * @param method
-	 *            the method
-	 * @param args
-	 *            the args
-	 * @param context
-	 *            the context
-	 * @param kwargs
-	 *            the kwargs
-	 * @return the object
-	 */
 	public Object callMethod(String method, OArguments args,
 			JSONObject context, JSONObject kwargs) {
 		return callMethod(mModel.getModelName(), method, args, context, kwargs);

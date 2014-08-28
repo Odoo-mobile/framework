@@ -119,4 +119,6 @@
     <string name="toast_unable_to_reach_odoo_server">Unable to reach Odoo Server.</string>
     <string name="toast_no_database_found">No database found !</string>
 
+    <bool name="fit_to_window_height">false</bool>
+
 </resources>

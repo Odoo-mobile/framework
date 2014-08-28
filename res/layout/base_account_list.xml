@@ -8,8 +8,6 @@
         android:id="@+id/gridAccounts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingTop="?android:attr/actionBarSize"
         app:custom_layout="@layout/base_account_row_item"
         app:showAsCard="true" >
     </odoo.controls.OList>

@@ -13,7 +13,8 @@
             android:layout_height="match_parent"
             android:background="@color/odoo_purple"
             android:scaleType="centerCrop"
-            android:src="@drawable/default_cover" />
+            android:src="@drawable/default_cover"
+            android:tint="@color/session_photo_scrim" />
 
         <RelativeLayout
             android:layout_width="match_parent"

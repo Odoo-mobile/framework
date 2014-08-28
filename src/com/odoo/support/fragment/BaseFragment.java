@@ -118,6 +118,11 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 		return mDb;
 	}
 
+	public Boolean inNetwork() {
+		App app = (App) scope.context().getApplicationContext();
+		return app.inNetwork();
+	}
+
 	/**
 	 * Gets the resource string values
 	 * 

@@ -8,7 +8,7 @@
     <color name="gray_light">#d1d0d0</color>
     <color name="list_divider">#ddd</color>
     <color name="card_view_parent_background">#e5e5e5</color>
-    <color name="session_photo_scrim">#6000</color>
+    <color name="session_photo_scrim">#3000</color>
     <color name="body_text_1">#de000000</color>
     <color name="body_text_2">#8a000000</color>
     <color name="body_text_3">#60000000</color>
@@ -20,5 +20,7 @@
     <color name="navdrawer_text_color_selected">@color/theme_primary</color>
     <color name="navdrawer_icon_tint">#808080</color>
     <color name="navdrawer_icon_tint_selected">@color/theme_primary</color>
+    <color name="actionbar_bg_color">#ebebeb</color>
+    <color name="translucent_status_bg_color">@color/actionbar_bg_color</color>
 
 </resources>
