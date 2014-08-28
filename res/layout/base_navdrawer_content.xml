@@ -13,7 +13,8 @@
             android:layout_height="match_parent"
             android:background="@color/odoo_purple"
             android:scaleType="centerCrop"
-            android:src="@drawable/default_cover" />
+            android:src="@drawable/default_cover"
+            android:tint="@color/session_photo_scrim" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -50,6 +51,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_toLeftOf="@id/expand_account_box_indicator"
                 android:ellipsize="end"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:maxLines="1"
                 android:paddingBottom="16dp"
                 android:singleLine="true"
@@ -64,6 +66,7 @@
                 android:layout_alignLeft="@id/profile_image"
                 android:layout_toLeftOf="@id/expand_account_box_indicator"
                 android:ellipsize="end"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textColor="@color/body_text_1_inverse"

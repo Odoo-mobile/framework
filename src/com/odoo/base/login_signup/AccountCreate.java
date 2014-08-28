@@ -241,7 +241,8 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 		@Override
 		protected Boolean doInBackground(Void... params) {
 			try {
-				OdooHelper odoo = new OdooHelper(getActivity(),mUser.isAllowSelfSignedSSL());
+				OdooHelper odoo = new OdooHelper(getActivity(),
+						mUser.isAllowSelfSignedSSL());
 				OUser user = null;
 				if (mSelfHosted) {
 					user = odoo.login(mUser.getUsername(), mUser.getPassword(),
@@ -287,7 +288,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 
 		public DatabaseCreate() {
 			mApp = (App) getActivity().getApplicationContext();
-			mIRModel = new IrModel(getActivity());
+			mIRModel = new IrModel(getActivity().getApplicationContext());
 		}
 
 		@Override

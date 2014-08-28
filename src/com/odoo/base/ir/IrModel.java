@@ -2,10 +2,12 @@ package com.odoo.base.ir;
 
 import android.content.Context;
 
+import com.odoo.base.ir.providers.model.ModelProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.provider.OContentProvider;
 
 public class IrModel extends OModel {
 
@@ -32,5 +34,10 @@ public class IrModel extends OModel {
 	@Override
 	public Boolean checkForWriteDate() {
 		return false;
+	}
+
+	@Override
+	public OContentProvider getContentProvider() {
+		return new ModelProvider();
 	}
 }

@@ -138,7 +138,7 @@ public class ODataRow {
 	public Bundle getPrimaryBundleData() {
 		Bundle bundle = new Bundle();
 		bundle.putInt("id", getInt("id"));
-		bundle.putInt("local_id", getInt("local_id"));
+		bundle.putInt(OColumn.ROW_ID, getInt(OColumn.ROW_ID));
 		return bundle;
 	}
 

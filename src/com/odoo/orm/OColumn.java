@@ -30,7 +30,7 @@ import java.util.List;
 public class OColumn {
 
 	/** The Constant ROW_ID. */
-	public static final String ROW_ID = "local_id";
+	public static final String ROW_ID = "_id";
 
 	/** The column domains. */
 	private LinkedHashMap<String, ColumnDomain> columnDomains = new LinkedHashMap<String, OColumn.ColumnDomain>();
@@ -104,6 +104,8 @@ public class OColumn {
 
 	/** The check row id. */
 	private Boolean checkRowId = true;
+
+	private Boolean mSyncMasterRecord = true;
 
 	/*
 	 * (non-Javadoc)
@@ -756,6 +758,15 @@ public class OColumn {
 			domain.append("]");
 			return domain.toString();
 		}
+	}
+
+	public boolean canSyncMasterRecord() {
+		return mSyncMasterRecord;
+	}
+
+	public OColumn syncMasterRecord(boolean syncMasterRecord) {
+		mSyncMasterRecord = syncMasterRecord;
+		return this;
 	}
 
 }

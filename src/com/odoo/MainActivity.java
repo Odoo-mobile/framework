@@ -38,6 +38,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.auth.OdooAccountManager;
@@ -519,4 +520,10 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		}
 
 	}
+
+	public void setActionbarAutoHide(ListView listView) {
+		Log.v(TAG, "setActionbarAutoHide");
+		enableActionBarAutoHide(listView);
+	}
+
 }

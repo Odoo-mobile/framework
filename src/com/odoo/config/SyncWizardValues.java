@@ -21,7 +21,7 @@ package com.odoo.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.odoo.addons.partners.providers.partners.PartnersProvider;
+import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.support.SyncValue;
 import com.odoo.support.SyncValue.Type;
 import com.odoo.support.SyncWizardHelper;

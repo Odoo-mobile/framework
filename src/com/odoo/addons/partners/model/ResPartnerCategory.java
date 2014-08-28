@@ -2,9 +2,11 @@ package com.odoo.addons.partners.model;
 
 import android.content.Context;
 
+import com.odoo.addons.partners.providers.partners_category.PartnerCategoryProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.provider.OContentProvider;
 
 public class ResPartnerCategory extends OModel {
 
@@ -14,4 +16,8 @@ public class ResPartnerCategory extends OModel {
 		super(context, "res.partner.category");
 	}
 
+	@Override
+	public OContentProvider getContentProvider() {
+		return new PartnerCategoryProvider();
+	}
 }

@@ -535,13 +535,15 @@ public class OUser {
 		this.version_serie = version_serie;
 	}
 
-	public static String getDBName(Context context) {
+	public String getDBName() {
 		String db_name = "OdooSQLite";
-		OUser user = OUser.current(context);
-		if (user != null) {
-			db_name += "_" + user.getUsername();
-			db_name += "_" + user.getDatabase();
-		}
+		db_name += "_" + getUsername();
+		db_name += "_" + getDatabase();
 		return db_name + ".db";
+	}
+
+	@Override
+	public String toString() {
+		return getAndroidName();
 	}
 }

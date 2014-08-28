@@ -24,11 +24,11 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/keyline_2"
         android:ellipsize="end"
-        android:fontFamily="@string/font_fontFamily_medium"
+        android:fontFamily="@string/font_fontFamily_light"
         android:maxLines="1"
         android:singleLine="true"
         android:textColor="@color/body_text_1"
-        android:textSize="@dimen/text_size_medium"
+        android:textSize="@dimen/text_size_large"
         android:textStyle="@integer/font_textStyle_medium" />
 
 </FrameLayout>

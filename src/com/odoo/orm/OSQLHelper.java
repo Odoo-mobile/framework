@@ -169,6 +169,7 @@ public class OSQLHelper {
 			if (type_class.isAssignableFrom(OText.class)) {
 				return new OText().getType();
 			}
+
 			// Text
 			if (type_class.isAssignableFrom(OHtml.class)) {
 				return new OHtml().getType();

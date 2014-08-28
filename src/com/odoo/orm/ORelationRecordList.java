@@ -27,7 +27,7 @@ public class ORelationRecordList {
 		return _relation_records.keySet();
 	}
 
-	class ORelationRecords {
+	public class ORelationRecords {
 		private OModel base_model = null;
 		private OModel rel_model = null;
 		private String ref_column = null;

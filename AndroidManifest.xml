@@ -77,6 +77,34 @@
             </intent-filter>
         </activity>
 
+        <!-- Base Providers (Note: update authority as per your app package) -->
+        <provider
+            android:name="com.odoo.base.ir.providers.model.ModelProvider"
+            android:authorities="com.odoo.base.ir.providers.model"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.users.UsersProvider"
+            android:authorities="com.odoo.base.res.providers.users"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.ir.providers.attachments.AttachmentProvider"
+            android:authorities="com.odoo.base.ir.providers.attachments"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.country.CountryProvider"
+            android:authorities="com.odoo.base.res.providers.country"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.company.CompanyProvider"
+            android:authorities="com.odoo.base.res.providers.company"
+            android:exported="false"
+            android:multiprocess="true" />
+
+        <!-- /Base Providers -->
         <!-- Contact service -->
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"
@@ -96,12 +124,17 @@
 
         <!-- ResPartner Provider -->
         <provider
-            android:name="com.odoo.addons.partners.providers.partners.PartnersProvider"
-            android:authorities="com.odoo.addons.partners.providers.partners"
+            android:name="com.odoo.base.res.providers.partners.PartnersProvider"
+            android:authorities="com.odoo.base.res.providers.partners"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Partners"
             android:syncable="true" />
+        <provider
+            android:name="com.odoo.addons.partners.providers.partners_category.PartnerCategoryProvider"
+            android:authorities="com.odoo.addons.partners.providers.partners_category"
+            android:exported="false"
+            android:multiprocess="true" />
         <!-- ResPartner Service -->
         <service
             android:name="com.odoo.addons.partners.sevices.PartnersService"

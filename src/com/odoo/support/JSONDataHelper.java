@@ -73,8 +73,8 @@ public class JSONDataHelper {
 	 *            the ids
 	 * @return the int[]
 	 */
-	public static int[] jsonArrayTointArray(JSONArray ids) {
-		int newIds[] = new int[ids.length()];
+	public static Integer[] jsonArrayTointArray(JSONArray ids) {
+		Integer newIds[] = new Integer[ids.length()];
 		if (ids != null) {
 			for (int i = 0; i < ids.length(); i++) {
 				try {

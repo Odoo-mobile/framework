@@ -27,6 +27,7 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -176,8 +177,14 @@ public class SyncWizard extends BaseFragment {
 					}
 				}
 			}
-			getActivity().finish();
-			getActivity().startActivity(getActivity().getIntent());
+			new Handler().postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					getActivity().finish();
+					getActivity().startActivity(getActivity().getIntent());
+				}
+			}, 500);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

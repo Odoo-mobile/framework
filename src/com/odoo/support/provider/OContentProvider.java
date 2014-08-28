@@ -19,189 +19,315 @@
 
 package com.odoo.support.provider;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.json.JSONArray;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.provider.BaseColumns;
-import android.text.TextUtils;
 
-import com.odoo.orm.OSQLiteHelper;
+import com.odoo.orm.OColumn;
+import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.OModel;
+import com.odoo.orm.OModel.Command;
+import com.odoo.orm.SelectionBuilder;
+import com.odoo.util.JSONUtils;
 
 /**
- * The Class OEContentProvider.
+ * The Class OContentProvider.
  */
 public abstract class OContentProvider extends ContentProvider implements
-		OEContentProviderHelper {
+		OContentProviderHelper {
 
-	/** The Constant CONSTANTS. */
-	private static final int CONSTANTS = 1;
+	private final int COLLECTION = 1;
 
-	/** The authority. */
-	public static String AUTHORITY = "";
+	private final int SINGLE_ROW = 2;
 
-	/** The Constant CONSTANT_ID. */
-	private static final int CONSTANT_ID = 2;
+	private UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-	/** The Constant MATCHER. */
-	private static final UriMatcher MATCHER;
+	/** The database model. */
+	private OModel model = null;
 
-	/** The Constant TABLE. */
-	private static final String TABLE = "constants";
-
-	/** The contenturi. */
-	public static String CONTENTURI = "";
-
-	/** The db. */
-	OSQLiteHelper db = null;
-
-	/**
-	 * The Class Constants.
-	 */
-	public static final class Constants implements BaseColumns {
-
-		/** The Constant CONTENT_URI. */
-		public static final Uri CONTENT_URI = Uri.parse("content://"
-				+ CONTENTURI + "/constants");
-
-		/** The Constant DEFAULT_SORT_ORDER. */
-		public static final String DEFAULT_SORT_ORDER = "title";
-
-		/** The Constant TITLE. */
-		public static final String TITLE = "title";
-
-		/** The Constant VALUE. */
-		public static final String VALUE = "value";
+	public static Uri buildURI(String authority, String path) {
+		Uri.Builder uriBuilder = new Uri.Builder();
+		uriBuilder.authority(authority);
+		uriBuilder.appendPath(path);
+		uriBuilder.scheme("content");
+		return uriBuilder.build();
 	}
 
-	static {
-		MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-		MATCHER.addURI(CONTENTURI, "constants", CONSTANTS);
-		MATCHER.addURI(CONTENTURI, "constants/#", CONSTANT_ID);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#delete(android.net.Uri,
-	 * java.lang.String, java.lang.String[])
-	 */
 	@Override
 	public int delete(Uri uri, String where, String[] whereArgs) {
-		// TODO Auto-generated method stub
-		int count = db.getWritableDatabase().delete(TABLE, where, whereArgs);
-		getContext().getContentResolver().notifyChange(uri, null);
-
-		return (count);
+		reInitModel();
+		final SQLiteDatabase db = model.getWritableDatabase();
+		assert db != null;
+		final int match = matcher.match(uri);
+		int count = 0;
+		SelectionBuilder builder = new SelectionBuilder();
+		switch (match) {
+		case COLLECTION:
+			count = builder.table(model.getTableName()).where(where, whereArgs)
+					.delete(db);
+			break;
+		case SINGLE_ROW:
+			String id = uri.getLastPathSegment();
+			count = builder.table(model.getTableName())
+					.where(OColumn.ROW_ID + "=?", id).where(where, whereArgs)
+					.delete(db);
+			break;
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+		// Send broadcast to registered ContentObservers, to refresh UI.
+		Context ctx = getContext();
+		assert ctx != null;
+		ctx.getContentResolver().notifyChange(uri, null, false);
+		return count;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#getType(android.net.Uri)
-	 */
 	@Override
 	public String getType(Uri uri) {
-		// TODO Auto-generated method stub
-		if (isCollectionUri(uri)) {
-
-			return (CONTENTURI + "/constant");
-		}
-
-		return (CONTENTURI + "/constant");
+		return uri().toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#insert(android.net.Uri,
-	 * android.content.ContentValues)
-	 */
+	private void handleManyToMany(HashMap<String, List<Integer>> record_ids,
+			int _id) {
+		if (record_ids.size() > 0) {
+			for (String key : record_ids.keySet()) {
+				List<Integer> ids = record_ids.get(key);
+				OColumn column = model.getColumn(key);
+				OModel rel_model = model.createInstance(column.getType());
+				model.manageManyToManyRecords(model.getWritableDatabase(),
+						rel_model, ids, _id, Command.Replace);
+			}
+		}
+	}
+
+	private HashMap<String, List<Integer>> getManyToManyRecords(
+			ContentValues values) {
+		HashMap<String, List<Integer>> ids = new HashMap<String, List<Integer>>();
+		for (OColumn col : model.getRelationColumns()) {
+			if (col.getRelationType() == RelationType.ManyToMany) {
+				if (values.containsKey(col.getName())) {
+					List<Integer> record_ids = new ArrayList<Integer>();
+					try {
+						record_ids.addAll(JSONUtils
+								.<Integer> toList(new JSONArray(values.get(
+										col.getName()).toString())));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					ids.put(col.getName(), record_ids);
+					values.remove(col.getName());
+				}
+			}
+		}
+		return ids;
+	}
+
 	@Override
 	public Uri insert(Uri uri, ContentValues initialValues) {
-		return null;
+		reInitModel();
+		HashMap<String, List<Integer>> manyToManyIds = getManyToManyRecords(initialValues);
+		final SQLiteDatabase db = model.getWritableDatabase();
+		assert db != null;
+		final int match = matcher.match(uri);
+		Uri result;
+		switch (match) {
+		case COLLECTION:
+			long id = db.insertOrThrow(model.getTableName(), null,
+					initialValues);
+			handleManyToMany(manyToManyIds, (int) id);
+			result = Uri.parse(uri() + "/" + id);
+			break;
+		case SINGLE_ROW:
+			throw new UnsupportedOperationException(
+					"Insert not supported on URI: " + uri);
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+		// Send broadcast to registered ContentObservers, to refresh UI.
+		Context ctx = getContext();
+		assert ctx != null;
+		ctx.getContentResolver().notifyChange(uri, null, false);
+		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#onCreate()
-	 */
 	@Override
 	public boolean onCreate() {
-		db = new OSQLiteHelper(getContext());
-		AUTHORITY = authority();
-		CONTENTURI = contentUri();
-		return ((db == null) ? false : true);
-
+		model = model(getContext());
+		matcher.addURI(authority(), path(), COLLECTION);
+		matcher.addURI(authority(), path() + "/#", SINGLE_ROW);
+		return ((model == null) ? false : true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#query(android.net.Uri,
-	 * java.lang.String[], java.lang.String, java.lang.String[],
-	 * java.lang.String)
-	 */
+	private void reInitModel() {
+		if (model.getDatabaseName().length() == 0) {
+			onCreate();
+		}
+	}
+
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sort) {
-		// TODO Auto-generated method stub
-		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-
-		qb.setTables(TABLE);
-
-		String orderBy;
-
-		if (TextUtils.isEmpty(sort)) {
-			orderBy = Constants.DEFAULT_SORT_ORDER;
-		} else {
-			orderBy = sort;
-		}
-
-		Cursor c = qb.query(db.getReadableDatabase(), projection, selection,
-				selectionArgs, null, null, orderBy);
-
-		c.setNotificationUri(getContext().getContentResolver(), uri);
-
-		return (c);
+		projection = validateProjections(projection);
+		Cursor c = createQuery(uri, projection, selection, selectionArgs, sort);
+		Context ctx = getContext();
+		assert ctx != null;
+		c.setNotificationUri(ctx.getContentResolver(), uri);
+		return c;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.content.ContentProvider#update(android.net.Uri,
-	 * android.content.ContentValues, java.lang.String, java.lang.String[])
-	 */
 	@Override
 	public int update(Uri uri, ContentValues values, String where,
 			String[] whereArgs) {
-		// TODO Auto-generated method stub
-		int count = db.getWritableDatabase().update(TABLE, values, where,
-				whereArgs);
+		reInitModel();
+		SelectionBuilder builder = new SelectionBuilder();
+		final SQLiteDatabase db = model.getWritableDatabase();
+		final int match = matcher.match(uri);
+		int count;
+		switch (match) {
+		case COLLECTION:
 
-		getContext().getContentResolver().notifyChange(uri, null);
+			Cursor cr = query(uri, new String[] { OColumn.ROW_ID }, where,
+					whereArgs, null);
+			while (cr.moveToNext()) {
+				int id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+				handleManyToMany(getManyToManyRecords(values), id);
+			}
+			cr.close();
 
-		return (count);
+			count = builder.table(model.getTableName()).where(where, whereArgs)
+					.update(db, values);
+			break;
+		case SINGLE_ROW:
+			String id = uri.getLastPathSegment();
+			handleManyToMany(getManyToManyRecords(values), Integer.parseInt(id));
+			count = builder.table(model.getTableName()).where(where, whereArgs)
+					.where(OColumn.ROW_ID + "=?", id).where(where, whereArgs)
+					.update(db, values);
+			break;
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+		Context ctx = getContext();
+		assert ctx != null;
+		ctx.getContentResolver().notifyChange(uri, null, false);
+		return count;
 	}
 
-	/**
-	 * Checks if is collection uri.
-	 * 
-	 * @param url
-	 *            the url
-	 * @return true, if is collection uri
-	 */
-	private boolean isCollectionUri(Uri url) {
-		return (MATCHER.match(url) == CONSTANTS);
+	private String[] validateProjections(String[] projection) {
+		List<String> columns = new ArrayList<String>();
+		columns.addAll(Arrays.asList(projection));
+		columns.add(OColumn.ROW_ID);
+		if (model.getColumn("id") != null)
+			columns.add("id");
+		return columns.toArray(new String[columns.size()]);
 	}
 
-}
+	private Cursor createQuery(Uri uri, String[] projection, String selection,
+			String[] selectionArgs, String sort) {
+		reInitModel();
+		SQLiteQueryBuilder query = new SQLiteQueryBuilder();
+		boolean withAlias = (projection.length < model.projection().length);
+		StringBuffer joins = new StringBuffer();
+		String base_table = model.getTableName();
+		String base_alias = base_table + "_base";
+		HashMap<String, String> projectionMap = new HashMap<String, String>();
+		List<String> mJoinTables = new ArrayList<String>();
+		for (String col_name : projection) {
+			String col = col_name;
+			if (col_name.contains(".")) {
+				col = col_name.split("\\.")[0];
+			}
+			OColumn column = model.getColumn(col);
+			String display_col = col;
+			if (withAlias) {
+				display_col = base_alias + "." + col + " AS " + col;
+				if (column.getRelationType() != null) {
+					OModel rel_model = model.createInstance(column.getType());
+					String table = rel_model.getTableName();
+					String alias = table;
+					alias = table + "_self";
+					table += " AS " + alias;
+					if (!mJoinTables.contains(alias)) {
+						mJoinTables.add(alias);
+						joins.append(" JOIN ");
+						joins.append(table);
+						joins.append(" ON ");
+						joins.append(base_alias + "." + column.getName());
+						joins.append(" = ");
+						joins.append(alias + "." + OColumn.ROW_ID);
+						joins.append(" ");
+					}
+					String rel_col = col;
+					String rel_col_name = "";
+					if (col_name.contains(".")) {
+						rel_col += "_" + col_name.split("\\.")[1];
+						rel_col_name = col_name.split("\\.")[1];
+					}
+					projectionMap.put(rel_col, alias + "." + rel_col_name
+							+ " AS " + rel_col);
+				}
+			}
+			projectionMap.put(col, display_col);
+		}
+		StringBuffer tables = new StringBuffer();
+		tables.append(base_table + ((withAlias) ? " AS " + base_alias : " "));
+		tables.append(joins.toString());
+		query.setTables(tables.toString());
+		query.setProjectionMap(projectionMap);
+		StringBuffer whr = new StringBuffer();
+		String where = null;
+		if (selection != null && selectionArgs != null) {
+			if (withAlias) {
+				// Check for and
+				Pattern pattern = Pattern.compile("and|AND");
+				String[] data = pattern.split(selection);
+				for (String token : data) {
+					whr.append(base_alias + "." + token.trim());
+					whr.append(" AND ");
+				}
+				whr.delete(whr.length() - 5, whr.length());
+				// Check for or
+				pattern = Pattern.compile("or|OR");
+				data = pattern.split(whr.toString());
+				whr = new StringBuffer();
+				for (String token : data) {
+					whr.append((!token.contains(base_alias)) ? base_alias + "."
+							+ token.trim() : token.trim());
+					whr.append(" OR ");
+				}
+				whr.delete(whr.length() - 4, whr.length());
+			} else {
+				whr.append(selection);
+			}
+			where = whr.toString();
+		}
+		Cursor c = null;
+		int uriMatch = matcher.match(uri);
+		switch (uriMatch) {
+		case SINGLE_ROW:
+			// Return a single entry, by ID.
+			String id = uri.getLastPathSegment();
+			query.appendWhere(base_alias + "." + OColumn.ROW_ID + " = " + id);
+		case COLLECTION:
+			c = query.query(model.getReadableDatabase(), null, where,
+					selectionArgs, null, null, sort);
+			return c;
+		default:
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+	}
 
-interface OEContentProviderHelper {
-	public String authority();
-
-	public String contentUri();
 }

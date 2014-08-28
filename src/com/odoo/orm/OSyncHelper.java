@@ -296,7 +296,7 @@ public class OSyncHelper {
 	 * @return records object, which are new on server or latest updated on
 	 *         server
 	 */
-	private JSONObject checkForLocalLatestUpdate(OModel model, JSONObject result) {
+	public JSONObject checkForLocalLatestUpdate(OModel model, JSONObject result) {
 		JSONObject newResult = result;
 		try {
 			if (result.has("records")
@@ -762,7 +762,7 @@ public class OSyncHelper {
 	 * @param result
 	 *            the result
 	 */
-	private void handleResult(OModel model, JSONObject result) {
+	public void handleResult(OModel model, JSONObject result) {
 		try {
 			JSONArray records = (result.has("result")) ? result
 					.getJSONArray("result") : result.getJSONArray("records");
@@ -945,22 +945,9 @@ public class OSyncHelper {
 	 * @return the object
 	 */
 	public Object callMethod(String method, OArguments args, JSONObject context) {
-		return callMethod(method, args, context, null);
+		return callMethod(mModel.getModelName(), method, args, context, null);
 	}
 
-	/**
-	 * Call method.
-	 * 
-	 * @param method
-	 *            the method
-	 * @param args
-	 *            the args
-	 * @param context
-	 *            the context
-	 * @param kwargs
-	 *            the kwargs
-	 * @return the object
-	 */
 	public Object callMethod(String method, OArguments args,
 			JSONObject context, JSONObject kwargs) {
 		return callMethod(mModel.getModelName(), method, args, context, kwargs);

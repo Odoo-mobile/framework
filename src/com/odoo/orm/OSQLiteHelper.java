@@ -28,10 +28,11 @@ public class OSQLiteHelper extends SQLiteOpenHelper {
 	OModules mModules = null;
 	List<String> mDBTables = new ArrayList<String>();
 
-	public OSQLiteHelper(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	public OSQLiteHelper(Context context, String dbName) {
+		super(context, dbName, null, DATABASE_VERSION);
 		mContext = context;
 		mModules = new OModules();
+
 	}
 
 	public List<OModel> baseModels() {

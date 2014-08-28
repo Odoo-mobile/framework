@@ -1,18 +1,26 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_layout"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff" >
+    android:background="@color/translucent_status_bg_color"
+    android:fitsSystemWindows="@bool/fit_to_window_height"
+    android:paddingTop="@dimen/window_title_bar_height" >
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#ffffff" >
-    </FrameLayout>
 
-    <!-- Nav drawer -->
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff" >
+        </FrameLayout>
+        <!-- Nav drawer -->
 
-    <include layout="@layout/base_navdrawer_for_ab_overlay" />
+        <include layout="@layout/base_navdrawer_for_ab_overlay" />
+    </android.support.v4.widget.DrawerLayout>
 
-</android.support.v4.widget.DrawerLayout>
+</FrameLayout>

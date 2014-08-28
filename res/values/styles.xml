@@ -16,12 +16,12 @@
     <style name="AppTheme" parent="AppBaseTheme">
 
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
         <item name="android:actionBarStyle">@style/CustomActionbar</item>
     </style>
 
     <style name="CustomActionbar" parent="android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#ebebeb</item>
+        <item name="android:background">@color/actionbar_bg_color</item>
     </style>
 
 </resources>

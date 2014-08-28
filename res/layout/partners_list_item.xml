@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="15dp"
-    odoo:background_selector="@drawable/oe_listview_background_selector"
+    odoo:background_selector="?android:attr/listSelector"
     odoo:model="res.partner" >
 
     <odoo.controls.OField
@@ -44,18 +44,6 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
-                android:layout_marginTop="3dp"
-                odoo:fieldTextStyle="bold"
-                odoo:field_color="@color/odoo_purple"
-                odoo:field_name="parent_id_name"
-                odoo:field_textAppearance="?android:attr/textAppearanceSmall"
-                odoo:with_label="false" >
-            </odoo.controls.OField>
-
-            <odoo.controls.OField
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 odoo:field_color="#006400"
                 odoo:field_name="email"
                 odoo:singleLine="true"
@@ -87,6 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="category_id"
+            odoo:ref_column="name"
             odoo:with_label="false" >
         </odoo.controls.OField>
     </LinearLayout>
