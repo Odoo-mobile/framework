@@ -208,9 +208,9 @@ public class PartnersCursorLoader extends BaseFragment implements
 	public boolean onSearchViewTextChange(String newFilter) {
 
 		if (mCurFilter == null && newFilter == null)
-			return true;
+			return false;
 		if (mCurFilter != null && mCurFilter.equals(newFilter))
-			return true;
+			return false;
 
 		mCurFilter = newFilter;
 		getLoaderManager().restartLoader(0, null, this);
