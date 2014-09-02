@@ -1,6 +1,7 @@
 package com.odoo.support.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import odoo.ODomain;
@@ -45,11 +46,12 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	private OModel mModel = null;
 	private App mApp = null;
 	private Odoo mOdoo = null;
-	private ODomain mDomain = null;
+	private HashMap<String, ODomain> mDomains = new HashMap<String, ODomain>();
 	private Boolean checkForWriteCreateDate = true;
 	/** The relation record list. */
 	private ORelationRecordList mRelationRecordList = new ORelationRecordList();
 	private OSyncHelper mSync = null;
+	private OSyncService mSyncService = null;
 
 	/** The finished models. */
 	private List<String> mFinishedModels = new ArrayList<String>();
@@ -59,23 +61,26 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	/** The sync data limit. */
 	private Integer mSyncDataLimit = 0;
 	private PreferenceManager mPref = null;
-	private OSyncFinishListener mOSyncFinishListener = null;
+	private HashMap<String, OSyncFinishListener> mOSyncFinishListeners = new HashMap<String, OSyncFinishListener>();
 
-	public OSyncAdapter(Context context, OModel model, boolean autoInitialize) {
+	public OSyncAdapter(Context context, OModel model, OSyncService service,
+			boolean autoInitialize) {
 		super(context, autoInitialize);
 		mContext = context;
 		mModel = model;
+		mSyncService = service;
 		mContentResolver = context.getContentResolver();
 		mApp = (App) mContext.getApplicationContext();
 		init();
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public OSyncAdapter(Context context, OModel model, boolean autoInitialize,
-			boolean allowParallelSyncs) {
+	public OSyncAdapter(Context context, OModel model, OSyncService service,
+			boolean autoInitialize, boolean allowParallelSyncs) {
 		super(context, autoInitialize, allowParallelSyncs);
 		mContext = context;
 		mModel = model;
+		mSyncService = service;
 		mContentResolver = context.getContentResolver();
 		init();
 	}
@@ -87,7 +92,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	}
 
 	public OSyncAdapter setDomain(ODomain domain) {
-		mDomain = domain;
+		mDomains.put(mModel.getModelName(), domain);
 		return this;
 	}
 
@@ -109,9 +114,12 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		Log.v(TAG, "Performing sync for :" + mModel.getModelName());
 		Log.v(TAG, "User : " + user.getAndroidName());
 		Log.v(TAG, mModel.uri().toString());
+		mSyncService.performDataSync(this, extras, user);
 		mModel.setUser(user);
 		mApp.setSyncUser(user);
-		performSync(mModel, mDomain, account, syncResult, true);
+		ODomain domain = (mDomains.containsKey(mModel.getModelName())) ? mDomains
+				.get(mModel.getModelName()) : null;
+		performSync(mModel, domain, account, syncResult, true);
 	}
 
 	private void performSync(OModel model, ODomain domain, Account account,
@@ -180,7 +188,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 			for (int i = 0; i < records.length(); i++) {
 				JSONObject record = records.getJSONObject(i);
 				batch.clear();
-				batch.add(createBatch(account, model, record));
+				batch.add(createBatch(account, model, record, syncResult));
 				mContentResolver.applyBatch(model.authority(), batch);
 			}
 			// mContentResolver.applyBatch(model.authority(), batch);
@@ -216,8 +224,10 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		irmodel.update(values, "model = ?",
 				new Object[] { model.getModelName() });
 		mApp.setSyncUser(null);
-		if (mOSyncFinishListener != null) {
-			OSyncAdapter adapter = mOSyncFinishListener.performSync();
+		if (mOSyncFinishListeners.containsKey(model.getModelName())) {
+			OSyncAdapter adapter = mOSyncFinishListeners.get(
+					model.getModelName()).performSync(syncResult);
+			mOSyncFinishListeners.remove(model.getModelName());
 			if (adapter != null) {
 				SyncResult result = new SyncResult();
 				OModel sync_model = adapter.getModel();
@@ -280,6 +290,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 				ContentProviderOperation.Builder builder = ContentProviderOperation
 						.newDelete(model.uri().buildUpon()
 								.appendPath(Integer.toString(localId)).build());
+				syncResult.stats.numDeletes++;
 				batch.add(builder.build());
 			}
 			mContentResolver.applyBatch(model.authority(), batch);
@@ -462,7 +473,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	}
 
 	private ContentProviderOperation createBatch(Account account, OModel model,
-			JSONObject original_record) {
+			JSONObject original_record, SyncResult syncResult) {
 		ContentProviderOperation.Builder batch = null;
 		try {
 			int id = original_record.getInt("id");
@@ -471,6 +482,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 					.buildUpon()
 					.appendPath(Integer.toString(model.selectRowId(id)))
 					.build()) : ContentProviderOperation.newInsert(model.uri());
+			if (update) {
+				syncResult.stats.numUpdates++;
+			} else {
+				syncResult.stats.numInserts++;
+			}
 			List<Integer> r_ids = new ArrayList<Integer>();
 			for (OColumn column : model.getColumns(false)) {
 				JSONObject record = model.beforeCreateRow(column,
@@ -625,7 +641,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	}
 
 	public OSyncAdapter onSyncFinish(OSyncFinishListener syncFinish) {
-		mOSyncFinishListener = syncFinish;
+		mOSyncFinishListeners.put(mModel.getModelName(), syncFinish);
 		return this;
 	}
 }

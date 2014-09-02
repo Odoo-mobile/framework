@@ -57,6 +57,7 @@ public class BezelImageView extends ImageView {
 	private Bitmap mCacheBitmap;
 	private int mCachedWidth;
 	private int mCachedHeight;
+	private Context mContext;
 
 	public BezelImageView(Context context) {
 		this(context, null);
@@ -68,7 +69,7 @@ public class BezelImageView extends ImageView {
 
 	public BezelImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-
+		mContext = context;
 		// Attribute initialization
 		final TypedArray a = context.obtainStyledAttributes(attrs,
 				R.styleable.BezelImageView, defStyle, 0);
@@ -89,7 +90,16 @@ public class BezelImageView extends ImageView {
 				mDesaturateOnPress);
 
 		a.recycle();
+		otherInit();
+	}
 
+	public void autoSetMaskDrawable() {
+		mMaskDrawable = mContext.getResources().getDrawable(
+				R.drawable.circle_mask);
+		otherInit();
+	}
+
+	private void otherInit() {
 		// Other initialization
 		mBlackPaint = new Paint();
 		mBlackPaint.setColor(0xff000000);

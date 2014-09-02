@@ -18,11 +18,15 @@
  */
 package com.odoo;
 
+import java.util.List;
+
 import odoo.OVersionException;
 import odoo.Odoo;
 import odoo.OdooInstance;
 import odoo.OdooVersion;
+import android.app.ActivityManager;
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -118,5 +122,15 @@ public class App extends Application {
 			isConnected = true;
 		}
 		return isConnected;
+	}
+
+	public boolean appOnTop() {
+		ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+		ComponentName componentInfo = taskInfo.get(0).topActivity;
+		if (componentInfo.getPackageName().equalsIgnoreCase(getPackageName())) {
+			return true;
+		}
+		return false;
 	}
 }

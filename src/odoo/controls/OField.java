@@ -45,8 +45,8 @@ import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -719,7 +719,14 @@ public class OField extends LinearLayout implements
 	 */
 	private void createBinaryControl(final OFieldType binary_type,
 			final boolean roundedImage) {
-		final ImageView imgBinary = new ImageView(mContext);
+		final ImageView imgBinary;
+		if (roundedImage) {
+			imgBinary = new BezelImageView(mContext);
+			imgBinary.setScaleType(ScaleType.CENTER_CROP);
+			((BezelImageView) imgBinary).autoSetMaskDrawable();
+		} else {
+			imgBinary = new ImageView(mContext);
+		}
 		int heightWidth = mAttributes.getResource(KEY_ROUND_IMAGE_WIDTH_HEIGHT,
 				-1);
 		if (heightWidth > -1) {
@@ -732,11 +739,6 @@ public class OField extends LinearLayout implements
 		final Bitmap binary_image = BitmapFactory.decodeResource(mContext
 				.getResources(), (default_image < 0) ? R.drawable.attachment
 				: default_image);
-		if (roundedImage) {
-			imgBinary.setImageBitmap(Base64Helper.getRoundedCornerBitmap(
-					mContext, binary_image, true));
-		} else
-			imgBinary.setImageBitmap(binary_image);
 		new Handler().postDelayed(new Runnable() {
 
 			@Override
@@ -778,18 +780,13 @@ public class OField extends LinearLayout implements
 						if (!roundedImage)
 							imgBinary.setScaleType(ScaleType.CENTER_CROP);
 					}
-					if (roundedImage) {
-						imgBinary.setImageBitmap(Base64Helper
-								.getRoundedCornerBitmap(mContext, newBitmap,
-										true));
-					} else
-						imgBinary.setImageBitmap(newBitmap);
+					imgBinary.setImageBitmap(newBitmap);
 					break;
 				default:
 					break;
 				}
 			}
-		}, 300);
+		}, 50);
 		addView(imgBinary);
 	}
 
