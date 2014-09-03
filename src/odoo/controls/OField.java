@@ -631,6 +631,8 @@ public class OField extends LinearLayout implements
 					mWebView.setLayoutParams(mLayoutParams);
 					if (content.equals("false")) {
 						content = "";
+					} else if (withReadMoreButton()) {
+						mWebView.setLines(5);
 					}
 					mWebView.setHtmlContent(content);
 					mWebView.setBackgroundColor(Color.TRANSPARENT);
@@ -653,12 +655,15 @@ public class OField extends LinearLayout implements
 			final String content) {
 		if (withReadMoreButton() && !TextUtils.isEmpty(container.getText())) {
 			final OWebTextView shortContainer = new OWebTextView(mContext);
-			shortContainer.setHtmlContent(content);
+			shortContainer.setHtmlSpanContent(container.getHtmlSpan());
 			shortContainer.setBackgroundColor(Color.TRANSPARENT);
 			shortContainer.setLayoutParams(container.getLayoutParams());
 			shortContainer.setVisibility(View.GONE);
+			shortContainer.setTextAppearance(mContext,
+					android.R.attr.textAppearanceSmall);
+			container.setTextAppearance(mContext,
+					android.R.attr.textAppearanceSmall);
 			addView(shortContainer);
-			container.setLines(5);
 			container.setPadding(container.getPaddingLeft(),
 					container.getPaddingTop(), container.getPaddingRight(),
 					(int) (3 * mScaleFactor));
@@ -843,7 +848,7 @@ public class OField extends LinearLayout implements
 					break;
 				}
 			}
-		}, 50);
+		}, 250);
 		addView(imgBinary);
 	}
 

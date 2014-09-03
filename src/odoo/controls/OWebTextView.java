@@ -52,12 +52,16 @@ public class OWebTextView extends TextView {
 		mMetrics = getResources().getDisplayMetrics();
 		mScaleFactor = mMetrics.density;
 		int padding = (int) (10 * mScaleFactor);
-		setPadding(padding, padding, padding, padding);
-		setTextAppearance(mContext, android.R.attr.textAppearanceMedium);
-		setTypeface(OControlHelper.lightFont());
+		setPadding(padding, padding, padding, 0);
 		setClickable(true);
 		setMovementMethod(new ScrollingMovementMethod());
 		setMovementMethod(LinkMovementMethod.getInstance());
+	}
+
+	@Override
+	public void setTextAppearance(Context context, int resid) {
+		super.setTextAppearance(context, resid);
+		setTypeface(OControlHelper.lightFont());
 	}
 
 	public void setHtmlContent(String content) {
@@ -65,6 +69,14 @@ public class OWebTextView extends TextView {
 		originalContent = content;
 		htmlSpan = Html.fromHtml(content, p, null);
 		setText(htmlSpan);
+	}
+
+	public void setHtmlSpanContent(Spanned content) {
+		setText(content);
+	}
+
+	public Spanned getHtmlSpan() {
+		return htmlSpan;
 	}
 
 	public void trimContent(int lines) {

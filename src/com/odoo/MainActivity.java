@@ -521,9 +521,16 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 	}
 
+	public void setViewAutoHide(ListView listView, View view) {
+		registerHideableHeaderView(view);
+		enableActionBarAutoHide(listView);
+		hideActionBar(false);
+	}
+
 	public void setActionbarAutoHide(ListView listView) {
 		Log.v(TAG, "setActionbarAutoHide");
 		enableActionBarAutoHide(listView);
+		hideActionBar(true);
 	}
 
 }
