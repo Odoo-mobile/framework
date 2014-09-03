@@ -38,6 +38,7 @@
             <enum name="horizontal" value="0" />
             <enum name="vertical" value="1" />
         </attr>
+        <attr name="readMoreButton" format="boolean" />
     </declare-styleable>
     <declare-styleable name="OLabel">
         <attr name="label" format="string" />

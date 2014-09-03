@@ -38,15 +38,15 @@ import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
-import android.widget.ImageView.ScaleType;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -138,6 +138,9 @@ public class OField extends LinearLayout implements
 
 	/** The Constant KEY_CUSTOM_LAYOUT_ORIANTATION. */
 	public static final String KEY_CUSTOM_LAYOUT_ORIANTATION = "customLayoutOriantation";
+
+	/** The Constant KEY_READ_MORE_BUTTON. */
+	public static final String KEY_READ_MORE_BUTTON = "readMoreButton";
 
 	/**
 	 * The Enum OFieldMode.
@@ -265,7 +268,7 @@ public class OField extends LinearLayout implements
 	private Switch mSwitch = null;
 
 	/** The web view. */
-	private WebView mWebView = null;
+	private OWebTextView mWebView = null;
 
 	/** The display metrics. */
 	private DisplayMetrics mMetrics = null;
@@ -622,22 +625,76 @@ public class OField extends LinearLayout implements
 				if (!showAsText) {
 					String content = mControlRecord
 							.getString(mColumn.getName());
-					content = content.replaceAll("(\r\n|\n)", "<br />");
 					mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
 							LayoutParams.WRAP_CONTENT);
-					mWebView = new WebView(mContext);
+					mWebView = new OWebTextView(mContext);
 					mWebView.setLayoutParams(mLayoutParams);
-					mWebView.loadData(content, "text/html; charset=UTF-8",
-							"UTF-8");
-					mWebView.getSettings().setTextZoom(90);
+					if (content.equals("false")) {
+						content = "";
+					}
+					mWebView.setHtmlContent(content);
 					mWebView.setBackgroundColor(Color.TRANSPARENT);
 					addView(mWebView);
+					addReadMoreButton(mWebView, content);
 				} else {
 					createTextViewControl();
 					setText(StringUtils.htmlToString(mControlRecord
 							.getString(mColumn.getName())));
 				}
 			}
+		}
+	}
+
+	private boolean withReadMoreButton() {
+		return mAttributes.getBoolean(KEY_READ_MORE_BUTTON, false);
+	}
+
+	private void addReadMoreButton(final OWebTextView container,
+			final String content) {
+		if (withReadMoreButton() && !TextUtils.isEmpty(container.getText())) {
+			final OWebTextView shortContainer = new OWebTextView(mContext);
+			shortContainer.setHtmlContent(content);
+			shortContainer.setBackgroundColor(Color.TRANSPARENT);
+			shortContainer.setLayoutParams(container.getLayoutParams());
+			shortContainer.setVisibility(View.GONE);
+			addView(shortContainer);
+			container.setLines(5);
+			container.setPadding(container.getPaddingLeft(),
+					container.getPaddingTop(), container.getPaddingRight(),
+					(int) (3 * mScaleFactor));
+			TextView txvAddMore = new TextView(mContext);
+			txvAddMore.setGravity(Gravity.CENTER);
+			txvAddMore.setTextAppearance(mContext,
+					android.R.attr.textAppearanceMedium);
+			txvAddMore.setTypeface(OControlHelper.boldFont());
+			txvAddMore.setText(R.string.label_read_more);
+			txvAddMore.setAllCaps(true);
+			int padd = (int) (10 * mScaleFactor);
+			txvAddMore.setPadding(padd, padd, padd, padd);
+			txvAddMore.setClickable(true);
+			txvAddMore.setTextColor(mContext.getResources().getColor(
+					R.color.odoo_purple));
+			txvAddMore.setBackgroundResource(R.drawable.oe_background_selector);
+			txvAddMore.setTag("more");
+			txvAddMore.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					TextView txv = (TextView) v;
+					if (v.getTag().toString().equals("more")) {
+						container.setVisibility(View.GONE);
+						shortContainer.setVisibility(View.VISIBLE);
+						txv.setText(R.string.label_read_less);
+						v.setTag("less");
+					} else {
+						v.setTag("more");
+						txv.setText(R.string.label_read_more);
+						container.setVisibility(View.VISIBLE);
+						shortContainer.setVisibility(View.GONE);
+					}
+				}
+			});
+			addView(txvAddMore);
 		}
 	}
 
@@ -1064,6 +1121,8 @@ public class OField extends LinearLayout implements
 				mTypedArray.getInt(R.styleable.OField_imageWidthHeight, -1));
 		mAttributes.put(KEY_CUSTOM_LAYOUT_ORIANTATION, mTypedArray.getInt(
 				R.styleable.OField_customLayoutOriantation, -1));
+		mAttributes.put(KEY_READ_MORE_BUTTON, mTypedArray.getBoolean(
+				R.styleable.OField_readMoreButton, false));
 	}
 
 	/**

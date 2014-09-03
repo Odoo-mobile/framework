@@ -30,13 +30,15 @@ import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.OnSearchViewChangeListener;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
+import com.odoo.support.listview.OCursorListAdapter.OnRowViewClickListener;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.util.logger.OLog;
 
 public class PartnersCursorLoader extends BaseFragment implements
 		OnRefreshListener, LoaderManager.LoaderCallbacks<Cursor>,
 		SyncStatusObserverListener, OnSearchViewChangeListener,
-		OnItemClickListener {
+		OnItemClickListener, OnRowViewClickListener {
 	public static final String TAG = Partners.class.getSimpleName();
 	public static final String KEY = "partner_type";
 	private Type mCurrentType = Type.Companies;
@@ -78,6 +80,7 @@ public class PartnersCursorLoader extends BaseFragment implements
 		listView = (ListView) view.findViewById(R.id.partners_listView);
 		mAdapter = new OCursorListAdapter(getActivity(), null,
 				R.layout.partners_list_item);
+		mAdapter.setOnRowViewClickListener(R.id.imgUserProfilePicture, this);
 		listView.setAdapter(mAdapter);
 		listView.setOnItemClickListener(this);
 		scope.main().setActionbarAutoHide(listView);
@@ -233,5 +236,11 @@ public class PartnersCursorLoader extends BaseFragment implements
 		PartnersDetail partner = new PartnersDetail();
 		partner.setArguments(bundle);
 		startFragment(partner, true);
+	}
+
+	@Override
+	public void onRowViewClick(int position, Cursor cursor, View view,
+			View parent) {
+		OLog.log(cursor.getString(cursor.getColumnIndex("name")));
 	}
 }

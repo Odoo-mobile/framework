@@ -105,6 +105,8 @@
     <string name="label_version">Version</string>
     <string name="label_update_info">Update Info</string>
     <string name="label_process_anyway">Process Anyway</string>
+    <string name="label_read_more">Read More</string>
+    <string name="label_read_less">Read Less</string>
 
     <!-- Toasts -->
     <string name="toast_setting_saved">Setting saved.</string>

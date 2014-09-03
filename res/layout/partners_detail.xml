@@ -101,6 +101,7 @@
             android:layout_height="wrap_content"
             odoo:field_name="comment"
             odoo:label_color="@color/odoo_purple"
+            odoo:readMoreButton="true"
             odoo:with_label="true" />
 
         <odoo.controls.OField

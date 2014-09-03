@@ -9,6 +9,7 @@
     odoo:model="res.partner" >
 
     <odoo.controls.OField
+        android:id="@+id/imgUserProfilePicture"
         android:layout_width="65dp"
         android:layout_height="65dp"
         android:layout_marginRight="10dp"
