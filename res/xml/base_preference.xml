@@ -2,14 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory
-        android:key="account_dummy"
-        android:title="" >
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:key="account_dummy2"
-        android:title="" >
-    </PreferenceCategory>
-    <PreferenceCategory
         android:key="general_settings"
         android:title="@string/general_settings" >
         <Preference android:summary="@string/application_settings_summary" >

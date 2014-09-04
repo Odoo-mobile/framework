@@ -7,7 +7,7 @@
     <style name="AppBaseTheme" parent="android:Theme.Holo.Light">
 
         <!-- API 11 theme customizations can go here. -->
-        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
     </style>
 
 </resources>

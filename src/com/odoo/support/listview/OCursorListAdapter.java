@@ -23,11 +23,13 @@ public class OCursorListAdapter extends CursorAdapter {
 	private HashMap<String, View> mViewCache = new HashMap<String, View>();
 	private Boolean mCacheViews = false;
 	private OnViewBindListener mOnViewBindListener = null;
+	private Context mContext = null;
 
 	public OCursorListAdapter(Context context, Cursor c, int layout) {
 		super(context, c, false);
 		mLayout = layout;
 		mInflater = LayoutInflater.from(context);
+		mContext = context;
 	}
 
 	public OCursorListAdapter allowCacheView(Boolean cache) {
@@ -60,9 +62,9 @@ public class OCursorListAdapter extends CursorAdapter {
 	public View getView(final int position, View view, ViewGroup viewGroup) {
 		getCursor().moveToPosition(position);
 		Cursor cursor = getCursor();
-		View cacheView = getCachedView(cursor);
-		if (mCacheViews && cacheView != null) {
-			return cacheView;
+		view = getCachedView(cursor);
+		if (mCacheViews && view != null) {
+			return view;
 		}
 		view = newView(mContext, cursor, (ViewGroup) view);
 		final View mView = view;
@@ -140,12 +142,12 @@ public class OCursorListAdapter extends CursorAdapter {
 		return view;
 	}
 
-	public int getResource() {
-		return mLayout;
-	}
-
 	public View inflate(int resource, ViewGroup viewGroup) {
 		return mInflater.inflate(resource, viewGroup, false);
+	}
+
+	public int getResource() {
+		return mLayout;
 	}
 
 	public void setOnRowViewClickListener(int view_id,

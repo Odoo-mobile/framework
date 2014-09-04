@@ -194,6 +194,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			View v = mFormFieldControls.get(i);
 			if (v instanceof OField) {
 				OField field = (OField) v;
+				field.reInit();
 				OColumn column = mModel.getColumn(field.getFieldName());
 				OModel ref_model = null;
 				if (column != null) {
