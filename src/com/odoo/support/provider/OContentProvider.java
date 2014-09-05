@@ -198,7 +198,6 @@ public abstract class OContentProvider extends ContentProvider implements
 		int count;
 		switch (match) {
 		case COLLECTION:
-
 			Cursor cr = query(uri, new String[] { OColumn.ROW_ID }, where,
 					whereArgs, null);
 			while (cr.moveToNext()) {
@@ -229,7 +228,8 @@ public abstract class OContentProvider extends ContentProvider implements
 	private String[] validateProjections(String[] projection) {
 		List<String> columns = new ArrayList<String>();
 		columns.addAll(Arrays.asList(projection));
-		columns.add(OColumn.ROW_ID);
+		columns.addAll(Arrays.asList(new String[] { OColumn.ROW_ID, "is_dirty",
+				"is_active", "odoo_name" }));
 		if (model.getColumn("id") != null)
 			columns.add("id");
 		return columns.toArray(new String[columns.size()]);
