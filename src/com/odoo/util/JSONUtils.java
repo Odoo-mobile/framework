@@ -19,4 +19,15 @@ public class JSONUtils {
 		}
 		return list;
 	}
+
+	public static <T> JSONArray toArray(List<T> list) {
+		JSONArray array = new JSONArray();
+		try {
+			for (T obj : list)
+				array.put(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return array;
+	}
 }

@@ -26,6 +26,7 @@ import java.util.TimeZone;
 import odoo.controls.MultiTagsTextView.TokenListener;
 import odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener;
 import odoo.controls.OTagsView.CustomTagViewListener;
+import odoo.controls.OTagsView.NewTokenCreateListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -469,7 +470,6 @@ public class OField extends LinearLayout implements
 			mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
 					LayoutParams.WRAP_CONTENT);
 			mManyToManyTags.setLayoutParams(mLayoutParams);
-			mManyToManyTags.setNewTokenCreateListener(null);
 			for (ODataRow row : mSelectedObjects) {
 				mManyToManyTags.addObject(row);
 			}
@@ -1400,5 +1400,15 @@ public class OField extends LinearLayout implements
 
 	public void setOnItemClickListener(OForm.OnViewClickListener listener) {
 		mOForm_OnViewClickListener = listener;
+	}
+
+	public void setOnNewTokenCreateListener(NewTokenCreateListener listener) {
+		if (mManyToManyTags != null)
+			mManyToManyTags.setNewTokenCreateListener(listener);
+	}
+
+	public void addTagObject(Object tag) {
+		if (mManyToManyTags != null)
+			mManyToManyTags.addObject(tag);
 	}
 }
