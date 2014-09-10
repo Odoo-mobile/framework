@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -24,6 +25,7 @@ import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -291,6 +293,7 @@ public class Attachments implements OnClickListener {
 		return new File(uri.getPath()).exists();
 	}
 
+	@SuppressLint("InlinedApi")
 	public void newAttachment(Types type) {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -299,8 +302,13 @@ public class Attachments implements OnClickListener {
 			createDialog(type);
 			break;
 		case IMAGE:
-			// intent = new Intent(Intent.ACTION_PICK,
-			// MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			if (Build.VERSION.SDK_INT < 19) {
+				intent = new Intent();
+				intent.setAction(Intent.ACTION_GET_CONTENT);
+			} else {
+				intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+				intent.addCategory(Intent.CATEGORY_OPENABLE);
+			}
 			intent.setType("image/*");
 			requestIntent(intent, REQUEST_IMAGE);
 			break;
