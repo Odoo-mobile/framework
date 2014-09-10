@@ -23,6 +23,7 @@ public class OCursorListAdapter extends CursorAdapter {
 	private HashMap<String, View> mViewCache = new HashMap<String, View>();
 	private Boolean mCacheViews = false;
 	private OnViewBindListener mOnViewBindListener = null;
+	private BeforeBindUpdateData mBeforeBindUpdateData = null;
 	private Context mContext = null;
 
 	public OCursorListAdapter(Context context, Cursor c, int layout) {
@@ -51,10 +52,13 @@ public class OCursorListAdapter extends CursorAdapter {
 		for (String col : cursor.getColumnNames()) {
 			row.put(col, getValue(cursor, col));
 		}
+		if (mBeforeBindUpdateData != null) {
+			row.addAll(mBeforeBindUpdateData.updateDataRow(cursor));
+		}
 		OForm form = (OForm) view;
 		form.initForm(row);
 		if (mOnViewBindListener != null) {
-			mOnViewBindListener.onViewBind(view, cursor);
+			mOnViewBindListener.onViewBind(view, cursor, row);
 		}
 	}
 
@@ -163,18 +167,25 @@ public class OCursorListAdapter extends CursorAdapter {
 		mOnViewBindListener = bindListener;
 	}
 
+	public void setBeforeBindUpdateData(BeforeBindUpdateData updater) {
+		mBeforeBindUpdateData = updater;
+	}
+
 	public interface OnRowViewClickListener {
 		public void onRowViewClick(int position, Cursor cursor, View view,
 				View parent);
 	}
 
 	public interface OnViewBindListener {
-		public void onViewBind(View view, Cursor cursor);
+		public void onViewBind(View view, Cursor cursor, ODataRow row);
+	}
+
+	public interface BeforeBindUpdateData {
+		public ODataRow updateDataRow(Cursor cr);
 	}
 
 	public interface OnViewCreateListener {
 		public View onViewCreated(Context context, ViewGroup view, Cursor cr,
 				int position);
-
 	}
 }

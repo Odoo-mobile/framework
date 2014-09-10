@@ -44,14 +44,15 @@ public class IrAttachment extends OModel {
 
 	OColumn name = new OColumn("Name", OText.class);
 	OColumn datas_fname = new OColumn("Data file name", OText.class);
-	OColumn type = new OColumn("Type", OText.class);
+	OColumn type = new OColumn("Type", OText.class).setLocalColumn();
 	OColumn file_size = new OColumn("File Size", OInteger.class);
 	OColumn res_model = new OColumn("Model", OVarchar.class, 100);
 	OColumn file_type = new OColumn("Content Type", OVarchar.class, 100);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne);
-	OColumn res_id = new OColumn("Resource id", OInteger.class);
-
+	OColumn res_id = new OColumn("Resource id", OInteger.class).setDefault(0);
+	OColumn scheme = new OColumn("File Scheme", OVarchar.class, 100)
+			.setLocalColumn();
 	// Local Column
 	OColumn file_uri = new OColumn("File URI", OVarchar.class, 150)
 			.setLocalColumn().setDefault(false);

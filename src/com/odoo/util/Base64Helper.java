@@ -38,7 +38,6 @@ import android.net.Uri;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Base64Helper.
  */

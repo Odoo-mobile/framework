@@ -214,7 +214,6 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(TAG, "Partners", true));
 		menu.add(new DrawerItem(TAG, "Companies",
 				count(context, Type.Companies), R.drawable.ic_action_company,
 				object(Type.Companies)));

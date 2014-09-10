@@ -86,12 +86,23 @@ public class OValues {
 		return _values.toString();
 	}
 
+	public ODataRow toDataRow() {
+		ODataRow row = new ODataRow();
+		row.addAll(_values);
+		return row;
+	}
+
 	public ContentValues toContentValues() {
 		ContentValues values = new ContentValues();
 		for (String key : _values.keySet()) {
 			Object val = _values.get(key);
+			val = (val == null) ? "false" : val;
 			values.put(key, val.toString());
 		}
 		return values;
+	}
+
+	public void addAll(HashMap<String, Object> data) {
+		_values.putAll(data);
 	}
 }

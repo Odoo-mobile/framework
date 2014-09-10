@@ -168,7 +168,7 @@ public class OField extends LinearLayout implements
 	/**
 	 * The Enum OFieldType.
 	 */
-	enum OFieldType {
+	public enum OFieldType {
 
 		/** The many to one. */
 		MANY_TO_ONE,
@@ -909,7 +909,11 @@ public class OField extends LinearLayout implements
 			mFieldLabel.setLayoutParams(mLayoutParams);
 			mFieldLabel.setBottomBorderHeight(mAttributes.getResource(
 					KEY_BOTTOM_BORDER_HEIGHT, 2));
-			mFieldLabel.setLabel(mAttributes.getString(KEY_FIELD_NAME, ""));
+			if (mColumn != null) {
+				mFieldLabel.setLabel(mColumn.getLabel());
+			} else {
+				mFieldLabel.setLabel(mAttributes.getString(KEY_FIELD_NAME, ""));
+			}
 			Integer mAttrLabelTextAppearnce = mAttributes.getResource(
 					KEY_LABEL_TEXT_APPEARANCE, 0);
 			if (mAttrLabelTextAppearnce != 0)
