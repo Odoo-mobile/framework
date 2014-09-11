@@ -21,7 +21,6 @@ package com.odoo.support.fragment;
 import android.content.ContentResolver;
 import android.content.SyncStatusObserver;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -331,38 +330,6 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		scope = new AppScope(getActivity());
-	}
-
-	/**
-	 * AsyncTask quick task helper
-	 */
-
-	protected class BackgroundTask extends AsyncTask<Void, Void, Object> {
-		AsyncTaskListener mListener = null;
-
-		public BackgroundTask(AsyncTaskListener listener) {
-			mListener = listener;
-		}
-
-		@Override
-		protected Object doInBackground(Void... params) {
-			if (mListener != null) {
-				return mListener.onPerformTask();
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Object result) {
-			super.onPostExecute(result);
-			if (mListener != null) {
-				mListener.onFinish(result);
-			}
-		}
-	}
-
-	public BackgroundTask newBackgroundTask(AsyncTaskListener taskListener) {
-		return new BackgroundTask(taskListener);
 	}
 
 }
