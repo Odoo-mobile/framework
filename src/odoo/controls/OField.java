@@ -634,11 +634,18 @@ public class OField extends LinearLayout implements
 						content = "";
 					} else if (withReadMoreButton()) {
 						mWebView.setLines(5);
+						mWebView.setMaxLines(5);
 					}
+					mWebView.setPadding(mWebView.getPaddingLeft(),
+							mWebView.getPaddingTop(),
+							mWebView.getPaddingRight(),
+							(int) (10 * mScaleFactor));
+					mWebView.setTextAppearance(mContext,
+							android.R.attr.textAppearanceSmall);
 					mWebView.setHtmlContent(content);
 					mWebView.setBackgroundColor(Color.TRANSPARENT);
 					addView(mWebView);
-					addReadMoreButton(mWebView, content);
+					addReadMoreButton(content);
 				} else {
 					createTextViewControl();
 					setText(StringUtils.htmlToString(mControlRecord
@@ -652,55 +659,61 @@ public class OField extends LinearLayout implements
 		return mAttributes.getBoolean(KEY_READ_MORE_BUTTON, false);
 	}
 
-	private void addReadMoreButton(final OWebTextView container,
-			final String content) {
-		if (withReadMoreButton() && !TextUtils.isEmpty(container.getText())) {
-			final OWebTextView shortContainer = new OWebTextView(mContext);
-			shortContainer.setHtmlSpanContent(container.getHtmlSpan());
-			shortContainer.setBackgroundColor(Color.TRANSPARENT);
-			shortContainer.setLayoutParams(container.getLayoutParams());
-			shortContainer.setVisibility(View.GONE);
-			shortContainer.setTextAppearance(mContext,
-					android.R.attr.textAppearanceSmall);
-			container.setTextAppearance(mContext,
-					android.R.attr.textAppearanceSmall);
-			addView(shortContainer);
-			container.setPadding(container.getPaddingLeft(),
-					container.getPaddingTop(), container.getPaddingRight(),
-					(int) (3 * mScaleFactor));
-			TextView txvAddMore = new TextView(mContext);
-			txvAddMore.setGravity(Gravity.CENTER);
-			txvAddMore.setTextAppearance(mContext,
+	private void addReadMoreButton(final String content) {
+		if (withReadMoreButton() && !TextUtils.isEmpty(mWebView.getText())) {
+			final TextView txvReadMore = new TextView(mContext);
+			txvReadMore.setGravity(Gravity.CENTER);
+			txvReadMore.setTextAppearance(mContext,
 					android.R.attr.textAppearanceMedium);
-			txvAddMore.setTypeface(OControlHelper.boldFont());
-			txvAddMore.setText(R.string.label_read_more);
-			txvAddMore.setAllCaps(true);
+			txvReadMore.setTypeface(OControlHelper.boldFont());
+			txvReadMore.setText(R.string.label_read_more);
+			txvReadMore.setAllCaps(true);
 			int padd = (int) (10 * mScaleFactor);
-			txvAddMore.setPadding(padd, padd, padd, padd);
-			txvAddMore.setClickable(true);
-			txvAddMore.setTextColor(mContext.getResources().getColor(
+			txvReadMore.setPadding(padd, padd, padd, padd);
+			txvReadMore.setClickable(true);
+			txvReadMore.setTextColor(mContext.getResources().getColor(
 					R.color.odoo_purple));
-			txvAddMore.setBackgroundResource(R.drawable.oe_background_selector);
-			txvAddMore.setTag("more");
-			txvAddMore.setOnClickListener(new OnClickListener() {
+			txvReadMore
+					.setBackgroundResource(R.drawable.oe_background_selector);
+			txvReadMore.setTag("more");
+			txvReadMore.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
 					TextView txv = (TextView) v;
 					if (v.getTag().toString().equals("more")) {
-						container.setVisibility(View.GONE);
-						shortContainer.setVisibility(View.VISIBLE);
+						mWebView.setLines(mWebView.getLineCount());
+						mWebView.setMaxLines(mWebView.getLineCount());
 						txv.setText(R.string.label_read_less);
 						v.setTag("less");
 					} else {
 						v.setTag("more");
 						txv.setText(R.string.label_read_more);
-						container.setVisibility(View.VISIBLE);
-						shortContainer.setVisibility(View.GONE);
+						mWebView.setLines(5);
+						mWebView.setMaxLines(5);
 					}
 				}
 			});
-			addView(txvAddMore);
+			mWebView.setOnLayoutLoad(new OWebTextView.OnLayoutLoad() {
+
+				@Override
+				public void layoutLoad(OWebTextView view) {
+					new Handler().post(new Runnable() {
+
+						@Override
+						public void run() {
+							int lines = mWebView.getLineCount();
+							if (lines < 5) {
+								mWebView.setLines(lines);
+								mWebView.setMaxLines(lines);
+								mWebView.postInvalidate();
+								txvReadMore.setVisibility(View.GONE);
+							}
+						}
+					});
+				}
+			});
+			addView(txvReadMore);
 		}
 	}
 
@@ -799,58 +812,51 @@ public class OField extends LinearLayout implements
 		}
 		final int default_image = mAttributes.getResource(KEY_DEFAULT_IMAGE,
 				R.drawable.attachment);
-		new Handler().postDelayed(new Runnable() {
 
-			@Override
-			public void run() {
-				final Bitmap binary_image = BitmapFactory.decodeResource(
-						mContext.getResources(),
-						(default_image < 0) ? R.drawable.attachment
-								: default_image);
-				ODataRow record = null;
-				String column_name = getRefColumn();
-				if (mControlRecord != null) {
-					if (column_name != null) {
-						if (mColumn.getRelationType() == RelationType.ManyToOne) {
-							record = mControlRecord.getM2ORecord(
-									mColumn.getName()).browse();
-						}
-					} else {
-						record = mControlRecord;
-						if (mColumn != null)
-							column_name = mColumn.getName();
-						else {
-							column_name = mAttributes.getString(KEY_FIELD_NAME,
-									null);
-						}
-					}
+		final Bitmap binary_image = BitmapFactory.decodeResource(mContext
+				.getResources(), (default_image < 0) ? R.drawable.attachment
+				: default_image);
+		ODataRow record = null;
+		String column_name = getRefColumn();
+		if (mControlRecord != null) {
+			if (column_name != null) {
+				if (mColumn.getRelationType() == RelationType.ManyToOne) {
+					record = mControlRecord.getM2ORecord(mColumn.getName())
+							.browse();
 				}
-
-				switch (binary_type) {
-				case BINARY_FILE:
-					imgBinary
-							.setImageResource((default_image < 0) ? R.drawable.attachment
-									: default_image);
-					break;
-				case BINARY_ROUND_IMAGE:
-				case BINARY_IMAGE:
-					Bitmap newBitmap = binary_image;
-					if (record != null
-							&& !record.getString(column_name).equals("false")
-							&& !record.getString(column_name).equals("null")
-							&& !record.getString(column_name).equals("0")) {
-						newBitmap = Base64Helper.getBitmapImage(mContext,
-								record.getString(column_name));
-						if (!roundedImage)
-							imgBinary.setScaleType(ScaleType.CENTER_CROP);
-					}
-					imgBinary.setImageBitmap(newBitmap);
-					break;
-				default:
-					break;
+			} else {
+				record = mControlRecord;
+				if (mColumn != null)
+					column_name = mColumn.getName();
+				else {
+					column_name = mAttributes.getString(KEY_FIELD_NAME, null);
 				}
 			}
-		}, 300);
+		}
+
+		switch (binary_type) {
+		case BINARY_FILE:
+			imgBinary
+					.setImageResource((default_image < 0) ? R.drawable.attachment
+							: default_image);
+			break;
+		case BINARY_ROUND_IMAGE:
+		case BINARY_IMAGE:
+			Bitmap newBitmap = binary_image;
+			if (record != null
+					&& !record.getString(column_name).equals("false")
+					&& !record.getString(column_name).equals("null")
+					&& !record.getString(column_name).equals("0")) {
+				newBitmap = Base64Helper.getBitmapImage(mContext,
+						record.getString(column_name));
+				if (!roundedImage)
+					imgBinary.setScaleType(ScaleType.CENTER_CROP);
+			}
+			imgBinary.setImageBitmap(newBitmap);
+			break;
+		default:
+			break;
+		}
 		addView(imgBinary);
 	}
 
@@ -1409,6 +1415,25 @@ public class OField extends LinearLayout implements
 	public void setOnNewTokenCreateListener(NewTokenCreateListener listener) {
 		if (mManyToManyTags != null)
 			mManyToManyTags.setNewTokenCreateListener(listener);
+	}
+
+	public void setOnTokenFocusChangeListener(OnFocusChangeListener listener) {
+		if (mManyToManyTags != null) {
+			mManyToManyTags.setOnFocusChangeListener(listener);
+		}
+	}
+
+	public void setTagText(String str) {
+		if (mManyToManyTags != null) {
+			mManyToManyTags.setText(str);
+		}
+	}
+
+	public Object getToken() {
+		if (mManyToManyTags != null) {
+			return mManyToManyTags.getText();
+		}
+		return null;
 	}
 
 	public void addTagObject(Object tag) {

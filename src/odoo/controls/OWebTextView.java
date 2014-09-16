@@ -17,6 +17,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
@@ -37,6 +38,7 @@ public class OWebTextView extends TextView {
 	private Spanned htmlSpan = null;
 	private String originalContent = null;
 	private Boolean trimedContent = false;
+	private OnLayoutLoad mOnLayoutLoad = null;
 
 	public OWebTextView(Context context) {
 		this(context, null, 0);
@@ -67,8 +69,22 @@ public class OWebTextView extends TextView {
 	public void setHtmlContent(String content) {
 		URLImageParser p = new URLImageParser(mContext, this);
 		originalContent = content;
-		htmlSpan = Html.fromHtml(content, p, null);
+		htmlSpan = trim(Html.fromHtml(content, p, null));
 		setText(htmlSpan);
+	}
+
+	public static Spanned trim(Spanned s) {
+		int start = 0;
+		int end = s.length();
+		while (start < end && Character.isWhitespace(s.charAt(start))) {
+			start++;
+		}
+		while (end > start && Character.isWhitespace(s.charAt(end - 1))) {
+			end--;
+		}
+		CharSequence str = s.subSequence(start, end);
+		SpannableStringBuilder builder = new SpannableStringBuilder(str);
+		return builder;
 	}
 
 	public void setHtmlSpanContent(Spanned content) {
@@ -77,6 +93,14 @@ public class OWebTextView extends TextView {
 
 	public Spanned getHtmlSpan() {
 		return htmlSpan;
+	}
+
+	@Override
+	protected void onLayout(boolean changed, int left, int top, int right,
+			int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
+		if (mOnLayoutLoad != null)
+			mOnLayoutLoad.layoutLoad(this);
 	}
 
 	public void trimContent(int lines) {
@@ -186,5 +210,13 @@ public class OWebTextView extends TextView {
 				return response.getEntity().getContent();
 			}
 		}
+	}
+
+	public void setOnLayoutLoad(OnLayoutLoad listener) {
+		mOnLayoutLoad = listener;
+	}
+
+	public interface OnLayoutLoad {
+		public void layoutLoad(OWebTextView view);
 	}
 }

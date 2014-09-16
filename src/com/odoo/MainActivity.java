@@ -118,20 +118,31 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 					View.GONE);
 			mTwoPane = true;
 		}
+		if (savedInstanceState != null) {
+			// mDrawerItemSelectedPosition = savedInstanceState
+			// .getInt("current_drawer_item");
+			return;
+		}
 		init();
 	}
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		if (OUser.current(mContext) != null && savedInstanceState != null
-				&& !isNewAccountRequest()) {
-			setDrawerItemPosition(savedInstanceState
-					.getInt("current_drawer_item"));
-			if (OdooAccountManager.isAnyUser(mContext)) {
-				setDrawerItemPosition((getDrawerItemPosition() < 0) ? 0
-						: getDrawerItemPosition());
-				onNavDrawerItemClicked(getDrawerItem(getDrawerItemPosition()));
+		if (OUser.current(mContext) != null && !isNewAccountRequest()) {
+			populateNavDrawer(savedInstanceState);
+			setupAccountBox();
+			if (savedInstanceState != null) {
+				setDrawerItemPosition(savedInstanceState
+						.getInt("current_drawer_item"));
+			} else {
+				if (OdooAccountManager.isAnyUser(mContext)) {
+					setDrawerItemPosition((getDrawerItemPosition() < 0) ? 0
+							: getDrawerItemPosition());
+					onNavDrawerItemClicked(
+							getDrawerItem(getDrawerItemPosition()),
+							savedInstanceState);
+				}
 			}
 		}
 	}

@@ -276,7 +276,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 		mDrawerToggle.syncState();
 	}
 
-	protected void populateNavDrawer() {
+	protected void populateNavDrawer(Bundle savedBundle) {
 		Log.d(TAG, "initDrawer()");
 		if (mDrawerLayout == null)
 			initDrawerControls();
@@ -285,7 +285,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 		mNavDrawerItems.clear();
 		mNavDrawerItems.addAll(DrawerHelper.drawerItems(mContext));
 		mNavDrawerItems.addAll(setSettingMenu());
-		createNavDrawerItems();
+		createNavDrawerItems(savedBundle);
 	}
 
 	private List<DrawerItem> setSettingMenu() {
@@ -333,7 +333,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 
 	abstract protected void intentRequests();
 
-	private void createNavDrawerItems() {
+	private void createNavDrawerItems(Bundle savedBundle) {
 		mDrawerItemsListContainer = (ViewGroup) findViewById(R.id.navdrawer_items_list);
 		if (mDrawerItemsListContainer == null) {
 			return;
@@ -344,26 +344,30 @@ public abstract class BaseActivity extends FragmentActivity implements
 		int i = 0;
 		for (DrawerItem item : mNavDrawerItems) {
 			mNavDrawerItemViews[i] = makeNavDrawerItem(item,
-					mDrawerItemsListContainer);
+					mDrawerItemsListContainer, savedBundle);
 			mDrawerItemsListContainer.addView(mNavDrawerItemViews[i]);
 			++i;
 		}
 		if (mDrawerItemSelectedPosition == -1) {
-			selectDrawerItem();
+			selectDrawerItem(savedBundle);
 		}
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 	}
 
-	private void selectDrawerItem() {
+	private void selectDrawerItem(Bundle savedBundle) {
+		if (savedBundle != null) {
+			return;
+		}
 		for (DrawerItem item : mNavDrawerItems) {
 			if (!item.isGroupTitle()) {
-				onNavDrawerItemClicked(item);
+				onNavDrawerItemClicked(item, savedBundle);
 				break;
 			}
 		}
 	}
 
-	private View makeNavDrawerItem(final DrawerItem item, ViewGroup container) {
+	private View makeNavDrawerItem(final DrawerItem item, ViewGroup container,
+			final Bundle savedBundle) {
 		boolean selected = mDrawerItemSelectedPosition == item.getId();
 
 		int layoutToInflate = 0;
@@ -404,7 +408,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 		view.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onNavDrawerItemClicked(item);
+				onNavDrawerItemClicked(item, savedBundle);
 			}
 		});
 		return view;
@@ -441,7 +445,8 @@ public abstract class BaseActivity extends FragmentActivity implements
 
 	}
 
-	protected void onNavDrawerItemClicked(final DrawerItem item) {
+	protected void onNavDrawerItemClicked(final DrawerItem item,
+			Bundle savedBundle) {
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -508,16 +513,10 @@ public abstract class BaseActivity extends FragmentActivity implements
 				.getColor(R.color.navdrawer_icon_tint));
 	}
 
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		if (OUser.current(mContext) != null && !isNewAccountRequest()) {
-			populateNavDrawer();
-			setupAccountBox();
-			// Sync the toggle state after onRestoreInstanceState has occurred.
-			if (mDrawerToggle != null) {
-				mDrawerToggle.syncState();
-			}
+	public void setDrawerToggleSyncState() {
+		// Sync the toggle state after onRestoreInstanceState has occurred.
+		if (mDrawerToggle != null) {
+			mDrawerToggle.syncState();
 		}
 	}
 
@@ -710,6 +709,12 @@ public abstract class BaseActivity extends FragmentActivity implements
 		}
 
 		set.start();
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putInt("current_drawer_item", mDrawerItemSelectedPosition);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
