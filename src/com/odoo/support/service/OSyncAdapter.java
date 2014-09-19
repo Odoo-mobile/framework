@@ -284,6 +284,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 					ids.remove(ids.indexOf(server_id));
 				}
 			}
+			Log.i(TAG, "Found " + ids.size() + " entries for delete in local");
 			ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 			for (Integer id : ids) {
 				Integer localId = model.selectRowId(id);
@@ -301,11 +302,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 
 	private void deleteRecordFromServer(Account account, OModel model,
 			SyncResult syncResult) {
-		Cursor c = mContentResolver
-				.query(model.uri(),
-						model.projection(),
-						"is_active = ? or is_active = 0 and is_dirty = ? or is_dirty = 0 and odoo_name = ?",
-						new String[] { "false", "true", account.name }, null);
+		Cursor c = mContentResolver.query(model.uri(), model.projection(),
+				"is_active = ? and is_dirty = ? and odoo_name = ?",
+				new String[] { "false", "true", account.name }, null);
 		assert c != null;
 		Log.i(TAG, "Found " + c.getCount()
 				+ " local entries for delete on server");
@@ -390,7 +389,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 						.newUpdate(model.uri().buildUpon()
 								.appendPath(Integer.toString(local_id)).build());
 				builder.withValue("id", newId);
-				builder.withValue("is_dirty", false);
+				builder.withValue("is_dirty", "false");
 				batch.add(builder.build());
 				mContentResolver.applyBatch(model.authority(), batch);
 				mContentResolver.notifyChange(model.uri(), null, false);

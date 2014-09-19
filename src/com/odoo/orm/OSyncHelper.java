@@ -373,7 +373,9 @@ public class OSyncHelper {
 					mOdoo.updateValues(model.getModelName(), values,
 							row.getInt("id"));
 					OValues vals = new OValues();
-					vals.put("is_dirty", "false");
+					if (row.getBoolean("is_active")) {
+						vals.put("is_dirty", "false");
+					}
 					model.update(vals, row.getInt(OColumn.ROW_ID));
 				}
 			}
