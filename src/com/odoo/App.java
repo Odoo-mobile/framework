@@ -28,6 +28,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -132,5 +133,17 @@ public class App extends Application {
 			return true;
 		}
 		return false;
+	}
+
+	public boolean appInstalled(String app_package_name) {
+		PackageManager pm = getPackageManager();
+		boolean app_installed = false;
+		try {
+			pm.getPackageInfo(app_package_name, PackageManager.GET_ACTIVITIES);
+			app_installed = true;
+		} catch (PackageManager.NameNotFoundException e) {
+			app_installed = false;
+		}
+		return app_installed;
 	}
 }
