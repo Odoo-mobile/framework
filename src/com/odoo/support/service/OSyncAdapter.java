@@ -191,7 +191,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 				batch.add(createBatch(account, model, record, syncResult));
 				mContentResolver.applyBatch(model.authority(), batch);
 			}
-			// mContentResolver.applyBatch(model.authority(), batch);
 			// Updating relation records for master record
 			updateRelationRecords(account, syncResult);
 			// Creating record on server if model allows true
@@ -561,10 +560,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 							int row_id = m2m.createORReplace(vals);
 							row_ids.add(row_id);
 						}
-						// FIXME: What with many to many record in
-						// ContentProvider ???
-						// values.put(column.getName(), row_ids);
-						// batch.withValue("xyz", row_ids);
 						batch.withValue(column.getName(), row_ids.toString());
 						ORelationRecords mrel_record = mRelationRecordList.new ORelationRecords();
 						if (mRelationRecordList.contains(rel_key)) {

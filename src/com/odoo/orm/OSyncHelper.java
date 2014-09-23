@@ -348,6 +348,8 @@ public class OSyncHelper {
 				if (updateToServerRecordList.size() > 0) {
 					updateRecordOnServer(model, updateToServerRecordList);
 				}
+				Log.v(TAG, newORUpdateRecords.length()
+						+ " records new/update in local");
 				newResult.accumulate("records", newORUpdateRecords);
 				model.checkInActiveRecord(false);
 			}
@@ -816,8 +818,10 @@ public class OSyncHelper {
 	public JSONObject getFields(OModel model) {
 		JSONObject fields = new JSONObject();
 		try {
-			for (OColumn column : model.getColumns(false))
-				fields.accumulate("fields", column.getName());
+			for (OColumn column : model.getColumns(false)) {
+				if (!column.getName().equals("id"))
+					fields.accumulate("fields", column.getName());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

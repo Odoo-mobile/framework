@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -27,6 +29,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Parcelable;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.v4.app.NotificationCompat;
@@ -42,6 +46,7 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.util.Base64Helper;
+import com.odoo.util.ODate;
 
 public class Attachments implements OnClickListener {
 	public static final String TAG = Attachments.class.getSimpleName();
@@ -49,8 +54,9 @@ public class Attachments implements OnClickListener {
 	public static final String KEY_TYPE = "type";
 	public static final int REQUEST_CAMERA = 111;
 	public static final int REQUEST_IMAGE = 112;
-	public static final int REQUEST_FILE = 115;
 	public static final int REQUEST_AUDIO = 113;
+	public static final int REQUEST_FILE = 114;
+	private static final int SINGLE_ATTACHMENT_STREAM = 115;
 	private String KEY_FILE_URI = "file_uri";
 	private String KEY_FILE_NAME = "datas_fname";
 	private String KEY_FILE_TYPE = "file_type";
@@ -87,8 +93,15 @@ public class Attachments implements OnClickListener {
 				Uri file_uri = Uri.parse(uri);
 				if (fileExists(file_uri)) {
 					_open(file_uri);
-				} else if (attachment.getInt("id") != 0) {
-					_download(attachment);
+				} else if (isKitKat()) {
+					String kitkatDoc = getKitKatDocPath(file_uri);
+					if (kitkatDoc != null) {
+						file_uri = Uri.fromFile(new File(kitkatDoc));
+						_open(file_uri);
+					} else if (attachment.getInt("id") != 0)
+						_download(attachment);
+					else
+						noFileFound();
 				} else {
 					noFileFound();
 				}
@@ -293,6 +306,28 @@ public class Attachments implements OnClickListener {
 		return new File(uri.getPath()).exists();
 	}
 
+	@SuppressLint("NewApi")
+	private String getKitKatDocPath(Uri uri) {
+		String wholeID = DocumentsContract.getDocumentId(uri);
+		String id = wholeID.split(":")[1];
+		String[] column = { MediaStore.Images.Media.DATA };
+		String sel = MediaStore.Images.Media._ID + "=?";
+		Cursor cursor = mContext.getContentResolver().query(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, column, sel,
+				new String[] { id }, null);
+		String filePath = null;
+		int columnIndex = cursor.getColumnIndex(column[0]);
+		if (cursor.moveToFirst()) {
+			filePath = cursor.getString(columnIndex);
+		}
+		cursor.close();
+		return filePath;
+	}
+
+	private boolean isKitKat() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+	}
+
 	@SuppressLint("InlinedApi")
 	public void newAttachment(Types type) {
 		Intent intent = new Intent();
@@ -371,6 +406,10 @@ public class Attachments implements OnClickListener {
 		case REQUEST_CAMERA:
 			attachment = getURIDetails(newImageUri);
 			break;
+		case SINGLE_ATTACHMENT_STREAM:
+			Uri uri = data.getParcelableExtra(Intent.EXTRA_STREAM);
+			attachment = getURIDetails(uri);
+			break;
 		default:
 			return null;
 		}
@@ -403,6 +442,8 @@ public class Attachments implements OnClickListener {
 				.getExtensionFromMimeType(mCR.getType(uri)));
 		values.put("file_type", (type == null) ? uri.getScheme() : type);
 		values.put("type", type);
+		if (mAttachment.getColumn("write_date") != null)
+			values.put("write_date", ODate.getUTCDate(ODate.DEFAULT_FORMAT));
 		return values;
 	}
 
@@ -431,6 +472,25 @@ public class Attachments implements OnClickListener {
 		default:
 		}
 		dialog.cancel();
+	}
+
+	public List<OValues> handleIntentRequest(Intent intent) {
+		List<OValues> attachments = new ArrayList<OValues>();
+		String action = intent.getAction();
+		// Handling single attachment request
+		if (Intent.ACTION_SEND.equals(action)) {
+			attachments.add(handleResult(SINGLE_ATTACHMENT_STREAM, intent));
+		}
+
+		// Handling multiple attachments request
+		if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+			for (Parcelable attach : intent
+					.getParcelableArrayListExtra(Intent.EXTRA_STREAM)) {
+				Uri uri = (Uri) attach;
+				attachments.add(getURIDetails(uri));
+			}
+		}
+		return attachments;
 	}
 
 }
