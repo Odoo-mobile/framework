@@ -460,10 +460,12 @@ public abstract class BaseActivity extends FragmentActivity implements
 	}
 
 	private boolean isSettingDrawerItem(DrawerItem item) {
-		Fragment fragment = (Fragment) item.getFragmentInstace();
-		if (fragment.getArguments() != null
-				&& fragment.getArguments().containsKey("settings"))
-			return true;
+		if (item.getFragmentInstace() instanceof Fragment) {
+			Fragment fragment = (Fragment) item.getFragmentInstace();
+			if (fragment.getArguments() != null
+					&& fragment.getArguments().containsKey("settings"))
+				return true;
+		}
 		return false;
 	}
 
