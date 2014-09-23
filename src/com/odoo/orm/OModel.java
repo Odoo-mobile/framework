@@ -1534,15 +1534,11 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			break;
 		case Replace:
 			// Removing old entries
-			if (ids.size() > 0) {
-				String where = base_column + " = ? ";
-				String[] args = new String[] { base_id + "" };
-				db.delete(table, getWhereClause(where),
-						getWhereArgs(where, args));
-				// Creating new entries
-				manageManyToManyRecords(db, rel_model, ids, base_id,
-						Command.Add);
-			}
+			String where = base_column + " = ? ";
+			String[] args = new String[] { base_id + "" };
+			db.delete(table, getWhereClause(where), getWhereArgs(where, args));
+			// Creating new entries
+			manageManyToManyRecords(db, rel_model, ids, base_id, Command.Add);
 			break;
 		}
 	}
