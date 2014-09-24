@@ -331,7 +331,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 		return -1;
 	}
 
-	abstract protected void intentRequests();
+	abstract protected boolean intentRequests();
 
 	private void createNavDrawerItems(Bundle savedBundle) {
 		mDrawerItemsListContainer = (ViewGroup) findViewById(R.id.navdrawer_items_list);
