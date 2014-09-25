@@ -141,8 +141,7 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 					LoadInstances instances = new LoadInstances(result);
 					instances.execute();
 				} else {
-					// One instance only
-					loginWithInstance(result.get(0));
+					loginToOdoo();
 				}
 			} else {
 				CreateAccount createAccount = new CreateAccount(null,
@@ -225,7 +224,6 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 	// Step 2 : only if there are any instance found or self hosted
 	class CreateAccount extends AsyncTask<Void, Void, Boolean> {
 		OdooInstance mOdooInstance = null;
-		// OEDialog mDialog = null;
 		String mOdooException = null;
 		Boolean mSelfHosted = false;
 
@@ -354,7 +352,18 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		OdooInstance instance = (OdooInstance) mInstanceList.get(position);
-		loginWithInstance(instance);
+		String server_url = instance.getInstanceUrl();
+		if (!server_url.equals(OdooHelper.ODOO_SERVER_URL)) {
+			loginWithInstance(instance);
+		} else {
+			loginToOdoo();
+		}
+	}
+
+	private void loginToOdoo() {
+		mUser.setHost(OdooHelper.ODOO_SERVER_URL);
+		CreateAccount createAccount = new CreateAccount(null, true);
+		createAccount.execute();
 	}
 
 	private void loginWithInstance(OdooInstance instance) {
