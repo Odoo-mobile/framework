@@ -22,6 +22,7 @@ import com.odoo.support.OUser;
 public class OdooHelper {
 
 	public static final String TAG = OdooHelper.class.getSimpleName();
+	public static final String ODOO_SERVER_URL = "https://www.odoo.com";
 
 	Context mContext = null;
 	Boolean mForceConnect = false;
@@ -136,6 +137,10 @@ public class OdooHelper {
 
 	public List<OdooInstance> getUserInstances(OUser user) {
 		List<OdooInstance> list = new ArrayList<OdooInstance>();
+		OdooInstance oInstance = new OdooInstance();
+		oInstance.setCompanyName("Odoo");
+		oInstance.setInstanceUrl(ODOO_SERVER_URL);
+		list.add(oInstance);
 		mOdoo = mApp.getOdoo();
 		try {
 			OArguments args = new OArguments();
