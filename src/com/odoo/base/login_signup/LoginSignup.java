@@ -11,6 +11,8 @@ import odoo.Odoo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -57,6 +59,8 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		scope.main().lockDrawer(true);
 		mView = inflater.inflate(R.layout.base_login_signup_layout, container,
 				false);
+		mView.findViewById(R.id.forgot_password).setOnClickListener(this);
+		mView.findViewById(R.id.create_account).setOnClickListener(this);
 		init();
 		return mView;
 	}
@@ -109,6 +113,16 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 			break;
 		case R.id.btnLogin:
 			login();
+			break;
+		case R.id.forgot_password:
+			Intent intent = new Intent(Intent.ACTION_VIEW,
+					Uri.parse("https://www.odoo.com/web/reset_password"));
+			startActivity(intent);
+			break;
+		case R.id.create_account:
+			intent = new Intent(Intent.ACTION_VIEW,
+					Uri.parse("https://accounts.odoo.com/web/signup"));
+			startActivity(intent);
 			break;
 		}
 
@@ -218,10 +232,20 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 			super.onPostExecute(success);
 			if (success) {
 				if (OdooAccountManager.fetchAllAccounts(getActivity()) != null) {
-					if (OdooAccountManager.isAnyUser(getActivity())) {
-						OdooAccountManager.logoutUser(getActivity(),
-								OdooAccountManager.currentUser(getActivity())
-										.getAndroidName());
+					if (OdooAccountManager.getAccount(getActivity(),
+							mUser.getAndroidName()) == null) {
+						if (OdooAccountManager.isAnyUser(getActivity())) {
+							OdooAccountManager.logoutUser(
+									getActivity(),
+									OdooAccountManager.currentUser(
+											getActivity()).getAndroidName());
+						}
+					} else {
+						OControls.setGone(mView, R.id.loginProgress);
+						OControls.setVisible(mView, R.id.controls);
+						edtUsername.setError(getResources().getString(
+								R.string.toast_user_already_exists));
+						return;
 					}
 				}
 				app.setOdooInstance(mOdooInstance);

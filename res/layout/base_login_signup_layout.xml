@@ -221,6 +221,7 @@
                 android:textColor="#fff" />
 
             <TextView
+                android:id="@+id/forgot_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
@@ -245,6 +246,7 @@
                 android:textColor="#ffffff" />
 
             <TextView
+                android:id="@+id/create_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"

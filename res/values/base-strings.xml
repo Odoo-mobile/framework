@@ -120,6 +120,7 @@
     <string name="toast_provide_server_url">Provide Server URL</string>
     <string name="toast_unable_to_reach_odoo_server">Unable to reach Odoo Server.</string>
     <string name="toast_no_database_found">No database found !</string>
+    <string name="toast_user_already_exists">User already exists</string>
 
     <bool name="fit_to_window_height">false</bool>
 
