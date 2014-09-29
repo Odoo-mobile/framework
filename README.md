@@ -1,6 +1,10 @@
 Odoo Mobile Framework v2.0
 ==========================
 
+<a href="https://www.odoo.com/start" target="_blank">
+<img alt="Odoo Instace" src="https://dharmangsoni.odoo.com/website/image?max_height=768&field=datas&model=ir.attachment&id=42&max_width=250" style="height:50px; width:auto" />
+</a>
+
 Odoo is a powerful open source framework. With help of this framework we can rapidly develop almost any application.
 
 World is contracting with the growth of mobile phone technology. As the number of users is increasing day by day, facilities are also increasing. Now a days mobiles are not used just for making calls but they have innumerable uses and can be used as a Camera , Music player, Tablet PC, T.V. , Web browser etc. And with the new technologies, new software and operating systems are required.
