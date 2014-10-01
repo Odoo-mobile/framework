@@ -196,6 +196,7 @@ public class OUser {
 	 *            the account
 	 */
 	public void fillFromAccount(AccountManager accMgr, Account account) {
+
 		setName(accMgr.getUserData(account, "name"));
 		setUsername(accMgr.getUserData(account, "username"));
 		setUser_id(Integer.parseInt(accMgr.getUserData(account, "user_id")));
@@ -204,7 +205,11 @@ public class OUser {
 		setTimezone(accMgr.getUserData(account, "timezone"));
 		setIsactive(Boolean.parseBoolean(accMgr
 				.getUserData(account, "isactive")));
-		setAvatar(accMgr.getUserData(account, "avatar"));
+		try {
+			setAvatar(accMgr.getUserData(account, "avatar"));
+		} catch (Exception e) {
+			setAvatar("false");
+		}
 		setDatabase(accMgr.getUserData(account, "database"));
 		setHost(accMgr.getUserData(account, "host"));
 		setAndroidName(accMgr.getUserData(account, "android_name"));
@@ -221,6 +226,7 @@ public class OUser {
 		setInstanceDatabase(accMgr.getUserData(account, "instance_database"));
 		setInstanceUrl(accMgr.getUserData(account, "instance_url"));
 		setClientId(accMgr.getUserData(account, "client_id"));
+
 	}
 
 	/**
