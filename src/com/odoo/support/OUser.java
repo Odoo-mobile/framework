@@ -169,11 +169,7 @@ public class OUser {
 		setPartner_id(Integer.parseInt(data.getString("partner_id")));
 		setTimezone(data.getString("timezone"));
 		setIsactive(Boolean.parseBoolean(data.getString("isactive")));
-		try {
-			setAvatar(data.getString("avatar"));
-		} catch (Exception e) {
-			setAvatar("false");
-		}
+		setAvatar(data.getString("avatar"));
 		setDatabase(data.getString("database"));
 		setHost(data.getString("host"));
 		setAndroidName(data.getString("android_name"));
