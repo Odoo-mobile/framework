@@ -108,4 +108,10 @@ public @interface Odoo {
 		boolean bg_process() default false;
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ ElementType.FIELD, ElementType.METHOD })
+	public @interface hasDomainFilter {
+		boolean checkDomainRuntime() default true;
+	}
+
 }

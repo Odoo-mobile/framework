@@ -20,6 +20,7 @@ package odoo.controls;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import odoo.controls.OField.OFieldType;
@@ -35,6 +36,7 @@ import android.widget.RelativeLayout;
 
 import com.odoo.R;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.OColumn.ColumnDomain;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
@@ -213,6 +215,13 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 					if (column.hasOnChange() && editable) {
 						setOnChangeForColumn(field, column);
 					}
+
+					/**
+					 * Check for domain filter column.
+					 */
+					if (column.hasDomainFilterColumn() && editable) {
+						setOnDomainFilterCallBack(field, column);
+					}
 					OFieldType widget = null;
 					String label = field.getFieldName();
 					mFieldColumns.put(field.getFieldName(), column);
@@ -277,6 +286,36 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 							field.setText(mRecord.getString(field
 									.getFieldName()));
 					}
+				}
+			}
+		}
+	}
+
+	private void setOnDomainFilterCallBack(final OField field, final OColumn col) {
+		LinkedHashMap<String, ColumnDomain> filter_domain = col
+				.getFilterDomains();
+		for (String k : filter_domain.keySet()) {
+			ColumnDomain dmn = filter_domain.get(k);
+			if (dmn.getColumn() != null) {
+				OField fld = mFormFieldControls.get(dmn.getColumn());
+				if (fld != null) {
+					fld.setOnFilterDomainCallBack(dmn,
+							new OnDomainFilterCallbacks() {
+
+								@Override
+								public void onFieldValueChanged(
+										ColumnDomain domain) {
+									col.addDomain(domain.getColumn(),
+											domain.getOperator(),
+											domain.getValue());
+									if (field.getWidget() != null
+											&& field.getWidget() == OFieldType.MANY_TO_ONE) {
+										col.setHasDomainFilterColumn(false);
+										field.setColumn(col);
+										field.reInit();
+									}
+								}
+							});
 				}
 			}
 		}

@@ -438,6 +438,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						column.setOnChangeMethod(onChangeMethod);
 						column.setOnChangeBGProcess(checkForOnChangeBGProcess(field));
 					}
+
+					// Check for domain Filter on Column
+					column.setHasDomainFilterColumn(isDomainFilterColumn(field));
 				} else
 					return null;
 			}
@@ -494,6 +497,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			}
 		}
 		return null;
+	}
+
+	private boolean isDomainFilterColumn(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.hasDomainFilter.class);
+		if (annotation != null) {
+			Odoo.hasDomainFilter domainFilter = (Odoo.hasDomainFilter) annotation;
+			return domainFilter.checkDomainRuntime();
+		}
+		return false;
 	}
 
 	private Boolean checkForOnChangeBGProcess(Field field) {
@@ -605,7 +617,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					Class<? extends Annotation> type = annotation
 							.annotationType();
 					if (type.isAssignableFrom(Odoo.Functional.class)
-							|| type.isAssignableFrom(Odoo.onChange.class)) {
+							|| type.isAssignableFrom(Odoo.onChange.class)
+							|| type.isAssignableFrom(Odoo.hasDomainFilter.class)) {
 						versions++;
 					}
 				}
