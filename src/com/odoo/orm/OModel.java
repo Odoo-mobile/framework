@@ -432,6 +432,11 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 							column.setLocalColumn();
 						}
 					}
+					// Check for onChange Column
+					Method onChangeMethod = checkForOnChangeMethod(field);
+					if (onChangeMethod != null) {
+						column.setOnChangeMethod(onChangeMethod);
+					}
 				} else
 					return null;
 			}
@@ -483,6 +488,20 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					return getClass().getMethod(method_name, OValues.class);
 				else
 					return getClass().getMethod(method_name, ODataRow.class);
+			} catch (NoSuchMethodException e) {
+				Log.e(TAG, "No Such Method: " + e.getMessage());
+			}
+		}
+		return null;
+	}
+
+	private Method checkForOnChangeMethod(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.onChange.class);
+		if (annotation != null) {
+			Odoo.onChange onChange = (Odoo.onChange) annotation;
+			String method_name = onChange.method();
+			try {
+				return getClass().getMethod(method_name, ODataRow.class);
 			} catch (NoSuchMethodException e) {
 				Log.e(TAG, "No Such Method: " + e.getMessage());
 			}
@@ -573,8 +592,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 							break;
 						}
 					}
-					if (annotation.annotationType().isAssignableFrom(
-							Odoo.Functional.class)) {
+					Class<? extends Annotation> type = annotation
+							.annotationType();
+					if (type.isAssignableFrom(Odoo.Functional.class)
+							|| type.isAssignableFrom(Odoo.onChange.class)) {
 						versions++;
 					}
 				}
@@ -605,6 +626,19 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			}
 		}
 		return false;
+	}
+
+	public ODataRow getOnChangeValue(OColumn column, ODataRow row) {
+		if (column.hasOnChange()) {
+			Method method = column.getOnChangeMethod();
+			OModel model = this;
+			try {
+				return (ODataRow) method.invoke(model, new Object[] { row });
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -1103,6 +1137,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @param newId
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean updateRelationColumns(OValues values) {
 		SQLiteDatabase db = getWritableDatabase();
 		for (OColumn column : getColumns()) {

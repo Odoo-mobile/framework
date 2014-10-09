@@ -107,6 +107,8 @@ public class OColumn {
 
 	private Boolean mSyncMasterRecord = true;
 
+	private Method mOnChangeMethod = null;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -767,6 +769,18 @@ public class OColumn {
 	public OColumn syncMasterRecord(boolean syncMasterRecord) {
 		mSyncMasterRecord = syncMasterRecord;
 		return this;
+	}
+
+	public boolean hasOnChange() {
+		return (mOnChangeMethod != null);
+	}
+
+	public Method getOnChangeMethod() {
+		return mOnChangeMethod;
+	}
+
+	public void setOnChangeMethod(Method method) {
+		mOnChangeMethod = method;
 	}
 
 }

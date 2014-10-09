@@ -83,7 +83,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 	HashMap<String, OColumn> mFieldColumns = new HashMap<String, OColumn>();
 
 	/** The m form field controls. */
-	List<OField> mFormFieldControls = new ArrayList<OField>();
+	HashMap<String, OField> mFormFieldControls = new HashMap<String, OField>();
 
 	/** The m on view click listener. */
 	OnViewClickListener mOnViewClickListener = null;
@@ -189,9 +189,8 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 				setClickable(true);
 			}
 		}
-		int childs = mFormFieldControls.size();
-		for (int i = 0; i < childs; i++) {
-			View v = mFormFieldControls.get(i);
+		for (String key : mFormFieldControls.keySet()) {
+			View v = mFormFieldControls.get(key);
 			if (v instanceof OField) {
 				OField field = (OField) v;
 				field.reInit();
@@ -206,38 +205,42 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 						ref_column = ref_model.getColumn(field.getRefColumn());
 					}
 					field.setColumn(column);
+					/**
+					 * Check for onChange of columns in EditMode
+					 */
+					if (column.hasOnChange() && editable) {
+						setOnChangeForColumn(field, column);
+					}
 					OFieldType widget = null;
 					String label = field.getFieldName();
-					if (column != null) {
-						mFieldColumns.put(field.getFieldName(), column);
-						mFields.add(field.getTag().toString());
-						label = column.getLabel();
-						if (column.getRelationType() != null
-								&& column.getRelationType() == RelationType.ManyToOne) {
-							widget = OFieldType.MANY_TO_ONE;
-						}
-						if (column.getRelationType() != null
-								&& (column.getRelationType() == RelationType.ManyToMany || column
-										.getRelationType() == RelationType.OneToMany)) {
-							widget = OFieldType.MANY_TO_MANY_TAGS;
-						}
-						if (column.isFunctionalColumn()) {
-							Object value = mRecord.get(column.getName());
-							if (column.getType() == null)
-								column.setType(value.getClass());
-							field.setColumn(column);
-						}
-						if (column.getType().isAssignableFrom(OBlob.class)
-								|| (ref_column != null && ref_column.getType()
-										.isAssignableFrom(OBlob.class))) {
-							widget = OFieldType.BINARY;
-						}
-						if (column.getType().isAssignableFrom(OBoolean.class)) {
-							widget = OFieldType.BOOLEAN_WIDGET;
-						}
-						if (column.getType().isAssignableFrom(OHtml.class)) {
-							widget = OFieldType.WEB_VIEW;
-						}
+					mFieldColumns.put(field.getFieldName(), column);
+					mFields.add(field.getTag().toString());
+					label = column.getLabel();
+					if (column.getRelationType() != null
+							&& column.getRelationType() == RelationType.ManyToOne) {
+						widget = OFieldType.MANY_TO_ONE;
+					}
+					if (column.getRelationType() != null
+							&& (column.getRelationType() == RelationType.ManyToMany || column
+									.getRelationType() == RelationType.OneToMany)) {
+						widget = OFieldType.MANY_TO_MANY_TAGS;
+					}
+					if (column.isFunctionalColumn()) {
+						Object value = mRecord.get(column.getName());
+						if (column.getType() == null)
+							column.setType(value.getClass());
+						field.setColumn(column);
+					}
+					if (column.getType().isAssignableFrom(OBlob.class)
+							|| (ref_column != null && ref_column.getType()
+									.isAssignableFrom(OBlob.class))) {
+						widget = OFieldType.BINARY;
+					}
+					if (column.getType().isAssignableFrom(OBoolean.class)) {
+						widget = OFieldType.BOOLEAN_WIDGET;
+					}
+					if (column.getType().isAssignableFrom(OHtml.class)) {
+						widget = OFieldType.WEB_VIEW;
 					}
 					if (widget != null) {
 						if (mRecord != null
@@ -277,6 +280,27 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 		}
 	}
 
+	private void setOnChangeForColumn(OField field, final OColumn col) {
+		field.setOnChangeCallBack(new OnChangeCallback() {
+
+			@Override
+			public void onValueChange(ODataRow row) {
+				ODataRow vals = mModel.getOnChangeValue(col, row);
+				for (String key : vals.keys()) {
+					if (mFormFieldControls.containsKey(key)) {
+						OField field = mFormFieldControls.get(key);
+						if (field.getWidget() != null) {
+							// Relation field
+							field.selectManyToOneRecord(vals.getInt(key));
+						} else {
+							field.setText(vals.getString(key));
+						}
+					}
+				}
+			}
+		});
+	}
+
 	/**
 	 * Find all fields.
 	 * 
@@ -291,7 +315,8 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 				findAllFields((ViewGroup) v);
 			}
 			if (v instanceof OField) {
-				mFormFieldControls.add((OField) v);
+				OField field = (OField) v;
+				mFormFieldControls.put(field.getFieldName(), field);
 			}
 		}
 	}

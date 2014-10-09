@@ -94,4 +94,10 @@ public @interface Odoo {
 		}
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ ElementType.FIELD, ElementType.METHOD })
+	public @interface onChange {
+		String method();
+	}
+
 }
