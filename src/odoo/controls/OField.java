@@ -278,6 +278,10 @@ public class OField extends LinearLayout implements
 	private Float mScaleFactor = 0F;
 
 	private OForm.OnViewClickListener mOForm_OnViewClickListener = null;
+	/**
+	 * Used for handling onChange of Control (if any)
+	 */
+	private OnChangeCallback mOnChangeCallBack = null;
 
 	/**
 	 * Instantiates a new field.
@@ -904,6 +908,13 @@ public class OField extends LinearLayout implements
 		}
 	}
 
+	public void selectManyToOneRecord(int row_id) {
+		if (mManyToOne != null) {
+			mManyToOne.setRecordId(row_id);
+			mManyToOne.reInit();
+		}
+	}
+
 	/**
 	 * Creates the label.
 	 */
@@ -1397,6 +1408,9 @@ public class OField extends LinearLayout implements
 	@Override
 	public void onManyToOneItemChangeListener(OColumn column, ODataRow row) {
 		mFieldValue = row.get(OColumn.ROW_ID);
+		if (row.getInt(OColumn.ROW_ID) != 0 && mOnChangeCallBack != null) {
+			mOnChangeCallBack.onValueChange(row);
+		}
 	}
 
 	/**
@@ -1439,5 +1453,9 @@ public class OField extends LinearLayout implements
 	public void addTagObject(Object tag) {
 		if (mManyToManyTags != null)
 			mManyToManyTags.addObject(tag);
+	}
+
+	public void setOnChangeCallBack(OnChangeCallback callback) {
+		mOnChangeCallBack = callback;
 	}
 }

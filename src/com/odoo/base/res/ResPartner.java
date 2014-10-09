@@ -25,7 +25,9 @@ import com.odoo.addons.partners.model.ResPartnerCategory;
 import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
@@ -35,7 +37,7 @@ import com.odoo.support.provider.OContentProvider;
 import com.odoo.util.ODate;
 
 /**
- * The Class Res_PartnerDBHelper.
+ * The Class ResPartner.
  */
 public class ResPartner extends OModel {
 
@@ -57,6 +59,8 @@ public class ResPartner extends OModel {
 	// Extra Demo Module Columns
 	OColumn date = new OColumn("Date", ODateTime.class)
 			.setParsePattern(ODate.DEFAULT_FORMAT);
+
+	@Odoo.onChange(method = "onChange_Company_id")
 	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
 	OColumn child_ids = new OColumn("Contacts", ResPartner.class,
@@ -66,8 +70,6 @@ public class ResPartner extends OModel {
 			RelationType.ManyToMany);
 	OColumn customer = new OColumn("Customer", OBoolean.class);
 	OColumn supplier = new OColumn("Supplier", OBoolean.class);
-	OColumn state_id = new OColumn("State", ResCountry.class,
-			RelationType.ManyToOne);
 	OColumn country_id = new OColumn("Country", ResCountry.class,
 			RelationType.ManyToOne);
 
@@ -78,5 +80,13 @@ public class ResPartner extends OModel {
 	@Override
 	public OContentProvider getContentProvider() {
 		return new PartnersProvider();
+	}
+
+	public ODataRow onChange_Company_id(ODataRow row) {
+		ODataRow res = new ODataRow();
+		res.put("city", row.getString("city"));
+		res.put("website", row.getString("website"));
+		res.put("country_id", row.getM2ORecord("country_id").getId());
+		return res;
 	}
 }
