@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import odoo.controls.OField.TextStyle;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -213,6 +212,10 @@ public class OManyToOneWidget extends LinearLayout implements
 		mColumn = mModel.getColumn(column);
 		mColumn.cloneDomain(domains);
 		return this;
+	}
+
+	public void setDomains(LinkedHashMap<String, ColumnDomain> domains) {
+		mColumn.cloneDomain(domains);
 	}
 
 	/**

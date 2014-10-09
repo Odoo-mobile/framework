@@ -109,6 +109,7 @@ public class OColumn {
 
 	private Method mOnChangeMethod = null;
 	private Boolean mOnChangeBGProcess = false;
+	private Boolean mHasDomainFilterColumn = false;
 
 	/*
 	 * (non-Javadoc)
@@ -525,6 +526,13 @@ public class OColumn {
 	 * @return the domains
 	 */
 	public LinkedHashMap<String, ColumnDomain> getDomains() {
+		if (hasDomainFilterColumn()) {
+			return new LinkedHashMap<String, OColumn.ColumnDomain>();
+		}
+		return columnDomains;
+	}
+
+	public LinkedHashMap<String, ColumnDomain> getFilterDomains() {
 		return columnDomains;
 	}
 
@@ -790,6 +798,18 @@ public class OColumn {
 
 	public void setOnChangeBGProcess(Boolean process) {
 		mOnChangeBGProcess = process;
+	}
+
+	public void setHasDomainFilterColumn(Boolean filter_column) {
+		mHasDomainFilterColumn = filter_column;
+	}
+
+	public boolean hasDomainFilterColumn() {
+		return mHasDomainFilterColumn;
+	}
+
+	public void cleanDomains() {
+		columnDomains.clear();
 	}
 
 }

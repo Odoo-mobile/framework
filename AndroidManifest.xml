@@ -103,10 +103,16 @@
             android:authorities="com.odoo.base.res.providers.company"
             android:exported="false"
             android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.addons.partners.providers.country_state.CountryStateProvider"
+            android:authorities="com.odoo.addons.partners.providers.country_state"
+            android:exported="false"
+            android:multiprocess="true" />
 
         <!-- /Base Providers -->
         <!-- Contact service -->
-      <!--   <service
+        <!--
+        <service
             android:name="com.odoo.base.res.services.ContactSyncService"
             android:exported="true"
             android:process=":contacts" >
@@ -120,7 +126,9 @@
             <meta-data
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
-        </service> -->
+        </service>
+        -->
+
 
         <!-- ResPartner Provider -->
         <provider

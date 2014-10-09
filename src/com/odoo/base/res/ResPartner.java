@@ -21,6 +21,7 @@ package com.odoo.base.res;
 
 import android.content.Context;
 
+import com.odoo.addons.partners.model.ResCountryState;
 import com.odoo.addons.partners.model.ResPartnerCategory;
 import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.OColumn;
@@ -60,6 +61,9 @@ public class ResPartner extends OModel {
 	OColumn date = new OColumn("Date", ODateTime.class)
 			.setParsePattern(ODate.DEFAULT_FORMAT);
 
+	@Odoo.hasDomainFilter
+	OColumn state_id = new OColumn("State", ResCountryState.class,
+			RelationType.ManyToOne).addDomain("country_id", "=", this);
 	@Odoo.onChange(method = "onChange_Company_id")
 	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
