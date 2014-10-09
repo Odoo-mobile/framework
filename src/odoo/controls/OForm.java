@@ -23,8 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import odoo.controls.OField.OFieldType;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -285,20 +287,78 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 
 			@Override
 			public void onValueChange(ODataRow row) {
-				ODataRow vals = mModel.getOnChangeValue(col, row);
-				for (String key : vals.keys()) {
-					if (mFormFieldControls.containsKey(key)) {
-						OField field = mFormFieldControls.get(key);
-						if (field.getWidget() != null) {
-							// Relation field
-							field.selectManyToOneRecord(vals.getInt(key));
-						} else {
-							field.setText(vals.getString(key));
+				if (!col.isOnChangeBGProcess()) {
+					ODataRow vals = mModel.getOnChangeValue(col, row);
+					for (String key : vals.keys()) {
+						if (mFormFieldControls.containsKey(key)) {
+							OField field = mFormFieldControls.get(key);
+							if (field.getWidget() != null) {
+								// Relation field
+								field.selectManyToOneRecord(vals.getInt(key));
+							} else {
+								field.setText(vals.getString(key));
+							}
 						}
 					}
+				} else {
+					OnChangeBackgroundProcess bgProcess = new OnChangeBackgroundProcess(
+							mContext, mModel, col, row);
+					bgProcess.execute();
 				}
 			}
 		});
+	}
+
+	private class OnChangeBackgroundProcess extends
+			AsyncTask<Void, Void, ODataRow> {
+		private OModel mModel;
+		private OColumn mCol;
+		private ODataRow mRow;
+		private ProgressDialog mDialog;
+
+		public OnChangeBackgroundProcess(Context context, OModel model,
+				OColumn col, ODataRow row) {
+			mModel = model;
+			mCol = col;
+			mRow = row;
+			mDialog = new ProgressDialog(context);
+			mDialog.setTitle(context.getString(R.string.title_working));
+			mDialog.setMessage(context.getString(R.string.title_please_wait));
+			mDialog.setCancelable(false);
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			mDialog.show();
+		}
+
+		@Override
+		protected ODataRow doInBackground(Void... params) {
+			try {
+				Thread.sleep(500);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return mModel.getOnChangeValue(mCol, mRow);
+		}
+
+		@Override
+		protected void onPostExecute(ODataRow vals) {
+			super.onPostExecute(vals);
+			for (String key : vals.keys()) {
+				if (mFormFieldControls.containsKey(key)) {
+					OField field = mFormFieldControls.get(key);
+					if (field.getWidget() != null) {
+						// Relation field
+						field.selectManyToOneRecord(vals.getInt(key));
+					} else {
+						field.setText(vals.getString(key));
+					}
+				}
+			}
+			mDialog.dismiss();
+		}
 	}
 
 	/**

@@ -436,6 +436,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					Method onChangeMethod = checkForOnChangeMethod(field);
 					if (onChangeMethod != null) {
 						column.setOnChangeMethod(onChangeMethod);
+						column.setOnChangeBGProcess(checkForOnChangeBGProcess(field));
 					}
 				} else
 					return null;
@@ -493,6 +494,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			}
 		}
 		return null;
+	}
+
+	private Boolean checkForOnChangeBGProcess(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.onChange.class);
+		if (annotation != null) {
+			Odoo.onChange onChange = (Odoo.onChange) annotation;
+			return onChange.bg_process();
+		}
+		return false;
 	}
 
 	private Method checkForOnChangeMethod(Field field) {

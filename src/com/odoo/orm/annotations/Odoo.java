@@ -98,6 +98,14 @@ public @interface Odoo {
 	@Target({ ElementType.FIELD, ElementType.METHOD })
 	public @interface onChange {
 		String method();
+
+		/**
+		 * Background process If true, method block executed in background
+		 * thread. default false
+		 * 
+		 * @return
+		 */
+		boolean bg_process() default false;
 	}
 
 }
