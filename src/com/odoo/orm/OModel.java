@@ -700,6 +700,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return projection.toArray(new String[projection.size()]);
 	}
 
+	public String[] fields() {
+		List<String> fields = new ArrayList<String>();
+		for (OColumn col : getColumns(false)) {
+			fields.add(col.getName());
+		}
+		return fields.toArray(new String[fields.size()]);
+	}
+
 	/**
 	 * Select.
 	 * 

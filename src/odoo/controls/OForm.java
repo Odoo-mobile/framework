@@ -230,6 +230,9 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 					if (column.getRelationType() != null
 							&& column.getRelationType() == RelationType.ManyToOne) {
 						widget = OFieldType.MANY_TO_ONE;
+						if (field.isSearchableWidget()) {
+							widget = OFieldType.MANY_TO_ONE_SEARCHABLE;
+						}
 					}
 					if (column.getRelationType() != null
 							&& (column.getRelationType() == RelationType.ManyToMany || column
@@ -328,14 +331,17 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			public void onValueChange(ODataRow row) {
 				if (!col.isOnChangeBGProcess()) {
 					ODataRow vals = mModel.getOnChangeValue(col, row);
-					for (String key : vals.keys()) {
-						if (mFormFieldControls.containsKey(key)) {
-							OField field = mFormFieldControls.get(key);
-							if (field.getWidget() != null) {
-								// Relation field
-								field.selectManyToOneRecord(vals.getInt(key));
-							} else {
-								field.setText(vals.getString(key));
+					if (vals != null) {
+						for (String key : vals.keys()) {
+							if (mFormFieldControls.containsKey(key)) {
+								OField field = mFormFieldControls.get(key);
+								if (field.getWidget() != null) {
+									// Relation field
+									field.selectManyToOneRecord(vals
+											.getInt(key));
+								} else {
+									field.setText(vals.getString(key));
+								}
 							}
 						}
 					}

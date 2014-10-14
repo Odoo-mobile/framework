@@ -58,10 +58,14 @@
         </LinearLayout>
 
         <odoo.controls.OField
+            android:id="@+id/parent_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            odoo:customLayout="@layout/partners_company_item"
             odoo:field_name="parent_id"
             odoo:label_color="@color/odoo_purple"
+            odoo:widget="many_to_one_searchable"
+            odoo:widgetTitle="Search Partner"
             odoo:with_label="true" />
 
         <odoo.controls.OField
@@ -72,11 +76,15 @@
             odoo:with_label="true" />
 
         <odoo.controls.OField
+            android:id="@+id/country_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="country_id"
             odoo:label_color="@color/odoo_purple"
-            odoo:with_label="true" />
+            odoo:widget="many_to_one_searchable"
+            odoo:widgetTitle="Search Country"
+            odoo:with_label="true" >
+        </odoo.controls.OField>
 
         <odoo.controls.OField
             android:layout_width="match_parent"

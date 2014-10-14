@@ -2,7 +2,10 @@ package com.odoo.addons.partners;
 
 import java.util.List;
 
+import odoo.ODomain;
+import odoo.controls.OField;
 import odoo.controls.OForm;
+import odoo.controls.OSearchableMany2One.DialogListRowViewListener;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.odoo.R;
 import com.odoo.base.res.ResPartner;
@@ -20,7 +24,8 @@ import com.odoo.orm.OValues;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.drawer.DrawerItem;
 
-public class PartnersDetail extends BaseFragment {
+public class PartnersDetail extends BaseFragment implements
+		DialogListRowViewListener {
 
 	View mView = null;
 	OForm mForm = null;
@@ -46,6 +51,35 @@ public class PartnersDetail extends BaseFragment {
 
 	private void init() {
 		mForm = (OForm) mView.findViewById(R.id.partnerDetail);
+
+		// ManyToOne searchable control with dialog callback
+		OField company_id = (OField) mForm.findViewById(R.id.parent_id);
+		company_id.setManyToOneSearchableCallbacks(this);
+		OField country_id = (OField) mForm.findViewById(R.id.country_id);
+		country_id
+				.setManyToOneSearchableCallbacks(new DialogListRowViewListener() {
+
+					@Override
+					public ODomain onDialogSearchChange(String filter) {
+						ODomain domain = new ODomain();
+						domain.add("name", "ilike", filter);
+						return domain;
+					}
+
+					@Override
+					public View onDialogListRowGetView(Object data,
+							int position, View view, ViewGroup parent) {
+						return null;
+					}
+
+					@Override
+					public void bindDisplayLayoutLoad(ODataRow data, View layout) {
+						TextView txv = (TextView) layout;
+						if (data != null) {
+							txv.setText(data.getString("name"));
+						}
+					}
+				});
 		ResPartner resPartner = new ResPartner(getActivity());
 		if (mId != null) {
 			mRecord = resPartner.select(mId);
@@ -116,4 +150,29 @@ public class PartnersDetail extends BaseFragment {
 		return null;
 	}
 
+	@Override
+	public View onDialogListRowGetView(Object data, int position, View view,
+			ViewGroup parent) {
+		OForm form = (OForm) LayoutInflater.from(getActivity()).inflate(
+				R.layout.partners_company_item, parent, false);
+		form.initForm((ODataRow) data);
+		return form;
+	}
+
+	@Override
+	public ODomain onDialogSearchChange(String filter) {
+		ODomain domain = new ODomain();
+		domain.add("name", "ilike", filter);
+		return domain;
+	}
+
+	@Override
+	public void bindDisplayLayoutLoad(ODataRow data, View layout) {
+		OForm form = (OForm) layout;
+		if (data == null) {
+			data = new ODataRow();
+			data.put("name", "Select Company");
+		}
+		form.initForm(data);
+	}
 }

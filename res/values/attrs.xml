@@ -39,6 +39,10 @@
             <enum name="vertical" value="1" />
         </attr>
         <attr name="readMoreButton" format="boolean" />
+        <attr name="widget">
+            <enum name="many_to_one_searchable" value="0" />
+        </attr>
+        <attr name="widgetTitle" format="string|reference" />
     </declare-styleable>
     <declare-styleable name="OLabel">
         <attr name="label" format="string" />
@@ -74,6 +78,11 @@
         <attr name="maskDrawable" format="reference" />
         <attr name="borderDrawable" format="reference" />
         <attr name="desaturateOnPress" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="OSearchableMany2One">
+        <attr name="dataModel" format="string" />
+        <attr name="displayLayout" format="reference" />
+        <attr name="title" format="string|reference" />
     </declare-styleable>
 
 </resources>
