@@ -700,6 +700,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return projection.toArray(new String[projection.size()]);
 	}
 
+	public String[] fields() {
+		List<String> fields = new ArrayList<String>();
+		for (OColumn col : getColumns(false)) {
+			fields.add(col.getName());
+		}
+		return fields.toArray(new String[fields.size()]);
+	}
+
 	/**
 	 * Select.
 	 * 
@@ -829,7 +837,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		db.close();
 		return records;
 	}
-
+	
 	public List<ODataRow> query(String sql, String[] args) {
 		List<ODataRow> records = new ArrayList<ODataRow>();
 		SQLiteDatabase db = getReadableDatabase();

@@ -25,6 +25,7 @@ import java.util.TimeZone;
 
 import odoo.controls.MultiTagsTextView.TokenListener;
 import odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener;
+import odoo.controls.OSearchableMany2One.DialogListRowViewListener;
 import odoo.controls.OTagsView.CustomTagViewListener;
 import odoo.controls.OTagsView.NewTokenCreateListener;
 import android.annotation.SuppressLint;
@@ -143,6 +144,8 @@ public class OField extends LinearLayout implements
 
 	/** The Constant KEY_READ_MORE_BUTTON. */
 	public static final String KEY_READ_MORE_BUTTON = "readMoreButton";
+	public static final String KEY_WIDGET = "widget";
+	public static final String KEY_WIDGET_TITLE = "widgetTitle";
 
 	/**
 	 * The Enum OFieldMode.
@@ -172,7 +175,7 @@ public class OField extends LinearLayout implements
 	public enum OFieldType {
 
 		/** The many to one. */
-		MANY_TO_ONE,
+		MANY_TO_ONE, MANY_TO_ONE_SEARCHABLE,
 		/** The many to many tags. */
 		MANY_TO_MANY_TAGS,
 		/** The binary. */
@@ -237,6 +240,8 @@ public class OField extends LinearLayout implements
 
 	/** The many to one widget. */
 	private OManyToOneWidget mManyToOne = null;
+	private OSearchableMany2One mManyToOneSearchable = null;
+	private DialogListRowViewListener mDialogListRowViewListener = null;
 
 	/** The many to many tags. */
 	private OTagsView mManyToManyTags = null;
@@ -387,6 +392,9 @@ public class OField extends LinearLayout implements
 		switch (fieldWidget) {
 		case MANY_TO_ONE:
 			createManyToOneWidget();
+			break;
+		case MANY_TO_ONE_SEARCHABLE:
+			createManyToOneSearchable();
 			break;
 		case BINARY_FILE:
 		case BINARY_IMAGE:
@@ -915,6 +923,47 @@ public class OField extends LinearLayout implements
 		}
 	}
 
+	public String getWidgetTitle() {
+		return mAttributes.getString(KEY_WIDGET_TITLE, "");
+	}
+
+	// TODO
+	private void createManyToOneSearchable() {
+		mFieldWidget = OFieldType.MANY_TO_ONE_SEARCHABLE;
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		mManyToOneSearchable = new OSearchableMany2One(mContext);
+		mManyToOneSearchable.setLayoutParams(params);
+		mManyToOneSearchable.setTitle(getWidgetTitle());
+		mManyToOneSearchable.setModel(mModel);
+		mManyToOneSearchable.setDefaultDomain(mColumn.getDomains());
+		mManyToOneSearchable.setOnChangeCallback(mOnChangeCallBack);
+		mManyToOneSearchable.setOnFilterDomainCallBack(mColumnDomain,
+				mOnDomainFilterCallbacks);
+		int custom_layout = mAttributes.getResource(KEY_CUSTOM_LAYOUT, -1);
+		if (custom_layout > -1) {
+			mManyToOneSearchable.setDisplayLayout(custom_layout);
+		}
+		if (mDialogListRowViewListener != null) {
+			mManyToOneSearchable
+					.setDialogListRowViewListener(mDialogListRowViewListener);
+		}
+		if (mControlRecord != null
+				&& mControlRecord.contains(mColumn.getName())) {
+			ODataRow mrec = mControlRecord.getM2ORecord(mColumn.getName())
+					.browse();
+			mManyToOneSearchable.setRecord(mrec);
+		}
+		mManyToOneSearchable
+				.reInit(mAttributes.getBoolean(KEY_EDITABLE, false));
+		addView(mManyToOneSearchable);
+	}
+
+	public void setManyToOneSearchableCallbacks(
+			DialogListRowViewListener callback) {
+		mDialogListRowViewListener = callback;
+	}
+
 	public void selectManyToOneRecord(int row_id) {
 		if (mManyToOne != null) {
 			mManyToOne.setRecordId(row_id);
@@ -1158,6 +1207,10 @@ public class OField extends LinearLayout implements
 				R.styleable.OField_customLayoutOriantation, -1));
 		mAttributes.put(KEY_READ_MORE_BUTTON, mTypedArray.getBoolean(
 				R.styleable.OField_readMoreButton, false));
+		mAttributes.put(KEY_WIDGET,
+				mTypedArray.getInt(R.styleable.OField_widget, -1));
+		mAttributes.put(KEY_WIDGET_TITLE,
+				mTypedArray.getString(R.styleable.OField_widgetTitle));
 	}
 
 	/**
@@ -1354,6 +1407,10 @@ public class OField extends LinearLayout implements
 				return mSwitch.isChecked();
 			case MANY_TO_ONE:
 				return mFieldValue;
+			case MANY_TO_ONE_SEARCHABLE:
+				if (mManyToOneSearchable.getValue() != null)
+					return mManyToOneSearchable.getValue().getInt(
+							OColumn.ROW_ID);
 			case MANY_TO_MANY_TAGS:
 				List<Integer> rIds = new ArrayList<Integer>();
 				Integer base_record_id = (mControlRecord != null) ? mControlRecord
@@ -1381,6 +1438,13 @@ public class OField extends LinearLayout implements
 			case WEB_VIEW:
 				return "<p>" + getText().replaceAll("(\r\n|\n)", "<br />")
 						+ "</p>";
+			case BINARY_IMAGE:
+			case BINARY_ROUND_IMAGE:
+				if (mControlRecord != null
+						&& mControlRecord.contains(mColumn.getName())) {
+					return mControlRecord.get(mColumn.getName());
+				}
+				return null;
 			default:
 				return getText();
 			}
@@ -1476,5 +1540,9 @@ public class OField extends LinearLayout implements
 			OnDomainFilterCallbacks callback) {
 		mColumnDomain = domain;
 		mOnDomainFilterCallbacks = callback;
+	}
+
+	public boolean isSearchableWidget() {
+		return (mAttributes.getResource(KEY_WIDGET, -1) > -1);
 	}
 }

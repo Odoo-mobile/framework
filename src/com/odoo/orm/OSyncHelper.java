@@ -40,6 +40,7 @@ import com.odoo.base.ir.IrAttachment;
 import com.odoo.base.ir.IrModel;
 import com.odoo.orm.ORelationRecordList.ORelationRecords;
 import com.odoo.support.OUser;
+import com.odoo.util.JSONUtils;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 
@@ -565,6 +566,19 @@ public class OSyncHelper {
 		return synced;
 	}
 
+	public void quickStoreRecords(ODataRow row) {
+		Log.v(TAG, "quickStoreRecords");
+		try {
+			JSONObject records = new JSONObject();
+			records.put("records",
+					new JSONArray().put(JSONUtils.toJSONObject(row)));
+			handleResult(mModel, records);
+			handleRelationRecords(mModel);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Gets the last sync date.
 	 * 
@@ -1002,5 +1016,9 @@ public class OSyncHelper {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public ServerDataHelper dataHelper() {
+		return new ServerDataHelper(mContext, mModel, mOdoo);
 	}
 }
