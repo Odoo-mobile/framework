@@ -837,7 +837,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		db.close();
 		return records;
 	}
-
+	
 	public List<ODataRow> query(String sql, String[] args) {
 		List<ODataRow> records = new ArrayList<ODataRow>();
 		SQLiteDatabase db = getReadableDatabase();

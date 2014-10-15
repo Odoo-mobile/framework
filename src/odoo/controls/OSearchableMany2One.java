@@ -321,8 +321,8 @@ public class OSearchableMany2One extends LinearLayout implements
 			public View getView(int position, View convertView, ViewGroup parent) {
 				if (mDialogListRowViewListener != null) {
 					View v = mDialogListRowViewListener.onDialogListRowGetView(
-							mObjects.get(position), position, convertView,
-							parent);
+							(ODataRow) mObjects.get(position), position,
+							convertView, parent);
 					if (v != null)
 						return v;
 				}
@@ -480,7 +480,7 @@ public class OSearchableMany2One extends LinearLayout implements
 	}
 
 	public interface DialogListRowViewListener {
-		public View onDialogListRowGetView(Object data, int position,
+		public View onDialogListRowGetView(ODataRow data, int position,
 				View view, ViewGroup parent);
 
 		public ODomain onDialogSearchChange(String filter);

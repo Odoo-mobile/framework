@@ -22,6 +22,7 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class PartnersDetail extends BaseFragment implements
@@ -67,7 +68,7 @@ public class PartnersDetail extends BaseFragment implements
 					}
 
 					@Override
-					public View onDialogListRowGetView(Object data,
+					public View onDialogListRowGetView(ODataRow data,
 							int position, View view, ViewGroup parent) {
 						return null;
 					}
@@ -151,11 +152,11 @@ public class PartnersDetail extends BaseFragment implements
 	}
 
 	@Override
-	public View onDialogListRowGetView(Object data, int position, View view,
+	public View onDialogListRowGetView(ODataRow data, int position, View view,
 			ViewGroup parent) {
-		OForm form = (OForm) LayoutInflater.from(getActivity()).inflate(
+		View form = LayoutInflater.from(getActivity()).inflate(
 				R.layout.partners_company_item, parent, false);
-		form.initForm((ODataRow) data);
+		OControls.setText(form, R.id.company_name, data.getString("name"));
 		return form;
 	}
 
@@ -168,11 +169,11 @@ public class PartnersDetail extends BaseFragment implements
 
 	@Override
 	public void bindDisplayLayoutLoad(ODataRow data, View layout) {
-		OForm form = (OForm) layout;
+		TextView txvName = (TextView) layout.findViewById(R.id.company_name);
 		if (data == null) {
 			data = new ODataRow();
 			data.put("name", "Select Company");
 		}
-		form.initForm(data);
+		txvName.setText(data.getString("name"));
 	}
 }
