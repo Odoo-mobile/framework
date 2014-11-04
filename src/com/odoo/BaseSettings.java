@@ -48,10 +48,10 @@ public class BaseSettings extends PreferenceActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		ActionBar actionbar = getActionBar();
-		actionbar.setHomeButtonEnabled(true);
-		actionbar.setSubtitle(R.string.title_application_settings);
-		actionbar.setDisplayHomeAsUpEnabled(true);
-		actionbar.setIcon(R.drawable.ic_action_settings);
+		// actionbar.setHomeButtonEnabled(true);
+		// actionbar.setSubtitle(R.string.title_application_settings);
+		// actionbar.setDisplayHomeAsUpEnabled(true);
+		// actionbar.setIcon(R.drawable.ic_action_settings);
 		addPreferencesFromResource(R.xml.base_preference);
 	}
 

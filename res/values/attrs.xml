@@ -47,7 +47,7 @@
     <declare-styleable name="OLabel">
         <attr name="label" format="string" />
         <attr name="textAppearance" format="reference" />
-        <attr name="color" format="color" />
+        <attr name="labelColor" format="color" />
         <attr name="bottom_border_height" format="integer" />
     </declare-styleable>
     <declare-styleable name="OList">
@@ -82,7 +82,7 @@
     <declare-styleable name="OSearchableMany2One">
         <attr name="dataModel" format="string" />
         <attr name="displayLayout" format="reference" />
-        <attr name="title" format="string|reference" />
+        <attr name="widget_title" format="string|reference" />
     </declare-styleable>
 
 </resources>

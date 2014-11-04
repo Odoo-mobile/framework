@@ -15,16 +15,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="name"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:with_label="true" />
 
         <odoo.controls.OLabel
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            odoo:bottom_border_height="2"
             odoo:label="Type"
+            odoo:labelColor="@color/theme_primary"
             odoo:textAppearance="?android:attr/textAppearanceSmall"
-            odoo:color="@color/odoo_purple" >
+            odoo:color="@color/theme_primary" >
         </odoo.controls.OLabel>
 
         <LinearLayout
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 odoo:booleanWidget="checkbox_widget"
                 odoo:field_name="is_company"
-                odoo:label_color="@color/odoo_purple"
+                odoo:label_color="@color/theme_primary"
                 odoo:with_label="false" />
 
             <odoo.controls.OField
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 odoo:booleanWidget="checkbox_widget"
                 odoo:field_name="customer"
-                odoo:label_color="@color/odoo_purple"
+                odoo:label_color="@color/theme_primary"
                 odoo:with_label="false" />
 
             <odoo.controls.OField
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 odoo:booleanWidget="checkbox_widget"
                 odoo:field_name="supplier"
-                odoo:label_color="@color/odoo_purple"
+                odoo:label_color="@color/theme_primary"
                 odoo:with_label="false" />
         </LinearLayout>
 
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             odoo:customLayout="@layout/partners_company_item"
             odoo:field_name="parent_id"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:widget="many_to_one_searchable"
             odoo:widgetTitle="Search Partner"
             odoo:with_label="true" />
@@ -72,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="city"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:with_label="true" />
 
         <odoo.controls.OField
@@ -80,7 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="country_id"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:widget="many_to_one_searchable"
             odoo:widgetTitle="Search Country"
             odoo:with_label="true" >
@@ -90,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="state_id"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:with_label="true" />
 
         <odoo.controls.OField
@@ -99,7 +99,7 @@
             odoo:customLayout="@layout/partners_tags"
             odoo:customLayoutOriantation="vertical"
             odoo:field_name="category_id"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:with_label="true" />
 
         <odoo.controls.OField
@@ -108,14 +108,14 @@
             odoo:customLayout="@layout/partners_contacts"
             odoo:customLayoutOriantation="vertical"
             odoo:field_name="child_ids"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:with_label="true" />
 
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="comment"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:readMoreButton="true"
             odoo:with_label="true" />
 
@@ -123,14 +123,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="email"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:with_label="true" />
 
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             odoo:field_name="website"
-            odoo:label_color="@color/odoo_purple"
+            odoo:label_color="@color/theme_primary"
             odoo:with_label="true" />
     </odoo.controls.OForm>
 

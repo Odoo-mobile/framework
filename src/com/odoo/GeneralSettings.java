@@ -19,7 +19,6 @@
 
 package com.odoo;
 
-import android.app.ActionBar;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.MenuItem;
@@ -30,11 +29,11 @@ public class GeneralSettings extends PreferenceActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		ActionBar actionbar = getActionBar();
-		actionbar.setTitle(R.string.general_settings);
-		actionbar.setHomeButtonEnabled(true);
-		actionbar.setDisplayHomeAsUpEnabled(true);
-		actionbar.setIcon(R.drawable.ic_action_settings);
+//		ActionBar actionbar = getActionBar();
+//		actionbar.setTitle(R.string.general_settings);
+//		actionbar.setHomeButtonEnabled(true);
+//		actionbar.setDisplayHomeAsUpEnabled(true);
+//		actionbar.setIcon(R.drawable.ic_action_settings);
 		addPreferencesFromResource(R.xml.account_preferences);
 	}
 

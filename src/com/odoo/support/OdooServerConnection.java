@@ -64,7 +64,7 @@ public class OdooServerConnection {
 	public boolean testConnection(Context context, String serverURL)
 			throws OVersionException, SSLPeerUnverifiedException {
 		Log.d(TAG, "OdooServerConnection->testConnection()");
-		if (TextUtils.isEmpty(serverURL)) {
+		if (TextUtils.isEmpty(serverURL) && !serverURL.contains(".")) {
 			return false;
 		}
 		try {

@@ -62,9 +62,9 @@ public class OControls {
 			long duration, Context context) {
 		View view = parent_view.findViewById(resource_id);
 		view.setVisibility(View.VISIBLE);
-		Animation animate = AnimationUtils.loadAnimation(context,
-				R.anim.slide_in_from_left);
-		view.startAnimation(animate);
+//		Animation animate = AnimationUtils.loadAnimation(context,
+//				R.anim.slide_in_from_left);
+//		view.startAnimation(animate);
 
 	}
 
@@ -72,9 +72,9 @@ public class OControls {
 			long duration, Context context) {
 		View view = parent_view.findViewById(resource_id);
 		view.setVisibility(View.VISIBLE);
-		Animation animate = AnimationUtils.loadAnimation(context,
-				R.anim.slide_in_from_left);
-		view.startAnimation(animate);
+//		Animation animate = AnimationUtils.loadAnimation(context,
+//				R.anim.slide_in_from_left);
+//		view.startAnimation(animate);
 
 	}
 

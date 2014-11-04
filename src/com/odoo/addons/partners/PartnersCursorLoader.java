@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.R;
 import com.odoo.base.res.ResPartner;
@@ -83,7 +83,6 @@ public class PartnersCursorLoader extends BaseFragment implements
 		mAdapter.setOnRowViewClickListener(R.id.imgUserProfilePicture, this);
 		listView.setAdapter(mAdapter);
 		listView.setOnItemClickListener(this);
-		scope.main().setActionbarAutoHide(listView);
 		getLoaderManager().initLoader(0, null, this);
 	}
 

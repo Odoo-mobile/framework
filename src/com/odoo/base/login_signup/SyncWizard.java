@@ -66,9 +66,6 @@ public class SyncWizard extends BaseFragment {
 		scope = new AppScope(this);
 		rootView = inflater.inflate(R.layout.base_login_signup_sync_wizard,
 				container, false);
-		getActivity().setTitle(R.string.title_configuration);
-		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
-		getActivity().getActionBar().setHomeButtonEnabled(false);
 		generateLayout();
 		return rootView;
 	}
@@ -199,6 +196,14 @@ public class SyncWizard extends BaseFragment {
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
+
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		actionbar().setTitle(_s(R.string.title_configuration));
+		actionbar().setDisplayHomeAsUpEnabled(false);
+		actionbar().setHomeButtonEnabled(false);
+	}
 }

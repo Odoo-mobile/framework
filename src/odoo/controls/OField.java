@@ -980,15 +980,14 @@ public class OField extends LinearLayout implements
 		if (mAttributes.getBoolean(KEY_WITH_LABEL, true)) {
 			mFieldLabel = new OLabel(mContext);
 			mFieldLabel.setLayoutParams(mLayoutParams);
-			mFieldLabel.setBottomBorderHeight(mAttributes.getResource(
-					KEY_BOTTOM_BORDER_HEIGHT, 2));
+			mFieldLabel.setBottomBorderHeight(0);//mAttributes.getResource(KEY_BOTTOM_BORDER_HEIGHT, 0));
 			if (mColumn != null) {
 				mFieldLabel.setLabel(mColumn.getLabel());
 			} else {
 				mFieldLabel.setLabel(mAttributes.getString(KEY_FIELD_NAME, ""));
 			}
 			Integer mAttrLabelTextAppearnce = mAttributes.getResource(
-					KEY_LABEL_TEXT_APPEARANCE, 0);
+					KEY_LABEL_TEXT_APPEARANCE, 2);
 			if (mAttrLabelTextAppearnce != 0)
 				mFieldLabel.setTextAppearance(mAttrLabelTextAppearnce);
 			mFieldLabel.setColor(mAttributes.getColor(KEY_LABEL_COLOR,

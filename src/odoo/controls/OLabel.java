@@ -59,7 +59,7 @@ public class OLabel extends LinearLayout {
 	Integer mAttrTextAppearance = 0;
 
 	/** The attr bottom border height. */
-	Integer mAttrBottomBorderHeight = 1;
+	Integer mAttrBottomBorderHeight = 0;
 
 	/**
 	 * Instantiates a new label.
@@ -158,12 +158,12 @@ public class OLabel extends LinearLayout {
 	 */
 	private void initAttributeValues() {
 		mAttrLabel = mTypedArray.getString(R.styleable.OLabel_label);
-		mAttrColor = mTypedArray
-				.getColor(R.styleable.OLabel_color, Color.BLACK);
+		mAttrColor = mTypedArray.getColor(R.styleable.OLabel_labelColor,
+				Color.BLACK);
 		mAttrTextAppearance = mTypedArray.getResourceId(
 				R.styleable.OLabel_textAppearance, 0);
 		mAttrBottomBorderHeight = mTypedArray.getInteger(
-				R.styleable.OLabel_bottom_border_height, 1);
+				R.styleable.OLabel_bottom_border_height, 0);
 	}
 
 	/**

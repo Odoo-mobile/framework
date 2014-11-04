@@ -20,7 +20,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/odoo_purple" />
+                    android:background="@color/theme_primary" />
             </FrameLayout>
 
             <ImageView
@@ -53,7 +53,7 @@
                 android:id="@+id/userFullName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:gravity="center_horizontal"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
@@ -71,13 +71,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_user_login"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/odoo_purple"
+                android:textColor="@color/theme_primary"
                 android:textStyle="bold" />
 
             <TextView
@@ -85,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -93,13 +93,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_server_url"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/odoo_purple"
+                android:textColor="@color/theme_primary"
                 android:textStyle="bold" />
 
             <TextView
@@ -107,7 +107,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -115,13 +115,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_database"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/odoo_purple"
+                android:textColor="@color/theme_primary"
                 android:textStyle="bold" />
 
             <TextView
@@ -129,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -137,13 +137,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_odoo_version"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/odoo_purple"
+                android:textColor="@color/theme_primary"
                 android:textStyle="bold" />
 
             <TextView
@@ -151,7 +151,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -159,13 +159,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="@string/str_timezone"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/odoo_purple"
+                android:textColor="@color/theme_primary"
                 android:textStyle="bold" />
 
             <TextView
@@ -173,7 +173,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />

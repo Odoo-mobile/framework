@@ -72,7 +72,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		getActionBar().setIcon(R.drawable.ic_odoo_o);
+		getActionbar().setIcon(R.drawable.ic_odoo_o);
 		mContext = this;
 		mFragment = getSupportFragmentManager();
 		if (OUser.current(mContext) != null && savedInstanceState == null) {
@@ -100,8 +100,9 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		} else {
 			List<OUser> accounts = OdooAccountManager.fetchAllAccounts(this);
 			if (accounts.size() <= 0) {
-				getActionBar().setDisplayHomeAsUpEnabled(false);
-				getActionBar().setHomeButtonEnabled(false);
+				getActionbar().setDisplayHomeAsUpEnabled(false);
+				getActionbar().setDisplayShowTitleEnabled(false);
+				getActionbar().setHomeButtonEnabled(false);
 				initDrawerControls();
 				lockDrawer(true);
 				LoginSignup loginSignUp = new LoginSignup();
@@ -152,8 +153,9 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		 * checks for available account related to Odoo
 		 */
 		if (!OdooAccountManager.hasAccounts(this) || isNewAccountRequest()) {
-			getActionBar().setDisplayHomeAsUpEnabled(false);
-			getActionBar().setHomeButtonEnabled(false);
+			getActionbar().setDisplayHomeAsUpEnabled(false);
+			getActionbar().setDisplayShowTitleEnabled(false);
+			getActionbar().setHomeButtonEnabled(false);
 			lockDrawer(true);
 			LoginSignup loginSignUp = new LoginSignup();
 			startMainFragment(loginSignUp, false);
@@ -202,8 +204,9 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						getActionBar().setDisplayHomeAsUpEnabled(false);
-						getActionBar().setHomeButtonEnabled(false);
+						getActionbar().setDisplayHomeAsUpEnabled(false);
+						getActionbar().setDisplayShowTitleEnabled(false);
+						getActionbar().setHomeButtonEnabled(false);
 						LoginSignup loginSignUp = new LoginSignup();
 						startMainFragment(loginSignUp, false);
 					}
