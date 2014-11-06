@@ -19,4 +19,10 @@
         <item name="background">@color/actionbar_bg_color</item>
     </style>
 
+    <style name="ProfileActivityTheme" parent="Theme.AppCompat.Light">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+    </style>
+
 </resources>

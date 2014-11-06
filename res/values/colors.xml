@@ -32,5 +32,6 @@
     <color name="body_text_disabled">#44000000</color>
     <color name="body_text_1_inverse">#deffffff</color>
     <color name="body_text_2_inverse">#8affffff</color>
+    <color name="profile_action_bar">#22000000</color>
 
 </resources>
