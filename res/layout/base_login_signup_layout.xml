@@ -261,12 +261,12 @@
                 android:id="@+id/odoo_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@string/font_fontFamily_light"
+                android:layout_margin="10dp"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:gravity="center"
-                android:padding="5dp"
-                android:text="Version v1.0 Alpha"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#ffffff"
+                android:padding="10dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#99ffffff"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>

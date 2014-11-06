@@ -56,27 +56,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BaseSettings" >
-            <intent-filter>
-                <action android:name="com.odoo.ACTION_ACCOUNT_BASE_CONFIG" />
-
-                <category android:name="android.intent.category.PREFERENCE" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".GeneralSettings" >
-            <intent-filter>
-                <action android:name="com.odoo.ACTION_ACCOUNT_GENERAL_CONFIG" />
-
-                <category android:name="android.intent.category.PREFERENCE" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".base.about.About" >
-            <intent-filter>
-                <action android:name="com.odoo.ACTION_ABOUT" />
-            </intent-filter>
+        <activity
+            android:name=".SettingActivity"
+            android:theme="@style/SettingActivity" >
         </activity>
         <activity
-            android:name=".UserProfileActivity"
+            android:name=".base.about.About"
+            android:theme="@style/ProfileActivityTheme" >
+        </activity>
+        <activity
+            android:name="com.odoo.base.account.UserProfile"
             android:label="@string/title_activity_user_profile"
             android:theme="@style/ProfileActivityTheme" >
         </activity>

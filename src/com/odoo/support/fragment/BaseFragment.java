@@ -220,8 +220,8 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 	public void onResume() {
 		super.onResume();
 		scope = new AppScope(getActivity());
-		if (!scope.main().getActionbar().isShowing() && showActionbar)
-			scope.main().getActionbar().show();
+		if (actionbar().isShowing() && !showActionbar)
+			actionbar().hide();
 		if (scope.main().getNavItem() != null)
 			scope.main().setTitle(scope.main().getNavItem().getTitle());
 		if (mSyncStatusObserverListener != null) {

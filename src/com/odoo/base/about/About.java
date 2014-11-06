@@ -18,6 +18,8 @@
  */
 package com.odoo.base.about;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -29,7 +31,7 @@ import com.odoo.R;
 
 public class About extends ActionBarActivity {
 
-	TextView versionName = null, aboutLine2 = null, aboutLine3 = null,
+	private TextView versionName = null, aboutLine2 = null, aboutLine3 = null,
 			aboutLine4 = null;
 
 	@Override
@@ -39,6 +41,9 @@ public class About extends ActionBarActivity {
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setTitle("");
+		actionBar.setBackgroundDrawable(new ColorDrawable(Color
+				.parseColor("#00000000")));
 		versionName = (TextView) findViewById(R.id.txvVersionName);
 
 		try {

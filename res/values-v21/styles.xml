@@ -14,6 +14,8 @@
         <item name="colorPrimary">@color/actionbar_bg_color</item>
         <item name="android:colorPrimaryDark">@color/actionbar_bg_color_dark</item>
         <item name="colorPrimaryDark">@color/actionbar_bg_color_dark</item>
+        <item name="colorAccent">@color/theme_primary_dark</item>
+        <item name="android:colorAccent">@color/theme_primary_dark</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">true</item>

@@ -1,13 +1,8 @@
-package com.odoo;
+package com.odoo.base.account;
 
 import odoo.OdooInstance;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -22,17 +17,18 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.orm.OdooHelper;
 import com.odoo.support.AppScope;
 import com.odoo.support.OUser;
 import com.odoo.util.Base64Helper;
 import com.odoo.util.OControls;
+import com.odoo.util.dialog.MaterialDialog;
 
-@SuppressLint("NewApi")
-public class UserProfileActivity extends ActionBarActivity {
+public class UserProfile extends ActionBarActivity {
 	private EditText password = null;
-	private AlertDialog.Builder builder = null;
+	private MaterialDialog builder = null;
 	private Dialog dialog = null;
 	private View rootview = null;
 	private AppScope scope = null;
@@ -48,6 +44,8 @@ public class UserProfileActivity extends ActionBarActivity {
 		actionBar.setBackgroundDrawable(new ColorDrawable(Color
 				.parseColor("#00000000")));
 		actionBar.setTitle("");
+		actionBar.setHomeButtonEnabled(true);
+		actionBar.setDisplayHomeAsUpEnabled(true);
 		scope = new AppScope(mContext);
 		rootview = findViewById(R.id.profile_parent_view);
 		setupView();
@@ -100,15 +98,17 @@ public class UserProfileActivity extends ActionBarActivity {
 	}
 
 	private Dialog inputPasswordDialog() {
-		builder = new Builder(scope.context());
+		builder = new MaterialDialog(scope.context());
 		password = new EditText(scope.context());
 		password.setTransformationMethod(PasswordTransformationMethod
 				.getInstance());
-		builder.setTitle(R.string.title_enter_password)
-				.setMessage(R.string.toast_provide_password).setView(password);
-		builder.setPositiveButton(R.string.label_update_info,
-				new OnClickListener() {
-					public void onClick(DialogInterface di, int i) {
+		builder.setTitle(R.string.title_enter_password);
+		builder.setCustomView(password);
+		builder.setupPositiveButton(R.string.label_update_info,
+				new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
 						OUser userData = null;
 						try {
 							OdooHelper odoo = null;
@@ -149,17 +149,18 @@ public class UserProfileActivity extends ActionBarActivity {
 									Toast.LENGTH_LONG).show();
 						}
 						setupView();
-						dialog.cancel();
-						dialog = null;
+						dialog.dismiss();
 					}
 				});
-		builder.setNegativeButton(R.string.label_cancel, new OnClickListener() {
-			public void onClick(DialogInterface di, int i) {
-				dialog.cancel();
-				dialog = null;
-			}
-		});
-		return builder.create();
+		builder.setupNegativeButton(R.string.label_cancel,
+				new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						dialog.dismiss();
+					}
+				});
+		return builder;
 
 	}
 }

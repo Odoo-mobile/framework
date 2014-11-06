@@ -135,7 +135,7 @@ public class OLabel extends LinearLayout {
 		mLabelTextView.setPadding(5, 5, 5, 5);
 		mLabelTextView.setText(mAttrLabel);
 		mLabelTextView.setAllCaps(true);
-		mLabelTextView.setTypeface(OControlHelper.lightFont(), Typeface.BOLD);
+		mLabelTextView.setTypeface(OControlHelper.boldFont(), Typeface.BOLD);
 		if (mAttrTextAppearance != 0)
 			mLabelTextView.setTextAppearance(mContext, mAttrTextAppearance);
 		mLabelTextView.setTextColor(mAttrColor);

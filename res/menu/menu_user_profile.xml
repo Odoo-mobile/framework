@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/menu_account_user_profile_sync"
-        android:icon="@drawable/ic_action_sync"
+        android:icon="@drawable/ic_action_notes"
         android:title="@string/title_refresh_details"
         app:showAsAction="always">
     </item>

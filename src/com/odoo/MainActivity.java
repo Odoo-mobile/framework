@@ -44,6 +44,7 @@ import android.widget.Toast;
 
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.account.AccountsDetail;
+import com.odoo.base.account.UserProfile;
 import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
@@ -241,7 +242,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	public boolean onSettingItemSelected(SettingKeys key) {
 		switch (key) {
 		case GLOBAL_SETTING:
-			Intent i = new Intent(this, BaseSettings.class);
+			Intent i = new Intent(this, SettingActivity.class);
 			startActivityForResult(i, RESULT_SETTINGS);
 			return true;
 		case ACCOUNTS:
@@ -251,7 +252,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		case PROFILE:
 			// UserProfile profileFragment = new UserProfile();
 			// startMainFragment(profileFragment, true);
-			Intent intent = new Intent(this, UserProfileActivity.class);
+			Intent intent = new Intent(this, UserProfile.class);
 			startActivity(intent);
 			return true;
 		default:

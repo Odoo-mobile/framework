@@ -3,16 +3,12 @@ package com.odoo.addons.partners;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.controls.OList;
-import odoo.controls.OList.OnListBottomReachedListener;
-import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
@@ -21,53 +17,52 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.providers.partners.PartnersProvider;
-import com.odoo.orm.ODataRow;
-import com.odoo.orm.OModel;
-import com.odoo.receivers.SyncFinishReceiver;
-import com.odoo.support.AppScope;
+import com.odoo.orm.OColumn;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.support.fragment.OnSearchViewChangeListener;
+import com.odoo.support.fragment.SyncStatusObserverListener;
+import com.odoo.support.listview.OCursorListAdapter;
+import com.odoo.support.listview.OCursorListAdapter.OnRowViewClickListener;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.util.logger.OLog;
 
-public class Partners extends BaseFragment implements OnRowClickListener,
-		OnListBottomReachedListener, OnRefreshListener,
-		LoaderManager.LoaderCallbacks<Cursor> {
-
+public class Partners extends BaseFragment implements
+		OnRefreshListener, LoaderManager.LoaderCallbacks<Cursor>,
+		SyncStatusObserverListener, OnSearchViewChangeListener,
+		OnItemClickListener, OnRowViewClickListener {
 	public static final String TAG = Partners.class.getSimpleName();
 	public static final String KEY = "partner_type";
-
+	private Type mCurrentType = Type.Companies;
 	private View mView = null;
-	private List<ODataRow> mListRecords = new ArrayList<ODataRow>();
-	private OList mListcontrol = null;
-	private DataLoader mDataLoader = null;
-	private Integer mLimit = 10;
-	private Integer mOffset = 0;
-	private Integer mLastPosition = -1;
-	private Boolean mSync = false;
 
 	public enum Type {
 		Customers, Suppliers, Companies
 	}
 
-	private Type mCurrentType = Type.Companies;
+	/**
+	 * cursor loader
+	 */
+	private OCursorListAdapter mAdapter;
+	private ListView listView = null;
+	// If non-null, this is the current filter the user has provided.
+	private String mCurFilter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		scope = new AppScope(this);
+		setHasSyncStatusObserver(TAG, this, db());
 		initArgs();
-		mView = inflater.inflate(R.layout.partners_list, container, false);
-		init();
-		getActivity().getSupportLoaderManager().initLoader(1, null, this);
-		setHasSwipeRefreshView(mView, R.id.swipe_container, this);
-		return mView;
+		return inflater.inflate(R.layout.partners_listview, container, false);
 	}
 
 	private void initArgs() {
@@ -77,29 +72,18 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		}
 	}
 
-	private void init() {
-		OControls.setVisible(mView, R.id.loadingProgress);
-		mListcontrol = (OList) mView.findViewById(R.id.listRecords);
-		mListcontrol.setOnRowClickListener(this);
-		mListcontrol.setOnListBottomReachedListener(this);
-		mListcontrol.setRecordOffset(mListRecords.size());
-		if (mLastPosition == -1) {
-			mDataLoader = new DataLoader(mOffset);
-			mDataLoader.execute();
-		} else {
-			showData();
-		}
-	}
-
-	private void showData() {
-		mListcontrol.setCustomView(R.layout.partners_list_item);
-		mListcontrol.initListControl(mListRecords);
-		OControls.setGone(mView, R.id.loadingProgress);
-	}
-
 	@Override
-	public Object databaseHelper(Context context) {
-		return new ResPartner(context);
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		mView = view;
+		setHasSwipeRefreshView(view, R.id.swipe_container, this);
+		listView = (ListView) view.findViewById(R.id.partners_listView);
+		mAdapter = new OCursorListAdapter(getActivity(), null,
+				R.layout.partners_list_item);
+		mAdapter.setOnRowViewClickListener(R.id.imgUserProfilePicture, this);
+		listView.setAdapter(mAdapter);
+		listView.setOnItemClickListener(this);
+		getLoaderManager().initLoader(0, null, this);
 	}
 
 	@Override
@@ -107,10 +91,7 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		super.onCreateOptionsMenu(menu, inflater);
 		menu.clear();
 		inflater.inflate(R.menu.menu_partners, menu);
-		SearchView mSearchView = (SearchView) menu.findItem(
-				R.id.menu_partner_search).getActionView();
-		if (mListcontrol != null)
-			mSearchView.setOnQueryTextListener(mListcontrol.getQueryListener());
+		setHasSearchView(this, menu, R.id.menu_partner_search);
 	}
 
 	@Override
@@ -125,90 +106,14 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 		}
 	}
 
-	class DataLoader extends AsyncTask<Void, Void, Void> {
-		Integer offset = 0;
-
-		public DataLoader(Integer offset) {
-			this.offset = offset;
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			try {
-				Thread.sleep(500);
-			} catch (Exception e) {
-
-			}
-			scope.main().runOnUiThread(new Runnable() {
-
-				@Override
-				public void run() {
-					if (db().isEmptyTable() && !mSync) {
-						mSync = true;
-						setSwipeRefreshing(true);
-						scope.main().requestSync(PartnersProvider.AUTHORITY);
-					}
-					if (offset == 0)
-						mListRecords.clear();
-
-					// Using Join
-					// OQuery query = db().browse();
-					// if (mCurrentType != Type.Companies) {
-					// query.columns("*", "country_id.name", "parent_id.name");
-					// } else {
-					// query.columns("*", "country_id.name");
-					// }
-					// query.addWhere(getWhere(mCurrentType), "=", true);
-					// // query.setOffset(offset);
-					// // query.setLimit(mLimit);
-					// query.setOrder("local_id", "DESC");
-					// mListRecords.addAll(query.fetch());
-					// mOffset = query.getNextOffset();
-					// mListcontrol.setRecordOffset(mOffset);
-
-					// Using Simple Query
-
-					OModel model = db();
-					model.setOffset(offset).setLimit(mLimit);
-					Object[] args = new Object[] { true };
-					mListRecords.addAll(model.select(getWhere(mCurrentType)
-							+ " = ?", args, null, null, "local_id DESC"));
-					mOffset = model.getNextOffset();
-					mListcontrol.setRecordOffset(mOffset);
-
-				}
-			});
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			showData();
-		}
-	}
-
-	private String getWhere(Type type) {
-		String where = null;
-		switch (type) {
-		case Companies:
-			where = "is_company";
-			break;
-		case Customers:
-			where = "customer";
-			break;
-		case Suppliers:
-			where = "supplier";
-			break;
-		}
-		return where;
-
+	@Override
+	public Object databaseHelper(Context context) {
+		return new ResPartner(context);
 	}
 
 	private int count(Context context, Type type) {
-		String where = getWhere(type) + " = ?";
 		Object[] args = new Object[] { true };
-		return new ResPartner(context).count(where, args);
+		return new ResPartner(context).count(getWhere(type) + " = ? ", args);
 	}
 
 	@Override
@@ -235,55 +140,51 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	@Override
-	public void onRowItemClick(int position, View view, ODataRow row) {
-		mLastPosition = position;
-		Bundle arg = new Bundle();
-		arg.putAll(row.getPrimaryBundleData());
-		PartnersDetail partner = new PartnersDetail();
-		partner.setArguments(arg);
-		startFragment(partner, true);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		scope.main().registerReceiver(mSyncFinishReceiver,
-				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		scope.main().unregisterReceiver(mSyncFinishReceiver);
-	}
-
-	SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
-		@Override
-		public void onReceive(Context context, android.content.Intent intent) {
-			scope.main().refreshDrawer(TAG);
-			hideRefreshingProgress();
-			if (mDataLoader != null) {
-				mDataLoader.cancel(true);
-			}
-			mOffset = 0;
-			mDataLoader = new DataLoader(0);
-			mDataLoader.execute();
-			mSync = true;
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		if (db().isEmptyTable()) {
+			scope.main().requestSync(PartnersProvider.AUTHORITY);
+			setSwipeRefreshing(true);
 		}
-	};
-
-	@Override
-	public void onBottomReached(Integer record_limit, Integer record_offset) {
-		if (mDataLoader != null) {
-			mDataLoader.cancel(true);
+		String selection = null;
+		String[] args = null;
+		if (mCurFilter != null) {
+			selection = " name like ? and " + getWhere(mCurrentType) + " = ?";
+			args = new String[] { "%" + mCurFilter + "%", "true" };
+		} else {
+			selection = getWhere(mCurrentType) + " = ?";
+			args = new String[] { "true" };
 		}
-		mDataLoader = new DataLoader(record_offset);
-		mDataLoader.execute();
+		return new CursorLoader(getActivity(), db().uri(), new String[] {
+				"image_small", "name", "email", "city", "country_id.name" },
+				selection, args, OColumn.ROW_ID + " DESC");
+	}
+
+	private String getWhere(Type type) {
+		String where = null;
+		switch (type) {
+		case Companies:
+			where = "is_company";
+			break;
+		case Customers:
+			where = "customer";
+			break;
+		case Suppliers:
+			where = "supplier";
+			break;
+		}
+		return where;
+
 	}
 
 	@Override
-	public Boolean showLoader() {
-		return true;
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		mAdapter.changeCursor(cursor);
+		OControls.setGone(mView, R.id.loadingProgress);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		mAdapter.changeCursor(null);
 	}
 
 	@Override
@@ -298,18 +199,46 @@ public class Partners extends BaseFragment implements OnRowClickListener,
 	}
 
 	@Override
-	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		return null;
+	public void onStatusChange(Boolean refreshing) {
+		if (!refreshing) {
+			hideRefreshingProgress();
+		}
 	}
 
 	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
+	public boolean onSearchViewTextChange(String newFilter) {
 
+		if (mCurFilter == null && newFilter == null)
+			return false;
+		if (mCurFilter != null && mCurFilter.equals(newFilter))
+			return false;
+
+		mCurFilter = newFilter;
+		getLoaderManager().restartLoader(0, null, this);
+		return true;
 	}
 
 	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-
+	public void onSearchViewClose() {
+		// nothing to do
 	}
 
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		Cursor c = (Cursor) mAdapter.getItem(position);
+		Bundle bundle = new Bundle();
+		bundle.putInt(OColumn.ROW_ID,
+				c.getInt(c.getColumnIndex(OColumn.ROW_ID)));
+		bundle.putInt("id", c.getInt(c.getColumnIndex("id")));
+		PartnersDetail partner = new PartnersDetail();
+		partner.setArguments(bundle);
+		startFragment(partner, true);
+	}
+
+	@Override
+	public void onRowViewClick(int position, Cursor cursor, View view,
+			View parent) {
+		OLog.log(cursor.getString(cursor.getColumnIndex("name")));
+	}
 }

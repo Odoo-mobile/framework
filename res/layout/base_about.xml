@@ -4,101 +4,98 @@
     android:layout_height="match_parent"
     android:fillViewport="true" >
 
-    <RelativeLayout
-        android:id="@+id/layoutToMove"
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff" >
+        android:background="#ffffff"
+        android:orientation="vertical" >
 
-        <RelativeLayout
-            android:id="@+id/logoLayout"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="170dp"
-            android:background="#FFFFFF"
-            android:gravity="center_horizontal"
+            android:layout_height="250dp"
+            android:background="@color/theme_primary"
+            android:gravity="center"
+            android:orientation="vertical"
             android:padding="20dp" >
 
             <ImageView
                 android:id="@+id/abtus_imgLogo"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|center_horizontal"
-                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
                 android:contentDescription="@string/imgcontentDescription"
-                android:src="@drawable/odoo_small" />
+                android:src="@drawable/odoo_small"
+                android:tint="#ffffff" />
 
             <TextView
                 android:id="@+id/txvVersionName"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/abtus_imgLogo"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@string/font_fontFamily_condensed"
                 android:gravity="center"
                 android:paddingBottom="10dp"
                 android:paddingTop="25dp"
                 android:text="@string/app_version_name"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </RelativeLayout>
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#ebebeb" />
+        </LinearLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/layoutServerConfig"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:layout_below="@id/logoLayout"
-            android:background="#787878"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:orientation="vertical"
             android:padding="20dp" >
 
             <TextView
                 android:id="@+id/line1"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line1"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@android:color/white" />
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/line2"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/line1"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line2"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@android:color/white" />
+                android:textColorLink="#414141" />
 
             <TextView
                 android:id="@+id/line3"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/line2"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line3"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@android:color/white" />
+                android:textColorLink="#414141" />
 
             <TextView
                 android:id="@+id/line4"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/line3"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:gravity="left"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/about_Company_line4"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@android:color/white" />
-        </RelativeLayout>
-    </RelativeLayout>
+                android:textColorLink="#414141" />
+        </LinearLayout>
+    </LinearLayout>
 
 </ScrollView>

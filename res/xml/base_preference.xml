@@ -2,16 +2,48 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory
-        android:key="general_settings"
-        android:title="@string/general_settings" >
-        <Preference android:summary="@string/application_settings_summary" >
-            <intent android:action="com.odoo.ACTION_ACCOUNT_GENERAL_CONFIG" />
-        </Preference>
+        android:key="account_sync_settings"
+        android:title="Sync Settings" >
+        <PreferenceScreen
+            android:key="account_settings"
+            android:summary="Enable or disable data synchronization"
+            android:title="Sync Settings" >
+            <intent android:action="android.settings.SYNC_SETTINGS" />
+        </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory
-        android:key="account_settings"
-        android:title="@string/account_settings" >
+        android:key="sync_interval_settings"
+        android:title="Sync interval" >
+        <ListPreference
+            android:defaultValue="1440"
+            android:entries="@array/syncInterval"
+            android:entryValues="@array/syncIntervalValues"
+            android:key="sync_interval"
+            android:summary="Define how often synchronization will be performed"
+            android:title="Sync interval" />
     </PreferenceCategory>
+    <PreferenceCategory
+        android:key="sync_data_limit_settings"
+        android:title="Data Sync Limit" >
+        <ListPreference
+            android:defaultValue="60"
+            android:entries="@array/syncDataLimit"
+            android:entryValues="@array/syncDataLimitValues"
+            android:key="sync_data_limit"
+            android:summary="Define how old data to be synchronized"
+            android:title="Sync data limit" />
+    </PreferenceCategory>
+    <!--
+    <PreferenceCategory
+        android:key="contact_sync_setting"
+        android:title="Contact Sync" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="server_contact_sync"
+            android:summary="Enable or disable server partner synchronization"
+            android:title="Sync server partners" />
+    </PreferenceCategory>
+    -->
     <PreferenceCategory
         android:key="application_about"
         android:title="@string/title_about" >

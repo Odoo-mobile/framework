@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UserProfileActivity" >
+    tools:context=".UserProfile" >
 
     <LinearLayout
         android:id="@+id/profile_parent_view"
@@ -32,9 +32,9 @@
                 android:layout_gravity="bottom"
                 android:background="@drawable/name_bg_shade"
                 android:fontFamily="@string/font_fontFamily_condensed"
-                android:padding="20dp"
+                android:padding="10dp"
                 android:textColor="#ffffff"
-                android:textSize="30sp" />
+                android:textSize="25sp" />
         </FrameLayout>
 
         <LinearLayout
@@ -51,7 +51,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="#ffffff"
                 android:orientation="vertical"
-                android:padding="7dp" >
+                android:padding="10dp" >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -60,7 +60,7 @@
                     android:text="@string/str_user_login"
                     android:textAllCaps="true"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/theme_primary"
+                    android:textColor="@color/theme_secondary_dark"
                     android:textStyle="bold" />
 
                 <TextView
@@ -77,7 +77,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="#ffffff"
                 android:orientation="vertical"
-                android:padding="7dp" >
+                android:padding="10dp" >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -86,7 +86,7 @@
                     android:text="@string/str_server_url"
                     android:textAllCaps="true"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/theme_primary"
+                    android:textColor="@color/theme_secondary_dark"
                     android:textStyle="bold" />
 
                 <TextView
@@ -103,7 +103,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="#ffffff"
                 android:orientation="vertical"
-                android:padding="7dp" >
+                android:padding="10dp" >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -112,7 +112,7 @@
                     android:text="@string/str_database"
                     android:textAllCaps="true"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/theme_primary"
+                    android:textColor="@color/theme_secondary_dark"
                     android:textStyle="bold" />
 
                 <TextView
@@ -129,7 +129,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="#ffffff"
                 android:orientation="vertical"
-                android:padding="7dp" >
+                android:padding="10dp" >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -138,7 +138,7 @@
                     android:text="@string/str_odoo_version"
                     android:textAllCaps="true"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/theme_primary"
+                    android:textColor="@color/theme_secondary_dark"
                     android:textStyle="bold" />
 
                 <TextView
@@ -155,7 +155,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="#ffffff"
                 android:orientation="vertical"
-                android:padding="7dp" >
+                android:padding="10dp" >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -164,7 +164,7 @@
                     android:text="@string/str_timezone"
                     android:textAllCaps="true"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/theme_primary"
+                    android:textColor="@color/theme_secondary_dark"
                     android:textStyle="bold" />
 
                 <TextView

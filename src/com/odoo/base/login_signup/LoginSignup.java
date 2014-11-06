@@ -54,9 +54,14 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 	private Context mContext;
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		showActionBar(false);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		showActionBar(false);
 		scope = new AppScope(this);
 		scope.main().lockDrawer(true);
 		mContext = getActivity();
@@ -70,12 +75,20 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-
 		if (savedInstanceState != null
 				&& savedInstanceState.containsKey(KEY_SELF_HOSTED_URL)) {
 			mSelfHosted = !savedInstanceState.getBoolean(KEY_SELF_HOSTED_URL);
 			onClick(mView.findViewById(R.id.txvAddSelfHosted));
 		}
+		try {
+			String version = app().getPackageManager().getPackageInfo(
+					app().getPackageName(), 0).versionName;
+			String version_name = _s(R.string.label_version) + " " + version;
+			OControls.setText(view, R.id.odoo_version, version_name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void init() {
@@ -453,18 +466,13 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		scope = new AppScope(mContext);
-		scope.main().getActionbar().hide();
-	}
-
-	@Override
 	public void onPause() {
 		super.onPause();
 		if (mOdooURLTest != null) {
 			mOdooURLTest.cancel(true);
 		}
+		actionbar().show();
+		scope.main().lockDrawer(false);
 	}
 
 	@Override
@@ -472,4 +480,5 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		super.onSaveInstanceState(outState);
 		outState.putBoolean(KEY_SELF_HOSTED_URL, mSelfHosted);
 	}
+
 }

@@ -65,6 +65,7 @@
         <attr name="background_selector_boolean_field" format="string" />
         <attr name="true_background_selector" format="reference" />
         <attr name="false_background_selector" format="reference" />
+        <attr name="autoUIGenerate" format="boolean" />
     </declare-styleable>
     <declare-styleable name="OManyToOneWidget">
         <attr name="model_name" format="string" />

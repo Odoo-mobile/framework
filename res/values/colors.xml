@@ -1,9 +1,12 @@
 <resources>
 
     <!-- Base  Theme colors -->
-    <color name="theme_primary">#21b799</color>
-    <color name="theme_primary_dark">#157663</color>
-    <color name="theme_primary_light">#47dec0</color>
+    <color name="theme_primary">#4f8df5</color>
+    <color name="theme_primary_dark">#0d60ea</color>
+    <color name="theme_primary_light">#7facf8</color>
+    <color name="theme_secondary">#2D4A8F</color>
+    <color name="theme_secondary_dark">#213668</color>
+    <color name="theme_secondary_light">#446ac4</color>
     <color name="session_photo_scrim">#4000</color>
     <!-- Actionbar -->
     <color name="actionbar_bg_color">@color/theme_primary</color>
@@ -17,6 +20,13 @@
     <color name="nav_drawer_focused">#f3f3f3</color>
     <color name="nav_drawer_pressed">#EBEBEB</color>
     <color name="navdrawer_background">#ffffffff</color>
+    <!-- Material Dialog -->
+    <color name="text_title">#CC000000</color>
+    <color name="text_secondary">#8C000000</color>
+    <color name="light_blue">#03a9f4</color>
+
+    <!-- Form control Colors -->
+    <color name="field_parent_background">#ebebeb</color>
     <!--  -->
     <color name="odoo_purple">#a24689</color>
     <color name="odoo_green_dark">#669900</color>
