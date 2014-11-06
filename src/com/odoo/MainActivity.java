@@ -44,7 +44,6 @@ import android.widget.Toast;
 
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.account.AccountsDetail;
-import com.odoo.base.account.UserProfile;
 import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
@@ -250,8 +249,10 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 			startMainFragment(acFragment, true);
 			return true;
 		case PROFILE:
-			UserProfile profileFragment = new UserProfile();
-			startMainFragment(profileFragment, true);
+			// UserProfile profileFragment = new UserProfile();
+			// startMainFragment(profileFragment, true);
+			Intent intent = new Intent(this, UserProfileActivity.class);
+			startActivity(intent);
 			return true;
 		default:
 			return true;

@@ -27,7 +27,7 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
-        android:name="com.odoo.App"
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -35,7 +35,7 @@
         android:theme="@style/AppTheme" >
 
         <!-- Android Account Authentication Service -->
-        <service android:name="com.odoo.auth.OdooAuthenticateService" >
+        <service android:name=".auth.OdooAuthenticateService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" >
                 </action>
@@ -48,7 +48,7 @@
         </service>
 
         <activity
-            android:name="com.odoo.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,54 +56,59 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.odoo.BaseSettings" >
+        <activity android:name=".BaseSettings" >
             <intent-filter>
                 <action android:name="com.odoo.ACTION_ACCOUNT_BASE_CONFIG" />
 
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filter>
         </activity>
-        <activity android:name="com.odoo.GeneralSettings" >
+        <activity android:name=".GeneralSettings" >
             <intent-filter>
                 <action android:name="com.odoo.ACTION_ACCOUNT_GENERAL_CONFIG" />
 
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filter>
         </activity>
-        <activity android:name="com.odoo.base.about.About" >
+        <activity android:name=".base.about.About" >
             <intent-filter>
                 <action android:name="com.odoo.ACTION_ABOUT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".UserProfileActivity"
+            android:label="@string/title_activity_user_profile"
+            android:theme="@style/ProfileActivityTheme" >
+        </activity>
 
         <!-- Base Providers (Note: update authority as per your app package) -->
         <provider
-            android:name="com.odoo.base.ir.providers.model.ModelProvider"
+            android:name=".base.ir.providers.model.ModelProvider"
             android:authorities="com.odoo.base.ir.providers.model"
             android:exported="false"
             android:multiprocess="true" />
         <provider
-            android:name="com.odoo.base.res.providers.users.UsersProvider"
+            android:name=".base.res.providers.users.UsersProvider"
             android:authorities="com.odoo.base.res.providers.users"
             android:exported="false"
             android:multiprocess="true" />
         <provider
-            android:name="com.odoo.base.ir.providers.attachments.AttachmentProvider"
+            android:name=".base.ir.providers.attachments.AttachmentProvider"
             android:authorities="com.odoo.base.ir.providers.attachments"
             android:exported="false"
             android:multiprocess="true" />
         <provider
-            android:name="com.odoo.base.res.providers.country.CountryProvider"
+            android:name=".base.res.providers.country.CountryProvider"
             android:authorities="com.odoo.base.res.providers.country"
             android:exported="false"
             android:multiprocess="true" />
         <provider
-            android:name="com.odoo.base.res.providers.company.CompanyProvider"
+            android:name=".base.res.providers.company.CompanyProvider"
             android:authorities="com.odoo.base.res.providers.company"
             android:exported="false"
             android:multiprocess="true" />
         <provider
-            android:name="com.odoo.addons.partners.providers.country_state.CountryStateProvider"
+            android:name=".addons.partners.providers.country_state.CountryStateProvider"
             android:authorities="com.odoo.addons.partners.providers.country_state"
             android:exported="false"
             android:multiprocess="true" />
@@ -131,20 +136,20 @@
 
         <!-- ResPartner Provider -->
         <provider
-            android:name="com.odoo.base.res.providers.partners.PartnersProvider"
+            android:name=".base.res.providers.partners.PartnersProvider"
             android:authorities="com.odoo.base.res.providers.partners"
             android:enabled="true"
             android:exported="false"
             android:label="Partners"
             android:syncable="true" />
         <provider
-            android:name="com.odoo.addons.partners.providers.partners_category.PartnerCategoryProvider"
+            android:name=".addons.partners.providers.partners_category.PartnerCategoryProvider"
             android:authorities="com.odoo.addons.partners.providers.partners_category"
             android:exported="false"
             android:multiprocess="true" />
         <!-- ResPartner Service -->
         <service
-            android:name="com.odoo.addons.partners.sevices.PartnersService"
+            android:name=".addons.partners.sevices.PartnersService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
