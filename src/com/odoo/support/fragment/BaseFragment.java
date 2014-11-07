@@ -222,6 +222,10 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 		scope = new AppScope(getActivity());
 		if (actionbar().isShowing() && !showActionbar)
 			actionbar().hide();
+		else if (!actionbar().isShowing() && showActionbar) {
+			actionbar().show();
+		}
+
 		if (scope.main().getNavItem() != null)
 			scope.main().setTitle(scope.main().getNavItem().getTitle());
 		if (mSyncStatusObserverListener != null) {
