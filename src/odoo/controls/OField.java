@@ -65,6 +65,7 @@ import com.odoo.orm.OM2ORecord;
 import com.odoo.orm.OModel;
 import com.odoo.orm.OModel.Command;
 import com.odoo.orm.ORelIds;
+import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.support.listview.OListAdapter;
 import com.odoo.util.Base64Helper;
@@ -146,6 +147,11 @@ public class OField extends LinearLayout implements
 	public static final String KEY_READ_MORE_BUTTON = "readMoreButton";
 	public static final String KEY_WIDGET = "widget";
 	public static final String KEY_WIDGET_TITLE = "widgetTitle";
+
+	/**
+	 * Parent view. Updated for new UI look for API 21+
+	 */
+	private LinearLayout mParent = null;
 
 	/**
 	 * The Enum OFieldMode.
@@ -295,6 +301,8 @@ public class OField extends LinearLayout implements
 	private OnDomainFilterCallbacks mOnDomainFilterCallbacks = null;
 	private ColumnDomain mColumnDomain = null;
 
+	private boolean autoUpdateUI = false;
+
 	/**
 	 * Instantiates a new field.
 	 * 
@@ -332,6 +340,10 @@ public class OField extends LinearLayout implements
 	public OField(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init(context, attrs, defStyle);
+	}
+
+	public void setAutoUpdateUI(Boolean autoUpdate) {
+		autoUpdateUI = autoUpdate;
 	}
 
 	/**
@@ -373,6 +385,7 @@ public class OField extends LinearLayout implements
 	private void initControls() {
 		removeAllViews();
 		setOrientation(LinearLayout.VERTICAL);
+		setLayoutUI();
 		createLabel();
 		if (mFieldWidget == null) {
 			createTextViewControl();
@@ -380,6 +393,31 @@ public class OField extends LinearLayout implements
 			createWidget(mFieldWidget);
 		}
 
+	}
+
+	private void setLayoutUI() {
+		if (autoUpdateUI) {
+			int padd = (int) (mScaleFactor * 10);
+			if (!withLabel()) {
+				setPadding(padd, 5, padd, 5);
+			} else
+				setPadding(padd, padd, padd, padd);
+			setBackgroundColor(Color.WHITE);
+			post(new Runnable() {
+
+				@Override
+				public void run() {
+					LayoutParams params = (LayoutParams) getLayoutParams();
+					int margin = (int) (mScaleFactor * 5);
+					if (withLabel()) {
+						params.setMargins(margin, margin, margin, 0);
+					} else {
+						params.setMargins(margin, 0, margin, 0);
+					}
+					setLayoutParams(params);
+				}
+			});
+		}
 	}
 
 	/**
@@ -430,6 +468,10 @@ public class OField extends LinearLayout implements
 	public OField setObjectEditable(Boolean editable) {
 		mManyToManyObjectEditable = editable;
 		return this;
+	}
+
+	public boolean isEditable() {
+		return (mAttributes.getBoolean(KEY_EDITABLE, false));
 	}
 
 	/**
@@ -971,6 +1013,10 @@ public class OField extends LinearLayout implements
 		}
 	}
 
+	public boolean withLabel() {
+		return (mAttributes.getBoolean(KEY_WITH_LABEL, true));
+	}
+
 	/**
 	 * Creates the label.
 	 */
@@ -980,15 +1026,15 @@ public class OField extends LinearLayout implements
 		if (mAttributes.getBoolean(KEY_WITH_LABEL, true)) {
 			mFieldLabel = new OLabel(mContext);
 			mFieldLabel.setLayoutParams(mLayoutParams);
-			mFieldLabel.setBottomBorderHeight(mAttributes.getResource(
-					KEY_BOTTOM_BORDER_HEIGHT, 2));
+			mFieldLabel.setBottomBorderHeight(0);// mAttributes.getResource(KEY_BOTTOM_BORDER_HEIGHT,
+													// 0));
 			if (mColumn != null) {
 				mFieldLabel.setLabel(mColumn.getLabel());
 			} else {
 				mFieldLabel.setLabel(mAttributes.getString(KEY_FIELD_NAME, ""));
 			}
 			Integer mAttrLabelTextAppearnce = mAttributes.getResource(
-					KEY_LABEL_TEXT_APPEARANCE, 0);
+					KEY_LABEL_TEXT_APPEARANCE, 2);
 			if (mAttrLabelTextAppearnce != 0)
 				mFieldLabel.setTextAppearance(mAttrLabelTextAppearnce);
 			mFieldLabel.setColor(mAttributes.getColor(KEY_LABEL_COLOR,
@@ -1258,6 +1304,15 @@ public class OField extends LinearLayout implements
 					&& mColumn.getType().isAssignableFrom(ODateTime.class)) {
 				text = ODate.getDate(mContext, text, TimeZone.getDefault()
 						.getID(), displayPattern);
+			}
+			if (mColumn != null) {
+				if (mColumn.getType().isAssignableFrom(OBoolean.class)) {
+					if (text.equals("true")) {
+						text = mColumn.getLabel();
+					} else {
+						text = "No " + mColumn.getLabel();
+					}
+				}
 			}
 			mFieldTextView.setText(text);
 		}

@@ -3,4 +3,5 @@
     android:icon="@drawable/ic_launcher_odoo"
     android:label="@string/label_odoo"
     android:smallIcon="@drawable/ic_launcher_odoo" >
+
 </account-authenticator>

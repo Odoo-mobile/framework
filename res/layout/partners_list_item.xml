@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 odoo:fieldTextStyle="bold"
-                odoo:field_color="@color/odoo_purple"
+                odoo:field_color="@color/theme_secondary_dark"
                 odoo:field_name="name"
                 odoo:field_textAppearance="?android:attr/textAppearanceMedium"
                 odoo:with_label="false" >
@@ -45,7 +45,7 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                odoo:field_color="#006400"
+                odoo:field_color="@color/theme_secondary"
                 odoo:field_name="email"
                 odoo:singleLine="true"
                 odoo:with_label="false" >

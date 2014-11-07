@@ -13,12 +13,15 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,13 +40,14 @@ import com.odoo.auth.OdooAccountManager;
 import com.odoo.support.OUser;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.Base64Helper;
+import com.odoo.util.BitmapUtils;
 import com.odoo.util.OAppRater;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerHelper;
 import com.odoo.util.drawer.DrawerItem;
 import com.odoo.util.drawer.DrawerListener;
 
-public abstract class BaseActivity extends FragmentActivity implements
+public abstract class BaseActivity extends ActionBarActivity implements
 		FragmentLoader, DrawerListener {
 	public static final String TAG = BaseActivity.class.getSimpleName();
 	private static final int NAVDRAWER_LAUNCH_DELAY = 250;
@@ -63,6 +67,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 	private LinearLayout mAccountListContainer;
 	private ViewGroup mDrawerItemsListContainer;
 	private Boolean hideActionbar = true;
+	private ActionBar mActionBar;
 
 	// variables that control the Action Bar auto hide behavior (aka
 	// "quick recall")
@@ -91,6 +96,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 		OAppRater.app_launched(this);
 		mRequestForNewAccount = getIntent().getBooleanExtra(
 				"create_new_account", false);
+		mActionBar = getSupportActionBar();
 	}
 
 	protected void autoShowOrHideActionBar(boolean show) {
@@ -131,13 +137,17 @@ public abstract class BaseActivity extends FragmentActivity implements
 						.setInterpolator(new DecelerateInterpolator());
 			}
 		}
-		if (hideActionbar) {
-			if (shown) {
-				getActionBar().show();
-			} else {
-				getActionBar().hide();
-			}
+		// if (hideActionbar) {
+		if (shown) {
+			mActionBar.show();
+		} else {
+			mActionBar.hide();
 		}
+		// }
+	}
+
+	public ActionBar getActionbar() {
+		return mActionBar;
 	}
 
 	/**
@@ -224,25 +234,24 @@ public abstract class BaseActivity extends FragmentActivity implements
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = (String) title;
-		getActionBar().setTitle(mTitle);
+		getActionbar().setTitle(mTitle);
 	}
 
 	public void setTitle(CharSequence title, CharSequence subtitle) {
 		mTitle = (String) title;
 		this.setTitle(mTitle);
-		getActionBar().setSubtitle(subtitle);
+		getActionbar().setSubtitle(subtitle);
 	}
 
 	protected void initDrawerControls() {
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_navigation_drawer, R.string.drawer_open,
-				R.string.app_name) {
+				R.string.drawer_open, R.string.app_name) {
 
 			@Override
 			public void onDrawerClosed(View drawerView) {
 				super.onDrawerClosed(drawerView);
-				getActionBar().setIcon(R.drawable.ic_odoo_o);
+				getActionbar().setIcon(R.drawable.ic_odoo_o);
 				setTitle(mAppTitle, null);
 				invalidateOptionsMenu();
 			}
@@ -274,8 +283,9 @@ public abstract class BaseActivity extends FragmentActivity implements
 		Log.d(TAG, "initDrawer()");
 		if (mDrawerLayout == null)
 			initDrawerControls();
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		getActionbar().setDisplayHomeAsUpEnabled(true);
+		getActionbar().setHomeButtonEnabled(true);
+		getActionbar().setDisplayShowTitleEnabled(true);
 		mNavDrawerItems.clear();
 		mNavDrawerItems.addAll(DrawerHelper.drawerItems(mContext));
 		mNavDrawerItems.addAll(setSettingMenu());
@@ -542,6 +552,19 @@ public abstract class BaseActivity extends FragmentActivity implements
 			chosenAccountView.setVisibility(View.VISIBLE);
 			mAccountListContainer.setVisibility(View.INVISIBLE);
 		}
+
+		// Account background cover image. Replacing background color to primary
+		// theme
+		ImageView backCover = (ImageView) chosenAccountView
+				.findViewById(R.id.profile_cover_image);
+		Bitmap cover = BitmapFactory.decodeResource(getResources(),
+				R.drawable.default_cover);
+		int fromColor = Color.parseColor("#A2488A");
+		int targetColor = getResources().getColor(R.color.theme_primary);
+		Bitmap newCover = BitmapUtils.replaceColor(cover, fromColor,
+				targetColor);
+		backCover.setImageBitmap(newCover);
+
 		ImageView profileImageView = (ImageView) chosenAccountView
 				.findViewById(R.id.profile_image);
 		TextView nameTextView = (TextView) chosenAccountView

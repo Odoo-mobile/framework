@@ -105,7 +105,7 @@ public class OSearchableMany2One extends LinearLayout implements
 			mAttr.put(KEY_DATA_MODEL, mTypedArray
 					.getString(R.styleable.OSearchableMany2One_dataModel));
 			mAttr.put(KEY_TITLE, mTypedArray
-					.getString(R.styleable.OSearchableMany2One_title));
+					.getString(R.styleable.OSearchableMany2One_widget_title));
 			mAttr.put(KEY_DISPLAY_LAYOUT, mTypedArray.getResourceId(
 					R.styleable.OSearchableMany2One_displayLayout, -1));
 			mTypedArray.recycle();

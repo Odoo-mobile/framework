@@ -18,25 +18,32 @@
  */
 package com.odoo.base.about;
 
-import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.odoo.R;
 
-public class About extends Activity {
+public class About extends ActionBarActivity {
 
-	TextView versionName = null, aboutLine2 = null, aboutLine3 = null,
+	private TextView versionName = null, aboutLine2 = null, aboutLine3 = null,
 			aboutLine4 = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.base_about);
-		getActionBar().setHomeButtonEnabled(true);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		ActionBar actionBar = getSupportActionBar();
+		actionBar.setHomeButtonEnabled(true);
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setTitle("");
+		actionBar.setBackgroundDrawable(new ColorDrawable(Color
+				.parseColor("#00000000")));
 		versionName = (TextView) findViewById(R.id.txvVersionName);
 
 		try {

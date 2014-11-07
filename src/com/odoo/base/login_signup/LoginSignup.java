@@ -42,27 +42,53 @@ import com.odoo.util.drawer.DrawerItem;
 public class LoginSignup extends BaseFragment implements OnClickListener,
 		OnFocusChangeListener {
 
-	View mView = null;
-	Boolean mSelfHosted = false;
-	EditText edtHostedURL, edtUsername, edtPassword;
-	OdooURLTest mOdooURLTest = null;
-	Spinner dbListSpinner = null;
-	List<String> mDBList = new ArrayList<String>();
-	Boolean mSSLForceConnect = false;
-	String mServerURL = null;
+	private final String KEY_SELF_HOSTED_URL = "self_hosted_url";
+	private View mView = null;
+	private Boolean mSelfHosted = false;
+	private EditText edtHostedURL, edtUsername, edtPassword;
+	private OdooURLTest mOdooURLTest = null;
+	private Spinner dbListSpinner = null;
+	private List<String> mDBList = new ArrayList<String>();
+	private Boolean mSSLForceConnect = false;
+	private String mServerURL = null;
+	private Context mContext;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		showActionBar(false);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		showActionBar(false);
 		scope = new AppScope(this);
 		scope.main().lockDrawer(true);
+		mContext = getActivity();
 		mView = inflater.inflate(R.layout.base_login_signup_layout, container,
 				false);
 		mView.findViewById(R.id.forgot_password).setOnClickListener(this);
 		mView.findViewById(R.id.create_account).setOnClickListener(this);
 		init();
 		return mView;
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		if (savedInstanceState != null
+				&& savedInstanceState.containsKey(KEY_SELF_HOSTED_URL)) {
+			mSelfHosted = !savedInstanceState.getBoolean(KEY_SELF_HOSTED_URL);
+			onClick(mView.findViewById(R.id.txvAddSelfHosted));
+		}
+		try {
+			String version = app().getPackageManager().getPackageInfo(
+					app().getPackageName(), 0).versionName;
+			String version_name = _s(R.string.label_version) + " " + version;
+			OControls.setText(view, R.id.odoo_version, version_name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void init() {
@@ -102,7 +128,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 			} else {
 				mSelfHosted = true;
 				OControls.setVisible(mView, R.id.layoutSelfHosted, true,
-						getActivity());
+						mContext);
 				OControls.setText(mView, R.id.txvAddSelfHosted,
 						"Login with odoo.com");
 				edtHostedURL = (EditText) mView
@@ -158,10 +184,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 			int db_index = (dbListSpinner == null) ? 0 : dbListSpinner
 					.getSelectedItemPosition() - 1;
 			if (dbListSpinner != null && db_index + 1 <= 0) {
-				Toast.makeText(
-						getActivity(),
-						getResources()
-								.getString(R.string.toast_select_database),
+				Toast.makeText(mContext, _s(R.string.toast_select_database),
 						Toast.LENGTH_LONG).show();
 				return;
 			}
@@ -214,7 +237,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		@Override
 		protected Boolean doInBackground(Void... params) {
 
-			OdooHelper odoo = new OdooHelper(getActivity(),
+			OdooHelper odoo = new OdooHelper(mContext,
 					userData.getBoolean("force_connect"));
 			mUser = odoo.login(userData.getString("username"),
 					userData.getString("password"),
@@ -231,20 +254,20 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		protected void onPostExecute(Boolean success) {
 			super.onPostExecute(success);
 			if (success) {
-				if (OdooAccountManager.fetchAllAccounts(getActivity()) != null) {
-					if (OdooAccountManager.getAccount(getActivity(),
+				if (OdooAccountManager.fetchAllAccounts(mContext) != null) {
+					if (OdooAccountManager.getAccount(mContext,
 							mUser.getAndroidName()) == null) {
-						if (OdooAccountManager.isAnyUser(getActivity())) {
+						if (OdooAccountManager.isAnyUser(mContext)) {
 							OdooAccountManager.logoutUser(
-									getActivity(),
+									mContext,
 									OdooAccountManager.currentUser(
 											getActivity()).getAndroidName());
 						}
 					} else {
 						OControls.setGone(mView, R.id.loginProgress);
 						OControls.setVisible(mView, R.id.controls);
-						edtUsername.setError(getResources().getString(
-								R.string.toast_user_already_exists));
+						edtUsername
+								.setError(_s(R.string.toast_user_already_exists));
 						return;
 					}
 				}
@@ -254,13 +277,13 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 				args.putBoolean("self_hosted", mSelfHosted);
 				account_create.setArguments(args);
 
-				FragmentListener frag = (FragmentListener) getActivity();
+				FragmentListener frag = (FragmentListener) mContext;
 				frag.startMainFragment(account_create, false);
 			} else {
 				OControls.setGone(mView, R.id.loginProgress);
 				OControls.setVisible(mView, R.id.controls);
-				edtPassword.setError(getResources().getString(
-						R.string.toast_invalid_username_password));
+				edtPassword
+						.setError(_s(R.string.toast_invalid_username_password));
 			}
 		}
 	}
@@ -268,7 +291,8 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 	@Override
 	public void onFocusChange(View v, boolean hasFocus) {
 		if (v.getId() == R.id.edtSelfHostedURL && !hasFocus) {
-			if (!TextUtils.isEmpty(edtHostedURL.getText())) {
+			if (!TextUtils.isEmpty(edtHostedURL.getText())
+					&& validateURL(edtHostedURL.getText().toString())) {
 				if (mOdooURLTest != null)
 					mOdooURLTest.cancel(true);
 				mServerURL = createServerURL(edtHostedURL.getText().toString());
@@ -277,13 +301,17 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 			}
 		}
 		if (v.getId() == R.id.edtUserName && !hasFocus) {
-			if (edtHostedURL == null) {
+			if (edtHostedURL == null && mServerURL != null) {
 				if (mOdooURLTest != null)
 					mOdooURLTest.cancel(true);
 				mOdooURLTest = new OdooURLTest(mServerURL, false, false);
 				mOdooURLTest.execute();
 			}
 		}
+	}
+
+	private boolean validateURL(String url) {
+		return (url.contains("."));
 	}
 
 	class OdooURLTest extends AsyncTask<Void, Void, Boolean> {
@@ -320,10 +348,9 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		protected Boolean doInBackground(Void... params) {
 			boolean flag = false;
 			try {
-				flag = odooConnect.testConnection(getActivity(), odooServerURL);
+				flag = odooConnect.testConnection(mContext, odooServerURL);
 				if (!flag) {
-					errorMsg = getResources().getString(
-							R.string.toast_unable_to_reach_odoo_server);
+					errorMsg = _s(R.string.toast_unable_to_reach_odoo_server);
 				}
 			} catch (SSLPeerUnverifiedException ssl) {
 				flag = false;
@@ -355,10 +382,8 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 						login();
 					}
 				} else {
-					Toast.makeText(
-							getActivity(),
-							getResources().getString(
-									R.string.toast_no_database_found),
+					Toast.makeText(mContext,
+							_s(R.string.toast_no_database_found),
 							Toast.LENGTH_LONG).show();
 				}
 			} else {
@@ -380,10 +405,8 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 
 	private void initDatabaseSpinner(String[] dbs) {
 		if (dbs.length > 1) {
-			OControls.setVisible(mView, R.id.layoutBorderDB, true,
-					getActivity());
-			OControls.setVisible(mView, R.id.layoutDatabase, true,
-					getActivity());
+			OControls.setVisible(mView, R.id.layoutBorderDB, true, mContext);
+			OControls.setVisible(mView, R.id.layoutDatabase, true, mContext);
 			dbListSpinner = (Spinner) mView
 					.findViewById(R.id.spinnerDatabaseList);
 		}
@@ -397,10 +420,9 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 
 	private void loadDatabaseList(List<String> dbList) {
 		try {
-			dbList.add(0,
-					getActivity().getString(R.string.login_select_database));
-			ArrayAdapter<String> dbAdapter = new ArrayAdapter<String>(
-					getActivity(), R.layout.spinner_custom_layout, dbList);
+			dbList.add(0, _s(R.string.login_select_database));
+			ArrayAdapter<String> dbAdapter = new ArrayAdapter<String>(mContext,
+					R.layout.spinner_custom_layout, dbList);
 			dbAdapter.setDropDownViewResource(R.layout.spinner_custom_layout);
 			dbListSpinner.setAdapter(dbAdapter);
 		} catch (Exception e) {
@@ -422,7 +444,7 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 	}
 
 	private void showForceConnectDialog(String message) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setIcon(R.drawable.ic_action_alerts_and_states_warning);
 		builder.setTitle(R.string.title_ssl_warning);
 		builder.setMessage(R.string.untrusted_ssl_warning);
@@ -444,8 +466,19 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		getActivity().getActionBar().hide();
+	public void onPause() {
+		super.onPause();
+		if (mOdooURLTest != null) {
+			mOdooURLTest.cancel(true);
+		}
+		actionbar().show();
+		scope.main().lockDrawer(false);
 	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(KEY_SELF_HOSTED_URL, mSelfHosted);
+	}
+
 }

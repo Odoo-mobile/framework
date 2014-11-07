@@ -216,8 +216,8 @@ public class AccountsDetail extends BaseFragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
-		getActivity().setTitle("Accounts");
-		getActivity().getActionBar().show();
+		actionbar().setTitle("Accounts");
+		actionbar().show();
 		scope.main().lockDrawer(false);
 	}
 }

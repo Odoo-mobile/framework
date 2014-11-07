@@ -1,0 +1,26 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Base application theme for API 14+. This theme completely replaces
+        AppBaseTheme from BOTH res/values/styles.xml and
+        res/values-v11/styles.xml on API 14+ devices.
+    -->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar"></style>
+
+    <style name="AppTheme" parent="AppBaseTheme"> <!-- Application theme. -->
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:colorPrimary">@color/actionbar_bg_color</item>
+        <item name="colorPrimary">@color/actionbar_bg_color</item>
+        <item name="android:colorPrimaryDark">@color/actionbar_bg_color_dark</item>
+        <item name="colorPrimaryDark">@color/actionbar_bg_color_dark</item>
+        <item name="colorAccent">@color/theme_primary_dark</item>
+        <item name="android:colorAccent">@color/theme_primary_dark</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
+        <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
+    </style>
+
+</resources>

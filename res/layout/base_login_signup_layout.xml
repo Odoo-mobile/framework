@@ -6,7 +6,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/odoo_purple"
+        android:background="@color/theme_primary"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:padding="@dimen/odoo_padding" >
@@ -37,7 +37,7 @@
                 android:id="@+id/progressStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:gravity="center"
                 android:text="@string/title_loggin_in"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -80,7 +80,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:background="#ffffff"
-                        android:fontFamily="sans-serif-light"
+                        android:fontFamily="@string/font_fontFamily_light"
                         android:gravity="center_vertical"
                         android:hint="Your self-hosted URL"
                         android:singleLine="true"
@@ -101,14 +101,14 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="5dp"
                         android:src="@drawable/ic_action_done"
-                        android:tint="#669900"
+                        android:tint="@color/theme_primary_dark"
                         android:visibility="gone" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/odoo_purple" />
+                    android:background="@color/theme_primary_dark" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -131,7 +131,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
                         android:background="#ffffff"
-                        android:fontFamily="sans-serif-light"
+                        android:fontFamily="@string/font_fontFamily_light"
                         android:gravity="center_vertical"
                         android:hint="Username or email"
                         android:singleLine="true"
@@ -142,7 +142,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/odoo_purple" />
+                    android:background="@color/theme_primary_dark" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -165,7 +165,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
                         android:background="#ffffff"
-                        android:fontFamily="sans-serif-light"
+                        android:fontFamily="@string/font_fontFamily_light"
                         android:gravity="center_vertical"
                         android:hint="Password"
                         android:inputType="textPassword"
@@ -178,7 +178,7 @@
                     android:id="@+id/layoutBorderDB"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/odoo_purple"
+                    android:background="@color/theme_primary_dark"
                     android:visibility="gone" />
 
                 <LinearLayout
@@ -216,7 +216,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_marginTop="15dp"
                 android:background="@drawable/login_signup_button"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:text="Login"
                 android:textColor="#fff" />
 
@@ -225,7 +225,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="Forgot password?"
@@ -238,7 +238,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:clickable="true"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="Add self-hosted URL"
@@ -249,12 +249,24 @@
                 android:id="@+id/create_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@string/font_fontFamily_light"
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="Create account"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#ffffff"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/odoo_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:fontFamily="@string/font_fontFamily_condensed"
+                android:gravity="center"
+                android:padding="10dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#99ffffff"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>

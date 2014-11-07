@@ -59,7 +59,7 @@ public class OLabel extends LinearLayout {
 	Integer mAttrTextAppearance = 0;
 
 	/** The attr bottom border height. */
-	Integer mAttrBottomBorderHeight = 1;
+	Integer mAttrBottomBorderHeight = 0;
 
 	/**
 	 * Instantiates a new label.
@@ -135,7 +135,7 @@ public class OLabel extends LinearLayout {
 		mLabelTextView.setPadding(5, 5, 5, 5);
 		mLabelTextView.setText(mAttrLabel);
 		mLabelTextView.setAllCaps(true);
-		mLabelTextView.setTypeface(OControlHelper.lightFont(), Typeface.BOLD);
+		mLabelTextView.setTypeface(OControlHelper.boldFont(), Typeface.BOLD);
 		if (mAttrTextAppearance != 0)
 			mLabelTextView.setTextAppearance(mContext, mAttrTextAppearance);
 		mLabelTextView.setTextColor(mAttrColor);
@@ -158,12 +158,12 @@ public class OLabel extends LinearLayout {
 	 */
 	private void initAttributeValues() {
 		mAttrLabel = mTypedArray.getString(R.styleable.OLabel_label);
-		mAttrColor = mTypedArray
-				.getColor(R.styleable.OLabel_color, Color.BLACK);
+		mAttrColor = mTypedArray.getColor(R.styleable.OLabel_labelColor,
+				Color.BLACK);
 		mAttrTextAppearance = mTypedArray.getResourceId(
 				R.styleable.OLabel_textAppearance, 0);
 		mAttrBottomBorderHeight = mTypedArray.getInteger(
-				R.styleable.OLabel_bottom_border_height, 1);
+				R.styleable.OLabel_bottom_border_height, 0);
 	}
 
 	/**
