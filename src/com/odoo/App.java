@@ -80,7 +80,7 @@ public class App extends Application {
 		if (user != null) {
 			try {
 				if (user.isOAauthLogin()) {
-					odoo = new Odoo(user.getInstanceUrl(),
+					odoo = new Odoo(this, user.getInstanceUrl(),
 							user.isAllowSelfSignedSSL());
 					OdooInstance instance = new OdooInstance();
 					instance.setInstanceUrl(user.getInstanceUrl());
@@ -89,7 +89,8 @@ public class App extends Application {
 					odoo.oauth_authenticate(instance, user.getUsername(),
 							user.getPassword());
 				} else {
-					odoo = new Odoo(user.getHost(), user.isAllowSelfSignedSSL());
+					odoo = new Odoo(this, user.getHost(),
+							user.isAllowSelfSignedSSL());
 					odoo.authenticate(user.getUsername(), user.getPassword(),
 							user.getDatabase());
 				}

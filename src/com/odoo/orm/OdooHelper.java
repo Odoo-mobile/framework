@@ -45,7 +45,7 @@ public class OdooHelper {
 		Log.d(TAG, "OHelper->login()");
 		OUser userObj = null;
 		try {
-			mOdoo = new Odoo(serverURL, mForceConnect);
+			mOdoo = new Odoo(mContext, serverURL, mForceConnect);
 			JSONObject response = mOdoo.authenticate(username, password,
 					database);
 			int userId = 0;

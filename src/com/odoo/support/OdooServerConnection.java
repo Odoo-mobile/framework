@@ -68,7 +68,7 @@ public class OdooServerConnection {
 			return false;
 		}
 		try {
-			odoo = new Odoo(serverURL, mAllowSelfSignedSSL);
+			odoo = new Odoo(context, serverURL, mAllowSelfSignedSSL);
 			mDbLists = odoo.getDatabaseList();
 			if (mDbLists == null) {
 				mDbLists = new JSONArray();
