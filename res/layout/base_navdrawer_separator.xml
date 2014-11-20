@@ -3,24 +3,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/navdrawer_group_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:fontFamily="@string/font_fontFamily_condensed"
-        android:paddingBottom="3dp"
-        android:paddingLeft="@dimen/keyline_1"
-        android:textAllCaps="true"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#808080"
-        android:textStyle="bold" />
-
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginBottom="3dp"
+        android:layout_marginTop="8dp"
         android:background="#e5e5e5"
         android:gravity="start|center_vertical" />
+
+    <TextView
+        android:id="@+id/navdrawer_group_title"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:fontFamily="@string/font_fontFamily_medium"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:textAllCaps="true"
+        android:textColor="@color/navdrawer_icon_tint"
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
 </LinearLayout>

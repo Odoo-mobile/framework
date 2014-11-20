@@ -13,10 +13,10 @@
     <color name="actionbar_bg_color_dark">@color/theme_primary_dark</color>
     <color name="translucent_status_bg_color">@color/actionbar_bg_color</color>
     <!-- Drawer Nav Item Selector -->
-    <color name="navdrawer_text_color">#676767</color>
-    <color name="navdrawer_text_color_selected">@color/theme_primary</color>
+    <color name="navdrawer_text_color">#282828</color>
+    <color name="navdrawer_text_color_selected">#414141</color>
     <color name="navdrawer_icon_tint">#808080</color>
-    <color name="navdrawer_icon_tint_selected">@color/theme_primary</color>
+    <color name="navdrawer_icon_tint_selected">#414141</color>
     <color name="nav_drawer_focused">#f3f3f3</color>
     <color name="nav_drawer_pressed">#EBEBEB</color>
     <color name="navdrawer_background">#ffffffff</color>

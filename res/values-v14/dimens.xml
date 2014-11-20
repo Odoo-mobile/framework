@@ -1,5 +1,6 @@
 <resources>
 
     <dimen name="widget_margin">0dp</dimen>
-
+    <dimen name="drawer_status_bar_top_padding">0dp</dimen>
+	<dimen name="drawer_account_bottom_padding">16dp</dimen>
 </resources>

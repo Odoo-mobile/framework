@@ -1,0 +1,7 @@
+<resources>
+
+    <item name="overlay_top_margin" type="dimen">0dp</item>
+    <item name="drawer_status_bar_top_padding" type="dimen">0dp</item>
+    <item name="drawer_account_bottom_padding" type="dimen">16dp</item>
+
+</resources>

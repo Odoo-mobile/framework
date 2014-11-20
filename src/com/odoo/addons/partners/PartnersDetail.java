@@ -108,6 +108,17 @@ public class PartnersDetail extends BaseFragment implements
 	}
 
 	@Override
+	public void onMenuCreated(Menu menu) {
+		mMenu = menu;
+		updateMenu(mEditMode);
+	}
+
+	@Override
+	public int getMenuForTablet() {
+		return R.menu.menu_partners_detail;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_partner_detail_edit:

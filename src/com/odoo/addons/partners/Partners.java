@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -26,6 +27,7 @@ import com.odoo.R;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.OColumn;
+import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.OnSearchViewChangeListener;
 import com.odoo.support.fragment.SyncStatusObserverListener;
@@ -35,10 +37,9 @@ import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.odoo.util.logger.OLog;
 
-public class Partners extends BaseFragment implements
-		OnRefreshListener, LoaderManager.LoaderCallbacks<Cursor>,
-		SyncStatusObserverListener, OnSearchViewChangeListener,
-		OnItemClickListener, OnRowViewClickListener {
+public class Partners extends BaseFragment implements OnRefreshListener,
+		LoaderManager.LoaderCallbacks<Cursor>, SyncStatusObserverListener,
+		OnSearchViewChangeListener, OnItemClickListener, OnRowViewClickListener {
 	public static final String TAG = Partners.class.getSimpleName();
 	public static final String KEY = "partner_type";
 	private Type mCurrentType = Type.Companies;
@@ -83,6 +84,7 @@ public class Partners extends BaseFragment implements
 		mAdapter.setOnRowViewClickListener(R.id.imgUserProfilePicture, this);
 		listView.setAdapter(mAdapter);
 		listView.setOnItemClickListener(this);
+		scope = new AppScope(this);
 		getLoaderManager().initLoader(0, null, this);
 	}
 
@@ -104,6 +106,16 @@ public class Partners extends BaseFragment implements
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public void onMenuCreated(Menu menu) {
+		setHasSearchView(this, menu, R.id.menu_partner_search);
+	}
+
+	@Override
+	public int getMenuForTablet() {
+		return R.menu.menu_partners_dark;
 	}
 
 	@Override
@@ -179,7 +191,14 @@ public class Partners extends BaseFragment implements
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		mAdapter.changeCursor(cursor);
-		OControls.setGone(mView, R.id.loadingProgress);
+		new Handler().postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				OControls.setGone(mView, R.id.loadingProgress);
+				OControls.setVisible(mView, R.id.swipe_container);
+			}
+		}, 500);
 	}
 
 	@Override
@@ -241,4 +260,5 @@ public class Partners extends BaseFragment implements
 			View parent) {
 		OLog.log(cursor.getString(cursor.getColumnIndex("name")));
 	}
+
 }

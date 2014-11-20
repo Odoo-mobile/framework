@@ -13,8 +13,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -22,9 +20,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +40,6 @@ import com.odoo.auth.OdooAccountManager;
 import com.odoo.support.OUser;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.Base64Helper;
-import com.odoo.util.BitmapUtils;
 import com.odoo.util.OAppRater;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerHelper;
@@ -66,13 +65,12 @@ public abstract class BaseActivity extends ActionBarActivity implements
 	private Boolean mRequestForNewAccount = false;
 	private LinearLayout mAccountListContainer;
 	private ViewGroup mDrawerItemsListContainer;
-	private Boolean hideActionbar = true;
 	private ActionBar mActionBar;
+	private Toolbar mToolbar;
+	private Toolbar mSubToolbar;
+	private ToolBarMenuItemListener mToolBarMenuItemListener = null;
 
-	// variables that control the Action Bar auto hide behavior (aka
-	// "quick recall")
 	private static final int HEADER_HIDE_ANIM_DURATION = 300;
-	private boolean mActionBarAutoHideEnabled = false;
 	private int mActionBarAutoHideSensivity = 0;
 	private int mActionBarAutoHideMinY = 0;
 	private int mActionBarAutoHideSignal = 0;
@@ -99,6 +97,57 @@ public abstract class BaseActivity extends ActionBarActivity implements
 		mActionBar = getSupportActionBar();
 	}
 
+	public void setToolBar(Toolbar toolbar) {
+		if (toolbar != null) {
+			toolbar.setNavigationIcon(R.drawable.ic_action_navigation_menu);
+			if (getSubToolBar() != null) {
+				toolbar.setTitle("");
+			}
+			setSupportActionBar(toolbar);
+		}
+
+		mToolbar = toolbar;
+	}
+
+	public void setSubToolBarMenuHandler(ToolBarMenuItemListener listener) {
+		mToolBarMenuItemListener = listener;
+		if (listener != null) {
+			getSubToolBar().getMenu().clear();
+			getSubToolBar().inflateMenu(
+					mToolBarMenuItemListener.getMenuForTablet());
+			getSubToolBar().setOnMenuItemClickListener(
+					new Toolbar.OnMenuItemClickListener() {
+
+						@Override
+						public boolean onMenuItemClick(MenuItem arg0) {
+							return mToolBarMenuItemListener
+									.onMenuItemClick(arg0);
+						}
+					});
+			mToolBarMenuItemListener.onMenuCreated(getSubToolBar().getMenu());
+		}
+	}
+
+	public void setSubToolBar(Toolbar toolbar) {
+		mSubToolbar = toolbar;
+	}
+
+	public Toolbar getSubToolBar() {
+		return mSubToolbar;
+	}
+
+	public Toolbar getToolBar() {
+		return mToolbar;
+	}
+
+	public void setActionBarIcon(int resId) {
+		if (getToolBar() != null) {
+			getToolBar().setNavigationIcon(resId);
+		} else {
+			getActionbar().setIcon(resId);
+		}
+	}
+
 	protected void autoShowOrHideActionBar(boolean show) {
 		if (show == mActionBarShown) {
 			return;
@@ -120,10 +169,6 @@ public abstract class BaseActivity extends ActionBarActivity implements
 		}
 	}
 
-	public void hideActionBar(boolean hide) {
-		hideActionbar = hide;
-	}
-
 	@SuppressLint({ "InlinedApi", "NewApi" })
 	protected void onActionBarAutoShowOrHide(boolean shown) {
 		for (View view : mHideableHeaderViews) {
@@ -137,24 +182,29 @@ public abstract class BaseActivity extends ActionBarActivity implements
 						.setInterpolator(new DecelerateInterpolator());
 			}
 		}
-		// if (hideActionbar) {
 		if (shown) {
 			mActionBar.show();
 		} else {
 			mActionBar.hide();
 		}
-		// }
 	}
 
 	public ActionBar getActionbar() {
-		return mActionBar;
+		return getSupportActionBar();
+	}
+
+	public void setHideActionBarOnViewScroll(View view) {
+		if (getToolBar() == null) {
+			getActionbar().setHideOnContentScrollEnabled(true);
+			getActionbar().setHideOffset(10);
+			view.setNestedScrollingEnabled(true);
+		}
 	}
 
 	/**
 	 * Initializes the Action Bar auto-hide (aka Quick Recall) effect.
 	 */
 	private void initActionBarAutoHide() {
-		mActionBarAutoHideEnabled = true;
 		mActionBarAutoHideMinY = getResources().getDimensionPixelSize(
 				R.dimen.action_bar_auto_hide_min_y);
 		mActionBarAutoHideSensivity = getResources().getDimensionPixelSize(
@@ -234,7 +284,11 @@ public abstract class BaseActivity extends ActionBarActivity implements
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = (String) title;
-		getActionbar().setTitle(mTitle);
+		if (getSubToolBar() != null) {
+			getSubToolBar().setTitle(title);
+		} else {
+			getActionbar().setTitle(mTitle);
+		}
 	}
 
 	public void setTitle(CharSequence title, CharSequence subtitle) {
@@ -251,7 +305,8 @@ public abstract class BaseActivity extends ActionBarActivity implements
 			@Override
 			public void onDrawerClosed(View drawerView) {
 				super.onDrawerClosed(drawerView);
-				getActionbar().setIcon(R.drawable.ic_odoo_o);
+				if (getToolBar() == null)
+					getActionbar().setIcon(R.drawable.ic_odoo_o);
 				setTitle(mAppTitle, null);
 				invalidateOptionsMenu();
 			}
@@ -283,9 +338,11 @@ public abstract class BaseActivity extends ActionBarActivity implements
 		Log.d(TAG, "initDrawer()");
 		if (mDrawerLayout == null)
 			initDrawerControls();
-		getActionbar().setDisplayHomeAsUpEnabled(true);
-		getActionbar().setHomeButtonEnabled(true);
-		getActionbar().setDisplayShowTitleEnabled(true);
+		if (getSubToolBar() == null) {
+			getActionbar().setDisplayHomeAsUpEnabled(true);
+			getActionbar().setHomeButtonEnabled(true);
+			getActionbar().setDisplayShowTitleEnabled(true);
+		}
 		mNavDrawerItems.clear();
 		mNavDrawerItems.addAll(DrawerHelper.drawerItems(mContext));
 		mNavDrawerItems.addAll(setSettingMenu());
@@ -416,6 +473,13 @@ public abstract class BaseActivity extends ActionBarActivity implements
 			}
 		});
 		return view;
+	}
+
+	public View getNavBarView(int pos) {
+		if (mNavDrawerItemViews.length > 0 && pos < mNavDrawerItemViews.length) {
+			return mNavDrawerItemViews[pos];
+		}
+		return null;
 	}
 
 	@Override
@@ -555,16 +619,16 @@ public abstract class BaseActivity extends ActionBarActivity implements
 
 		// Account background cover image. Replacing background color to primary
 		// theme
-		ImageView backCover = (ImageView) chosenAccountView
-				.findViewById(R.id.profile_cover_image);
-		Bitmap cover = BitmapFactory.decodeResource(getResources(),
-				R.drawable.default_cover);
-		int fromColor = Color.parseColor("#A2488A");
-		int targetColor = getResources().getColor(R.color.theme_primary);
-		Bitmap newCover = BitmapUtils.replaceColor(cover, fromColor,
-				targetColor);
-		backCover.setImageBitmap(newCover);
-
+		/*
+		 * ImageView backCover = (ImageView) chosenAccountView
+		 * .findViewById(R.id.profile_cover_image); Bitmap cover =
+		 * BitmapFactory.decodeResource(getResources(),
+		 * R.drawable.default_cover); int fromColor =
+		 * Color.parseColor("#A2488A"); int targetColor =
+		 * getResources().getColor(R.color.theme_primary); Bitmap newCover =
+		 * BitmapUtils.replaceColor(cover, fromColor, targetColor);
+		 * backCover.setImageBitmap(newCover);
+		 */
 		ImageView profileImageView = (ImageView) chosenAccountView
 				.findViewById(R.id.profile_image);
 		TextView nameTextView = (TextView) chosenAccountView
@@ -743,6 +807,15 @@ public abstract class BaseActivity extends ActionBarActivity implements
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
+	public static interface ToolBarMenuItemListener {
+		public boolean onMenuItemClick(MenuItem item);
+
+		public int getMenuForTablet();
+
+		public void onMenuCreated(Menu menu);
+	}
+
 }
 
 interface FragmentLoader {

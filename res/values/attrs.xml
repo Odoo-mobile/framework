@@ -85,5 +85,8 @@
         <attr name="displayLayout" format="reference" />
         <attr name="widget_title" format="string|reference" />
     </declare-styleable>
+    <declare-styleable name="ODrawerScrollView">
+        <attr name="insetForeground" format="reference|color" />
+    </declare-styleable>
 
 </resources>

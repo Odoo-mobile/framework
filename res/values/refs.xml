@@ -1,5 +1,6 @@
 <resources>
 
     <item name="window_title_bar_height" type="dimen">0dp</item>
+    <item name="overlay_top_margin" type="dimen">0dp</item>
 
 </resources>

@@ -5,15 +5,17 @@
         AppBaseTheme from BOTH res/values/styles.xml and
         res/values-v11/styles.xml on API 14+ devices.
     -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar"></style>
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar"></style>
 
     <style name="AppTheme" parent="AppBaseTheme"> <!-- Application theme. -->
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:actionBarStyle">@style/CustomActionbar</item>
         <item name="actionBarStyle">@style/CustomActionbar</item>
-        <item name="android:windowTranslucentNavigation">@bool/fit_to_window_height</item>
         <item name="android:windowTranslucentStatus">@bool/fit_to_window_height</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowTranslucentNavigation">false</item>
     </style>
 
     <style name="CustomActionbar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">

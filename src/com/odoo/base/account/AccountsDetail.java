@@ -60,7 +60,7 @@ public class AccountsDetail extends BaseFragment implements
 		rootView = inflater.inflate(R.layout.base_account_list, container,
 				false);
 		scope = new AppScope(this);
-		scope.main().setTitle(R.string.title_accounts);
+		scope.main().setTitle(_s(R.string.title_accounts));
 		setupGrid();
 		return rootView;
 	}
@@ -101,7 +101,7 @@ public class AccountsDetail extends BaseFragment implements
 		switch (item.getItemId()) {
 		case R.id.menu_add_new_account:
 			LoginSignup loginSignUp = new LoginSignup();
-			startFragment(loginSignUp, true);
+			startFragment(loginSignUp, false, true);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

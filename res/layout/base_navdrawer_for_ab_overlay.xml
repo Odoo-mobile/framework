@@ -1,16 +1,14 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.odoo.util.drawer.ODrawerScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navdrawer"
     android:layout_width="@dimen/navdrawer_width"
     android:layout_height="match_parent"
-    android:layout_gravity="start"
-    android:background="#ffffff" >
+    android:layout_gravity="start|left"
+    android:background="@drawable/drawer_cover_bg"
+    android:fillViewport="true"
+    android:fitsSystemWindows="@bool/fit_to_window_height"
+    app:insetForeground="#4000" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+    <include layout="@layout/base_navdrawer_content" />
 
-        <include layout="@layout/base_navdrawer_content" />
-    </LinearLayout>
-
-</ScrollView>
+</com.odoo.util.drawer.ODrawerScrollView>

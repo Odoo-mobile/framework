@@ -4,16 +4,11 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <include
-        android:id="@+id/loadingProgress"
-        layout="@layout/listview_data_loading_progress"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp" />
-
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:visibility="gone" >
 
         <ListView
             android:id="@+id/partners_listView"
@@ -21,5 +16,9 @@
             android:layout_height="fill_parent" >
         </ListView>
     </android.support.v4.widget.SwipeRefreshLayout>
+
+    <include
+        android:id="@+id/loadingProgress"
+        layout="@layout/listview_data_loading_progress" />
 
 </LinearLayout>
