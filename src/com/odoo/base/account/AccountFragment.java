@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import odoo.OEVersionException;
+import odoo.OVersionException;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -240,7 +240,7 @@ public class AccountFragment extends BaseFragment {
 				flag = false;
 				mSSLError = true;
 				errorMsg = ssl.getMessage();
-			} catch (OEVersionException e) {
+			} catch (OVersionException e) {
 				flag = false;
 				errorMsg = e.getMessage();
 			}

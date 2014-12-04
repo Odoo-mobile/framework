@@ -41,7 +41,8 @@ public class App extends Application implements
 		OEUser user = OEUser.current(getApplicationContext());
 		if (user != null) {
 			try {
-				odoo = new Odoo(user.getHost(), user.isAllowSelfSignedSSL());
+				odoo = new Odoo(this, user.getHost(),
+						user.isAllowSelfSignedSSL());
 				odoo.authenticate(user.getUsername(), user.getPassword(),
 						user.getDatabase());
 			} catch (Exception e) {

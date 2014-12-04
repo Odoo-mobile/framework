@@ -27,7 +27,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OEDomain;
+import odoo.ODomain;
 
 import org.json.JSONObject;
 
@@ -439,7 +439,7 @@ public class Attachment implements OnClickListener {
 						OEFieldsHelper fields = new OEFieldsHelper(
 								new String[] { "name", "datas", "file_type",
 										"res_model", "res_id" });
-						OEDomain domain = new OEDomain();
+						ODomain domain = new ODomain();
 						domain.add("id", "=", mAttachmentInfo.getInt("id"));
 						JSONObject result = mOE.odoo().search_read(
 								mDb.getModelName(), fields.get(), domain.get());
