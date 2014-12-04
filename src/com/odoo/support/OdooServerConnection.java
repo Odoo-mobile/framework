@@ -20,7 +20,7 @@ package com.odoo.support;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import odoo.OEVersionException;
+import odoo.OVersionException;
 import odoo.Odoo;
 
 import org.json.JSONArray;
@@ -62,19 +62,19 @@ public class OdooServerConnection {
 	 * @throws SSLPeerUnverifiedException
 	 */
 	public boolean testConnection(Context context, String serverURL)
-			throws OEVersionException, SSLPeerUnverifiedException {
+			throws OVersionException, SSLPeerUnverifiedException {
 		Log.d(TAG, "OdooServerConnection->testConnection()");
 		if (TextUtils.isEmpty(serverURL)) {
 			return false;
 		}
 		try {
-			odoo = new Odoo(serverURL, mAllowSelfSignedSSL);
+			odoo = new Odoo(context,serverURL, mAllowSelfSignedSSL);
 			mDbLists = odoo.getDatabaseList();
 		} catch (SSLPeerUnverifiedException ssl) {
 			Log.d(TAG, "Throw SSLPeerUnverifiedException ");
 			throw new SSLPeerUnverifiedException(ssl.getMessage());
-		} catch (OEVersionException version) {
-			throw new OEVersionException(version.getMessage());
+		} catch (OVersionException version) {
+			throw new OVersionException(version.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -102,7 +102,7 @@ public class OdooServerConnection {
 	 * @throws SSLPeerUnverifiedException
 	 */
 	public static boolean isNetworkAvailable(Context context)
-			throws OEVersionException, SSLPeerUnverifiedException {
+			throws OVersionException, SSLPeerUnverifiedException {
 		boolean outcome = false;
 
 		OdooServerConnection osc = new OdooServerConnection();
@@ -124,7 +124,7 @@ public class OdooServerConnection {
 	 * @throws SSLPeerUnverifiedException
 	 */
 	public static boolean isNetworkAvailable(Context context, String url)
-			throws OEVersionException, SSLPeerUnverifiedException {
+			throws OVersionException, SSLPeerUnverifiedException {
 		boolean outcome = false;
 
 		OdooServerConnection osc = new OdooServerConnection();

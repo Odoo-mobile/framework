@@ -21,8 +21,8 @@ package com.odoo.orm;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OEArguments;
-import odoo.OEDomain;
+import odoo.OArguments;
+import odoo.ODomain;
 import odoo.Odoo;
 
 import org.json.JSONArray;
@@ -111,7 +111,7 @@ public class OEHelper {
 		Log.d(TAG, "OEHelper->login()");
 		OEUser userObj = null;
 		try {
-			mOdoo = new Odoo(serverURL, mAllowSelfSignedSSL);
+			mOdoo = new Odoo(mContext,serverURL, mAllowSelfSignedSSL);
 			JSONObject response = mOdoo.authenticate(username, password,
 					database);
 			int userId = 0;
@@ -122,7 +122,7 @@ public class OEHelper {
 
 					OEFieldsHelper fields = new OEFieldsHelper(new String[] {
 							"partner_id", "tz", "image", "company_id" });
-					OEDomain domain = new OEDomain();
+					ODomain domain = new ODomain();
 					domain.add("id", "=", userId);
 					JSONObject res = mOdoo
 							.search_read("res.users", fields.get(),
@@ -178,17 +178,17 @@ public class OEHelper {
 				removeLocalIfNotExists);
 	}
 
-	public boolean syncWithServer(OEDomain domain,
+	public boolean syncWithServer(ODomain domain,
 			boolean removeLocalIfNotExists) {
 		return syncWithServer(false, domain, null, false, -1,
 				removeLocalIfNotExists);
 	}
 
-	public boolean syncWithServer(OEDomain domain) {
+	public boolean syncWithServer(ODomain domain) {
 		return syncWithServer(false, domain, null, false, -1, false);
 	}
 
-	public boolean syncWithServer(boolean twoWay, OEDomain domain,
+	public boolean syncWithServer(boolean twoWay, ODomain domain,
 			List<Object> ids) {
 		return syncWithServer(twoWay, domain, ids, false, -1, false);
 	}
@@ -209,11 +209,11 @@ public class OEHelper {
 		return ids;
 	}
 
-	public boolean syncWithMethod(String method, OEArguments args) {
+	public boolean syncWithMethod(String method, OArguments args) {
 		return syncWithMethod(method, args, false);
 	}
 
-	public boolean syncWithMethod(String method, OEArguments args,
+	public boolean syncWithMethod(String method, OArguments args,
 			boolean removeLocalIfNotExists) {
 		Log.d(TAG, "OEHelper->syncWithMethod()");
 		Log.d(TAG, "Model: " + mDatabase.getModelName());
@@ -235,7 +235,7 @@ public class OEHelper {
 		return synced;
 	}
 
-	public boolean syncWithServer(boolean twoWay, OEDomain domain,
+	public boolean syncWithServer(boolean twoWay, ODomain domain,
 			List<Object> ids, boolean limitedData, int limits,
 			boolean removeLocalIfNotExists) {
 		boolean synced = false;
@@ -253,7 +253,7 @@ public class OEHelper {
 		OEFieldsHelper fields = new OEFieldsHelper(dbFinalList);
 		try {
 			if (domain == null) {
-				domain = new OEDomain();
+				domain = new ODomain();
 			}
 			if (ids != null) {
 				domain.add("id", "in", ids);
@@ -350,7 +350,7 @@ public class OEHelper {
 		Ir_model ir_model = new Ir_model(mContext);
 		try {
 			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "model" });
-			OEDomain domain = new OEDomain();
+			ODomain domain = new ODomain();
 			domain.add("model", "=", model);
 			JSONObject result = mOdoo.search_read(ir_model.getModelName(),
 					fields.get(), domain.get());
@@ -382,8 +382,8 @@ public class OEHelper {
 		return search_read(true);
 	}
 
-	private OEDomain getLocalIdsDomain(String operator) {
-		OEDomain domain = new OEDomain();
+	private ODomain getLocalIdsDomain(String operator) {
+		ODomain domain = new ODomain();
 		JSONArray ids = new JSONArray();
 		for (OEDataRow row : mDatabase.select()) {
 			ids.put(row.getInt("id"));
@@ -433,21 +433,21 @@ public class OEHelper {
 		}
 	}
 
-	public Object call_kw(String method, OEArguments arguments) {
+	public Object call_kw(String method, OArguments arguments) {
 		return call_kw(method, arguments, new JSONObject());
 	}
 
-	public Object call_kw(String method, OEArguments arguments,
+	public Object call_kw(String method, OArguments arguments,
 			JSONObject context) {
 		return call_kw(null, method, arguments, context, null);
 	}
 
-	public Object call_kw(String method, OEArguments arguments,
+	public Object call_kw(String method, OArguments arguments,
 			JSONObject context, JSONObject kwargs) {
 		return call_kw(null, method, arguments, context, kwargs);
 	}
 
-	public Object call_kw(String model, String method, OEArguments arguments,
+	public Object call_kw(String model, String method, OArguments arguments,
 			JSONObject context, JSONObject kwargs) {
 		Log.d(TAG, "OEHelper->call_kw()");
 		JSONObject result = null;
@@ -527,7 +527,7 @@ public class OEHelper {
 		Log.d(TAG, "OEHelper->moduleExists()");
 		boolean flag = false;
 		try {
-			OEDomain domain = new OEDomain();
+			ODomain domain = new ODomain();
 			domain.add("name", "ilike", name);
 			OEFieldsHelper fields = new OEFieldsHelper(new String[] { "state" });
 			JSONObject result = mOdoo.search_read("ir.module.module",

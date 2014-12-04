@@ -56,6 +56,8 @@ public class ResPartnerDB extends OEDatabase {
 		List<OEColumn> columns = new ArrayList<OEColumn>();
 		columns.add(new OEColumn("is_company", "Is Company", OEFields.text()));
 		columns.add(new OEColumn("name", "Name", OEFields.text()));
+		columns.add(new OEColumn("parent_id", "Company Name", OEFields
+				.manyToOne(new ResPartnerDB(mContext))));
 		columns.add(new OEColumn("image_small", "Image", OEFields.blob()));
 		columns.add(new OEColumn("street", "Street", OEFields.text()));
 		columns.add(new OEColumn("street2", "Street 2", OEFields.text()));
