@@ -67,10 +67,12 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	private OTouchListener mTouchAttacher;
 	private boolean mTwoPane;
 	private OUser mAccount = null;
+	Bundle mSavedInstanceState = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mSavedInstanceState = savedInstanceState;
 		setContentView(R.layout.activity_main);
 		if (findViewById(R.id.fragment_detail_container) != null) {
 			findViewById(R.id.fragment_detail_container).setVisibility(
@@ -472,7 +474,8 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 			}
 
 		}
-		if (mFragment.findFragmentByTag("main_fragment") != null) {
+		if (mFragment.findFragmentByTag("main_fragment") != null
+				&& mSavedInstanceState != null) {
 			mFragment.popBackStack("main_fragment",
 					FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			mFragment.popBackStack(null,
