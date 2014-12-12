@@ -72,6 +72,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mSavedInstanceState = savedInstanceState;
 		setContentView(R.layout.activity_main);
 		if (findViewById(R.id.fragment_detail_container) != null) {
 			findViewById(R.id.fragment_detail_container).setVisibility(
