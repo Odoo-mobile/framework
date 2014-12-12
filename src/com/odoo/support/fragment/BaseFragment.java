@@ -270,17 +270,18 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper,
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-
+					String user = "";
+					if (OUser.current(getActivity()) != null) {
+						user = OUser.current(getActivity()).getAndroidName();
+					}
 					boolean syncActive = ContentResolver.isSyncActive(
-							OdooAccountManager.getAccount(getActivity(), OUser
-									.current(getActivity()).getAndroidName()),
+							OdooAccountManager.getAccount(getActivity(), user),
 							syncOberserverModel.authority());
 					boolean syncPending = ContentResolver.isSyncPending(
-							OdooAccountManager.getAccount(getActivity(), OUser
-									.current(getActivity()).getAndroidName()),
+							OdooAccountManager.getAccount(getActivity(), user),
 							syncOberserverModel.authority());
 					boolean refreshing = syncActive | syncPending;
-					if (!refreshing) {
+					if (!refreshing && drawer_tag != null) {
 						scope.main().refreshDrawer(drawer_tag);
 					}
 					mSyncStatusObserverListener.onStatusChange(refreshing);
