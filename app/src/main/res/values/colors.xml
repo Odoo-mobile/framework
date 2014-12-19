@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="list_divider">#ddd</color>
+
+    <!-- Odoo Theme Colors -->
+
+    <color name="odoo_primary">#a24689</color>
+    <color name="odoo_secondary">#8f8f8f</color>
+    <color name="odoo_optional">#21b799</color>
+
+    <!-- Android Style Colors -->
+    <color name="android_blue">#33B5E5</color>
+    <color name="android_blue_dark">#0099CC</color>
+    <color name="android_violet">#AA66CC</color>
+    <color name="android_violet_dark">#9933CC</color>
+    <color name="android_green">#99CC00</color>
+    <color name="android_green_dark">#669900</color>
+    <color name="android_orange">#FFBB33</color>
+    <color name="android_orange_dark">#FF8800</color>
+    <color name="android_red">#FF4444</color>
+    <color name="android_red_dark">#CC0000</color>
+
+</resources>

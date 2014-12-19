@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-c036f59073e992fb45b7428356cc29afeffc972c.jar" />
+    </item>
+    <item
+        jar="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/pre-dexed/debug/classes-098e303b99992d47029de0e4652fd2d53b4efdf1.jar" />
+    </item>
+    <item
+        jar="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
+        <dex dex="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/pre-dexed/debug/classes-7bf263f5855a725c9a8afb65bf465da69610f2c1.jar" />
+    </item>
+    <item
+        jar="/home/dpr/eclipse-adt/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-6515be3f88e71b7f70573506152fe671c63bb5da.jar" />
+    </item>
+    <item
+        jar="/home/dpr/AndroidStudioProjects/OdooFramework/app/libs/odoo-v2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="8e6d8ee29d87624cf28a7e70123dfc8e61e6f0d7">
+        <dex dex="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/pre-dexed/debug/odoo-v2-f02eea6b1508f03a6fa40be09b99159c08c339f2.jar" />
+    </item>
+    <item
+        jar="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="dd9247ea0fabe8ee479638c4b4a23e93752be256">
+        <dex dex="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/pre-dexed/debug/classes-9bd6e75a8e8d241a6afe3a746d881ea29f9b6360.jar" />
+    </item>
+    <item
+        jar="/home/dpr/AndroidStudioProjects/OdooFramework/app/libs/swipe_library.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="56650729f9650e4d5d59267ddb840dfc3aaf4ff9">
+        <dex dex="/home/dpr/AndroidStudioProjects/OdooFramework/app/build/intermediates/pre-dexed/debug/swipe_library-b9521a29a820b5a58b8295f1d2d0a79e7a708a70.jar" />
+    </item>
+
+</items>
