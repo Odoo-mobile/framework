@@ -9,6 +9,17 @@
     <color name="odoo_secondary">#8f8f8f</color>
     <color name="odoo_optional">#21b799</color>
 
+    <!-- Drawer Colors -->
+    <color name="drawer_text_color">#282828</color>
+    <color name="drawer_text_color_selected">#414141</color>
+    <color name="drawer_icon_tint">#808080</color>
+    <color name="drawer_icon_tint_selected">#414141</color>
+    <color name="drawer_focused">#f3f3f3</color>
+    <color name="drawer_pressed">#EBEBEB</color>
+    <color name="drawer_background">#ffffffff</color>
+    <color name="drawer_separator_text_color">#acacac</color>
+    <color name="drawer_separator_background">#e5e5e5</color>
+
     <!-- Android Style Colors -->
     <color name="android_blue">#33B5E5</color>
     <color name="android_blue_dark">#0099CC</color>

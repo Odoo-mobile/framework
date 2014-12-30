@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.odoo.utils.drawer.ODrawerScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.odoo.core.utils.drawer.ODrawerScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navDrawer"
     android:layout_width="@dimen/drawerDefaultWidth"
@@ -85,7 +85,7 @@
                             android:layout_height="wrap_content"
                             android:scaleType="center"
                             android:src="@drawable/ic_drawer_accounts_expand"
-                            android:tint="#ffffff"
+                            android:tint="@android:color/white"
                             android:visibility="gone" />
                     </LinearLayout>
                 </LinearLayout>
@@ -96,7 +96,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/white"
+            android:background="@color/drawer_background"
             android:layout_height="0dp">
 
             <View
@@ -109,12 +109,14 @@
                 android:layout_width="match_parent"
                 android:orientation="vertical"
                 android:visibility="invisible"
+                android:background="@color/drawer_background"
                 android:layout_height="wrap_content">
                 <!-- Account added runtime  -->
             </LinearLayout>
 
             <!-- Drawer Items -->
             <LinearLayout
+                android:background="@color/drawer_background"
                 android:id="@+id/drawerItemList"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
@@ -125,4 +127,4 @@
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>
-</com.odoo.utils.drawer.ODrawerScrollView>
+</com.odoo.core.utils.drawer.ODrawerScrollView>

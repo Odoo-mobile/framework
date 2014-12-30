@@ -29,9 +29,11 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -40,17 +42,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.odoo.account.ManageAccounts;
-import com.odoo.account.OdooLogin;
-import com.odoo.auth.OdooAccountManager;
-import com.odoo.auth.OdooAuthenticator;
-import com.odoo.support.OUser;
-import com.odoo.utils.BitmapUtils;
-import com.odoo.utils.OActionBarUtils;
-import com.odoo.utils.OControls;
-import com.odoo.utils.OResource;
-import com.odoo.utils.sys.IOnActivityResultListener;
-import com.odoo.utils.sys.IOnBackPressListener;
+import com.odoo.core.account.ManageAccounts;
+import com.odoo.core.account.OdooLogin;
+import com.odoo.core.auth.OdooAccountManager;
+import com.odoo.core.auth.OdooAuthenticator;
+import com.odoo.core.support.OUser;
+import com.odoo.core.support.addons.fragment.IBaseFragment;
+import com.odoo.core.support.drawer.ODrawerItem;
+import com.odoo.core.utils.BitmapUtils;
+import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OControls;
+import com.odoo.core.utils.OFragmentUtils;
+import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.drawer.DrawerUtils;
+import com.odoo.core.utils.sys.IOnActivityResultListener;
+import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.List;
 
@@ -61,6 +67,7 @@ public class OdooActivity extends ActionBarActivity {
     public static final Integer DRAWER_ACCOUNT_BOX_ANIMATION_DURATION = 250;
     public static final String KEY_ACCOUNT_REQUEST = "key_account_request";
     public static final String KEY_NEW_USER_NAME = "key_new_account_username";
+    public static final String KEY_CURRENT_DRAWER_ITEM = "key_drawer_item_index";
     public static final Integer REQUEST_ACCOUNT_CREATE = 1101;
     public static final Integer REQUEST_ACCOUNTS_MANAGE = 1102;
 
@@ -72,10 +79,15 @@ public class OdooActivity extends ActionBarActivity {
     private LinearLayout mDrawerAccountContainer = null;
     private LinearLayout mDrawerItemContainer = null;
     private Boolean mAccountBoxExpanded = false;
+    private Bundle mSavedInstanceState = null;
+
+    private Integer mDrawerSelectedIndex = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSavedInstanceState = savedInstanceState;
+        Log.i(TAG, "OdooActivity->onCreate");
         setContentView(R.layout.odoo_activity);
         OActionBarUtils.setActionBar(this, true);
         setupDrawer();
@@ -116,6 +128,51 @@ public class OdooActivity extends ActionBarActivity {
         mDrawerToggle.syncState();
 
         setupAccountBox();
+        setupDrawerBox();
+    }
+
+    private void setupDrawerBox() {
+        mDrawerItemContainer = (LinearLayout) findViewById(R.id.drawerItemList);
+        mDrawerItemContainer.removeAllViews();
+        List<ODrawerItem> items = DrawerUtils.getDrawerItems(this);
+        for (ODrawerItem item : items) {
+            View view = LayoutInflater.from(this).
+                    inflate((item.isGroupTitle()) ? R.layout.base_drawer_group_layout :
+                            R.layout.base_drawer_menu_item, mDrawerItemContainer, false);
+            view.setTag(item);
+            if (!item.isGroupTitle()) {
+                view.setOnClickListener(drawerItemClick);
+            }
+            mDrawerItemContainer.addView(DrawerUtils.fillDrawerItemValue(view, item));
+        }
+    }
+
+    private View.OnClickListener drawerItemClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int index = mDrawerItemContainer.indexOfChild(v);
+            if (mDrawerSelectedIndex != index) {
+                focusOnDrawerItem(index);
+            }
+        }
+    };
+
+    /**
+     * Loads fragment or start intent
+     *
+     * @param instance, instance of fragment or intent
+     */
+    private void loadDrawerItemInstance(Object instance, Bundle extra) {
+        if (instance != null) {
+            if (instance instanceof Intent) {
+                Log.i(TAG, "Loading intent: " + instance.getClass().getCanonicalName());
+                // TODO: Start Intents
+            }
+            if (instance instanceof Fragment) {
+                Log.i(TAG, "Loading fragment: " + instance.getClass().getCanonicalName());
+                OFragmentUtils.get(this, mSavedInstanceState).startFragment((Fragment) instance, false, extra);
+            }
+        }
     }
 
     private void setupAccountBox() {
@@ -176,7 +233,7 @@ public class OdooActivity extends ActionBarActivity {
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mDrawerAccountContainer
+                mDrawerItemContainer
                         .setVisibility(mAccountBoxExpanded ? View.INVISIBLE
                                 : View.VISIBLE);
                 mDrawerAccountContainer
@@ -201,12 +258,12 @@ public class OdooActivity extends ActionBarActivity {
                             View.TRANSLATION_Y, 0).setDuration(
                             DRAWER_ACCOUNT_BOX_ANIMATION_DURATION));
             set.playSequentially(
-                    ObjectAnimator.ofFloat(mDrawerAccountContainer,
+                    ObjectAnimator.ofFloat(mDrawerItemContainer,
                             View.ALPHA, 0).setDuration(
                             DRAWER_ACCOUNT_BOX_ANIMATION_DURATION), subSet);
             set.start();
         } else {
-            mDrawerAccountContainer.setVisibility(View.VISIBLE);
+            mDrawerItemContainer.setVisibility(View.VISIBLE);
             AnimatorSet subSet = new AnimatorSet();
             subSet.playTogether(
                     ObjectAnimator
@@ -217,7 +274,7 @@ public class OdooActivity extends ActionBarActivity {
                             DRAWER_ACCOUNT_BOX_ANIMATION_DURATION));
             set.playSequentially(
                     subSet,
-                    ObjectAnimator.ofFloat(mDrawerAccountContainer,
+                    ObjectAnimator.ofFloat(mDrawerItemContainer,
                             View.ALPHA, 1).setDuration(
                             DRAWER_ACCOUNT_BOX_ANIMATION_DURATION));
             set.start();
@@ -299,7 +356,7 @@ public class OdooActivity extends ActionBarActivity {
     private View generateView(String title, int res_id) {
         View view = LayoutInflater.from(this).inflate(R.layout.base_drawer_account_item,
                 mDrawerAccountContainer, false);
-        OControls.setGone(view,R.id.profile_url_text);
+        OControls.setGone(view, R.id.profile_url_text);
         ImageView icon = (ImageView) view.findViewById(R.id.profile_image);
         icon.setImageResource(res_id);
         icon.setColorFilter(OResource.color(this, R.color.body_text_2));
@@ -378,4 +435,45 @@ public class OdooActivity extends ActionBarActivity {
     public void setOnActivityResultListener(IOnActivityResultListener listener) {
         mIOnActivityResultListener = listener;
     }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mSavedInstanceState = savedInstanceState;
+        if (savedInstanceState == null) {
+            // Loading Default Fragment (if any)
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    IBaseFragment fragment = DrawerUtils.getDefaultDrawerFragment();
+                    if (fragment != null) {
+                        ODrawerItem item = DrawerUtils.getStartableObject(OdooActivity.this, fragment);
+                        loadDrawerItemInstance(item.getInstance(), item.getExtra());
+                        int selected_item = DrawerUtils.findItemIndex(item, mDrawerItemContainer);
+                        if (selected_item > -1) {
+                            focusOnDrawerItem(selected_item);
+                        }
+                    }
+                }
+            }, DRAWER_ITEM_LAUNCH_DELAY);
+        } else {
+            mDrawerSelectedIndex = savedInstanceState.getInt(KEY_CURRENT_DRAWER_ITEM);
+            focusOnDrawerItem(mDrawerSelectedIndex);
+        }
+    }
+
+
+    private void focusOnDrawerItem(int index) {
+        mDrawerSelectedIndex = index;
+        for (int i = 0; i < mDrawerItemContainer.getChildCount(); i++) {
+            DrawerUtils.focusOnView(this, mDrawerItemContainer.getChildAt(i), i == index);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(KEY_CURRENT_DRAWER_ITEM, mDrawerSelectedIndex);
+        super.onSaveInstanceState(outState);
+    }
+
 }

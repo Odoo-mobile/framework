@@ -37,7 +37,7 @@ MERGED from com.android.support:support-v4:21.0.3:16:5
 		ADDED from AndroidManifest.xml:10:9
 	android:name
 		ADDED from AndroidManifest.xml:7:9
-activity#com.odoo.account.OdooLogin
+activity#com.odoo.core.account.OdooLogin
 ADDED from AndroidManifest.xml:14:9
 	android:name
 		ADDED from AndroidManifest.xml:14:19
@@ -51,7 +51,7 @@ category#android.intent.category.LAUNCHER
 ADDED from AndroidManifest.xml:18:17
 	android:name
 		ADDED from AndroidManifest.xml:18:27
-service#com.odoo.auth.OdooAuthService
+service#com.odoo.core.auth.OdooAuthService
 ADDED from AndroidManifest.xml:22:9
 	android:name
 		ADDED from AndroidManifest.xml:22:18
