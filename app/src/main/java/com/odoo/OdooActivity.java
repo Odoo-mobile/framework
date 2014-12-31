@@ -23,6 +23,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -68,6 +69,7 @@ public class OdooActivity extends ActionBarActivity {
     public static final String KEY_ACCOUNT_REQUEST = "key_account_request";
     public static final String KEY_NEW_USER_NAME = "key_new_account_username";
     public static final String KEY_CURRENT_DRAWER_ITEM = "key_drawer_item_index";
+    public static final String KEY_APP_TITLE = "key_app_title";
     public static final Integer REQUEST_ACCOUNT_CREATE = 1101;
     public static final Integer REQUEST_ACCOUNTS_MANAGE = 1102;
 
@@ -152,10 +154,25 @@ public class OdooActivity extends ActionBarActivity {
         public void onClick(View v) {
             int index = mDrawerItemContainer.indexOfChild(v);
             if (mDrawerSelectedIndex != index) {
-                focusOnDrawerItem(index);
+                ODrawerItem item = (ODrawerItem) v.getTag();
+                if (item.getInstance() instanceof Fragment) {
+                    focusOnDrawerItem(index);
+                    setTitle(item.getTitle());
+                }
+                loadDrawerItemInstance(item.getInstance(), item.getExtra());
             }
         }
     };
+
+    public void closeDrawer() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerLayout.closeDrawer(Gravity.START);
+            }
+        }, DRAWER_ITEM_LAUNCH_DELAY);
+
+    }
 
     /**
      * Loads fragment or start intent
@@ -166,13 +183,29 @@ public class OdooActivity extends ActionBarActivity {
         if (instance != null) {
             if (instance instanceof Intent) {
                 Log.i(TAG, "Loading intent: " + instance.getClass().getCanonicalName());
-                // TODO: Start Intents
+                startActivity((Intent) instance);
+            }
+            if (instance instanceof Class<?>) {
+                Class<?> cls = (Class<?>) instance;
+                Intent intent = null;
+                if (cls.getSuperclass().isAssignableFrom(Activity.class)) {
+                    intent = new Intent(this, cls);
+                }
+                if (cls.getSuperclass().isAssignableFrom(ActionBarActivity.class)) {
+                    intent = new Intent(this, cls);
+                }
+                if (intent != null) {
+                    intent.putExtras(extra);
+                    loadDrawerItemInstance(intent, null);
+                    return;
+                }
             }
             if (instance instanceof Fragment) {
                 Log.i(TAG, "Loading fragment: " + instance.getClass().getCanonicalName());
                 OFragmentUtils.get(this, mSavedInstanceState).startFragment((Fragment) instance, false, extra);
             }
         }
+        closeDrawer();
     }
 
     private void setupAccountBox() {
@@ -366,14 +399,6 @@ public class OdooActivity extends ActionBarActivity {
         return view;
     }
 
-    /**
-     * Lock/Unlock drawer sliding
-     *
-     * @param locked, boolean value to set drawer locked/unlock
-     */
-    public void lockDrawer(boolean locked) {
-        mDrawerLayout.setDrawerLockMode((!locked) ? DrawerLayout.STATE_IDLE : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -448,6 +473,7 @@ public class OdooActivity extends ActionBarActivity {
                     IBaseFragment fragment = DrawerUtils.getDefaultDrawerFragment();
                     if (fragment != null) {
                         ODrawerItem item = DrawerUtils.getStartableObject(OdooActivity.this, fragment);
+                        setTitle(item.getTitle());
                         loadDrawerItemInstance(item.getInstance(), item.getExtra());
                         int selected_item = DrawerUtils.findItemIndex(item, mDrawerItemContainer);
                         if (selected_item > -1) {
@@ -458,6 +484,7 @@ public class OdooActivity extends ActionBarActivity {
             }, DRAWER_ITEM_LAUNCH_DELAY);
         } else {
             mDrawerSelectedIndex = savedInstanceState.getInt(KEY_CURRENT_DRAWER_ITEM);
+            setTitle(savedInstanceState.getString(KEY_APP_TITLE));
             focusOnDrawerItem(mDrawerSelectedIndex);
         }
     }
@@ -473,6 +500,7 @@ public class OdooActivity extends ActionBarActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(KEY_CURRENT_DRAWER_ITEM, mDrawerSelectedIndex);
+        outState.putString(KEY_APP_TITLE, getTitle().toString());
         super.onSaveInstanceState(outState);
     }
 

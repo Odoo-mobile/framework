@@ -21,15 +21,16 @@ package com.odoo.addons.partners;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.odoo.R;
-import com.odoo.addons.partners.models.ResPartner;
+import com.odoo.base.addons.res.ResPartner;
+import com.odoo.core.account.OdooLogin;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
+import com.odoo.core.utils.logger.OLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +40,15 @@ public class Partners extends BaseFragment {
     public static final String KEY = Partners.class.getSimpleName();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        setTitle("Testing Title");
-        return super.onCreateView(inflater, container, savedInstanceState);
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.partners, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ResPartner db = new ResPartner(getActivity(), null);
     }
 
     @Override
@@ -54,17 +61,31 @@ public class Partners extends BaseFragment {
         List<ODrawerItem> items = new ArrayList<ODrawerItem>();
         items.add(new ODrawerItem(KEY)
                 .setTitle("Default Menu")
-                .setInstance(new Partners()));
+                .setInstance(new Partners())
+                .setExtra(getData("default")));
         items.add(new ODrawerItem(KEY).setTitle("Partners").setGroupTitle());
         items.add(new ODrawerItem(KEY)
                 .setTitle("With Icon")
                 .setIcon(R.drawable.ic_action_add)
-                .setInstance(new Partners()));
+                .setInstance(new Partners())
+                .setExtra(getData("with_icon")));
         items.add(new ODrawerItem(KEY)
                 .setTitle("With Counter")
                 .setIcon(R.drawable.ic_action_add)
                 .setCounter(10)
-                .setInstance(new Partners()));
+                .setInstance(new Partners())
+                .setExtra(getData("with_counter")));
+        items.add(new ODrawerItem(KEY)
+                .setTitle("Intent Call")
+                .setIcon(R.drawable.ic_action_action_done_all)
+                .setInstance(OdooLogin.class)
+                .setExtra(getData("intent_call")));
         return items;
+    }
+
+    public Bundle getData(String val) {
+        Bundle data = new Bundle();
+        data.putString("my_key", val);
+        return data;
     }
 }

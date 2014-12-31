@@ -15,18 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 30/12/14 4:00 PM
+ * Created on 31/12/14 11:30 AM
  */
-package com.odoo.addons.partners.models;
+package com.odoo.core.orm.fields.types;
 
-import android.content.Context;
-
-import com.odoo.core.orm.OModel;
-
-public class ResPartner extends OModel {
-
-    public ResPartner(Context context) {
-        super(context, "res.partner");
-    }
-
+public class OTimestamp extends ODateTime {
+    public static final String TAG = OTimestamp.class.getSimpleName();
 }

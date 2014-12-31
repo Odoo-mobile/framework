@@ -22,7 +22,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".core.account.OdooLogin"
+            android:name="com.odoo.core.account.OdooLogin"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,10 +31,10 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".core.account.ManageAccounts"></activity>
+        <activity android:name="com.odoo.core.account.ManageAccounts"></activity>
         <activity android:name="com.odoo.OdooActivity"></activity>
 
-        <service android:name=".core.auth.OdooAuthService">
+        <service android:name="com.odoo.core.auth.OdooAuthService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"></action>
             </intent-filter>
@@ -43,6 +43,9 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator"></meta-data>
         </service>
+        <provider
+            android:authorities="com.odoo.core.provider.content"
+            android:name="com.odoo.core.provider.BaseModelProvider" />
     </application>
 
 </manifest>

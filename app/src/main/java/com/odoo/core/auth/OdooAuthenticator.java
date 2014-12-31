@@ -30,9 +30,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.odoo.core.account.OdooLogin;
+import com.odoo.core.orm.OSQLite;
+import com.odoo.core.support.OUser;
 
 public class OdooAuthenticator extends AbstractAccountAuthenticator {
 
+    public static final String TAG = OdooAuthenticator.class.getSimpleName();
     public static final String KEY_NEW_ACCOUNT_REQUEST = "create_new_account";
     private Context mContext;
 
@@ -65,18 +68,11 @@ public class OdooAuthenticator extends AbstractAccountAuthenticator {
                     .getBoolean(AccountManager.KEY_BOOLEAN_RESULT);
 
             if (removalAllowed) {
-                //FIXME: Remove database from application
-//                OUser user = OdooAccountManager.getAccountDetail(mContext,
-//                        account.name);
-//                OSQLiteHelper sqlite = new OSQLiteHelper(mContext,
-//                        user.getDBName());
-//                if (sqlite.cleanUserRecords(account.name)) {
-//                    // TODO: next task after cleaning all record reletated to
-//                    // user.
-//                }
+                OUser user = OdooAccountManager.getDetails(mContext, account.name);
+                OSQLite sqLite = new OSQLite(mContext, user);
+                sqLite.dropDatabase();
             }
         }
-
         return result;
     }
 
