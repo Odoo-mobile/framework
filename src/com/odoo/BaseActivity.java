@@ -502,12 +502,16 @@ public abstract class BaseActivity extends ActionBarActivity implements
 		int itemIndex = 0;
 		for (int i = startIndex; i < newItems.size(); i++) {
 			ViewGroup v = (ViewGroup) mDrawerItemsListContainer.getChildAt(i);
-			DrawerItem item = newItems.get(itemIndex);
-			if (!item.isGroupTitle()) {
-				String counter = (item.getCounter() > 99) ? "99+" : (item
-						.getCounter() == 0) ? "" : item.getCounter() + "";
-				OControls.setText(v, R.id.counter, counter);
-				itemIndex++;
+			
+			// h4k1m: check if drawer item is not null in cursorloader fragment
+			if (newItems.size() > 0) 
+				DrawerItem item = newItems.get(itemIndex);
+				if (!item.isGroupTitle()) {
+					String counter = (item.getCounter() > 99) ? "99+" : (item
+							.getCounter() == 0) ? "" : item.getCounter() + "";
+					OControls.setText(v, R.id.counter, counter);
+					itemIndex++;
+				}
 			}
 		}
 
