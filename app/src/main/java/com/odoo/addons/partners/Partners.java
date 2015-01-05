@@ -30,7 +30,6 @@ import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
-import com.odoo.core.utils.logger.OLog;
 
 import java.util.ArrayList;
 import java.util.List;

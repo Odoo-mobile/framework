@@ -15,22 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 31/12/14 11:29 AM
+ * Created on 2/1/15 11:07 AM
  */
-package com.odoo.core.orm.fields.types;
+package com.odoo.addons.partners.services;
 
-import com.odoo.core.utils.ODateUtils;
+import android.os.Bundle;
 
-public class ODateTime extends OTypeHelper {
-    public static final String TAG = ODateTime.class.getSimpleName();
+import com.odoo.base.addons.res.ResPartner;
+import com.odoo.core.service.OSyncAdapter;
+import com.odoo.core.service.OSyncService;
+import com.odoo.core.support.OUser;
+
+public class PartnerSyncService extends OSyncService {
+    public static final String TAG = PartnerSyncService.class.getSimpleName();
 
     @Override
-    public String getFieldType() {
-        return "VARCHAR";
+    public OSyncAdapter getSyncAdapter() {
+        return new OSyncAdapter(getApplicationContext(), ResPartner.class, this, true);
     }
 
     @Override
-    public String getDataFormat() {
-        return ODateUtils.DEFAULT_FORMAT;
+    public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
+        adapter.syncDataLimit(50);
     }
 }

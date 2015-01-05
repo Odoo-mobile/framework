@@ -44,7 +44,7 @@ public class OColumn {
     private Boolean isLocalColumn = false;
     private LinkedHashMap<String, ColumnDomain> columnDomains = new LinkedHashMap<>();
     private Integer condition_operator_index = 0;
-
+    private Integer recordSyncLimit = 0;
 
     //Annotation properties
     private Method mOnChangeMethod = null;
@@ -68,6 +68,15 @@ public class OColumn {
 
     public OColumn setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public Integer getRecordSyncLimit() {
+        return recordSyncLimit;
+    }
+
+    public OColumn setRecordSyncLimit(Integer recordSyncLimit) {
+        this.recordSyncLimit = recordSyncLimit;
         return this;
     }
 

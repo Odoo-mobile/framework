@@ -15,22 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 31/12/14 11:29 AM
+ * Created on 5/1/15 12:03 PM
  */
-package com.odoo.core.orm.fields.types;
+package com.odoo.addons.partners.models;
 
-import com.odoo.core.utils.ODateUtils;
+import android.content.Context;
 
-public class ODateTime extends OTypeHelper {
-    public static final String TAG = ODateTime.class.getSimpleName();
+import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.support.OUser;
 
-    @Override
-    public String getFieldType() {
-        return "VARCHAR";
-    }
+public class ResPartnerCategory extends OModel {
+    public static final String TAG = ResPartnerCategory.class.getSimpleName();
 
-    @Override
-    public String getDataFormat() {
-        return ODateUtils.DEFAULT_FORMAT;
+    OColumn name = new OColumn("Name", OVarchar.class);
+
+    public ResPartnerCategory(Context context, OUser user) {
+        super(context, "res.partner.category", user);
     }
 }

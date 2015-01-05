@@ -22,6 +22,7 @@ package com.odoo.base.addons.res;
 import android.content.Context;
 
 import com.odoo.addons.partners.models.ResCountryState;
+import com.odoo.addons.partners.models.ResPartnerCategory;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.annotation.Odoo;
@@ -33,6 +34,7 @@ import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
 public class ResPartner extends OModel {
+
 
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100);
     OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefaultValue(false);
@@ -53,6 +55,7 @@ public class ResPartner extends OModel {
             .setRelatedColumn("parent_id");
     OColumn customer = new OColumn("Customer", OBoolean.class).setDefaultValue(false);
     OColumn supplier = new OColumn("Supplier", OBoolean.class).setDefaultValue(false);
+    OColumn category_id = new OColumn("Category Tags", ResPartnerCategory.class, OColumn.RelationType.ManyToMany);
 
     // Annotation demo columns
     @Odoo.hasDomainFilter

@@ -26,7 +26,7 @@ import com.odoo.core.support.addons.OAddon;
 public class Addons extends AddonsHelper {
 
     /**
-     * TODO: Declare your required module here
+     * Declare your required module here
      * NOTE: For maintain sequence use object name in asc order.
      * Ex.:
      * OAddon partners = new OAddon(Partners.class).setDefault();

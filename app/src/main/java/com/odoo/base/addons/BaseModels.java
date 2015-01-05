@@ -22,6 +22,7 @@ package com.odoo.base.addons;
 import android.content.Context;
 
 import com.odoo.base.addons.ir.IrAttachment;
+import com.odoo.base.addons.ir.IrModel;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.OModel;
@@ -34,6 +35,7 @@ public class BaseModels {
 
     public static List<OModel> baseModels(Context context) {
         List<OModel> models = new ArrayList<>();
+        models.add(new IrModel(context, null));
         models.add(new ResPartner(context, null));
         models.add(new ResCompany(context, null));
         models.add(new IrAttachment(context, null));

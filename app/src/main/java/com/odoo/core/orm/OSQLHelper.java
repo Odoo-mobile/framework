@@ -34,8 +34,7 @@ public class OSQLHelper {
     public static final String TAG = OSQLHelper.class.getSimpleName();
     private Context mContext = null;
     private List<String> mModels = new ArrayList<>();
-    private List<String> mSQLStatements = new ArrayList<>();
-    private HashMap<String, String> mModelClassPaths = new HashMap<>();
+    private HashMap<String, String> mSQLStatements = new HashMap<>();
 
     public OSQLHelper(Context context) {
         mContext = context;
@@ -49,18 +48,15 @@ public class OSQLHelper {
         StringBuffer sql = null;
         if (!mModels.contains(model.getModelName())) {
             mModels.add(model.getModelName());
-            mModelClassPaths.put(model.getModelName(), model.getClass()
-                    .getName());
             sql = new StringBuffer();
             sql.append("CREATE TABLE IF NOT EXISTS ");
             sql.append(model.getTableName());
             sql.append(" (");
-
             List<OColumn> columns = model.getColumns();
             sql.append(generateColumnStatement(model, columns));
             sql.deleteCharAt(sql.lastIndexOf(","));
             sql.append(")");
-            mSQLStatements.add(sql.toString());
+            mSQLStatements.put(model.getTableName(), sql.toString());
         }
     }
 
@@ -130,7 +126,7 @@ public class OSQLHelper {
                 sql.append(col_statement);
                 sql.deleteCharAt(sql.lastIndexOf(","));
                 sql.append(")");
-                mSQLStatements.add(sql.toString());
+                mSQLStatements.put(table_name, sql.toString());
                 Log.v(TAG, "Table Created : " + table_name);
             }
         } catch (Exception e) {
@@ -156,12 +152,8 @@ public class OSQLHelper {
         return null;
     }
 
-    public List<String> getStatements() {
+    public HashMap<String, String> getStatements() {
         return mSQLStatements;
-    }
-
-    public HashMap<String, String> getModelClassPaths() {
-        return mModelClassPaths;
     }
 
     public void createDropStatements(OModel model) {
@@ -172,7 +164,7 @@ public class OSQLHelper {
                 sql = new StringBuffer();
                 sql.append("DROP TABLE IF EXISTS ");
                 sql.append(model.getTableName());
-                mSQLStatements.add(sql.toString());
+                mSQLStatements.put(model.getTableName(), sql.toString());
                 Log.v(TAG, "Table Dropped : " + model.getTableName());
                 for (OColumn col : model.getColumns()) {
                     if (col.getRelationType() != null) {
@@ -185,7 +177,7 @@ public class OSQLHelper {
                                 sql.append("DROP TABLE IF EXISTS ");
                                 sql.append(table_name);
                                 mModels.add(table_name);
-                                mSQLStatements.add(sql.toString());
+                                mSQLStatements.put(table_name, sql.toString());
                                 Log.v(TAG, "Table Dropped : " + table_name);
                                 break;
                             case ManyToOne:
@@ -200,5 +192,34 @@ public class OSQLHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public List<OModel> getAllModels(List<OModel> models) {
+        mModels.clear();
+        List<OModel> all_models = new ArrayList<>();
+        for (OModel model : models) {
+            if (!mModels.contains(model.getModelName())) {
+                mModels.add(model.getModelName());
+                all_models.add(model);
+                // Checks for relation models
+                List<OModel> relModels = getRelationModels(model, model.getRelationColumns());
+                all_models.addAll(relModels);
+            }
+        }
+        mModels.clear();
+        return all_models;
+    }
+
+    private List<OModel> getRelationModels(OModel model, List<OColumn> cols) {
+        List<OModel> models = new ArrayList<>();
+        for (OColumn col : cols) {
+            OModel rel_model = model.createInstance(col.getType());
+            if (rel_model != null && !mModels.contains(rel_model.getModelName())) {
+                mModels.add(rel_model.getModelName());
+                models.add(rel_model);
+                models.addAll(getRelationModels(rel_model, rel_model.getRelationColumns()));
+            }
+        }
+        return models;
     }
 }

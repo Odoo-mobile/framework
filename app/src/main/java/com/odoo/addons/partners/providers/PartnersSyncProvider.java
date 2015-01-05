@@ -15,22 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 31/12/14 11:29 AM
+ * Created on 2/1/15 2:25 PM
  */
-package com.odoo.core.orm.fields.types;
+package com.odoo.addons.partners.providers;
 
-import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.orm.provider.BaseModelProvider;
 
-public class ODateTime extends OTypeHelper {
-    public static final String TAG = ODateTime.class.getSimpleName();
-
-    @Override
-    public String getFieldType() {
-        return "VARCHAR";
-    }
-
-    @Override
-    public String getDataFormat() {
-        return ODateUtils.DEFAULT_FORMAT;
-    }
+public class PartnersSyncProvider extends BaseModelProvider {
+    public static final String TAG = PartnersSyncProvider.class.getSimpleName();
 }

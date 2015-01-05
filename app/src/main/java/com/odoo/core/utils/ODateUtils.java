@@ -28,7 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class ODateUtils {
-    public final String TAG = ODateUtils.class.getSimpleName();
+    public final static String TAG = ODateUtils.class.getSimpleName();
     public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -38,7 +38,7 @@ public class ODateUtils {
      *
      * @return current date string (Default timezone)
      */
-    public final String getDate() {
+    public static String getDate() {
         return getDate(new Date(), DEFAULT_FORMAT);
     }
 
@@ -48,7 +48,7 @@ public class ODateUtils {
      * @param format, date format
      * @return current date string (Default timezone)
      */
-    public final String getDate(String format) {
+    public static String getDate(String format) {
         return getDate(new Date(), format);
     }
 
@@ -59,7 +59,7 @@ public class ODateUtils {
      * @param defaultFormat, date format
      * @return current date string (default timezone)
      */
-    public final String getDate(Date date, String defaultFormat) {
+    public static String getDate(Date date, String defaultFormat) {
         return createDate(date, defaultFormat, false);
     }
 
@@ -68,7 +68,7 @@ public class ODateUtils {
      *
      * @return string, UTC Date
      */
-    public final String getUTCDate() {
+    public static String getUTCDate() {
         return getUTCDate(new Date(), DEFAULT_FORMAT);
     }
 
@@ -78,7 +78,7 @@ public class ODateUtils {
      * @param format, date format
      * @return UTC date string
      */
-    public final String getUTCDate(String format) {
+    public static String getUTCDate(String format) {
         return getUTCDate(new Date(), format);
     }
 
@@ -89,7 +89,7 @@ public class ODateUtils {
      * @param defaultFormat, Date pattern format
      * @return UTC date string
      */
-    public final String getUTCDate(Date date, String defaultFormat) {
+    public static String getUTCDate(Date date, String defaultFormat) {
         return createDate(date, defaultFormat, true);
     }
 
@@ -101,7 +101,7 @@ public class ODateUtils {
      * @param dateFormat default date format
      * @return string converted date string
      */
-    public final String convertToDefault(String date, String dateFormat) {
+    public static String convertToDefault(String date, String dateFormat) {
         return convertToDefault(date, dateFormat, dateFormat);
     }
 
@@ -113,7 +113,7 @@ public class ODateUtils {
      * @param toFormat   converting date format
      * @return string converted date string
      */
-    public final String convertToDefault(String date, String dateFormat, String toFormat) {
+    public static String convertToDefault(String date, String dateFormat, String toFormat) {
         return createDate(createDateObject(date, dateFormat, false), toFormat, false);
     }
 
@@ -124,7 +124,7 @@ public class ODateUtils {
      * @param dateFormat default date format
      * @return string date string in UTC timezone
      */
-    public final String convertToUTC(String date, String dateFormat) {
+    public static String convertToUTC(String date, String dateFormat) {
         return convertToUTC(date, dateFormat, dateFormat);
     }
 
@@ -136,7 +136,7 @@ public class ODateUtils {
      * @param toFormat   display format
      * @return string, returns string converted to UTC
      */
-    public final String convertToUTC(String date, String dateFormat, String toFormat) {
+    public static String convertToUTC(String date, String dateFormat, String toFormat) {
         return createDate(createDateObject(date, dateFormat, true), toFormat, true);
     }
 
@@ -148,7 +148,7 @@ public class ODateUtils {
      * @param hasDefaultTimezone if date is in default timezone than true, otherwise false
      * @return Date, returns Date object with given date
      */
-    public final Date createDateObject(String date, String dateFormat, Boolean hasDefaultTimezone) {
+    public static Date createDateObject(String date, String dateFormat, Boolean hasDefaultTimezone) {
         Date dateObj = null;
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
@@ -168,7 +168,7 @@ public class ODateUtils {
      * @param days days to before
      * @return string date string before days
      */
-    public final String getDateBefore(int days) {
+    public static String getDateBefore(int days) {
         Date today = new Date();
         Calendar cal = new GregorianCalendar();
         cal.setTime(today);
@@ -188,4 +188,5 @@ public class ODateUtils {
         gmtFormat.setTimeZone(gmtTime);
         return gmtFormat.format(date);
     }
+
 }

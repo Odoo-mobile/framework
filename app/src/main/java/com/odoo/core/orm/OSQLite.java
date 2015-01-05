@@ -33,21 +33,30 @@ import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.utils.OPreferenceManager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class OSQLite extends SQLiteOpenHelper {
     public static final String TAG = OSQLite.class.getSimpleName();
+    public static final String KEY_MODEL_CLASS_REGISTER = "key_model_class_register";
     public static final int DATABASE_VERSION = 1;
     private Context mContext;
     private OUser mUser = null;
     private Addons mAddons;
+    private OPreferenceManager mPref;
 
     public OSQLite(Context context, OUser user) {
         super(context, (user != null) ? user.getDBName() : OUser.current(context).getDBName(), null, DATABASE_VERSION);
         mContext = context;
         mAddons = new Addons();
         mUser = (user != null) ? user : OUser.current(context);
+        mPref = new OPreferenceManager(mContext);
+        synchronized (this) {
+            if (!mPref.getBoolean(KEY_MODEL_CLASS_REGISTER, false)) {
+                mPref.setBoolean(KEY_MODEL_CLASS_REGISTER, true);
+                // Registering model class paths
+                registerModelsClassPath();
+            }
+        }
     }
 
     private List<OModel> getModels() {
@@ -76,13 +85,13 @@ public class OSQLite extends SQLiteOpenHelper {
         // Creating tables
         for (OModel model : getModels()) {
             sqlHelper.createStatements(model);
-            Log.v(TAG, "Table Created : " + model.getTableName());
         }
-        for (String query : sqlHelper.getStatements()) {
+        for (String key : sqlHelper.getStatements().keySet()) {
+            String query = sqlHelper.getStatements().get(key);
             db.execSQL(query);
+            Log.i(TAG, "Table Created : " + key);
         }
         registerModels(sqlHelper.getModels());
-        registerModelsClassPath(sqlHelper.getModelClassPaths());
     }
 
     private void registerModels(List<String> models) {
@@ -90,19 +99,17 @@ public class OSQLite extends SQLiteOpenHelper {
         mPref.putStringSet("models", models);
     }
 
-    private void registerModelsClassPath(HashMap<String, String> modelClassPath) {
-        OPreferenceManager pfManager = new OPreferenceManager(mContext);
-        for (String key : modelClassPath.keySet()) {
+    private void registerModelsClassPath() {
+        OSQLHelper sqlHelper = new OSQLHelper(mContext);
+        for (OModel model : sqlHelper.getAllModels(getModels())) {
+            String key = model.getModelName();
+            String path = model.getClass().getName();
             // Setting class path
-            pfManager.putString(key, modelClassPath.get(key));
-
-            List<String> server_cols = getColumns(modelClassPath.get(key)
-                    .toString(), true);
-            pfManager.putStringSet(key + ".server", server_cols);
-            List<String> local_cols = getColumns(modelClassPath.get(key)
-                    .toString(), false);
-            pfManager.putStringSet(key + ".local", local_cols);
-
+            mPref.putString(key, path);
+            List<String> server_cols = getColumns(path, true);
+            mPref.putStringSet(key + ".server", server_cols);
+            List<String> local_cols = getColumns(path, false);
+            mPref.putStringSet(key + ".local", local_cols);
         }
     }
 
@@ -127,10 +134,12 @@ public class OSQLite extends SQLiteOpenHelper {
         OSQLHelper sqlHelper = new OSQLHelper(mContext);
         for (OModel model : getModels()) {
             sqlHelper.createDropStatements(model);
-            Log.v(TAG, "Table dropped " + model.getTableName());
         }
-        for (String query : sqlHelper.getStatements())
+        for (String key : sqlHelper.getStatements().keySet()) {
+            String query = sqlHelper.getStatements().get(key);
             db.execSQL(query);
+            Log.i(TAG, "Table dropped " + key);
+        }
         onCreate(db);
     }
 

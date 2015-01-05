@@ -48,7 +48,7 @@ public class OO2MRecord {
     }
 
     public List<Integer> getIds(OModel rel_model) {
-       //FIXME
+        //FIXME
 //        return mDatabase.selecto2MRelIds(mDatabase, rel_model, mRecordId,
 //                mCol.getRelatedColumn());
         return null;
@@ -57,17 +57,8 @@ public class OO2MRecord {
     public List<ODataRow> browseEach() {
         rel_model = mDatabase.createInstance(mCol.getType());
         String column = mCol.getRelatedColumn();
-        //FIXME
-//        return rel_model.select(column + " = ? ",
-//                new String[]{mRecordId + ""}, null, null, mOrderBy);
-        return null;
+        return rel_model.select(null, column + " = ? ",
+                new String[]{mRecordId + ""}, mOrderBy);
     }
 
-    public ODataRow browseAt(int index) {
-        List<ODataRow> list = browseEach();
-        if (list.size() == 0) {
-            return null;
-        }
-        return list.get(index);
-    }
 }

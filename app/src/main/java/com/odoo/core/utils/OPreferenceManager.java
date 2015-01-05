@@ -29,7 +29,7 @@ import java.util.Set;
 
 public class OPreferenceManager {
     public static final String TAG = OPreferenceManager.class.getSimpleName();
-    SharedPreferences mPref = null;
+    private SharedPreferences mPref = null;
 
     public OPreferenceManager(Context context) {
         mPref = android.preference.PreferenceManager
@@ -44,8 +44,7 @@ public class OPreferenceManager {
 
     public void putStringSet(String key, List<String> values) {
         SharedPreferences.Editor editor = mPref.edit();
-        Set<String> vals = new HashSet<String>(values);
-        editor.putStringSet(key, vals);
+        editor.putStringSet(key, new HashSet<String>(values));
         editor.commit();
     }
 
@@ -63,6 +62,16 @@ public class OPreferenceManager {
 
     public int getInt(String key, int default_value) {
         return Integer.parseInt(mPref.getString(key, default_value + ""));
+    }
+
+    public void setBoolean(String key, Boolean value) {
+        SharedPreferences.Editor editor = mPref.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
+    public boolean getBoolean(String key, boolean defValue) {
+        return mPref.getBoolean(key, defValue);
     }
 
 }

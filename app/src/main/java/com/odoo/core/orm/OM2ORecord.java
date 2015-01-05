@@ -40,15 +40,13 @@ public class OM2ORecord {
 
     public String getName() {
         rel_model = base_model.createInstance(mCol.getType());
-        //FIXME
-        //return rel_model.getName(record_id);
-        return null;
+        return rel_model.browse(new String[]{"name"}, OColumn.ROW_ID + "=?",
+                new String[]{record_id + ""}).getString("name");
     }
 
     public ODataRow browse(OModel rel_model) {
         if (record_id != null) {
-            //FIXME
-//            return rel_model.select(record_id);
+            return rel_model.browse(record_id);
         }
         return null;
     }
@@ -56,5 +54,10 @@ public class OM2ORecord {
     public ODataRow browse() {
         rel_model = base_model.createInstance(mCol.getType());
         return browse(rel_model);
+    }
+
+    @Override
+    public String toString() {
+        return record_id + "";
     }
 }
