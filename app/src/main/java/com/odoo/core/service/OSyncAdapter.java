@@ -179,7 +179,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             OSyncDataUtils.SyncRelationRecords record = relationRecords.get(key);
             OModel model = record.getBaseModel();
             OModel rel_model = record.getRelationModel();
-
             ODomain domain = new ODomain();
             domain.add("id", "in", record.getUniqueIds());
             syncData(rel_model, user, domain, result, false, false);
@@ -199,6 +198,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                     break;
                 case ManyToMany:
+                    //TODO: unable to store value to master records...
                     // Nothing to do. Already added relation records links
                     break;
             }

@@ -21,6 +21,7 @@ package com.odoo.core.orm;
 
 import com.odoo.core.orm.fields.OColumn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OO2MRecord {
@@ -48,17 +49,19 @@ public class OO2MRecord {
     }
 
     public List<Integer> getIds(OModel rel_model) {
-        //FIXME
-//        return mDatabase.selecto2MRelIds(mDatabase, rel_model, mRecordId,
-//                mCol.getRelatedColumn());
-        return null;
+        List<Integer> ids = new ArrayList<>();
+        List<ODataRow> records = rel_model.select(new String[]{OColumn.ROW_ID},
+                mCol.getRelatedColumn() + " = ?", new String[]{mRecordId + ""});
+        for (ODataRow record : records) {
+            ids.add(record.getInt(OColumn.ROW_ID));
+        }
+        return ids;
     }
 
     public List<ODataRow> browseEach() {
         rel_model = mDatabase.createInstance(mCol.getType());
-        String column = mCol.getRelatedColumn();
-        return rel_model.select(null, column + " = ? ",
-                new String[]{mRecordId + ""}, mOrderBy);
+        return rel_model.select(null,
+                mCol.getRelatedColumn() + " = ?", new String[]{mRecordId + ""}, mOrderBy);
     }
 
 }

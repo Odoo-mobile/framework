@@ -57,7 +57,7 @@ public class BaseModelProvider extends ContentProvider {
     }
 
     @Override
-    public final boolean onCreate() {
+    public boolean onCreate() {
         return true;
     }
 
@@ -73,7 +73,7 @@ public class BaseModelProvider extends ContentProvider {
     }
 
     @Override
-    public final Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs, String sortOrder) {
         setModel(uri);
         String[] projection = removeRelationColumns(base_projection);
         int match = matcher.match(uri);
@@ -112,12 +112,12 @@ public class BaseModelProvider extends ContentProvider {
     }
 
     @Override
-    public final String getType(Uri uri) {
+    public String getType(Uri uri) {
         return uri.toString();
     }
 
     @Override
-    public final Uri insert(Uri uri, ContentValues all_values) {
+    public Uri insert(Uri uri, ContentValues all_values) {
         setModel(uri);
         ContentValues[] values = generateValues(all_values);
         ContentValues value_to_insert = values[0];
@@ -155,7 +155,7 @@ public class BaseModelProvider extends ContentProvider {
     }
 
     @Override
-    public final int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
         int count = 0;
         setModel(uri);
         int match = matcher.match(uri);
@@ -190,7 +190,7 @@ public class BaseModelProvider extends ContentProvider {
     }
 
     @Override
-    public final int update(Uri uri, ContentValues all_values, String selection, String[] selectionArgs) {
+    public int update(Uri uri, ContentValues all_values, String selection, String[] selectionArgs) {
         setModel(uri);
         ContentValues[] values = generateValues(all_values);
         ContentValues value_to_update = values[0];

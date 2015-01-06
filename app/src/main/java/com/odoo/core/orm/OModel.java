@@ -42,6 +42,8 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.StringUtils;
+import com.odoo.core.utils.logger.OLog;
 
 import java.io.InvalidObjectException;
 import java.lang.annotation.Annotation;
@@ -314,10 +316,22 @@ public class OModel extends OSQLite {
     private String[] updateProjection(String[] projection) {
         HashSet<String> names = new HashSet<>();
         if (projection == null) {
-            projection = new String[]{};
+            projection = projection();
         }
         names.addAll(Arrays.asList(projection));
         names.addAll(Arrays.asList(new String[]{OColumn.ROW_ID, "id"}));
+        return names.toArray(new String[names.size()]);
+    }
+
+    public String[] projection() {
+        List<String> names = new ArrayList<>();
+        for (OColumn column : getColumns()) {
+            if (column.getRelationType() == null || column.canFunctionalStore()) {
+                names.add(column.getName());
+            } else if (column.getRelationType() == OColumn.RelationType.ManyToOne) {
+                names.add(column.getName());
+            }
+        }
         return names.toArray(new String[names.size()]);
     }
 
@@ -403,9 +417,13 @@ public class OModel extends OSQLite {
                 ODataRow row = OCursorUtils.toDatarow(cr);
                 for (OColumn column : getRelationColumns(projection)) {
                     if (!row.getString(column.getName()).equals("false")
-                            || column.getRelationType() == OColumn.RelationType.OneToMany) {
+                            || column.getRelationType() == OColumn.RelationType.OneToMany
+                            || column.getRelationType() == OColumn.RelationType.ManyToMany) {
                         switch (column.getRelationType()) {
                             case ManyToMany:
+                                OM2MRecord m2mRecords = new OM2MRecord(this, column, row.getInt(OColumn.ROW_ID));
+                                row.put(column.getName(), m2mRecords);
+                                OLog.log("Setting many to many column " + column.getName());
                                 break;
                             case ManyToOne:
                                 OM2ORecord m2ORecord = new OM2ORecord(this, column, row.getInt(column.getName()));
@@ -683,4 +701,32 @@ public class OModel extends OSQLite {
         }
     }
 
+    public List<ODataRow> selectManyToManyRecords(String[] projection, String column_name, int row_id) {
+        OColumn column = getColumn(column_name);
+        OModel rel_model = createInstance(column.getType());
+        String table = getTableName() + "_" + rel_model.getTableName() + "_rel";
+        String base_column = getTableName() + "_id";
+        String rel_column = rel_model.getTableName() + "_id";
+
+        // Getting relation table ids
+        List<String> ids = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cr = null;
+        try {
+            cr = db.query(table, new String[]{rel_column}, base_column + "=?",
+                    new String[]{row_id + ""}, null, null, null);
+            if (cr.moveToFirst()) {
+                do {
+                    ids.add(cr.getInt(0) + "");
+                } while (cr.moveToNext());
+            }
+        } finally {
+            if (cr != null) {
+                cr.close();
+            }
+            db.close();
+        }
+        return rel_model.select(projection, OColumn.ROW_ID + " IN (" + StringUtils.repeat(" ?, ", ids.size() - 1) + " ?)",
+                ids.toArray(new String[ids.size()]));
+    }
 }

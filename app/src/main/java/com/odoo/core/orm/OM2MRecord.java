@@ -21,6 +21,7 @@ package com.odoo.core.orm;
 
 import com.odoo.core.orm.fields.OColumn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OM2MRecord {
@@ -28,7 +29,6 @@ public class OM2MRecord {
     private OColumn mCol = null;
     private int mId = 0;
     private OModel mDatabase = null;
-    private OModel rel_model = null;
 
     public OM2MRecord(OModel model, OColumn col, int id) {
         mDatabase = model;
@@ -37,24 +37,15 @@ public class OM2MRecord {
     }
 
     public List<Integer> getRelIds() {
-        rel_model = mDatabase.createInstance(mCol.getType());
-        //FIXME:
-        //return mDatabase.selectM2MRelIds(mDatabase, rel_model, mId);
-        return null;
+        List<Integer> ids = new ArrayList<>();
+        for (ODataRow row : mDatabase.selectManyToManyRecords(new String[]{OColumn.ROW_ID},
+                mCol.getName(), mId)) {
+            ids.add(row.getInt(OColumn.ROW_ID));
+        }
+        return ids;
     }
 
     public List<ODataRow> browseEach() {
-        rel_model = mDatabase.createInstance(mCol.getType());
-        //FIXME:
-//        return mDatabase.selectM2MRecords(mDatabase, rel_model, mId);
-        return null;
-    }
-
-    public ODataRow browseAt(int index) {
-        List<ODataRow> list = browseEach();
-        if (list.size() == 0) {
-            return null;
-        }
-        return list.get(index);
+        return mDatabase.selectManyToManyRecords(null, mCol.getName(), mId);
     }
 }

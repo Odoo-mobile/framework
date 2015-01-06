@@ -261,21 +261,14 @@ public class OSyncDataUtils {
 
     private void addUpdateRelationRecord(OModel baseModel, OModel model, String column, String relatedColumn,
                                          OColumn.RelationType type, List<Integer> ids) {
-        List<Integer> recIds = new ArrayList<>();
-        // Removing recently synced records.
-        for (Integer id : ids) {
-            if (!recordsId.contains(id)) {
-                recIds.add(id);
-            }
-        }
         String key = model.getTableName() + "_" + column;
         if (relationRecordsHashMap.containsKey(key)) {
             SyncRelationRecords data = relationRecordsHashMap.get(key);
-            data.updateIds(recIds);
+            data.updateIds(ids);
             relationRecordsHashMap.put(key, data);
         } else {
             relationRecordsHashMap.put(key,
-                    new SyncRelationRecords(baseModel, model, column, relatedColumn, type, recIds));
+                    new SyncRelationRecords(baseModel, model, column, relatedColumn, type, ids));
         }
     }
 
