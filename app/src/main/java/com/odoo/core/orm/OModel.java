@@ -41,6 +41,7 @@ import com.odoo.core.orm.provider.BaseModelProvider;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OListUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.logger.OLog;
@@ -49,6 +50,7 @@ import java.io.InvalidObjectException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,6 +73,7 @@ public class OModel extends OSQLite {
     private String model_name = null;
     private List<OColumn> mColumns = new ArrayList<>();
     private List<OColumn> mRelationColumns = new ArrayList<>();
+    private List<OColumn> mFunctionalColumns = new ArrayList<>();
     private HashMap<String, Field> mDeclaredFields = new HashMap<>();
     private OdooVersion mOdooVersion = null;
 
@@ -164,18 +167,112 @@ public class OModel extends OSQLite {
                 column.setName(field.getName());
                 Boolean validField = compatibleField(field);
                 if (validField) {
-                    /**
-                     * TODO:
-                     * 1. Check for functional annotation
-                     * 2. Check for function store annotation
-                     * 3. Check for onChange event method
-                     * 4. Check for domain filter column
-                     */
+                    // Functional Method
+                    Method method = checkForFunctionalColumn(field);
+                    if (method != null) {
+                        column.setIsFunctionalColumn(true);
+                        column.setFunctionalMethod(method);
+                        column.setFunctionalStore(checkForFunctionalStore(field));
+                        column.setFunctionalStoreDepends(getFunctionalDepends(field));
+                        if (!column.canFunctionalStore()) {
+                            column.setLocalColumn();
+                        }
+                    }
+
+                    // Onchange method for column
+                    Method onChangeMethod = checkForOnChangeMethod(field);
+                    if (onChangeMethod != null) {
+                        column.setOnChangeMethod(onChangeMethod);
+                        column.setOnChangeBGProcess(checkForOnChangeBGProcess(field));
+                    }
+
+                    // domain filter on column
+                    column.setHasDomainFilterColumn(isDomainFilterColumn(field));
                     return column;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.e(TAG, e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    private boolean isDomainFilterColumn(Field field) {
+        Annotation annotation = field.getAnnotation(Odoo.hasDomainFilter.class);
+        if (annotation != null) {
+            Odoo.hasDomainFilter domainFilter = (Odoo.hasDomainFilter) annotation;
+            return domainFilter.checkDomainRuntime();
+        }
+        return false;
+    }
+
+    private Boolean checkForOnChangeBGProcess(Field field) {
+        Annotation annotation = field.getAnnotation(Odoo.onChange.class);
+        if (annotation != null) {
+            Odoo.onChange onChange = (Odoo.onChange) annotation;
+            return onChange.bg_process();
+        }
+        return false;
+    }
+
+    private Method checkForOnChangeMethod(Field field) {
+        Annotation annotation = field.getAnnotation(Odoo.onChange.class);
+        if (annotation != null) {
+            Odoo.onChange onChange = (Odoo.onChange) annotation;
+            String method_name = onChange.method();
+            try {
+                return getClass().getMethod(method_name, ODataRow.class);
+            } catch (NoSuchMethodException e) {
+                Log.e(TAG, "No Such Method: " + e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Check for functional store.
+     *
+     * @param field the field
+     * @return the boolean
+     */
+    public Boolean checkForFunctionalStore(Field field) {
+        Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+        if (annotation != null) {
+            Odoo.Functional functional = (Odoo.Functional) annotation;
+            return functional.store();
+        }
+        return false;
+    }
+
+
+    /**
+     * Gets the functional depends.
+     *
+     * @param field the field
+     * @return the functional depends
+     */
+    public String[] getFunctionalDepends(Field field) {
+        Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+        if (annotation != null) {
+            Odoo.Functional functional = (Odoo.Functional) annotation;
+            return functional.depends();
+        }
+        return null;
+    }
+
+    private Method checkForFunctionalColumn(Field field) {
+        Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+        if (annotation != null) {
+            Odoo.Functional functional = (Odoo.Functional) annotation;
+            String method_name = functional.method();
+            try {
+                if (functional.store())
+                    return getClass().getMethod(method_name, OValues.class);
+                else
+                    return getClass().getMethod(method_name, ODataRow.class);
+            } catch (NoSuchMethodException e) {
+                Log.e(TAG, "No Such Method: " + e.getMessage());
             }
         }
         return null;
@@ -238,14 +335,26 @@ public class OModel extends OSQLite {
                         if (column.getRelationType() != null) {
                             mRelationColumns.add(column);
                         }
-                        //TODO: check for functional columns.
-                        mColumns.add(column);
+                        if (column.isFunctionalColumn()) {
+                            if (column.canFunctionalStore()) {
+                                mColumns.add(column);
+                            }
+                            mFunctionalColumns.add(column);
+                        } else {
+                            mColumns.add(column);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    public List<OColumn> getFunctionalColumns() {
+        if (mColumns.size() <= 0)
+            prepareFields();
+        return mFunctionalColumns;
     }
 
     public String getModelName() {
@@ -315,11 +424,31 @@ public class OModel extends OSQLite {
 
     private String[] updateProjection(String[] projection) {
         HashSet<String> names = new HashSet<>();
-        if (projection == null) {
-            projection = projection();
+        String[] allProjection = projection;
+        if (allProjection == null) {
+            allProjection = projection();
+        } else {
+            for (String col : projection) {
+                OColumn column = getColumn(col);
+                if (column.isFunctionalColumn() && column.canFunctionalStore()) {
+                    names.add(column.getName());
+                }
+            }
         }
-        names.addAll(Arrays.asList(projection));
-        names.addAll(Arrays.asList(new String[]{OColumn.ROW_ID, "id"}));
+        names.addAll(Arrays.asList(allProjection));
+        names.addAll(Arrays.asList(new String[]{OColumn.ROW_ID, "id", "_write_date", "_is_dirty", "_is_active"}));
+        return names.toArray(new String[names.size()]);
+    }
+
+    public String[] projection(Boolean onlyServerColumns) {
+        List<String> names = new ArrayList<>();
+        for (OColumn column : getColumns(false)) {
+            if (column.getRelationType() == null || column.canFunctionalStore()) {
+                names.add(column.getName());
+            } else if (column.getRelationType() == OColumn.RelationType.ManyToOne) {
+                names.add(column.getName());
+            }
+        }
         return names.toArray(new String[names.size()]);
     }
 
@@ -344,17 +473,33 @@ public class OModel extends OSQLite {
         return true;
     }
 
+    public boolean allowUpdateRecordOnServer() {
+        return true;
+    }
+
+    public boolean allowCreateRecordOnServer() {
+        return true;
+    }
+
+    public boolean allowDeleteRecordOnServer() {
+        return true;
+    }
+
+    public boolean allowDeleteRecordInLocal() {
+        return true;
+    }
+
     // Database Operations
     public ODataRow browse(int row_id) {
-        ODataRow row = null;
-        Cursor cr = mContext.getContentResolver().query(uri().withAppendedPath(uri(), row_id + ""),
-                null, null, null, null);
-        if (cr != null && cr.getCount() > 0) {
-            cr.moveToFirst();
-            row = OCursorUtils.toDatarow(cr);
-            cr.close();
+        return browse(null, row_id);
+    }
+
+    public ODataRow browse(String[] projection, int row_id) {
+        List<ODataRow> rows = select(projection, OColumn.ROW_ID + " = ?", new String[]{row_id + ""});
+        if (rows.size() > 0) {
+            return rows.get(0);
         }
-        return row;
+        return null;
     }
 
     public ODataRow browse(String[] projection, String selection, String[] args) {
@@ -423,7 +568,6 @@ public class OModel extends OSQLite {
                             case ManyToMany:
                                 OM2MRecord m2mRecords = new OM2MRecord(this, column, row.getInt(OColumn.ROW_ID));
                                 row.put(column.getName(), m2mRecords);
-                                OLog.log("Setting many to many column " + column.getName());
                                 break;
                             case ManyToOne:
                                 OM2ORecord m2ORecord = new OM2ORecord(this, column, row.getInt(column.getName()));
@@ -436,12 +580,59 @@ public class OModel extends OSQLite {
                         }
                     }
                 }
+                for (OColumn column : getFunctionalColumns(projection)) {
+                    List<String> depends = column.getFunctionalStoreDepends();
+                    OLog.log(column.getName() + ":" + depends);
+                    if (depends != null && depends.size() > 0) {
+                        ODataRow values = new ODataRow();
+                        for (String depend : depends) {
+                            if (row.contains(depend)) {
+                                values.put(depend, row.get(depend));
+                            }
+                        }
+                        if (values.size() == depends.size()) {
+                            Object value = getFunctionalMethodValue(column, values);
+                            row.put(column.getName(), value);
+                        }
+                    }
+                }
                 rows.add(row);
             } while (cr.moveToNext());
         }
 
         cr.close();
         return rows;
+    }
+
+    public Object getFunctionalMethodValue(OColumn column, Object record) {
+        if (column.isFunctionalColumn()) {
+            Method method = column.getFunctionalMethod();
+            OModel model = this;
+            try {
+                return method.invoke(model, new Object[]{record});
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    private List<OColumn> getFunctionalColumns(String[] projection) {
+        List<OColumn> cols = new ArrayList<>();
+        if (projection != null) {
+            for (String key : projection) {
+                OColumn column = getColumn(key);
+                if (column.isFunctionalColumn() && !column.canFunctionalStore()) {
+                    cols.add(column);
+                }
+            }
+        } else {
+            for (OColumn column : getFunctionalColumns()) {
+                if (!column.canFunctionalStore())
+                    cols.add(column);
+            }
+        }
+        return cols;
     }
 
     private List<OColumn> getRelationColumns(String[] projection) {
@@ -530,6 +721,11 @@ public class OModel extends OSQLite {
         return (count > 0);
     }
 
+    public boolean isServerRecordDirty(int server_id) {
+        int count = count("id = ? and _is_dirty = ?", new String[]{server_id + "", "true"});
+        return (count > 0);
+    }
+
     public boolean hasRecord(int row_id) {
         int count = count(OColumn.ROW_ID + " = ? ", new String[]{row_id + ""});
         return (count > 0);
@@ -578,25 +774,54 @@ public class OModel extends OSQLite {
         return new HashMap<>();
     }
 
+    public int deleteRecords(List<Integer> serverIds, boolean permanently) {
+        String selection = "id IN (" + StringUtils.repeat("?, ", serverIds.size() - 1) + " ?)";
+        String[] args = OListUtils.toStringList(serverIds).toArray(new String[serverIds.size()]);
+        if (permanently) {
+            return delete(selection, args, true);
+        } else {
+            OValues values = new OValues();
+            values.put("_is_active", "false");
+            return update(selection, args, values);
+        }
+    }
+
     public int delete(String selection, String[] args) {
-        List<ODataRow> records = select(new String[]{"_is_active"}, selection, args);
+        return delete(selection, args, false);
+    }
+
+    public int delete(String selection, String[] args, boolean permanently) {
         int count = 0;
-        for (ODataRow row : records) {
-            if (row.getBoolean("_is_active")) {
-                OValues values = new OValues();
-                values.put("_is_active", false);
-                update(row.getInt(OColumn.ROW_ID), values);
-            } else {
-                mContext.getContentResolver().delete(uri(), OColumn.ROW_ID + "= ?",
-                        new String[]{row.getString(OColumn.ROW_ID)});
+        if (permanently) {
+            count = mContext.getContentResolver().delete(uri(), selection, args);
+        } else {
+            List<ODataRow> records = select(new String[]{"_is_active"}, selection, args);
+            for (ODataRow row : records) {
+                if (row.getBoolean("_is_active")) {
+                    OValues values = new OValues();
+                    values.put("_is_active", "false");
+                    update(row.getInt(OColumn.ROW_ID), values);
+                }
+                count++;
             }
-            count++;
         }
         return count;
     }
 
     public boolean delete(int row_id) {
-        int count = mContext.getContentResolver().delete(uri().withAppendedPath(uri(), row_id + ""), null, null);
+        return delete(row_id, false);
+    }
+
+    public boolean delete(int row_id, boolean permanently) {
+        int count = 0;
+        if (permanently)
+            count = mContext.getContentResolver().delete(uri().withAppendedPath(uri(), row_id + ""), null, null);
+        else {
+            OValues values = new OValues();
+            values.put("_is_active", "false");
+            update(row_id, values);
+            count++;
+        }
         return (count > 0) ? true : false;
     }
 
@@ -627,8 +852,8 @@ public class OModel extends OSQLite {
             }
         } finally {
             cr.close();
-            db.close();
         }
+        db.close();
         return rows;
 
     }

@@ -65,10 +65,10 @@ public class ResPartner extends OModel {
     OColumn parent_id = new OColumn("Related Company", ResPartner.class, OColumn.RelationType.ManyToOne)
             .addDomain("is_company", "=", true);
 
+
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);
     }
-
 
     public ODataRow onChangeCompanyId(ODataRow row) {
         ODataRow res = new ODataRow();

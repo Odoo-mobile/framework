@@ -79,20 +79,27 @@ public class BaseModelProvider extends ContentProvider {
         int match = matcher.match(uri);
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         builder.setTables(mModel.getTableName());
+
+        // If selection not null and does not contain _is_active
+        if ((selection != null && !selection.contains("_is_active")) || selection == null) {
+            builder.appendWhere("_is_active = 'true'");
+        }
+        Cursor cr = null;
         switch (match) {
             case COLLECTION:
-                return builder.query(mModel.getReadableDatabase(), projection,
+                cr = builder.query(mModel.getReadableDatabase(), projection,
                         selection, selectionArgs, null, null, sortOrder);
+                break;
             case SINGLE_ROW:
                 int row_id = Integer.parseInt(uri.getLastPathSegment());
-                return builder.query(mModel.getReadableDatabase(), projection,
+                cr = builder.query(mModel.getReadableDatabase(), projection,
                         OColumn.ROW_ID + " = ? ", new String[]{row_id + ""}, null, null, null);
             case UriMatcher.NO_MATCH:
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        return null;
+        return cr;
     }
 
     private String[] removeRelationColumns(String[] projection) {
@@ -120,8 +127,13 @@ public class BaseModelProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues all_values) {
         setModel(uri);
         ContentValues[] values = generateValues(all_values);
+
         ContentValues value_to_insert = values[0];
         value_to_insert.put("_write_date", ODateUtils.getUTCDate());
+        if (!value_to_insert.containsKey("_is_active"))
+            value_to_insert.put("_is_active", "true");
+        if (!value_to_insert.containsKey("_is_dirty"))
+            value_to_insert.put("_is_dirty", "false");
         int match = matcher.match(uri);
         switch (match) {
             case COLLECTION:
@@ -132,7 +144,6 @@ public class BaseModelProvider extends ContentProvider {
                 } finally {
                     db.close();
                 }
-
                 // Updating relation columns for record
                 if (values[1].size() > 0) {
                     storeUpdateRelationRecords(values[1], OColumn.ROW_ID + "  = ?", new String[]{new_id + ""});
@@ -194,12 +205,17 @@ public class BaseModelProvider extends ContentProvider {
         setModel(uri);
         ContentValues[] values = generateValues(all_values);
         ContentValues value_to_update = values[0];
-        value_to_update.put("_write_date", ODateUtils.getUTCDate());
+        if (!value_to_update.containsKey("_write_date"))
+            value_to_update.put("_write_date", ODateUtils.getUTCDate());
+        if (!value_to_update.containsKey("_is_dirty")) {
+            value_to_update.put("_is_dirty", "true");
+        }
+
         int count = 0;
         int match = matcher.match(uri);
-        SQLiteDatabase db = mModel.getWritableDatabase();
         switch (match) {
             case COLLECTION:
+                SQLiteDatabase db = mModel.getWritableDatabase();
                 try {
                     count = db.update(mModel.getTableName(), value_to_update, selection, selectionArgs);
                 } finally {
@@ -213,6 +229,7 @@ public class BaseModelProvider extends ContentProvider {
                 break;
             case SINGLE_ROW:
                 String row_id = uri.getLastPathSegment();
+                db = mModel.getWritableDatabase();
                 try {
                     count = db.update(mModel.getTableName(), value_to_update, OColumn.ROW_ID + "  = ?", new String[]{row_id});
                     // Updating relation columns for record

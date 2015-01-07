@@ -92,6 +92,7 @@ public class OSQLite extends SQLiteOpenHelper {
             Log.i(TAG, "Table Created : " + key);
         }
         registerModels(sqlHelper.getModels());
+
     }
 
     private void registerModels(List<String> models) {

@@ -107,4 +107,12 @@ public class OValues {
     public void addAll(HashMap<String, Object> data) {
         _values.putAll(data);
     }
+
+    public static OValues from(ContentValues contentValues) {
+        OValues values = new OValues();
+        for (String key : contentValues.keySet()) {
+            values.put(key, contentValues.get(key));
+        }
+        return values;
+    }
 }

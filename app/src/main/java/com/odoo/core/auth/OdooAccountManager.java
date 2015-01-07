@@ -203,7 +203,7 @@ public class OdooAccountManager {
     }
 
     private static boolean cancelUserSync(Account account) {
-        //TODO: Add sync wizard values
+        //TODO: Cancel user's sync services. if any.
         /**
          *      SyncWizardValues syncVals = new SyncWizardValues();
          for (SyncValue sync : syncVals.syncValues()) {

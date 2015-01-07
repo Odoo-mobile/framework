@@ -33,12 +33,14 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -105,7 +107,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "Model       : " + mModel.getModelName());
         Log.i(TAG, "Database    : " + mModel.getDatabaseName());
         Log.i(TAG, "Odoo Version: " + mUser.getVersion_number());
-
         // Calling service callback
         mService.performDataSync(this, extras, mUser);
 
@@ -159,11 +160,29 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     getFields(model), domain.get(), 0, mSyncDataLimit, "create_date", "DESC");
             OSyncDataUtils dataUtils = new OSyncDataUtils(mContext, mOdoo, model, user, response,
                     result, createRelationRecords);
-            // TODO: Update record on server
-            // dataUtils.updateRecordsOnServer();
+            // Updating records on server if local are latest updated.
+            // if model allowed update record to server
+            if (model.allowUpdateRecordOnServer()) {
+                dataUtils.updateRecordsOnServer();
+            }
 
-            // Creating relation records
+            // Creating or updating relation records
             handleRelationRecords(user, dataUtils.getRelationRecordsHashMap(), result);
+
+            // If model allowed to create record on server
+            if (model.allowCreateRecordOnServer()) {
+                createRecordsOnServer(model);
+            }
+
+            // If model allowed to delete record on server
+            if (model.allowDeleteRecordOnServer()) {
+                removeRecordOnServer(model);
+            }
+
+            // If model allowed to delete server removed record from local database
+            if (model.allowDeleteRecordInLocal()) {
+                removeNonExistRecordFromLocal(model);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -194,11 +213,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         OValues values = new OValues();
                         ODataRow rec = rel_model.browse(rel_model.selectRowId(id));
                         values.put(related_column, rec.getInt(related_column));
+                        values.put("_is_dirty", "false");
                         rel_model.update(rel_model.selectRowId(id), values);
                     }
                     break;
                 case ManyToMany:
-                    //TODO: unable to store value to master records...
                     // Nothing to do. Already added relation records links
                     break;
             }
@@ -227,5 +246,106 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             e.printStackTrace();
         }
         return fields;
+    }
+
+
+    /**
+     * Creates locally created record on server (id with zero)
+     *
+     * @param model model object
+     */
+    private void createRecordsOnServer(OModel model) {
+        List<ODataRow> records = model.select(null,
+                "(id = ? or id = ?)", new String[]{"0", "false"});
+        int counter = 0;
+        for (ODataRow record : records) {
+            int id = createOnServer(model, JSONUtils.createJSONValues(model, record));
+            if (id != OModel.INVALID_ROW_ID) {
+                OValues values = new OValues();
+                values.put("id", id);
+                values.put("_is_dirty", "false");
+                values.put("_write_date", ODateUtils.getUTCDate());
+                model.update(record.getInt(OColumn.ROW_ID), values);
+                counter++;
+            } else {
+                Log.e(TAG, "Unable to create record on server.");
+            }
+        }
+        if (counter == records.size()) {
+            Log.i(TAG, counter + " records created on server.");
+        }
+    }
+
+    private int createOnServer(OModel model, JSONObject values) {
+        int id = OModel.INVALID_ROW_ID;
+        try {
+            if (values != null) {
+                JSONObject response = mOdoo.createNew(model.getModelName(), values);
+                id = response.getInt("result");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+
+
+    /**
+     * Removes record on server if local record is not active
+     *
+     * @param model
+     */
+    private void removeRecordOnServer(OModel model) {
+        List<ODataRow> records = model.select(new String[]{},
+                "id != ? and _is_active = ?", new String[]{"0", "false"});
+        List<Integer> serverIds = new ArrayList<>();
+        for (ODataRow record : records) {
+            serverIds.add(record.getInt("id"));
+        }
+        if (removeRecordsFromServer(model, serverIds)) {
+            int counter = model.deleteRecords(serverIds, true);
+            Log.i(TAG, counter + " records removed from server and local database");
+        } else {
+            Log.e(TAG, "Unable to remove records from server");
+        }
+    }
+
+    private boolean removeRecordsFromServer(OModel model, List<Integer> serverIds) {
+        try {
+            mOdoo.unlink(model.getModelName(), serverIds);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Removes non exist record from local database
+     *
+     * @param model
+     */
+    private void removeNonExistRecordFromLocal(OModel model) {
+        List<Integer> ids = model.getServerIds();
+        try {
+            ODomain domain = new ODomain();
+            domain.add("id", "in", new JSONArray(ids.toString()));
+            JSONObject result = mOdoo.search_read(model.getModelName(),
+                    new JSONObject(), domain.get());
+            JSONArray records = result.getJSONArray("records");
+            if (records.length() > 0) {
+                for (int i = 0; i < records.length(); i++) {
+                    JSONObject record = records.getJSONObject(i);
+                    ids.remove(ids.indexOf(record.getInt("id")));
+                }
+            }
+            int removedCounter = 0;
+            if (ids.size() > 0) {
+                removedCounter = model.deleteRecords(ids, true);
+            }
+            Log.i(TAG, removedCounter + " Records removed from local database.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -85,6 +85,10 @@ public class ODataRow {
         return _data.containsKey(key);
     }
 
+    public int size() {
+        return _data.size();
+    }
+
     @Override
     public String toString() {
         return _data.toString();

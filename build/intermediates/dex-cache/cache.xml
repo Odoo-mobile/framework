@@ -19,7 +19,7 @@
         jar="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/libs/odoo-v2.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="8e6d8ee29d87624cf28a7e70123dfc8e61e6f0d7">
+        sha1="0e1ea050e9840b84f56887fba02c42f126a5cb7a">
         <dex dex="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/odoo-v2-91d20eaff350785cab597f528d89baf025f4ad1f.jar" />
     </item>
     <item

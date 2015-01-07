@@ -15,32 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 30/12/14 3:29 PM
+ * Created on 7/1/15 12:43 PM
  */
-package com.odoo.core.support.addons.fragment;
+package com.odoo.core.utils;
 
-import android.support.v4.app.Fragment;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.odoo.core.orm.OModel;
-import com.odoo.core.support.OUser;
-
-public abstract class BaseFragment extends Fragment implements IBaseFragment {
+public class OListUtils {
+    public static final String TAG = OListUtils.class.getSimpleName();
 
 
-    public void setTitle(String title) {
-        getActivity().setTitle(title);
-    }
-
-    public OModel db() {
-        Class<?> model = database();
-        if (model != null) {
-            return new OModel(getActivity(), null, user()).createInstance(model);
+    public static List<String> toStringList(List<Integer> list) {
+        List<String> items = new ArrayList<>();
+        for (Integer item : list) {
+            items.add(item + "");
         }
-        return null;
+        return items;
     }
-
-    public OUser user() {
-        return OUser.current(getActivity());
-    }
-
 }

@@ -31,6 +31,8 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OListUtils;
+import com.odoo.core.utils.StringUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,7 +52,7 @@ public class OSyncDataUtils {
     private OModel mModel;
     private OUser mUser;
     private JSONObject response;
-    private HashSet<Integer> recordsId = new HashSet<>();
+    private HashSet<String> recordsId = new HashSet<>();
     private HashMap<String, SyncRelationRecords> relationRecordsHashMap = new HashMap<>();
     private Odoo mOdoo;
     private SyncResult mResult;
@@ -73,8 +75,6 @@ public class OSyncDataUtils {
 
     private void checkLocalUpdatedRecords() {
         try {
-            // FIXME: Check for _is_active
-
             // Array of records which are new or need to update in local
             JSONArray finalRecords = new JSONArray();
 
@@ -84,7 +84,8 @@ public class OSyncDataUtils {
             JSONArray records = response.getJSONArray("records");
             for (int i = 0; i < records.length(); i++) {
                 JSONObject record = records.getJSONObject(i);
-                if (mModel.hasServerRecord(record.getInt("id"))) {
+                if (mModel.hasServerRecord(record.getInt("id"))
+                        && mModel.isServerRecordDirty(record.getInt("id"))) {
                     int server_id = record.getInt("id");
                     serverIds.add(server_id);
                     serverIdRecords.put("key_" + server_id, record);
@@ -93,6 +94,13 @@ public class OSyncDataUtils {
                 }
             }
 
+            // getting local dirty records if server records length = 0
+            if (records.length() <= 0) {
+                for (ODataRow row : mModel.select(new String[]{"name"}, "_is_dirty = ? and _is_active = ?",
+                        new String[]{"true", "true"})) {
+                    serverIds.add(row.getInt("id"));
+                }
+            }
             // Comparing dirty (updated) record
             List<Integer> updateToServerIds = new ArrayList<>();
             if (serverIds.size() > 0) {
@@ -102,16 +110,18 @@ public class OSyncDataUtils {
                     String write_date = write_dates.get(key);
                     ODataRow record = mModel.browse(new String[]{"_write_date"}, "id = ?",
                             new String[]{server_id + ""});
-                    Date write_date_obj = ODateUtils.createDateObject(write_date,
-                            ODateUtils.DEFAULT_FORMAT, false);
-                    Date _write_date_obj = ODateUtils.createDateObject(record.getString("_write_date"),
-                            ODateUtils.DEFAULT_FORMAT, false);
-
-                    if (_write_date_obj.compareTo(write_date_obj) > 0) {
-                        // Local record is latest
-                        updateToServerIds.add(server_id);
-                    } else {
-                        finalRecords.put(serverIdRecords.get(key));
+                    if (record != null) {
+                        Date write_date_obj = ODateUtils.createDateObject(write_date,
+                                ODateUtils.DEFAULT_FORMAT, false);
+                        Date _write_date_obj = ODateUtils.createDateObject(record.getString("_write_date"),
+                                ODateUtils.DEFAULT_FORMAT, false);
+                        if (_write_date_obj.compareTo(write_date_obj) > 0) {
+                            // Local record is latest
+                            updateToServerIds.add(server_id);
+                        } else {
+                            if (serverIdRecords.containsKey(key))
+                                finalRecords.put(serverIdRecords.get(key));
+                        }
                     }
                 }
             }
@@ -126,7 +136,7 @@ public class OSyncDataUtils {
     private HashMap<String, String> getWriteDate(OModel model, List<Integer> ids) {
         HashMap<String, String> map = new HashMap<>();
         try {
-            JSONArray result = null;
+            JSONArray result;
             if (model.getColumn("write_date") != null) {
                 OdooFields fields = new OdooFields(new String[]{"write_date"});
                 ODomain domain = new ODomain();
@@ -152,6 +162,7 @@ public class OSyncDataUtils {
 
     private void handleResult() {
         try {
+            recordsId.clear();
             JSONArray records = response.getJSONArray("records");
             int length = records.length();
             List<OValues> valuesCollection = new ArrayList<>();
@@ -159,12 +170,28 @@ public class OSyncDataUtils {
             for (int i = 0; i < length; i++) {
                 JSONObject record = records.getJSONObject(i);
                 OValues values = new OValues();
-                recordsId.add(record.getInt("id"));
+                recordsId.add(mModel.getModelName() + "_" + record.getInt("id"));
                 for (OColumn column : columns) {
                     String name = column.getName();
                     if (column.getRelationType() == null) {
-                        // Normal Columns
-                        values.put(name, record.get(name));
+
+                        // checks for functional store fields
+                        if (column.isFunctionalColumn() && column.canFunctionalStore()) {
+                            List<String> depends = column.getFunctionalStoreDepends();
+                            OValues dependValues = new OValues();
+                            for (String depend : depends) {
+                                if (record.has(depend)) {
+                                    dependValues.put(depend, record.get(depend));
+                                }
+                            }
+                            if (dependValues.size() == depends.size()) {
+                                Object value = mModel.getFunctionalMethodValue(column, dependValues);
+                                values.put(column.getName(), value);
+                            }
+                        } else {
+                            // Normal Columns
+                            values.put(name, record.get(name));
+                        }
                     } else {
                         // Relation Columns
                         if (!(record.get(name) instanceof Boolean)) {
@@ -172,13 +199,17 @@ public class OSyncDataUtils {
                                 case ManyToOne:
                                     JSONArray m2oData = record.getJSONArray(name);
                                     OModel m2o_model = mModel.createInstance(column.getType());
-                                    OValues m2oValue = new OValues();
-                                    m2oValue.put("id", m2oData.get(0));
-                                    m2oValue.put("name", m2oData.get(1));
-                                    int m2oRowId = m2o_model.insertOrUpdate("id = ?", new String[]{m2oData.getInt(0) + ""},
-                                            m2oValue);
-                                    if (m2oRowId == OModel.INVALID_ROW_ID) {
-                                        m2oRowId = mModel.selectRowId(m2oData.getInt(0));
+                                    String recKey = m2o_model.getModelName() + "_" + m2oData.get(0);
+                                    int m2oRowId;
+                                    if (!recordsId.contains(recKey)) {
+                                        OValues m2oValue = new OValues();
+                                        m2oValue.put("id", m2oData.get(0));
+                                        m2oValue.put("name", m2oData.get(1));
+                                        m2oValue.put("_is_dirty", "false");
+                                        m2oRowId = m2o_model.insertOrUpdate("id = ?", new String[]{m2oData.getInt(0) + ""},
+                                                m2oValue);
+                                    } else {
+                                        m2oRowId = m2o_model.selectRowId(m2oData.getInt(0));
                                     }
                                     values.put(name, m2oRowId);
                                     if (mCreateRelationRecords) {
@@ -204,9 +235,16 @@ public class OSyncDataUtils {
                                     }
                                     List<Integer> m2mRowIds = new ArrayList<>();
                                     for (Integer id : m2mIds) {
-                                        OValues m2mValues = new OValues();
-                                        m2mValues.put("id", id);
-                                        int r_id = m2mModel.insertOrUpdate("id = ?", new String[]{id + ""}, m2mValues);
+                                        recKey = m2mModel.getModelName() + "_" + id;
+                                        int r_id = OModel.INVALID_ROW_ID;
+                                        if (!recordsId.contains(recKey)) {
+                                            OValues m2mValues = new OValues();
+                                            m2mValues.put("id", id);
+                                            m2mValues.put("_is_dirty", "false");
+                                            r_id = m2mModel.insertOrUpdate("id = ?", new String[]{id + ""}, m2mValues);
+                                        } else {
+                                            r_id = m2mModel.selectRowId(id);
+                                        }
                                         m2mRowIds.add(r_id);
                                     }
                                     if (m2mRowIds.size() > 0) {
@@ -231,7 +269,8 @@ public class OSyncDataUtils {
                 }
                 // Some default values
                 values.put("_write_date", ODateUtils.getUTCDate());
-                values.put("_is_active", true);
+                values.put("_is_active", "true");
+                values.put("_is_dirty", "false");
                 valuesCollection.add(values);
             }
             HashMap<String, List<Integer>> map = mModel.insertOrUpdate(valuesCollection);
@@ -249,10 +288,25 @@ public class OSyncDataUtils {
 
     public boolean updateRecordsOnServer() {
         try {
-            //TODO: Update latest dirty record to server. (local_write_date > server_write_date)
             // Use key (modal name) from updateToServerRecords
             // use updateToServerRecords ids
-
+            int counter = 0;
+            for (String key : updateToServerRecords.keySet()) {
+                OModel model = OModel.get(mContext, key, mUser.getAndroidName());
+                List<String> ids = OListUtils.toStringList(updateToServerRecords.get(key));
+                counter += ids.size();
+                for (ODataRow record : model.select(null,
+                        "id IN ( " + StringUtils.repeat("?, ", ids.size() - 1) + " ?)",
+                        ids.toArray(new String[ids.size()]))) {
+                    mOdoo.updateValues(model.getModelName(),
+                            JSONUtils.createJSONValues(model, record), record.getInt("id"));
+                    OValues value = new OValues();
+                    value.put("_is_dirty", "false");
+                    value.put("_write_date", ODateUtils.getUTCDate());
+                    model.update(record.getInt(OColumn.ROW_ID), value);
+                }
+            }
+            Log.i(TAG, counter + " records updated on server");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -358,5 +412,6 @@ public class OSyncDataUtils {
             return ids;
         }
     }
+
 
 }

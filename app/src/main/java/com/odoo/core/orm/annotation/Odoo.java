@@ -57,12 +57,6 @@ public @interface Odoo {
          */
         String[] depends() default {};
 
-        /**
-         * Check row id.
-         *
-         * @return true, if successful
-         */
-        boolean checkRowId() default true;
     }
 
     @Retention(RetentionPolicy.RUNTIME)

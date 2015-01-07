@@ -165,6 +165,11 @@ public class OColumn {
         return mHasDomainFilterColumn;
     }
 
+    public OColumn setHasDomainFilterColumn(Boolean domainFilterColumn) {
+        mHasDomainFilterColumn = domainFilterColumn;
+        return this;
+    }
+
     public boolean hasOnChange() {
         return (mOnChangeMethod != null);
     }
@@ -233,6 +238,24 @@ public class OColumn {
         return this;
     }
 
+    public Boolean isFunctionalColumn() {
+        return is_functional_column;
+    }
+
+    public OColumn setIsFunctionalColumn(Boolean is_functional_column) {
+        this.is_functional_column = is_functional_column;
+        return this;
+    }
+
+    public Method getFunctionalMethod() {
+        return functional_method;
+    }
+
+    public OColumn setFunctionalMethod(Method functional_method) {
+        this.functional_method = functional_method;
+        return this;
+    }
+
     /**
      * Gets the functional store depends.
      *
@@ -251,12 +274,23 @@ public class OColumn {
                 ", label='" + label + '\'' +
                 ", related_column='" + related_column + '\'' +
                 ", size=" + size +
-                ", type=" + type.getName() +
+                ", type=" + type +
                 ", relationType=" + relationType +
                 ", defaultValue=" + defaultValue +
                 ", autoIncrement=" + autoIncrement +
                 ", required=" + required +
                 ", isLocalColumn=" + isLocalColumn +
+                ", columnDomains=" + columnDomains +
+                ", condition_operator_index=" + condition_operator_index +
+                ", recordSyncLimit=" + recordSyncLimit +
+                ", mOnChangeMethod=" + mOnChangeMethod +
+                ", mOnChangeBGProcess=" + mOnChangeBGProcess +
+                ", mHasDomainFilterColumn=" + mHasDomainFilterColumn +
+                ", is_functional_column=" + is_functional_column +
+                ", functional_method=" + functional_method +
+                ", use_annotation=" + use_annotation +
+                ", functional_store=" + functional_store +
+                ", functional_store_depends=" + Arrays.toString(functional_store_depends) +
                 '}';
     }
 
@@ -308,6 +342,7 @@ public class OColumn {
         public void setConditionalOperator(String conditional_operator) {
             this.conditional_operator = conditional_operator;
         }
+
 
         @Override
         public String toString() {

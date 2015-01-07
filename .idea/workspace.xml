@@ -39,81 +39,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="OSyncAdapter.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncAdapter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1302" max-vertical-offset="2010">
-              <caret line="191" column="70" selection-start-line="191" selection-start-column="70" selection-end-line="191" selection-end-column="70" />
-              <folding>
-                <element signature="method#syncData#0;class#OSyncAdapter#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OModel.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OModel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5166113" vertical-offset="889" max-vertical-offset="4230">
-              <caret line="176" column="36" selection-start-line="176" selection-start-column="36" selection-end-line="176" selection-end-column="36" />
-              <folding>
-                <element signature="method#prepareFields#0;class#OModel#0" expanded="true" />
-                <element signature="method#select#3;class#OModel#0" expanded="true" />
-                <element signature="method#getRelationColumns#1;class#OModel#0" expanded="true" />
-                <element signature="method#selectManyToManyRecords#0;class#OModel#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OM2MRecord.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OM2MRecord.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
-              <caret line="48" column="54" selection-start-line="48" selection-start-column="54" selection-end-line="48" selection-end-column="54" />
-              <folding>
-                <element signature="method#OM2MRecord#0;class#OM2MRecord#0" expanded="true" />
-                <element signature="method#getRelIds#0;class#OM2MRecord#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Partners.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="Partners.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/Partners.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="945">
-              <caret line="53" column="35" selection-start-line="53" selection-start-column="35" selection-end-line="53" selection-end-column="35" />
+            <state vertical-scroll-proportion="0.5232558" vertical-offset="0" max-vertical-offset="602">
+              <caret line="56" column="13" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
               <folding>
                 <element signature="method#onViewCreated#0;class#Partners#0" expanded="true" />
-                <element signature="e#1858#1859#0" expanded="true" />
-                <element signature="e#1897#1898#0" expanded="true" />
-                <element signature="method#drawerMenus#0;class#Partners#0" expanded="true" />
-                <element signature="method#getData#0;class#Partners#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OSyncDataUtils.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncDataUtils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="630" max-vertical-offset="5220">
-              <caret line="64" column="21" selection-start-line="64" selection-start-column="21" selection-end-line="64" selection-end-column="21" />
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-                <element signature="imports" expanded="true" />
-                <element signature="method#checkLocalUpdatedRecords#0;class#OSyncDataUtils#0" expanded="true" />
-                <element signature="method#getWriteDate#0;class#OSyncDataUtils#0" expanded="true" />
-                <element signature="method#handleResult#0;class#OSyncDataUtils#0" expanded="true" />
-                <element signature="e#8963#8972#0" expanded="true" />
-                <element signature="e#10639#10648#0" expanded="true" />
-                <element signature="method#updateRecordsOnServer#0;class#OSyncDataUtils#0" expanded="true" />
-                <element signature="method#addUpdateRelationRecord#0;class#OSyncDataUtils#0" expanded="true" />
-                <element signature="method#getRelationRecordsHashMap#0;class#OSyncDataUtils#0" expanded="true" />
-                <element signature="method#SyncRelationRecords#0;class#SyncRelationRecords#0;class#OSyncDataUtils#0" expanded="true" />
-                <element signature="method#setServerIds#0;class#SyncRelationRecords#0;class#OSyncDataUtils#0" expanded="true" />
-                <element signature="method#getUniqueIds#0;class#SyncRelationRecords#0;class#OSyncDataUtils#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -977,7 +909,7 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="4258170483296" />
+        <entry key="$PROJECT_DIR$" value="4259974198195" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -1018,6 +950,23 @@
                           </list>
                         </option>
                         <option name="path" value="$PROJECT_DIR$/app" />
+                      </ExternalModuleBuildClasspathPojo>
+                    </value>
+                  </entry>
+                  <entry key="$PROJECT_DIR$/odoo">
+                    <value>
+                      <ExternalModuleBuildClasspathPojo>
+                        <option name="entries">
+                          <list>
+                            <option value="$APPLICATION_HOME_DIR$/gradle/m2repository/com/android/tools/build/builder/1.0.0/builder-1.0.0-sources.jar" />
+                            <option value="$APPLICATION_HOME_DIR$/gradle/m2repository/com/android/tools/build/gradle/1.0.0/gradle-1.0.0-sources.jar" />
+                            <option value="$APPLICATION_HOME_DIR$/gradle/m2repository/com/android/tools/build/builder-model/1.0.0/builder-model-1.0.0-sources.jar" />
+                            <option value="$APPLICATION_HOME_DIR$/gradle/m2repository/com/android/tools/build/builder/1.0.0/builder-1.0.0.jar" />
+                            <option value="$APPLICATION_HOME_DIR$/gradle/m2repository/com/android/tools/build/builder-model/1.0.0/builder-model-1.0.0.jar" />
+                            <option value="$APPLICATION_HOME_DIR$/gradle/m2repository/com/android/tools/build/gradle/1.0.0/gradle-1.0.0.jar" />
+                          </list>
+                        </option>
+                        <option name="path" value="$PROJECT_DIR$/odoo" />
                       </ExternalModuleBuildClasspathPojo>
                     </value>
                   </entry>
@@ -1092,12 +1041,7 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/types/OInteger.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/types/OTypeHelper.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/auth/OdooAuthenticator.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/annotation/Odoo.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/base/addons/res/ResCountry.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OValues.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/types/ODate.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/models/ResCountryState.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/OCursorUtils.java" />
@@ -1118,31 +1062,36 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/ODateUtils.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/base/addons/ir/IrModel.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/base/addons/BaseModels.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/OColumn.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/services/PartnerSyncService.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/types/ODateTime.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/types/OHtml.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/config/Addons.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OSQLHelper.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/models/ResPartnerCategory.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/base/addons/res/ResPartner.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/JSONUtils.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/provider/BaseModelProvider.java" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/App.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/config/BaseConfig.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OSQLite.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OO2MRecord.java" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/provider/BaseModelProvider.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/ODataRow.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OM2ORecord.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OM2MRecord.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/StringUtils.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncDataUtils.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncAdapter.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/Partners.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/annotation/Odoo.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/OColumn.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/ODataRow.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/base/addons/res/ResPartner.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OValues.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OSQLite.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/OListUtils.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/JSONUtils.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/auth/OdooAccountManager.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OModel.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/support/addons/fragment/BaseFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncAdapter.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncDataUtils.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/provider/BaseModelProvider.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/Partners.java" />
       </list>
     </option>
   </component>
@@ -1196,8 +1145,9 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="Scope" />
+      <pane id="ProjectPane" />
+      <pane id="PackagesPane" />
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -1222,7 +1172,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1232,7 +1181,7 @@
     <property name="MemberChooser.sorted" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="android.project.structure.last.selected" value="app" />
+    <property name="android.project.structure.last.selected" value="odoo" />
     <property name="android.project.structure.proportion" value="0.15" />
     <property name="options.lastSelected" value="editor" />
     <property name="options.splitter.main.proportions" value="0.3" />
@@ -1244,7 +1193,7 @@
     <property name="FullScreen" value="false" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="OverrideImplement.overriding.sorted" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../play_store/key_store/com_odoo" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop" />
     <property name="ExportApk.ApkPath" value="$PROJECT_DIR$/app" />
     <property name="ExportApk.Flavors" value="" />
     <property name="ExportApk.BuildType" value="release" />
@@ -1458,7 +1407,7 @@
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290938" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5643879" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290938" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2794562" sideWeight="0.5007949" order="2" side_tool="true" content_ui="tabs" />
@@ -1470,14 +1419,14 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290938" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290938" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4944356" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6868045" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4944356" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2794562" sideWeight="0.49920508" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Memory Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290938" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3990461" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2794562" sideWeight="0.5007949" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1506,72 +1455,14 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="6" />
+      <option name="time" value="8" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/types/OInteger.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.24916944" vertical-offset="0" max-vertical-offset="602">
-          <caret line="28" column="0" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/types/OSelection.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.19933555" vertical-offset="0" max-vertical-offset="602">
-          <caret line="26" column="23" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/base/addons/res/ResCountry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.29900333" vertical-offset="0" max-vertical-offset="602">
-          <caret line="30" column="68" selection-start-line="30" selection-start-column="68" selection-end-line="30" selection-end-column="68" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1196#1197#0" expanded="false" />
-            <element signature="e#1247#1248#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OValues.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.3737541" vertical-offset="238" max-vertical-offset="1740">
-          <caret line="71" column="42" selection-start-line="71" selection-start-column="42" selection-end-line="71" selection-end-column="42" />
-          <folding>
-            <element signature="n#!!doc" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#1099#1115#0" expanded="false" />
-            <element signature="e#1270#1271#0" expanded="false" />
-            <element signature="e#1309#1310#0" expanded="false" />
-            <element signature="e#1346#1347#0" expanded="false" />
-            <element signature="e#1385#1386#0" expanded="false" />
-            <element signature="e#1826#1827#0" expanded="false" />
-            <element signature="e#1876#1877#0" expanded="false" />
-            <element signature="e#2036#2037#0" expanded="false" />
-            <element signature="e#2083#2084#0" expanded="false" />
-            <element signature="e#2391#2392#0" expanded="false" />
-            <element signature="e#2428#2429#0" expanded="false" />
-            <element signature="e#2474#2475#0" expanded="false" />
-            <element signature="e#2515#2516#0" expanded="false" />
-            <element signature="e#3020#3021#0" expanded="false" />
-            <element signature="e#3056#3057#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/types/OTypeHelper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.1744186" vertical-offset="0" max-vertical-offset="602">
           <caret line="25" column="43" selection-start-line="25" selection-start-column="43" selection-end-line="25" selection-end-column="43" />
-          <folding>
-            <element signature="e#965#966#0" expanded="false" />
-            <element signature="e#1015#1016#0" expanded="false" />
-            <element signature="method#getType#0;class#OTypeHelper#0" expanded="false" />
-            <element signature="method#setSize#0;class#OTypeHelper#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1607,10 +1498,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.37375414" vertical-offset="0" max-vertical-offset="602">
           <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1306#1307#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1632,14 +1519,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.7385399" vertical-offset="0" max-vertical-offset="900">
           <caret line="72" column="27" selection-start-line="72" selection-start-column="27" selection-end-line="72" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/build/intermediates/manifests/full/debug/AndroidManifest.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.21317157" vertical-offset="687" max-vertical-offset="1290">
-          <caret line="54" column="0" selection-start-line="54" selection-start-column="0" selection-end-line="54" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -1654,14 +1533,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.44850498" vertical-offset="0" max-vertical-offset="602">
           <caret line="36" column="23" selection-start-line="36" selection-start-column="12" selection-end-line="36" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/annotation/Odoo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.15282393" vertical-offset="613" max-vertical-offset="1515">
-          <caret line="68" column="24" selection-start-line="68" selection-start-column="23" selection-end-line="68" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1686,29 +1557,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/auth/OdooAccountManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6511628" vertical-offset="1108" max-vertical-offset="1710">
-          <caret line="207" column="67" selection-start-line="207" selection-start-column="67" selection-end-line="207" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/models/ResPartnerCategory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.24916944" vertical-offset="0" max-vertical-offset="602">
           <caret line="28" column="21" selection-start-line="28" selection-start-column="21" selection-end-line="28" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/JSONUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5481728" vertical-offset="180" max-vertical-offset="1110">
-          <caret line="37" column="37" selection-start-line="37" selection-start-column="37" selection-end-line="37" selection-end-column="37" />
-          <folding>
-            <element signature="method#toList#0;class#JSONUtils#0" expanded="false" />
-            <element signature="method#toArray#0;class#JSONUtils#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1726,9 +1578,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.18987341" vertical-offset="0" max-vertical-offset="395">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding>
-            <element signature="tag#sync-adapter#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1761,22 +1610,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3986711" vertical-offset="0" max-vertical-offset="602">
-          <caret line="16" column="30" selection-start-line="16" selection-start-column="30" selection-end-line="16" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OSQLite.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.27740863" vertical-offset="163" max-vertical-offset="765">
-          <caret line="54" column="49" selection-start-line="54" selection-start-column="49" selection-end-line="54" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OO2MRecord.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.3488372" vertical-offset="0" max-vertical-offset="602">
@@ -1787,21 +1620,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/provider/BaseModelProvider.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.2988116" vertical-offset="0" max-vertical-offset="960">
-          <caret line="192" column="11" selection-start-line="192" selection-start-column="11" selection-end-line="192" selection-end-column="11" />
-          <folding>
-            <element signature="method#removeRelationColumns#0;class#BaseModelProvider#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/providers/PartnersSyncProvider.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.19933555" vertical-offset="0" max-vertical-offset="602">
           <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1842,34 +1664,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/support/addons/fragment/BaseFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2740864" vertical-offset="0" max-vertical-offset="602">
-          <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/support/addons/fragment/IBaseFragment.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.19933555" vertical-offset="0" max-vertical-offset="602">
           <caret line="30" column="22" selection-start-line="30" selection-start-column="22" selection-end-line="30" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/ODataRow.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.8936877" vertical-offset="0" max-vertical-offset="1245">
-          <caret line="145" column="1" selection-start-line="145" selection-start-column="1" selection-end-line="145" selection-end-column="1" />
-          <folding>
-            <element signature="method#getInt#0;class#ODataRow#0" expanded="true" />
-            <element signature="e#1972#1973#0" expanded="true" />
-            <element signature="e#2022#2023#0" expanded="true" />
-            <element signature="e#3269#3270#0" expanded="true" />
-            <element signature="e#3297#3298#0" expanded="true" />
-            <element signature="method#getPrimaryBundleData#0;class#ODataRow#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1883,24 +1681,6 @@
             <element signature="method#browse#0;class#OM2ORecord#0" expanded="true" />
             <element signature="method#browse#1;class#OM2ORecord#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/OColumn.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.77574754" vertical-offset="2503" max-vertical-offset="3105">
-          <caret line="326" column="9" selection-start-line="326" selection-start-column="9" selection-end-line="326" selection-end-column="9" />
-          <folding>
-            <element signature="method#toString#0;class#ColumnDomain#0;class#OColumn#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/base/addons/res/ResPartner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.67275745" vertical-offset="0" max-vertical-offset="720">
-          <caret line="57" column="23" selection-start-line="57" selection-start-column="12" selection-end-line="57" selection-end-column="23" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1927,72 +1707,202 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="1.2458472" vertical-offset="0" max-vertical-offset="900">
           <caret line="68" column="22" selection-start-line="68" selection-start-column="22" selection-end-line="68" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/annotation/Odoo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.94684386" vertical-offset="0" max-vertical-offset="1425">
+          <caret line="59" column="5" selection-start-line="59" selection-start-column="5" selection-end-line="59" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OValues.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.72591364" vertical-offset="268" max-vertical-offset="870">
+          <caret line="113" column="49" selection-start-line="113" selection-start-column="49" selection-end-line="113" selection-end-column="49" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#repeat#0;class#StringUtils#0" expanded="true" />
-            <element signature="method#capitalizeString#0;class#StringUtils#0" expanded="true" />
-            <element signature="method#htmlToString#0;class#StringUtils#0" expanded="true" />
-            <element signature="e#2253#2254#0" expanded="true" />
-            <element signature="e#2297#2298#0" expanded="true" />
+            <element signature="method#keys#0;class#OValues#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncDataUtils.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/fields/OColumn.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="630" max-vertical-offset="5220">
-          <caret line="64" column="21" selection-start-line="64" selection-start-column="21" selection-end-line="64" selection-end-column="21" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1697" max-vertical-offset="3825">
+          <caret line="225" column="31" selection-start-line="225" selection-start-column="31" selection-end-line="225" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/base/addons/res/ResPartner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.77574754" vertical-offset="118" max-vertical-offset="720">
+          <caret line="71" column="0" selection-start-line="71" selection-start-column="0" selection-end-line="71" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/OListUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.32392028" vertical-offset="0" max-vertical-offset="602">
+          <caret line="31" column="32" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/ODataRow.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.32941177" vertical-offset="649" max-vertical-offset="1515">
+          <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
+            <element signature="method#getInt#0;class#ODataRow#0" expanded="true" />
+            <element signature="e#2022#2023#0" expanded="true" />
+            <element signature="method#getPrimaryBundleData#0;class#ODataRow#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/utils/JSONUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1534" max-vertical-offset="2295">
+          <caret line="125" column="53" selection-start-line="125" selection-start-column="53" selection-end-line="125" selection-end-column="53" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="method#toList#0;class#JSONUtils#0" expanded="false" />
+            <element signature="method#toArray#0;class#JSONUtils#0" expanded="false" />
+            <element signature="method#toList#1;class#JSONUtils#0" expanded="false" />
+            <element signature="method#toDataRow#0;class#JSONUtils#0" expanded="false" />
+            <element signature="method#toJSONObject#0;class#JSONUtils#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/auth/OdooAccountManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6013289" vertical-offset="1273" max-vertical-offset="1875">
+          <caret line="205" column="52" selection-start-line="205" selection-start-column="52" selection-end-line="205" selection-end-column="52" />
+          <folding>
+            <element signature="method#logout#0;class#OdooAccountManager#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="395">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="602">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3986711" vertical-offset="0" max-vertical-offset="602">
+          <caret line="16" column="30" selection-start-line="16" selection-start-column="30" selection-end-line="16" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OSQLite.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7475083" vertical-offset="0" max-vertical-offset="750">
+          <caret line="109" column="25" selection-start-line="109" selection-start-column="25" selection-end-line="109" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/support/addons/fragment/BaseFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5730897" vertical-offset="0" max-vertical-offset="602">
+          <caret line="43" column="5" selection-start-line="43" selection-start-column="5" selection-end-line="43" selection-end-column="5" />
+          <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#checkLocalUpdatedRecords#0;class#OSyncDataUtils#0" expanded="true" />
-            <element signature="method#getWriteDate#0;class#OSyncDataUtils#0" expanded="true" />
-            <element signature="method#handleResult#0;class#OSyncDataUtils#0" expanded="true" />
-            <element signature="e#8963#8972#0" expanded="true" />
-            <element signature="e#10639#10648#0" expanded="true" />
-            <element signature="method#updateRecordsOnServer#0;class#OSyncDataUtils#0" expanded="true" />
-            <element signature="method#addUpdateRelationRecord#0;class#OSyncDataUtils#0" expanded="true" />
-            <element signature="method#getRelationRecordsHashMap#0;class#OSyncDataUtils#0" expanded="true" />
-            <element signature="method#SyncRelationRecords#0;class#SyncRelationRecords#0;class#OSyncDataUtils#0" expanded="true" />
-            <element signature="method#setServerIds#0;class#SyncRelationRecords#0;class#OSyncDataUtils#0" expanded="true" />
-            <element signature="method#getUniqueIds#0;class#SyncRelationRecords#0;class#OSyncDataUtils#0" expanded="true" />
+            <element signature="method#db#0;class#BaseFragment#0" expanded="true" />
+            <element signature="e#1368#1369#0" expanded="true" />
+            <element signature="e#1419#1420#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncAdapter.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/provider/BaseModelProvider.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1302" max-vertical-offset="2010">
-          <caret line="191" column="70" selection-start-line="191" selection-start-column="70" selection-end-line="191" selection-end-column="70" />
+        <state vertical-scroll-proportion="5.8280253" vertical-offset="0" max-vertical-offset="2745">
+          <caret line="129" column="0" selection-start-line="129" selection-start-column="0" selection-end-line="129" selection-end-column="0" />
           <folding>
-            <element signature="method#syncData#0;class#OSyncAdapter#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/Partners.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="945">
-          <caret line="53" column="35" selection-start-line="53" selection-start-column="35" selection-end-line="53" selection-end-column="35" />
-          <folding>
-            <element signature="method#onViewCreated#0;class#Partners#0" expanded="true" />
-            <element signature="e#1858#1859#0" expanded="true" />
-            <element signature="e#1897#1898#0" expanded="true" />
-            <element signature="method#drawerMenus#0;class#Partners#0" expanded="true" />
-            <element signature="method#getData#0;class#Partners#0" expanded="true" />
+            <element signature="method#query#0;class#BaseModelProvider#0" expanded="true" />
+            <element signature="method#update#0;class#BaseModelProvider#0" expanded="true" />
+            <element signature="e#10269#10278#0" expanded="true" />
+            <element signature="method#generateValues#0;class#BaseModelProvider#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/orm/OModel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5166113" vertical-offset="889" max-vertical-offset="4230">
-          <caret line="176" column="36" selection-start-line="176" selection-start-column="36" selection-end-line="176" selection-end-column="36" />
+        <state vertical-scroll-proportion="1.4882352" vertical-offset="3752" max-vertical-offset="6015">
+          <caret line="685" column="32" selection-start-line="685" selection-start-column="32" selection-end-line="685" selection-end-column="32" />
           <folding>
-            <element signature="method#prepareFields#0;class#OModel#0" expanded="true" />
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="method#browse#1;class#OModel#0" expanded="true" />
+            <element signature="method#browse#2;class#OModel#0" expanded="true" />
+            <element signature="method#getServerIds#0;class#OModel#0" expanded="true" />
+            <element signature="method#getLastSyncDateTime#0;class#OModel#0" expanded="true" />
             <element signature="method#select#3;class#OModel#0" expanded="true" />
-            <element signature="method#getRelationColumns#1;class#OModel#0" expanded="true" />
+            <element signature="method#insertOrUpdate#0;class#OModel#0" expanded="true" />
+            <element signature="method#deleteRecords#0;class#OModel#0" expanded="true" />
+            <element signature="method#delete#1;class#OModel#0" expanded="true" />
+            <element signature="method#delete#3;class#OModel#0" expanded="true" />
+            <element signature="e#30877#30878#0" expanded="true" />
+            <element signature="e#30918#30919#0" expanded="true" />
+            <element signature="method#query#1;class#OModel#0" expanded="true" />
             <element signature="method#selectManyToManyRecords#0;class#OModel#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.6496816" vertical-offset="1646" max-vertical-offset="4485">
+          <caret line="165" column="47" selection-start-line="165" selection-start-column="26" selection-end-line="165" selection-end-column="47" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#onPerformSync#0;class#OSyncAdapter#0" expanded="true" />
+            <element signature="method#handleRelationRecords#0;class#OSyncAdapter#0" expanded="true" />
+            <element signature="method#createRecordsOnServer#0;class#OSyncAdapter#0" expanded="true" />
+            <element signature="method#createOnServer#0;class#OSyncAdapter#0" expanded="true" />
+            <element signature="method#removeRecordOnServer#0;class#OSyncAdapter#0" expanded="true" />
+            <element signature="method#removeRecordsFromServer#0;class#OSyncAdapter#0" expanded="true" />
+            <element signature="method#removeNonExistRecordFromLocal#0;class#OSyncAdapter#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/core/service/OSyncDataUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.2705882" vertical-offset="679" max-vertical-offset="2970">
+          <caret line="124" column="21" selection-start-line="124" selection-start-column="21" selection-end-line="124" selection-end-column="21" />
+          <folding>
+            <element signature="method#getWriteDate#0;class#OSyncDataUtils#0" expanded="true" />
+            <element signature="method#updateRecordsOnServer#0;class#OSyncDataUtils#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/odoo/addons/partners/Partners.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5232558" vertical-offset="0" max-vertical-offset="602">
+          <caret line="56" column="13" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+          <folding>
+            <element signature="method#onViewCreated#0;class#Partners#0" expanded="true" />
           </folding>
         </state>
       </provider>
