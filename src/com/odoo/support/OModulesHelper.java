@@ -20,6 +20,7 @@ package com.odoo.support;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -49,21 +50,32 @@ public class OModulesHelper {
 	 */
 	private void prepareModuleList() {
 		mModules.clear();
-		for (Field module_col : getClass().getDeclaredFields()) {
-			if (module_col.getType().isAssignableFrom(OModule.class)) {
-				module_col.setAccessible(true);
-				try {
-					OModule module = (OModule) module_col.get(this);
-					if (module.isDefault()) {
-						mDefaultModule = module;
-						mModules.add(0, module);
-					} else {
-						mModules.add(module);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+				
+		// h4k1m: get modules from fields
+		Field[] fields = getClass().getDeclaredFields();
+		OModule[] modules = new OModule[fields.length];
+		
+		for (int i = 0; i < fields.length; i++) {
+		    fields[i].setAccessible(true);
+
+		    try {
+				modules[i] = (OModule) fields[i].get(this);	
+		    } catch (Exception e) {
+				e.printStackTrace();
+		    }
+ 		}
+		
+		// h4k1m: sort menu modules array
+		Arrays.sort(modules);
+
+		// h4k1m: iterate over sorted modules instead of fields
+		for (OModule module : modules) {
+		    if (module.isDefault()) {
+				mDefaultModule = module;
+				mModules.add(0, module);
+		    } else {
+				mModules.add(module);
+		    }
 		}
 	}
 

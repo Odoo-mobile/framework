@@ -23,14 +23,22 @@ import android.content.Context;
 import com.odoo.orm.OModel;
 import com.odoo.support.fragment.OModuleHelper;
 
-public class OModule {
+public class OModule implements Comparable<OModule> {
 
 	Class<?> module = null;
 	Boolean isDefault = false;
+		
+	/**
+	 * @param mPriority used to sort drawer modules	
+	 * @type Integer
+	 * @author h.Benoudjit
+	 */
+	Integer mPriority = 0;
 
-	public OModule(Class<?> module) {
+	public OModule(Class<?> module, int priority) {
 		super();
 		this.module = module;
+		this.mPriority = priority;
 	}
 
 	public OModule setDefault() {
@@ -58,5 +66,11 @@ public class OModule {
 
 	public String toString() {
 		return module.getSimpleName();
+	}
+	
+	@Override
+	public int compareTo(OModule other) {
+	        // h4k1m: make modules comparable to sort them in the drawer
+		return this.mPriority.compareTo(other.mPriority);
 	}
 }

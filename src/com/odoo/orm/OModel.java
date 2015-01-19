@@ -1262,11 +1262,11 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	private void notifyDataChange(Integer id) {
-		// FIXME: remove method after content provider ready
-		/*
-		 * Uri uri = uri(); if (id != null) uri.buildUpon().appendPath(id + "");
-		 * mContext.getContentResolver().notifyChange(uri, null, false);
-		 */
+		// h4k1m: enable upload to server
+		Uri uri = uri();
+		if (id != null)
+			uri.buildUpon().appendPath(id + "");
+		mContext.getContentResolver().notifyChange(uri, null);
 	}
 
 	private void sendDatasetChangeBroadcast(Integer newId) {

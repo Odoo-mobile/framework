@@ -16,11 +16,12 @@
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  * 
  */
-package com.odoo.orm;
+package com.itsolutions.eshop.orm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 
@@ -148,6 +149,17 @@ public class ODataRow {
 	}
 
 	public OValues toValues() {
+		// h4k1m: get Integer foreign key(s) from M2O (M2M) relation object
+        for (Map.Entry<String, Object> entry : _data.entrySet()) {
+            String field = entry.getKey();
+            Object value = entry.getValue();
+		
+            if (value instanceof OM2ORecord)
+            	_data.put(field, ((OM2ORecord) value).getRecordId());
+            if (value instanceof OM2MRecord)
+            	_data.put(field, ((OM2MRecord) value).getRelIds());
+        }
+
 		OValues values = new OValues();
 		values.addAll(getAll());
 		return values;
