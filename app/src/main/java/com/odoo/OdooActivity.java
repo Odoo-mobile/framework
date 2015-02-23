@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
@@ -41,19 +42,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.odoo.core.account.AppIntro;
 import com.odoo.core.account.ManageAccounts;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
+import com.odoo.core.orm.OModel;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
+import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OFragmentUtils;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.drawer.DrawerUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
@@ -70,8 +76,11 @@ public class OdooActivity extends ActionBarActivity {
     public static final String KEY_NEW_USER_NAME = "key_new_account_username";
     public static final String KEY_CURRENT_DRAWER_ITEM = "key_drawer_item_index";
     public static final String KEY_APP_TITLE = "key_app_title";
+    public static final String KEY_HAS_ACTIONBAR_SPINNER = "key_has_actionbar_spinner";
     public static final Integer REQUEST_ACCOUNT_CREATE = 1101;
     public static final Integer REQUEST_ACCOUNTS_MANAGE = 1102;
+    public static final String KEY_FRESH_LOGIN = "key_fresh_login";
+
 
     private DrawerLayout mDrawerLayout = null;
     private ActionBarDrawerToggle mDrawerToggle = null;
@@ -82,14 +91,25 @@ public class OdooActivity extends ActionBarActivity {
     private LinearLayout mDrawerItemContainer = null;
     private Boolean mAccountBoxExpanded = false;
     private Bundle mSavedInstanceState = null;
-
+    private Spinner spinner_nav = null;
     private Integer mDrawerSelectedIndex = -1;
+    private Boolean mHasActionBarSpinner = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSavedInstanceState = savedInstanceState;
         Log.i(TAG, "OdooActivity->onCreate");
+        OPreferenceManager preferenceManager = new OPreferenceManager(this);
+        if (!preferenceManager.getBoolean(KEY_FRESH_LOGIN, false)) {
+            preferenceManager.setBoolean(KEY_FRESH_LOGIN, true);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(new Intent(OdooActivity.this, AppIntro.class));
+                }
+            }, 1000);
+        }
         setContentView(R.layout.odoo_activity);
         OActionBarUtils.setActionBar(this, true);
         setupDrawer();
@@ -160,6 +180,8 @@ public class OdooActivity extends ActionBarActivity {
                     setTitle(item.getTitle());
                 }
                 loadDrawerItemInstance(item.getInstance(), item.getExtra());
+            } else {
+                closeDrawer();
             }
         }
     };
@@ -195,7 +217,8 @@ public class OdooActivity extends ActionBarActivity {
                     intent = new Intent(this, cls);
                 }
                 if (intent != null) {
-                    intent.putExtras(extra);
+                    if (extra != null)
+                        intent.putExtras(extra);
                     loadDrawerItemInstance(intent, null);
                     return;
                 }
@@ -206,6 +229,10 @@ public class OdooActivity extends ActionBarActivity {
             }
         }
         closeDrawer();
+    }
+
+    public void loadFragment(Fragment fragment, Boolean addToBackState, Bundle extra) {
+        OFragmentUtils.get(this, null).startFragment(fragment, addToBackState, extra);
     }
 
     private void setupAccountBox() {
@@ -337,25 +364,30 @@ public class OdooActivity extends ActionBarActivity {
 
                         // Logging in to other account
                         OdooAccountManager.login(OdooActivity.this, user.getAndroidName());
+                        OModel.sqLite = null;
 
                         mAccountBoxExpanded = false;
                         accountBoxToggle();
                         mDrawerLayout.closeDrawer(Gravity.START);
                         // Restarting activity
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent intent = getIntent();
-                                finish();
-                                startActivity(intent);
-                            }
-                        }, DRAWER_ITEM_LAUNCH_DELAY);
+                        restartActivity();
                     }
                 });
                 mDrawerAccountContainer.addView(view);
             }
         }
         accountListDefaultItems();
+    }
+
+    private void restartActivity() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(OdooActivity.this, OdooActivity.class);
+                finish();
+                startActivity(intent);
+            }
+        }, DRAWER_ITEM_LAUNCH_DELAY);
     }
 
     private void accountListDefaultItems() {
@@ -439,7 +471,8 @@ public class OdooActivity extends ActionBarActivity {
                     accountBoxToggle();
                 }
                 OdooAccountManager.login(this, data.getStringExtra(KEY_NEW_USER_NAME));
-                setupAccountBox();
+                OModel.sqLite = null;
+                restartActivity();
             }
             if (requestCode == REQUEST_ACCOUNTS_MANAGE) {
                 startActivity(new Intent(this, OdooLogin.class));
@@ -483,6 +516,7 @@ public class OdooActivity extends ActionBarActivity {
                 }
             }, DRAWER_ITEM_LAUNCH_DELAY);
         } else {
+            mHasActionBarSpinner = savedInstanceState.getBoolean(KEY_HAS_ACTIONBAR_SPINNER);
             mDrawerSelectedIndex = savedInstanceState.getInt(KEY_CURRENT_DRAWER_ITEM);
             setTitle(savedInstanceState.getString(KEY_APP_TITLE));
             focusOnDrawerItem(mDrawerSelectedIndex);
@@ -501,7 +535,43 @@ public class OdooActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(KEY_CURRENT_DRAWER_ITEM, mDrawerSelectedIndex);
         outState.putString(KEY_APP_TITLE, getTitle().toString());
+        outState.putBoolean(KEY_HAS_ACTIONBAR_SPINNER, mHasActionBarSpinner);
         super.onSaveInstanceState(outState);
+    }
+
+
+    public SyncUtils sync() {
+        return SyncUtils.get(this);
+    }
+
+    /**
+     * Actionbar Spinner handler
+     */
+
+    public void setHasActionBarSpinner(Boolean hasActionBarSpinner) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            Spinner spinner = (Spinner) findViewById(R.id.spinner_nav);
+            if (hasActionBarSpinner) {
+                if (spinner != null)
+                    spinner.setVisibility(View.VISIBLE);
+                actionBar.setDisplayShowTitleEnabled(false);
+            } else {
+                if (spinner != null)
+                    spinner.setVisibility(View.GONE);
+                actionBar.setDisplayShowTitleEnabled(true);
+            }
+            mHasActionBarSpinner = hasActionBarSpinner;
+        }
+    }
+
+    public Spinner getActionBarSpinner() {
+        Spinner spinner = null;
+        if (mHasActionBarSpinner) {
+            spinner = (Spinner) findViewById(R.id.spinner_nav);
+            spinner.setAdapter(null);
+        }
+        return spinner;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.odoo.core.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -52,6 +53,17 @@ public class OControls {
     public static void setGone(View parent_view, int resource_id) {
         View view = parent_view.findViewById(resource_id);
         view.setVisibility(View.GONE);
+    }
+
+    public static void setTextViewStrikeThrough(View parent, int res_id) {
+        TextView tv = (TextView) parent.findViewById(res_id);
+        tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+    }
+
+
+    public static void setTextColor(View parent, int txv_id, int color) {
+        TextView tv = (TextView) parent.findViewById(txv_id);
+        tv.setTextColor(color);
     }
 
 }

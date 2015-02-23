@@ -20,23 +20,24 @@
 package com.odoo.base.addons.res;
 
 import android.content.Context;
+import android.net.Uri;
 
-import com.odoo.addons.partners.models.ResCountryState;
-import com.odoo.addons.partners.models.ResPartnerCategory;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBlob;
 import com.odoo.core.orm.fields.types.OBoolean;
-import com.odoo.core.orm.fields.types.ODateTime;
+import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
+import org.json.JSONArray;
+
 public class ResPartner extends OModel {
-
-
-    OColumn name = new OColumn("Name", OVarchar.class).setSize(100);
+    public static final String AUTHORITY = "com.odoo.core.provider.content.sync.res_partner";
+    OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();
     OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefaultValue(false);
     OColumn image_small = new OColumn("Avatar", OBlob.class).setDefaultValue(false);
     OColumn street = new OColumn("Street", OVarchar.class).setSize(100);
@@ -48,33 +49,59 @@ public class ResPartner extends OModel {
     OColumn mobile = new OColumn("Mobile", OVarchar.class).setSize(15);
     OColumn email = new OColumn("Email", OVarchar.class);
     OColumn company_id = new OColumn("Company", ResCompany.class, OColumn.RelationType.ManyToOne);
-
-    // Extra Columns (Demo purpose only)
-    OColumn date = new OColumn("Date", ODateTime.class);
-    OColumn child_ids = new OColumn("Contacts", ResPartner.class, OColumn.RelationType.OneToMany)
-            .setRelatedColumn("parent_id");
-    OColumn customer = new OColumn("Customer", OBoolean.class).setDefaultValue(false);
-    OColumn supplier = new OColumn("Supplier", OBoolean.class).setDefaultValue(false);
-    OColumn category_id = new OColumn("Category Tags", ResPartnerCategory.class, OColumn.RelationType.ManyToMany);
-
-    // Annotation demo columns
-    @Odoo.hasDomainFilter
-    OColumn state_id = new OColumn("State", ResCountryState.class, OColumn.RelationType.ManyToOne)
-            .addDomain("country_id", "=", null);
-    @Odoo.onChange(method = "onChangeCompanyId")
     OColumn parent_id = new OColumn("Related Company", ResPartner.class, OColumn.RelationType.ManyToOne)
             .addDomain("is_company", "=", true);
-
+    OColumn country_id = new OColumn("Country", ResCountry.class, OColumn.RelationType.ManyToOne);
+    OColumn customer = new OColumn("Customer", OBoolean.class).setDefaultValue("true");
+    OColumn supplier = new OColumn("Supplier", OBoolean.class).setDefaultValue("false");
+    OColumn comment = new OColumn("Internal Note", OText.class);
+    @Odoo.Functional(store = true, depends = {"parent_id"}, method = "storeCompanyName")
+    OColumn company_name = new OColumn("Company Name", OVarchar.class).setSize(100)
+            .setLocalColumn();
+    OColumn large_image = new OColumn("Image", OBlob.class).setDefaultValue("false").setLocalColumn();
 
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);
     }
 
-    public ODataRow onChangeCompanyId(ODataRow row) {
-        ODataRow res = new ODataRow();
-        res.put("city", row.getString("city"));
-        res.put("website", row.getString("website"));
-        res.put("country_id", row.getM2ORecord("country_id").getId());
-        return res;
+    @Override
+    public Uri uri() {
+        return buildURI(AUTHORITY);
+    }
+
+    public String storeCompanyName(OValues value) {
+        try {
+            if (!value.getString("parent_id").equals("false")) {
+                JSONArray parent_id = new JSONArray(value.getString("parent_id"));
+                return parent_id.getString(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String getContact(Context context, int row_id) {
+        ODataRow row = new ResPartner(context, null).browse(row_id);
+        String contact;
+        if (row.getString("mobile").equals("false")) {
+            contact = row.getString("phone");
+        } else {
+            contact = row.getString("mobile");
+        }
+        return contact;
+    }
+
+    public String getAddress(ODataRow row) {
+        String add = "";
+        if (!row.getString("street").equals("false"))
+            add += row.getString("street") + ", ";
+        if (!row.getString("street2").equals("false"))
+            add += "\n" + row.getString("street2") + ", ";
+        if (!row.getString("city").equals("false"))
+            add += row.getString("city");
+        if (!row.getString("zip").equals("false"))
+            add += " - " + row.getString("zip") + " ";
+        return add;
     }
 }

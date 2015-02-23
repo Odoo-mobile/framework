@@ -25,7 +25,9 @@ import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
+import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.support.OUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +35,13 @@ import java.util.List;
 public class BaseModels {
     public static final String TAG = BaseModels.class.getSimpleName();
 
-    public static List<OModel> baseModels(Context context) {
+    public static List<OModel> baseModels(Context context, OUser user) {
         List<OModel> models = new ArrayList<>();
-        models.add(new IrModel(context, null));
-        models.add(new ResPartner(context, null));
-        models.add(new ResCompany(context, null));
-        models.add(new IrAttachment(context, null));
+        models.add(new IrModel(context, user));
+        models.add(new ResPartner(context, user));
+        models.add(new ResUsers(context, user));
+        models.add(new ResCompany(context, user));
+        models.add(new IrAttachment(context, user));
         return models;
     }
 }

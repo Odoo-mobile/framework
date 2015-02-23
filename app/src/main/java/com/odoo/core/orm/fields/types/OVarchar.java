@@ -27,4 +27,8 @@ public class OVarchar extends OTypeHelper {
         return "VARCHAR";
     }
 
+    @Override
+    public Integer getFieldSize() {
+        return 64;
+    }
 }

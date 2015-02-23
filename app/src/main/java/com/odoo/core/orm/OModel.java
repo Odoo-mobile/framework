@@ -19,17 +19,15 @@
  */
 package com.odoo.core.orm;
 
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.OperationApplicationException;
+import android.content.SyncResult;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.RemoteException;
 import android.util.Log;
 
+import com.odoo.App;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.annotation.Odoo;
@@ -37,14 +35,19 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OInteger;
+import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.provider.BaseModelProvider;
+import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
+import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.StringUtils;
-import com.odoo.core.utils.logger.OLog;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.InvalidObjectException;
 import java.lang.annotation.Annotation;
@@ -61,13 +64,14 @@ import java.util.Locale;
 import odoo.ODomain;
 import odoo.OdooVersion;
 
-public class OModel extends OSQLite {
+public class OModel {
 
     public static final String TAG = OModel.class.getSimpleName();
-    public static final String BASE_AUTHORITY = "com.odoo.core.provider.content";
+    public String BASE_AUTHORITY = "com.odoo.core.provider.content";
     public static final String KEY_UPDATE_IDS = "key_update_ids";
     public static final String KEY_INSERT_IDS = "key_insert_ids";
     public static final int INVALID_ROW_ID = -1;
+    public static OSQLite sqLite = null;
     private Context mContext;
     private OUser mUser;
     private String model_name = null;
@@ -76,6 +80,8 @@ public class OModel extends OSQLite {
     private List<OColumn> mFunctionalColumns = new ArrayList<>();
     private HashMap<String, Field> mDeclaredFields = new HashMap<>();
     private OdooVersion mOdooVersion = null;
+    private String default_name_column = "name";
+    public static OModelRegistry modelRegistry = new OModelRegistry();
 
     // Relation record command
     public enum Command {
@@ -109,13 +115,46 @@ public class OModel extends OSQLite {
     OColumn _is_active = new OColumn("Active Record", OBoolean.class).setDefaultValue(true).setLocalColumn();
 
     public OModel(Context context, String model_name, OUser user) {
-        super(context, user);
         mContext = context;
         mUser = (user == null) ? OUser.current(context) : user;
         this.model_name = model_name;
-        mOdooVersion = new OdooVersion();
-        mOdooVersion.setVersion_number(mUser.getVersion_number());
-        mOdooVersion.setServer_serie(mUser.getVersion_serie());
+        if (mUser != null) {
+            mOdooVersion = new OdooVersion();
+            mOdooVersion.setVersion_number(mUser.getVersion_number());
+            mOdooVersion.setServer_serie(mUser.getVersion_serie());
+            if (sqLite == null) {
+                sqLite = new OSQLite(mContext, mUser);
+            }
+        }
+    }
+
+    public SQLiteDatabase getReadableDatabase() {
+        return sqLite.getReadableDatabase();
+    }
+
+    public SQLiteDatabase getWritableDatabase() {
+        return sqLite.getWritableDatabase();
+    }
+
+    public String getDatabaseName() {
+        return sqLite.getDatabaseName();
+    }
+
+    public void close() {
+        // Any operation when closing database
+    }
+
+    public void setDefaultNameColumn(String nameColumn) {
+        default_name_column = nameColumn;
+    }
+
+    public String getDefaultNameColumn() {
+        return default_name_column;
+    }
+
+    public OModel setModelName(String model_name) {
+        this.model_name = model_name;
+        return this;
     }
 
     public OUser getUser() {
@@ -164,7 +203,8 @@ public class OModel extends OSQLite {
             try {
                 field.setAccessible(true);
                 column = (OColumn) field.get(this);
-                column.setName(field.getName());
+                if (column.getName() == null)
+                    column.setName(field.getName());
                 Boolean validField = compatibleField(field);
                 if (validField) {
                     // Functional Method
@@ -328,10 +368,11 @@ public class OModel extends OSQLite {
         mDeclaredFields.clear();
         for (Field field : fields) {
             if (field.getType().isAssignableFrom(OColumn.class)) {
-                mDeclaredFields.put(field.getName(), field);
+                String name = field.getName();
                 try {
                     OColumn column = getColumn(field);
                     if (column != null) {
+                        name = column.getName();
                         if (column.getRelationType() != null) {
                             mRelationColumns.add(column);
                         }
@@ -347,6 +388,7 @@ public class OModel extends OSQLite {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                mDeclaredFields.put(name, field);
             }
         }
     }
@@ -382,8 +424,7 @@ public class OModel extends OSQLite {
     public OModel createInstance(Class<?> type) {
         try {
             Constructor<?> constructor = type.getConstructor(Context.class, OUser.class);
-            OModel model = (OModel) constructor.newInstance(mContext, mUser);
-            return model;
+            return (OModel) constructor.newInstance(mContext, mUser);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -399,18 +440,33 @@ public class OModel extends OSQLite {
     }
 
     public static OModel get(Context context, String model_name, String username) {
-        OModel model = null;
-        try {
-            OPreferenceManager pfManager = new OPreferenceManager(context);
-            Class<?> model_class = Class.forName(pfManager.getString(
-                    model_name, null));
-            if (model_class != null)
-                model = new OModel(context, model_name, OdooAccountManager.getDetails(context, username))
-                        .createInstance(model_class);
-        } catch (Exception e) {
-            e.printStackTrace();
+        OModel model = modelRegistry.getModel(model_name, username);
+        OUser user = OdooAccountManager.getDetails(context, username);
+        if (model == null) {
+            try {
+                OPreferenceManager pfManager = new OPreferenceManager(context);
+                Class<?> model_class = Class.forName(pfManager.getString(model_name, null));
+                if (model_class != null) {
+                    model = new OModel(context, model_name, user).createInstance(model_class);
+                    if (model != null) {
+                        modelRegistry.register(model);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return model;
+    }
+
+    public String authority() {
+        return BASE_AUTHORITY;
+    }
+
+    public Uri buildURI(String authority) {
+        BASE_AUTHORITY = authority;
+        String path = getModelName().toLowerCase(Locale.getDefault());
+        return BaseModelProvider.buildURI(BASE_AUTHORITY, path, mUser.getAndroidName());
     }
 
     public Uri uri() {
@@ -490,6 +546,15 @@ public class OModel extends OSQLite {
     }
 
     // Database Operations
+
+    public String getLabel(String column, String key) {
+        OColumn col = getColumn(column);
+        if (col.getType().isAssignableFrom(OSelection.class)) {
+            return col.getSelectionMap().get(key);
+        }
+        return "false";
+    }
+
     public ODataRow browse(int row_id) {
         return browse(null, row_id);
     }
@@ -533,14 +598,6 @@ public class OModel extends OSQLite {
         return null;
     }
 
-    public void setLastSyncDateTimeToNow() {
-        IrModel model = new IrModel(mContext, mUser);
-        OValues values = new OValues();
-        values.put("model", getModelName());
-        values.put("last_synced", ODateUtils.getUTCDate());
-        model.insertOrUpdate("model = ?", new String[]{getModelName()}, values);
-    }
-
     public List<ODataRow> select() {
         return select(null, null, null, null);
     }
@@ -557,50 +614,51 @@ public class OModel extends OSQLite {
         Cursor cr = mContext.getContentResolver().query(uri(),
                 updateProjection(projection), where, args, sortOrder);
         List<ODataRow> rows = new ArrayList<>();
-        if (cr != null && cr.moveToFirst()) {
-            do {
-                ODataRow row = OCursorUtils.toDatarow(cr);
-                for (OColumn column : getRelationColumns(projection)) {
-                    if (!row.getString(column.getName()).equals("false")
-                            || column.getRelationType() == OColumn.RelationType.OneToMany
-                            || column.getRelationType() == OColumn.RelationType.ManyToMany) {
-                        switch (column.getRelationType()) {
-                            case ManyToMany:
-                                OM2MRecord m2mRecords = new OM2MRecord(this, column, row.getInt(OColumn.ROW_ID));
-                                row.put(column.getName(), m2mRecords);
-                                break;
-                            case ManyToOne:
-                                OM2ORecord m2ORecord = new OM2ORecord(this, column, row.getInt(column.getName()));
-                                row.put(column.getName(), m2ORecord);
-                                break;
-                            case OneToMany:
-                                OO2MRecord o2MRecord = new OO2MRecord(this, column, row.getInt(OColumn.ROW_ID));
-                                row.put(column.getName(), o2MRecord);
-                                break;
-                        }
-                    }
-                }
-                for (OColumn column : getFunctionalColumns(projection)) {
-                    List<String> depends = column.getFunctionalStoreDepends();
-                    OLog.log(column.getName() + ":" + depends);
-                    if (depends != null && depends.size() > 0) {
-                        ODataRow values = new ODataRow();
-                        for (String depend : depends) {
-                            if (row.contains(depend)) {
-                                values.put(depend, row.get(depend));
+        try {
+            if (cr != null && cr.moveToFirst()) {
+                do {
+                    ODataRow row = OCursorUtils.toDatarow(cr);
+                    for (OColumn column : getRelationColumns(projection)) {
+                        if (!row.getString(column.getName()).equals("false")
+                                || column.getRelationType() == OColumn.RelationType.OneToMany
+                                || column.getRelationType() == OColumn.RelationType.ManyToMany) {
+                            switch (column.getRelationType()) {
+                                case ManyToMany:
+                                    OM2MRecord m2mRecords = new OM2MRecord(this, column, row.getInt(OColumn.ROW_ID));
+                                    row.put(column.getName(), m2mRecords);
+                                    break;
+                                case ManyToOne:
+                                    OM2ORecord m2ORecord = new OM2ORecord(this, column, row.getInt(column.getName()));
+                                    row.put(column.getName(), m2ORecord);
+                                    break;
+                                case OneToMany:
+                                    OO2MRecord o2MRecord = new OO2MRecord(this, column, row.getInt(OColumn.ROW_ID));
+                                    row.put(column.getName(), o2MRecord);
+                                    break;
                             }
                         }
-                        if (values.size() == depends.size()) {
-                            Object value = getFunctionalMethodValue(column, values);
-                            row.put(column.getName(), value);
+                    }
+                    for (OColumn column : getFunctionalColumns(projection)) {
+                        List<String> depends = column.getFunctionalStoreDepends();
+                        if (depends != null && depends.size() > 0) {
+                            ODataRow values = new ODataRow();
+                            for (String depend : depends) {
+                                if (row.contains(depend)) {
+                                    values.put(depend, row.get(depend));
+                                }
+                            }
+                            if (values.size() == depends.size()) {
+                                Object value = getFunctionalMethodValue(column, values);
+                                row.put(column.getName(), value);
+                            }
                         }
                     }
-                }
-                rows.add(row);
-            } while (cr.moveToNext());
+                    rows.add(row);
+                } while (cr.moveToNext());
+            }
+        } finally {
+            cr.close();
         }
-
-        cr.close();
         return rows;
     }
 
@@ -613,6 +671,17 @@ public class OModel extends OSQLite {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        return false;
+    }
+
+    public Object getOnChangeMethodValue(OColumn column, Object record) {
+        Method method = column.getOnChangeMethod();
+        OModel model = this;
+        try {
+            return method.invoke(model, new Object[]{record});
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }
@@ -650,6 +719,16 @@ public class OModel extends OSQLite {
         return cols;
     }
 
+    public int insertOrUpdate(int serverId, OValues values) {
+        if (hasServerRecord(serverId)) {
+            int row_id = selectRowId(serverId);
+            update(row_id, values);
+            return row_id;
+        } else {
+            return insert(values);
+        }
+    }
+
     public int insertOrUpdate(String selection, String[] args, OValues values) {
         int count = update(selection, args, values);
         if (count <= 0) {
@@ -669,9 +748,12 @@ public class OModel extends OSQLite {
             }
         } finally {
             cr.close();
-            db.close();
         }
         return row_id;
+    }
+
+    public int selectServerId(int row_id) {
+        return browse(row_id).getInt("id");
     }
 
     public int selectRowId(int server_id) {
@@ -690,31 +772,6 @@ public class OModel extends OSQLite {
         return INVALID_ROW_ID;
     }
 
-    public List<Integer> insert(List<OValues> valuesCollection) {
-        ArrayList<ContentProviderOperation> batches = new ArrayList<>();
-        for (OValues values : valuesCollection) {
-            ContentProviderOperation.Builder batch = ContentProviderOperation.newInsert(uri());
-            batch.withValues(values.toContentValues());
-            batch.withYieldAllowed(true);
-            batches.add(batch.build());
-        }
-        if (batches.size() > 0) {
-            try {
-                ContentProviderResult[] results = mContext.getContentResolver()
-                        .applyBatch(BASE_AUTHORITY, batches);
-                List<Integer> ids = new ArrayList<>();
-                for (ContentProviderResult result : results) {
-                    ids.add((Integer.parseInt(result.uri.getLastPathSegment())));
-                }
-                return ids;
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            } catch (OperationApplicationException e) {
-                e.printStackTrace();
-            }
-        }
-        return new ArrayList<>();
-    }
 
     public boolean hasServerRecord(int server_id) {
         int count = count("id = ? ", new String[]{server_id + ""});
@@ -731,48 +788,6 @@ public class OModel extends OSQLite {
         return (count > 0);
     }
 
-
-    public HashMap<String, List<Integer>> insertOrUpdate(List<OValues> valuesCollection) {
-        List<Integer> localIds = getServerIds();
-        ArrayList<ContentProviderOperation> batches = new ArrayList<>();
-        List<Integer> updateIds = new ArrayList<>();
-        for (OValues values : valuesCollection) {
-            ContentProviderOperation.Builder batch = null;
-            boolean exists = (values.contains("id") && localIds.contains(values.getInt("id")));
-            if (!exists) {
-                batch = ContentProviderOperation.newInsert(uri());
-            } else {
-                int row_id = selectRowId(values.getInt("id"));
-                updateIds.add(row_id);
-                batch = ContentProviderOperation.newUpdate(uri().buildUpon().appendPath(row_id + "").build());
-            }
-            batch.withValues(values.toContentValues());
-            batch.withYieldAllowed(false);
-            batches.add(batch.build());
-        }
-        if (batches.size() > 0) {
-            try {
-                ContentProviderResult[] results = mContext.getContentResolver()
-                        .applyBatch(BASE_AUTHORITY, batches);
-                List<Integer> ids = new ArrayList<>();
-                for (ContentProviderResult result : results) {
-                    if (result.uri != null) {
-                        int new_id = (Integer.parseInt(result.uri.getLastPathSegment()));
-                        ids.add(new_id);
-                    }
-                }
-                HashMap<String, List<Integer>> map = new HashMap<>();
-                map.put(KEY_INSERT_IDS, ids);
-                map.put(KEY_UPDATE_IDS, updateIds);
-                return map;
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            } catch (OperationApplicationException e) {
-                e.printStackTrace();
-            }
-        }
-        return new HashMap<>();
-    }
 
     public int deleteRecords(List<Integer> serverIds, boolean permanently) {
         String selection = "id IN (" + StringUtils.repeat("?, ", serverIds.size() - 1) + " ?)";
@@ -853,7 +868,6 @@ public class OModel extends OSQLite {
         } finally {
             cr.close();
         }
-        db.close();
         return rows;
 
     }
@@ -867,7 +881,6 @@ public class OModel extends OSQLite {
             count = cr.getInt(0);
         } finally {
             cr.close();
-            db.close();
         }
         return count;
     }
@@ -910,8 +923,6 @@ public class OModel extends OSQLite {
                         break;
                     case Replace:
                         // Removing old entries
-                        String where = base_column + " = ? ";
-                        String[] args = new String[]{row_id + ""};
                         db.delete(table, base_column + " = ?", new String[]{row_id + ""});
                         // Creating new entries
                         storeManyToManyRecord(column_name, row_id, relationIds, Command.Add);
@@ -919,6 +930,7 @@ public class OModel extends OSQLite {
                 }
             } finally {
                 db.close();
+                rel_model.close();
             }
         } else {
             throw new InvalidObjectException("Column [" + column_name + "] not found in " + getModelName() + " model.");
@@ -949,9 +961,82 @@ public class OModel extends OSQLite {
             if (cr != null) {
                 cr.close();
             }
-            db.close();
         }
-        return rel_model.select(projection, OColumn.ROW_ID + " IN (" + StringUtils.repeat(" ?, ", ids.size() - 1) + " ?)",
+        List<ODataRow> data = rel_model.select(projection, OColumn.ROW_ID + " IN (" + StringUtils.repeat(" ?, ", ids.size() - 1) + " ?)",
                 ids.toArray(new String[ids.size()]));
+        rel_model.close();
+        return data;
+    }
+
+    public ServerDataHelper getServerDataHelper() {
+        return new ServerDataHelper(mContext, this, getUser());
+    }
+
+    public String getName(int row_id) {
+        ODataRow row = browse(row_id);
+        if (row != null) {
+            return row.getString("name");
+        }
+        return "false";
+    }
+
+    public ODataRow quickCreateRecord(ODataRow record) {
+        OSyncAdapter syncAdapter = new OSyncAdapter(mContext, getClass(), null, true);
+        syncAdapter.setModel(this);
+        ODomain domain = new ODomain();
+        domain.add("id", "=", record.getInt("id"));
+        syncAdapter.setDomain(domain);
+        syncAdapter.checkForWriteCreateDate(false);
+        syncAdapter.onPerformSync(getUser().getAccount(), null, authority(), null, new SyncResult());
+        return browse(null, "id = ?", new String[]{record.getString("id")});
+    }
+
+    public ODataRow countGroupBy(String column, String group_by, String having, String[] args) {
+        String sql = "select count(*) as total, " + column;
+        sql += " from " + getTableName() + " group by " + group_by + " having " + having;
+        List<ODataRow> data = query(sql, args);
+        if (data.size() > 0) {
+            return data.get(0);
+        } else {
+            ODataRow row = new ODataRow();
+            row.put("total", 0);
+            return row;
+        }
+    }
+
+    public boolean isInstalledOnServer(String module_name) {
+        try {
+            App app = (App) mContext.getApplicationContext();
+            IrModel model = new IrModel(mContext, getUser());
+            List<ODataRow> modules = model.select(null, "name = ?", new String[]{module_name.trim()});
+            if (modules.size() > 0) {
+                if (modules.get(0).getString("state").equals("installed")) {
+                    return true;
+                }
+            }
+            if (app.inNetwork()) {
+                odoo.Odoo odoo = app.getOdoo(getUser());
+                OdooFields fields = new OdooFields(new String[]{"state", "name"});
+                ODomain domain = new ODomain();
+                domain.add("name", "=", module_name);
+                JSONArray result = odoo.search_read("ir.module.module", fields.get(), domain.get())
+                        .getJSONArray("records");
+                if (result.length() > 0) {
+                    JSONObject record = result.getJSONObject(0);
+                    if (record.getString("state").equals("installed")) {
+                        OValues values = new OValues();
+                        values.put("id", record.getInt("id"));
+                        values.put("name", record.getString("name"));
+                        values.put("state", record.getString("state"));
+                        model.insertOrUpdate(record.getInt("id"), values);
+                        return true;
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

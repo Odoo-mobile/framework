@@ -33,4 +33,19 @@ public class ResCountry extends OModel {
     public ResCountry(Context context, OUser user) {
         super(context, "res.country", user);
     }
+
+    @Override
+    public boolean allowCreateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowDeleteRecordInLocal() {
+        return false;
+    }
 }

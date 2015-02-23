@@ -32,4 +32,23 @@
     <color name="android_red">#FF4444</color>
     <color name="android_red_dark">#CC0000</color>
 
+    <color name="control_focused">#e5e5e5</color>
+    <color name="control_pressed">#acacac</color>
+
+
+    <array name="letter_tile_colors">
+        <item>@color/android_blue</item>
+        <item>@color/android_violet_dark</item>
+        <item>@color/android_red</item>
+        <item>@color/android_green_dark</item>
+        <item>@color/android_blue_dark</item>
+        <item>@color/android_orange</item>
+        <item>@color/android_red_dark</item>
+        <item>@color/android_violet</item>
+        <item>@color/android_green</item>
+        <item>@color/android_orange_dark</item>
+    </array>
+
+    <color name="icon_tint">#5e5e5e</color>
+    <color name="actionbar_spinner_text_color">#414141</color>
 </resources>

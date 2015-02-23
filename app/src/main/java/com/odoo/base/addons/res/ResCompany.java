@@ -21,6 +21,7 @@ package com.odoo.base.addons.res;
 
 import android.content.Context;
 
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OVarchar;
@@ -30,8 +31,44 @@ public class ResCompany extends OModel {
     public static final String TAG = ResCompany.class.getSimpleName();
 
     OColumn name = new OColumn("Name", OVarchar.class);
+    OColumn currency_id = new OColumn("Currency", ResCurrency.class,
+            OColumn.RelationType.ManyToOne);
 
     public ResCompany(Context context, OUser user) {
         super(context, "res.company", user);
+    }
+
+    public static ODataRow getCurrency(Context context) {
+        ResCompany company = new ResCompany(context, null);
+        int row_id = company.selectRowId(Integer.parseInt(company.getUser().getCompany_id()));
+        return company.browse(row_id).getM2ORecord("currency_id").browse();
+    }
+
+    @Override
+    public boolean allowCreateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowDeleteRecordInLocal() {
+        return false;
+    }
+
+    public static int myId(Context context) {
+        ResCompany company = new ResCompany(context, null);
+        return company.selectRowId(Integer.parseInt(company.getUser().getCompany_id()));
+    }
+
+    public static int myCurrency(Context context) {
+        ResCompany company = new ResCompany(context, null);
+        ODataRow row = company.browse(company.selectRowId(Integer.parseInt(company.
+                getUser().getCompany_id())));
+        return row.getM2ORecord("currency_id").browse().getInt(OColumn.ROW_ID);
+
     }
 }

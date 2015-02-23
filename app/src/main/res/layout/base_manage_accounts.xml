@@ -8,9 +8,10 @@
 
     <include layout="@layout/base_toolbar" />
 
-    <ListView
+    <odoo.controls.ExpandableListControl
         android:id="@+id/accountList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ListView>
+        android:orientation="vertical"
+        android:layout_height="wrap_content"></odoo.controls.ExpandableListControl>
 
 </LinearLayout>

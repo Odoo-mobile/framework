@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_about_our_apps"
+        android:icon="@drawable/ic_action_play_store"
+        android:title="@string/label_our_apps"
+        app:showAsAction="always"></item>
+    <item
+        android:id="@+id/menu_about_github"
+        android:icon="@drawable/ic_action_github"
+        android:title="@string/label_odoo_mobile_on_github"
+        app:showAsAction="always"></item>
+</menu>

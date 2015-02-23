@@ -24,6 +24,8 @@ public class OConstants {
     public static final String URL_ODOO_RESET_PASSWORD = URL_ODOO + "/web/reset_password";
     public static final String URL_ODOO_SIGN_UP = URL_ODOO + "/web/signup";
     public static final String URL_ODOO_ACCOUNTS = "https://accounts.odoo.com";
+    public static final String URL_ODOO_MOBILE_GIT_HUB = "https://github.com/Odoo-mobile";
+    public static final String URL_ODOO_APPS_ON_PLAY_STORE = "https://play.google.com/store/apps/developer?id=Odoo+SA";
 
     public static final String ODOO_COMPANY_NAME = "Odoo";
 }

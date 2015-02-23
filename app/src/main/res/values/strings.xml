@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Odoo</string>
-
+    <string name="sync_label_customers">Customers</string>
+    <string name="toast_information_saved">Information Saved</string>
+    <string name="toast_image_size_too_large">Image size too large !</string>
+    <string name="label_no_customer_found">No Customer Found !</string>
 </resources>

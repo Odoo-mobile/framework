@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="@dimen/statusBarHeight"
+    android:background="#ebebeb"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#ffffff"
+        android:orientation="horizontal"
+        android:paddingLeft="0dp"
+        android:paddingRight="16dp">
+
+        <ImageView
+            android:id="@+id/search_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:src="@drawable/ic_action_search"
+            android:tint="#414141" />
+
+        <EditText
+            android:id="@+id/edt_searchable_input"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:ellipsize="end"
+            android:fontFamily="@string/font_normal"
+            android:gravity="center_vertical"
+            android:hint="Search"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceMedium">
+
+            <requestFocus />
+        </EditText>
+    </LinearLayout>
+
+    <View style="@style/ViewSeparator" />
+
+    <include
+        android:id="@+id/loading_progress"
+        layout="@layout/listview_data_loading_progress"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/searchable_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></ListView>
+
+</LinearLayout>

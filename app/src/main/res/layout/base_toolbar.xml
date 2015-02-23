@@ -6,5 +6,16 @@
     android:layout_height="wrap_content"
     android:background="@color/theme_primary"
     android:minHeight="?attr/actionBarSize"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-    app:theme="@style/ToolBarTheme" />
+    app:titleMarginStart="@dimen/default_16dp"
+    android:paddingRight="@dimen/default_8dp"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    app:theme="@style/ToolBarTheme">
+
+    <Spinner
+        android:id="@+id/spinner_nav"
+        android:visibility="gone"
+        android:layout_marginLeft="@dimen/default_16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</android.support.v7.widget.Toolbar>

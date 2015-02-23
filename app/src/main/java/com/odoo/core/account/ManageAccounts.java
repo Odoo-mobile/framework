@@ -25,31 +25,30 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.OdooActivity;
-import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
+import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ManageAccounts extends ActionBarActivity implements View.OnClickListener {
+import odoo.controls.ExpandableListControl;
 
-    private List<OUser> accounts = new ArrayList<OUser>();
-    private ListView mList = null;
-    private ArrayAdapter<OUser> mAdapter;
+public class ManageAccounts extends ActionBarActivity implements View.OnClickListener, ExpandableListControl.ExpandableListAdapterGetViewListener {
+
+    private List<Object> accounts = new ArrayList<>();
+    private ExpandableListControl mList = null;
+    private ExpandableListControl.ExpandableListAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,18 +59,9 @@ public class ManageAccounts extends ActionBarActivity implements View.OnClickLis
         setResult(RESULT_CANCELED);
         accounts.clear();
         accounts.addAll(OdooAccountManager.getAllAccounts(this));
-        mList = (ListView) findViewById(R.id.accountList);
-        mAdapter = new ArrayAdapter<OUser>(this, R.layout.base_account_item, accounts) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                if (convertView == null) {
-                    convertView = LayoutInflater.from(ManageAccounts.this).inflate(R.layout.base_account_item, parent, false);
-                }
-                generateView(convertView, getItem(position));
-                return convertView;
-            }
-        };
-        mList.setAdapter(mAdapter);
+        mList = (ExpandableListControl) findViewById(R.id.accountList);
+        mAdapter = mList.getAdapter(R.layout.base_account_item, accounts, this);
+        mAdapter.notifyDataSetChanged(accounts);
     }
 
     private void generateView(View view, OUser user) {
@@ -184,5 +174,11 @@ public class ManageAccounts extends ActionBarActivity implements View.OnClickLis
                 builder.show();
                 break;
         }
+    }
+
+    @Override
+    public View getView(int position, View view, ViewGroup parent) {
+        generateView(view, (OUser) mAdapter.getItem(position));
+        return view;
     }
 }

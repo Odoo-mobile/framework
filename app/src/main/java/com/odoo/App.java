@@ -27,6 +27,9 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.odoo.core.support.OUser;
+
+import java.util.HashMap;
 import java.util.List;
 
 import odoo.Odoo;
@@ -34,13 +37,24 @@ import odoo.Odoo;
 public class App extends Application {
 
     public static final String TAG = App.class.getSimpleName();
-    private static Odoo mOdoo = null;
+    private static HashMap<String, Odoo> mOdooInstances = new HashMap<>();
 
     @Override
     public void onCreate() {
         super.onCreate();
     }
 
+    public Odoo getOdoo(OUser user) {
+        if (mOdooInstances.containsKey(user.getAndroidName())) {
+            return mOdooInstances.get(user.getAndroidName());
+        }
+        return null;
+    }
+
+    public void setOdoo(Odoo odoo, OUser user) {
+        if (user != null)
+            mOdooInstances.put(user.getAndroidName(), odoo);
+    }
 
     /**
      * Checks for network availability
@@ -91,7 +105,5 @@ public class App extends Application {
         return meOnTop;
     }
 
-    public void setOdoo(Odoo odoo) {
-        mOdoo = odoo;
-    }
+
 }

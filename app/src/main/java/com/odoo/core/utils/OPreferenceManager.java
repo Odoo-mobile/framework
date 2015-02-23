@@ -42,10 +42,10 @@ public class OPreferenceManager {
         editor.commit();
     }
 
-    public void putStringSet(String key, List<String> values) {
+    public boolean putStringSet(String key, List<String> values) {
         SharedPreferences.Editor editor = mPref.edit();
-        editor.putStringSet(key, new HashSet<String>(values));
-        editor.commit();
+        editor.putStringSet(key, new HashSet<>(values));
+        return editor.commit();
     }
 
     public List<String> getStringSet(String key) {

@@ -30,12 +30,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
-import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
+import com.odoo.R;
 
 import java.util.List;
 

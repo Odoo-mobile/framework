@@ -20,16 +20,20 @@
 package com.odoo.base.addons.ir;
 
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.ODateUtils;
 
 public class IrModel extends OModel {
     public static final String TAG = IrModel.class.getSimpleName();
-
+    public static final String AUTHORITY = "com.odoo.core.provider.content.sync.ir_model";
     OColumn name = new OColumn("Model Description", OVarchar.class).setSize(100);
     OColumn model = new OColumn("Model", OVarchar.class).setSize(100);
     OColumn state = new OColumn("State", OVarchar.class).setSize(64);
@@ -42,6 +46,11 @@ public class IrModel extends OModel {
     }
 
     @Override
+    public Uri uri() {
+        return buildURI(AUTHORITY);
+    }
+
+    @Override
     public boolean checkForCreateDate() {
         return false;
     }
@@ -51,4 +60,11 @@ public class IrModel extends OModel {
         return false;
     }
 
+    public void setLastSyncDateTimeToNow(OModel model) {
+        Log.i(TAG, "Model Sync Update : " + model.getModelName());
+        OValues values = new OValues();
+        values.put("model", model.getModelName());
+        values.put("last_synced", ODateUtils.getUTCDate());
+        insertOrUpdate("model = ?", new String[]{model.getModelName()}, values);
+    }
 }

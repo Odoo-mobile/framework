@@ -20,6 +20,8 @@
 package com.odoo.core.orm;
 
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.odoo.core.orm.fields.OColumn;
 
@@ -27,10 +29,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ODataRow {
+public class ODataRow implements Parcelable {
     public static final String TAG = ODataRow.class.getSimpleName();
 
-    HashMap<String, Object> _data = new HashMap<String, Object>();
+    HashMap<String, Object> _data = new HashMap<>();
 
     public void put(String key, Object value) {
         _data.put(key, value);
@@ -75,6 +77,12 @@ public class ODataRow {
         return (OO2MRecord) _data.get(key);
     }
 
+    public List<Object> values() {
+        List<Object> values = new ArrayList<>();
+        values.addAll(_data.values());
+        return values;
+    }
+
     public List<String> keys() {
         List<String> list = new ArrayList<>();
         list.addAll(_data.keySet());
@@ -92,6 +100,16 @@ public class ODataRow {
     @Override
     public String toString() {
         return _data.toString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
     }
 
     public class IdName {

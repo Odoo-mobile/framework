@@ -62,28 +62,32 @@ public class OSQLHelper {
 
     private String generateColumnStatement(OModel model, List<OColumn> columns) {
         StringBuffer column_statement = new StringBuffer();
+        List<String> finishedColumns = new ArrayList<>();
         for (OColumn column : columns) {
-            String type = getType(column);
-            if (type != null) {
-                column_statement.append(column.getName());
-                column_statement.append(" " + type + " ");
-                if (column.isAutoIncrement()) {
-                    column_statement.append(" PRIMARY KEY ");
-                    column_statement.append(" AUTOINCREMENT ");
-                }
-                Object default_value = column.getDefaultValue();
-                if (default_value != null) {
-                    column_statement.append(" DEFAULT ");
-                    if (default_value instanceof String) {
-                        column_statement.append("'" + default_value + "'");
-                    } else {
-                        column_statement.append(default_value);
+            if (!finishedColumns.contains(column.getName())) {
+                finishedColumns.add(column.getName());
+                String type = getType(column);
+                if (type != null) {
+                    column_statement.append(column.getName());
+                    column_statement.append(" " + type + " ");
+                    if (column.isAutoIncrement()) {
+                        column_statement.append(" PRIMARY KEY ");
+                        column_statement.append(" AUTOINCREMENT ");
                     }
+                    Object default_value = column.getDefaultValue();
+                    if (default_value != null) {
+                        column_statement.append(" DEFAULT ");
+                        if (default_value instanceof String) {
+                            column_statement.append("'" + default_value + "'");
+                        } else {
+                            column_statement.append(default_value);
+                        }
+                    }
+                    column_statement.append(", ");
                 }
-                column_statement.append(", ");
-            }
-            if (column.getRelationType() != null) {
-                createRelationTable(model, column);
+                if (column.getRelationType() != null) {
+                    createRelationTable(model, column);
+                }
             }
         }
         return column_statement.toString();

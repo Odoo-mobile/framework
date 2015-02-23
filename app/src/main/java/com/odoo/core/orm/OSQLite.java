@@ -45,7 +45,8 @@ public class OSQLite extends SQLiteOpenHelper {
     private OPreferenceManager mPref;
 
     public OSQLite(Context context, OUser user) {
-        super(context, (user != null) ? user.getDBName() : OUser.current(context).getDBName(), null, DATABASE_VERSION);
+        super(context, (user != null) ? user.getDBName() : OUser.current(context).getDBName(), null
+                , DATABASE_VERSION);
         mContext = context;
         mAddons = new Addons();
         mUser = (user != null) ? user : OUser.current(context);
@@ -61,7 +62,7 @@ public class OSQLite extends SQLiteOpenHelper {
 
     private List<OModel> getModels() {
         List<OModel> models = new ArrayList<>();
-        models.addAll(BaseModels.baseModels(mContext));
+        models.addAll(BaseModels.baseModels(mContext, mUser));
         for (OAddon addon : mAddons.getAddons()) {
             IBaseFragment fragment = (IBaseFragment) addon.get();
             try {
@@ -92,26 +93,27 @@ public class OSQLite extends SQLiteOpenHelper {
             Log.i(TAG, "Table Created : " + key);
         }
         registerModels(sqlHelper.getModels());
-
     }
 
     private void registerModels(List<String> models) {
         OPreferenceManager mPref = new OPreferenceManager(mContext);
-        mPref.putStringSet("models", models);
+        if (mPref.putStringSet("models", models)) {
+            Log.i(TAG, models.size() + " Models registered.");
+        } else {
+            Log.e(TAG, "Unable to register models");
+        }
     }
 
-    private void registerModelsClassPath() {
+    private synchronized void registerModelsClassPath() {
         OSQLHelper sqlHelper = new OSQLHelper(mContext);
-        for (OModel model : sqlHelper.getAllModels(getModels())) {
+        List<OModel> modelsClassPath = sqlHelper.getAllModels(getModels());
+        for (OModel model : modelsClassPath) {
             String key = model.getModelName();
             String path = model.getClass().getName();
             // Setting class path
             mPref.putString(key, path);
-            List<String> server_cols = getColumns(path, true);
-            mPref.putStringSet(key + ".server", server_cols);
-            List<String> local_cols = getColumns(path, false);
-            mPref.putStringSet(key + ".local", local_cols);
         }
+        Log.i(TAG, modelsClassPath.size() + " models path registered.");
     }
 
     private List<String> getColumns(String model_class, boolean server_columns) {

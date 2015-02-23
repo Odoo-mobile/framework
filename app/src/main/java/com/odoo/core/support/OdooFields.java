@@ -19,11 +19,28 @@
  */
 package com.odoo.core.support;
 
+import com.odoo.core.orm.fields.OColumn;
+
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OdooFields {
 
     private JSONObject jFields = new JSONObject();
+
+    public OdooFields(List<OColumn> columns) {
+        List<String> fields = new ArrayList<>();
+        if (columns != null) {
+            for (OColumn column : columns) {
+                if (!column.isLocal() && !column.isFunctionalColumn()) {
+                    fields.add(column.getName());
+                }
+            }
+        }
+        addAll(fields.toArray(new String[fields.size()]));
+    }
 
     public OdooFields(String[] fields) {
         addAll(fields);

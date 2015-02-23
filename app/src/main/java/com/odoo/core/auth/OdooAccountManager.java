@@ -24,7 +24,10 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
 
+import com.odoo.App;
+import com.odoo.core.orm.OModelRegistry;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.sys.OCacheUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,8 +169,15 @@ public class OdooAccountManager {
      * @return new user object
      */
     public static OUser login(Context context, String username) {
-        // Logging out user if any
+
+        // Setting odoo instance to null
+        App app = (App) context.getApplicationContext();
+        app.setOdoo(null, null);
+        // Clearing models registry
+        OModelRegistry registry = new OModelRegistry();
+        registry.clearAll();
         OUser activeUser = getActiveUser(context);
+        // Logging out user if any
         if (activeUser != null) {
             logout(context, activeUser.getAndroidName());
         }
@@ -179,6 +189,8 @@ public class OdooAccountManager {
             Log.i(TAG, newUser.getName() + " Logged in successfully");
             return newUser;
         }
+        // Clearing old cache of the system
+        OCacheUtils.clearSystemCache(context);
         return null;
     }
 
@@ -203,13 +215,7 @@ public class OdooAccountManager {
     }
 
     private static boolean cancelUserSync(Account account) {
-        //TODO: Cancel user's sync services. if any.
-        /**
-         *      SyncWizardValues syncVals = new SyncWizardValues();
-         for (SyncValue sync : syncVals.syncValues()) {
-         ContentResolver.cancelSync(account, sync.getAuthority());
-         }
-         */
+        //Cancel user's sync services. if any.
         return true;
     }
 }

@@ -55,7 +55,8 @@ public class OdooServerTester {
                         mDatabases.put(mOdoo.getDatabaseName());
                     }
                 }
-                return true;
+                if (mDatabases.length() > 0)
+                    return true;
             } catch (SSLPeerUnverifiedException peer) {
                 throw new SSLPeerUnverifiedException(peer.getMessage());
             } catch (OVersionException version) {

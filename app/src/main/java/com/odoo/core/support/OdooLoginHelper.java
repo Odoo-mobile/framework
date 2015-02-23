@@ -52,7 +52,6 @@ public class OdooLoginHelper {
             JSONObject res = mOdoo.authenticate(username, password, database);
             int user_id = 0;
             if (res.get("uid") instanceof Integer) {
-                mApp.setOdoo(mOdoo);
                 user_id = res.getInt("uid");
                 OUser user = new OUser();
                 user.setOAuthLogin(false);
@@ -65,7 +64,9 @@ public class OdooLoginHelper {
 
                 ODomain domain = new ODomain();
                 domain.add("id", "=", user_id);
-                return getUserDetails(domain, user, null);
+                user = getUserDetails(domain, user, null);
+                mApp.setOdoo(mOdoo, user);
+                return user;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,11 +81,12 @@ public class OdooLoginHelper {
             JSONObject res = mOdoo.oauth_authenticate(instance, uData.getUsername(), uData.getPassword());
             int user_id = 0;
             if (res.get("uid") instanceof Integer) {
-                mApp.setOdoo(mOdoo);
                 user_id = res.getInt("uid");
                 ODomain domain = new ODomain();
                 domain.add("id", "=", user_id);
-                return getUserDetails(domain, uData, instance);
+                uData = getUserDetails(domain, uData, instance);
+                mApp.setOdoo(mOdoo, uData);
+                return uData;
             }
         } catch (OdooAccountExpireException e) {
             throw new OdooAccountExpireException(e.getMessage());

@@ -28,23 +28,26 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 
 import java.io.InvalidObjectException;
+import java.util.Arrays;
 import java.util.HashSet;
 
 public class BaseModelProvider extends ContentProvider {
     public static final String TAG = BaseModelProvider.class.getSimpleName();
-    private final static String KEY_MODEL = "key_model";
-    private final static String KEY_USERNAME = "key_username";
+    public final static String KEY_MODEL = "key_model";
+    public final static String KEY_USERNAME = "key_username";
     private final int COLLECTION = 1;
     private final int SINGLE_ROW = 2;
-    private OModel mModel = null;
-    private UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+    protected OModel mModel = null;
+    public UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     public static Uri buildURI(String authority, String model, String username) {
         Uri.Builder uriBuilder = new Uri.Builder();
@@ -61,20 +64,34 @@ public class BaseModelProvider extends ContentProvider {
         return true;
     }
 
+    public String authority() {
+        return null;
+    }
 
-    private void setModel(Uri uri) {
-        String authority = uri.getAuthority();
+    public OUser getUser(Uri uri) {
+        String username = uri.getQueryParameter(KEY_USERNAME);
+        return OdooAccountManager.getDetails(getContext(), username);
+    }
+
+    public void setModel(Uri uri) {
         String path = uri.getQueryParameter(KEY_MODEL);
         String username = uri.getQueryParameter(KEY_USERNAME);
-        matcher.addURI(authority, path, COLLECTION);
-        matcher.addURI(authority, path + "/#", SINGLE_ROW);
         mModel = OModel.get(getContext(), path, username);
         assert mModel != null;
+    }
+
+    private void setMatcher(Uri uri) {
+        String authority = (authority() != null) ? authority() : uri.getAuthority();
+        matcher.addURI(authority, mModel.getModelName(), COLLECTION);
+        matcher.addURI(authority, mModel.getModelName() + "/#", SINGLE_ROW);
     }
 
     @Override
     public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs, String sortOrder) {
         setModel(uri);
+        setMatcher(uri);
+        if (mModel == null)
+            return null;
         String[] projection = removeRelationColumns(base_projection);
         int match = matcher.match(uri);
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
@@ -99,12 +116,15 @@ public class BaseModelProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        Context ctx = getContext();
+        assert ctx != null;
+        cr.setNotificationUri(ctx.getContentResolver(), uri);
         return cr;
     }
 
     private String[] removeRelationColumns(String[] projection) {
         HashSet<String> columns = new HashSet<>();
-        if (projection != null && projection.length > 0) {
+        if (projection != null && projection.length > 0 && mModel != null) {
             for (String key : projection) {
                 OColumn column = mModel.getColumn(key);
                 if (column != null && column.getRelationType() == null) {
@@ -113,6 +133,7 @@ public class BaseModelProvider extends ContentProvider {
                     columns.add(key);
                 }
             }
+            columns.addAll(Arrays.asList(new String[]{OColumn.ROW_ID, "id", "_is_active", "_write_date"}));
             return columns.toArray(new String[columns.size()]);
         }
         return null;
@@ -126,8 +147,8 @@ public class BaseModelProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues all_values) {
         setModel(uri);
+        setMatcher(uri);
         ContentValues[] values = generateValues(all_values);
-
         ContentValues value_to_insert = values[0];
         value_to_insert.put("_write_date", ODateUtils.getUTCDate());
         if (!value_to_insert.containsKey("_is_active"))
@@ -139,11 +160,7 @@ public class BaseModelProvider extends ContentProvider {
             case COLLECTION:
                 SQLiteDatabase db = mModel.getWritableDatabase();
                 long new_id = 0;
-                try {
-                    new_id = db.insert(mModel.getTableName(), null, value_to_insert);
-                } finally {
-                    db.close();
-                }
+                new_id = db.insert(mModel.getTableName(), null, value_to_insert);
                 // Updating relation columns for record
                 if (values[1].size() > 0) {
                     storeUpdateRelationRecords(values[1], OColumn.ROW_ID + "  = ?", new String[]{new_id + ""});
@@ -158,10 +175,7 @@ public class BaseModelProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        // Send broadcast to registered ContentObservers, to refresh UI.
-        Context ctx = getContext();
-        assert ctx != null;
-        ctx.getContentResolver().notifyChange(uri, null, false);
+        notifyDataChange(uri);
         return null;
     }
 
@@ -169,58 +183,45 @@ public class BaseModelProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int count = 0;
         setModel(uri);
+        setMatcher(uri);
         int match = matcher.match(uri);
         switch (match) {
             case COLLECTION:
                 SQLiteDatabase db = mModel.getWritableDatabase();
-                try {
-                    count = db.delete(mModel.getTableName(), selection, selectionArgs);
-                } finally {
-                    db.close();
-                }
+                count = db.delete(mModel.getTableName(), selection, selectionArgs);
                 break;
             case SINGLE_ROW:
                 db = mModel.getWritableDatabase();
                 String row_id = uri.getLastPathSegment();
-                try {
-                    count = db.delete(mModel.getTableName(), OColumn.ROW_ID + "  = ?", new String[]{row_id});
-                } finally {
-                    db.close();
-                }
+                count = db.delete(mModel.getTableName(), OColumn.ROW_ID + "  = ?", new String[]{row_id});
                 break;
             case UriMatcher.NO_MATCH:
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        // Send broadcast to registered ContentObservers, to refresh UI.
-        Context ctx = getContext();
-        assert ctx != null;
-        ctx.getContentResolver().notifyChange(uri, null, false);
+        notifyDataChange(uri);
         return count;
     }
 
     @Override
     public int update(Uri uri, ContentValues all_values, String selection, String[] selectionArgs) {
         setModel(uri);
+        setMatcher(uri);
         ContentValues[] values = generateValues(all_values);
         ContentValues value_to_update = values[0];
-        if (!value_to_update.containsKey("_write_date"))
+        if (!value_to_update.containsKey("_write_date")) {
             value_to_update.put("_write_date", ODateUtils.getUTCDate());
+        }
         if (!value_to_update.containsKey("_is_dirty")) {
             value_to_update.put("_is_dirty", "true");
         }
-
         int count = 0;
         int match = matcher.match(uri);
         switch (match) {
             case COLLECTION:
                 SQLiteDatabase db = mModel.getWritableDatabase();
-                try {
-                    count = db.update(mModel.getTableName(), value_to_update, selection, selectionArgs);
-                } finally {
-                    db.close();
-                }
+                count = db.update(mModel.getTableName(), value_to_update, selection, selectionArgs);
                 // Updating relation columns
                 if (values[1].size() > 0) {
                     storeUpdateRelationRecords(values[1], selection, selectionArgs);
@@ -230,12 +231,8 @@ public class BaseModelProvider extends ContentProvider {
             case SINGLE_ROW:
                 String row_id = uri.getLastPathSegment();
                 db = mModel.getWritableDatabase();
-                try {
-                    count = db.update(mModel.getTableName(), value_to_update, OColumn.ROW_ID + "  = ?", new String[]{row_id});
-                    // Updating relation columns for record
-                } finally {
-                    db.close();
-                }
+                count = db.update(mModel.getTableName(), value_to_update, OColumn.ROW_ID + "  = ?", new String[]{row_id});
+                // Updating relation columns for record
                 if (values[1].size() > 0) {
                     storeUpdateRelationRecords(values[1], OColumn.ROW_ID + "  = ?", new String[]{row_id});
                 }
@@ -245,10 +242,7 @@ public class BaseModelProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        // Send broadcast to registered ContentObservers, to refresh UI.
-        Context ctx = getContext();
-        assert ctx != null;
-        ctx.getContentResolver().notifyChange(uri, null, false);
+        notifyDataChange(uri);
         return count;
     }
 
@@ -285,4 +279,10 @@ public class BaseModelProvider extends ContentProvider {
         return new ContentValues[]{data_value.toContentValues(), rel_value.toContentValues()};
     }
 
+    private void notifyDataChange(Uri uri) {
+        // Send broadcast to registered ContentObservers, to refresh UI.
+        Context ctx = getContext();
+        assert ctx != null;
+        ctx.getContentResolver().notifyChange(uri, null);
+    }
 }

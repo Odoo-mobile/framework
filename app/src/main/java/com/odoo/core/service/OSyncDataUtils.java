@@ -96,7 +96,8 @@ public class OSyncDataUtils {
 
             // getting local dirty records if server records length = 0
             if (records.length() <= 0) {
-                for (ODataRow row : mModel.select(new String[]{"name"}, "_is_dirty = ? and _is_active = ?",
+                for (ODataRow row : mModel.select(new String[]{mModel.getDefaultNameColumn()},
+                        "_is_dirty = ? and _is_active = ?",
                         new String[]{"true", "true"})) {
                     serverIds.add(row.getInt("id"));
                 }
@@ -165,8 +166,9 @@ public class OSyncDataUtils {
             recordsId.clear();
             JSONArray records = response.getJSONArray("records");
             int length = records.length();
-            List<OValues> valuesCollection = new ArrayList<>();
+            int counter = 0;
             List<OColumn> columns = mModel.getColumns(false);
+            columns.addAll(mModel.getFunctionalColumns());
             for (int i = 0; i < length; i++) {
                 JSONObject record = records.getJSONObject(i);
                 OValues values = new OValues();
@@ -184,10 +186,8 @@ public class OSyncDataUtils {
                                     dependValues.put(depend, record.get(depend));
                                 }
                             }
-                            if (dependValues.size() == depends.size()) {
-                                Object value = mModel.getFunctionalMethodValue(column, dependValues);
-                                values.put(column.getName(), value);
-                            }
+                            Object value = mModel.getFunctionalMethodValue(column, dependValues);
+                            values.put(column.getName(), value);
                         } else {
                             // Normal Columns
                             values.put(name, record.get(name));
@@ -204,13 +204,14 @@ public class OSyncDataUtils {
                                     if (!recordsId.contains(recKey)) {
                                         OValues m2oValue = new OValues();
                                         m2oValue.put("id", m2oData.get(0));
-                                        m2oValue.put("name", m2oData.get(1));
+                                        m2oValue.put(m2o_model.getDefaultNameColumn(), m2oData.get(1));
                                         m2oValue.put("_is_dirty", "false");
-                                        m2oRowId = m2o_model.insertOrUpdate("id = ?", new String[]{m2oData.getInt(0) + ""},
+                                        m2oRowId = m2o_model.insertOrUpdate(m2oData.getInt(0),
                                                 m2oValue);
                                     } else {
                                         m2oRowId = m2o_model.selectRowId(m2oData.getInt(0));
                                     }
+
                                     values.put(name, m2oRowId);
                                     if (mCreateRelationRecords) {
                                         // Add id to sync if model contains more than (id,name) columns
@@ -219,17 +220,19 @@ public class OSyncDataUtils {
                                                 && mModel.getOdooVersion().getVersion_number() > 7)) {
                                             List<Integer> m2oIds = new ArrayList<>();
                                             m2oIds.add(m2oData.getInt(0));
-                                            addUpdateRelationRecord(mModel, m2o_model, name, null,
+                                            addUpdateRelationRecord(mModel, m2o_model.getTableName(),
+                                                    column.getType(), name, null,
                                                     column.getRelationType(), m2oIds);
                                         }
                                     }
+                                    m2o_model.close();
                                     break;
                                 case ManyToMany:
                                     OModel m2mModel = mModel.createInstance(column.getType());
                                     List<Integer> m2mIds = JSONUtils.<Integer>toList(record.getJSONArray(name));
                                     if (mCreateRelationRecords) {
-                                        addUpdateRelationRecord(mModel, m2mModel, name, null,
-                                                column.getRelationType(),
+                                        addUpdateRelationRecord(mModel, m2mModel.getTableName(), column.getType(),
+                                                name, null, column.getRelationType(),
                                                 (column.getRecordSyncLimit() > 0) ?
                                                         m2mIds.subList(0, column.getRecordSyncLimit()) : m2mIds);
                                     }
@@ -241,7 +244,7 @@ public class OSyncDataUtils {
                                             OValues m2mValues = new OValues();
                                             m2mValues.put("id", id);
                                             m2mValues.put("_is_dirty", "false");
-                                            r_id = m2mModel.insertOrUpdate("id = ?", new String[]{id + ""}, m2mValues);
+                                            r_id = m2mModel.insertOrUpdate(id, m2mValues);
                                         } else {
                                             r_id = m2mModel.selectRowId(id);
                                         }
@@ -252,15 +255,18 @@ public class OSyncDataUtils {
                                         // (generated _id for each of server ids)
                                         values.put(name, m2mRowIds);
                                     }
+                                    m2mModel.close();
                                     break;
                                 case OneToMany:
                                     if (mCreateRelationRecords) {
                                         OModel o2mModel = mModel.createInstance(column.getType());
                                         List<Integer> o2mIds = JSONUtils.<Integer>toList(record.getJSONArray(name));
-                                        addUpdateRelationRecord(mModel, o2mModel, name, column.getRelatedColumn(),
+                                        addUpdateRelationRecord(mModel, o2mModel.getTableName(),
+                                                column.getType(), name, column.getRelatedColumn(),
                                                 column.getRelationType(),
                                                 (column.getRecordSyncLimit() > 0) ?
                                                         o2mIds.subList(0, column.getRecordSyncLimit()) : o2mIds);
+                                        o2mModel.close();
                                     }
                                     break;
                             }
@@ -268,18 +274,14 @@ public class OSyncDataUtils {
                     }
                 }
                 // Some default values
+                values.put("id", record.getInt("id"));
                 values.put("_write_date", ODateUtils.getUTCDate());
                 values.put("_is_active", "true");
                 values.put("_is_dirty", "false");
-                valuesCollection.add(values);
+                mModel.insertOrUpdate(record.getInt("id"), values);
+                counter++;
             }
-            HashMap<String, List<Integer>> map = mModel.insertOrUpdate(valuesCollection);
-            if (map.size() > 0) {
-                mResult.stats.numInserts = map.get(OModel.KEY_INSERT_IDS).size();
-                mResult.stats.numUpdates = map.get(OModel.KEY_UPDATE_IDS).size();
-                Log.i(TAG, mResult.stats.numInserts + " Record created");
-                Log.i(TAG, mResult.stats.numUpdates + " Record updated");
-            }
+            Log.i(TAG, counter + " records affected");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -304,6 +306,7 @@ public class OSyncDataUtils {
                     value.put("_is_dirty", "false");
                     value.put("_write_date", ODateUtils.getUTCDate());
                     model.update(record.getInt(OColumn.ROW_ID), value);
+                    model.close();
                 }
             }
             Log.i(TAG, counter + " records updated on server");
@@ -313,9 +316,10 @@ public class OSyncDataUtils {
         return false;
     }
 
-    private void addUpdateRelationRecord(OModel baseModel, OModel model, String column, String relatedColumn,
+    private void addUpdateRelationRecord(OModel baseModel, String relTable, Class<?> model,
+                                         String column, String relatedColumn,
                                          OColumn.RelationType type, List<Integer> ids) {
-        String key = model.getTableName() + "_" + column;
+        String key = relTable + "_" + column;
         if (relationRecordsHashMap.containsKey(key)) {
             SyncRelationRecords data = relationRecordsHashMap.get(key);
             data.updateIds(ids);
@@ -332,15 +336,22 @@ public class OSyncDataUtils {
         return new HashMap<>();
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if (mModel != null)
+            mModel.close();
+    }
+
     public static class SyncRelationRecords {
         private OModel baseModel;
-        private OModel relationModel;
+        private Class<?> relationModel;
         private String relationColumn;
         private String relatedColumn;
         private OColumn.RelationType relationType;
         private List<Integer> serverIds = new ArrayList<>();
 
-        public SyncRelationRecords(OModel baseModel, OModel relationModel, String relationColumn, String relatedColumn,
+        public SyncRelationRecords(OModel baseModel, Class<?> relationModel, String relationColumn, String relatedColumn,
                                    OColumn.RelationType relationType, List<Integer> serverIds) {
             this.baseModel = baseModel;
             this.relationModel = relationModel;
@@ -358,11 +369,11 @@ public class OSyncDataUtils {
             this.baseModel = baseModel;
         }
 
-        public OModel getRelationModel() {
+        public Class<?> getRelationModel() {
             return relationModel;
         }
 
-        public void setRelationModel(OModel relationModel) {
+        public void setRelationModel(Class<?> relationModel) {
             this.relationModel = relationModel;
         }
 

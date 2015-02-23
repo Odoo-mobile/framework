@@ -21,6 +21,8 @@ package com.odoo.core.service;
 
 import android.content.SyncResult;
 
+import com.odoo.core.support.OUser;
+
 public interface ISyncFinishListener {
-    public OSyncAdapter performSync(SyncResult syncResult);
+    public OSyncAdapter performNextSync(OUser user, SyncResult syncResult);
 }

@@ -32,8 +32,10 @@ public class OActionBarUtils {
         if (toolbar != null) {
             activity.setSupportActionBar(toolbar);
             ActionBar actionBar = activity.getSupportActionBar();
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            if (withHomeButtonEnabled) {
+                actionBar.setHomeButtonEnabled(true);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
     }
 }

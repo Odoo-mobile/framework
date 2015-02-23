@@ -26,11 +26,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class ODateUtils {
     public final static String TAG = ODateUtils.class.getSimpleName();
     public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
 
 
     /**
@@ -140,6 +142,10 @@ public class ODateUtils {
         return createDate(createDateObject(date, dateFormat, true), toFormat, true);
     }
 
+    public static String parseDate(String date, String dateFormat, String toFormat) {
+        return createDate(createDateObject(date, dateFormat, false), toFormat, true);
+    }
+
     /**
      * Create Date instance from given date string.
      *
@@ -181,6 +187,46 @@ public class ODateUtils {
         return gmtFormat.format(date);
     }
 
+    public static Date setDateTime(Date originalDate, int hour, int minute, int second) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(originalDate);
+        cal.set(Calendar.HOUR, hour);
+        cal.set(Calendar.MINUTE, minute);
+        cal.set(Calendar.SECOND, second);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    public static String getDateDayBeforeAfterUTC(String utcDate, int days) {
+        Date dt = createDateObject(utcDate, DEFAULT_FORMAT, false);
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(dt);
+        cal.add(Calendar.DAY_OF_MONTH, days);
+        return createDate(cal.getTime(), DEFAULT_FORMAT, true);
+    }
+
+    public static Date getDateDayBefore(Date originalDate, int days) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(originalDate);
+        cal.add(Calendar.DAY_OF_MONTH, days * -1);
+        return cal.getTime();
+    }
+
+    public static String getCurrentDateWithHour(int addHour) {
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(Calendar.HOUR);
+        cal.set(Calendar.HOUR, hour + addHour);
+        Date date = cal.getTime();
+        return ODateUtils.createDate(date, ODateUtils.DEFAULT_FORMAT, true);
+    }
+
+    public static Date getDateMinuteBefore(Date originalDate, int minutes) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(originalDate);
+        cal.add(Calendar.MINUTE, minutes * -1);
+        return cal.getTime();
+    }
+
     private static String createDate(Date date, String defaultFormat, Boolean utc) {
         SimpleDateFormat gmtFormat = new SimpleDateFormat();
         gmtFormat.applyPattern(defaultFormat);
@@ -189,4 +235,40 @@ public class ODateUtils {
         return gmtFormat.format(date);
     }
 
+    public static String floatToDuration(String duration_in_float) {
+        duration_in_float = String.format("%2.2f", Float.parseFloat(duration_in_float));
+        String[] parts = duration_in_float.split("\\.");
+        long minute = Long.parseLong(parts[0]);
+        long seconds = (60 * Long.parseLong(parts[1])) / 100;
+        return String.format("%02d:%02d", minute, seconds);
+    }
+
+    public static String durationToFloat(String duration) {
+        String[] parts = duration.split("\\:");
+        if (parts.length == 2) {
+            long minute = Long.parseLong(parts[0]);
+            long seconds = Long.parseLong(parts[1]);
+            if (seconds == 60) {
+                minute = minute + 1;
+                seconds = 0;
+            } else {
+                seconds = (100 * seconds) / 60;
+            }
+            return String.format("%d.%d", minute, seconds);
+        }
+        return "false";
+    }
+
+    public static String durationToFloat(long milliseconds) {
+        long minute = TimeUnit.MILLISECONDS.toMinutes(milliseconds);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
+                TimeUnit.MINUTES.toSeconds(minute);
+        if (seconds == 60) {
+            minute = minute + 1;
+            seconds = 0;
+        } else {
+            seconds = (100 * seconds) / 60;
+        }
+        return String.format("%d.%d", minute, seconds);
+    }
 }

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/theme_primary"
+        android:minHeight="?attr/actionBarSize"
+        app:titleMarginStart="@dimen/default_16dp"
+        android:paddingTop="@dimen/statusBarHeight"
+        android:paddingRight="@dimen/default_8dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+        app:theme="@style/ToolBarTheme" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="@color/theme_primary"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <ImageView
+                    android:id="@+id/abtus_imgLogo"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/odoo_small"
+                    android:tint="#ffffff" />
+
+                <TextView
+                    android:id="@+id/txvVersionName"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@string/font_condensed"
+                    android:gravity="center"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="25dp"
+                    android:text="@string/app_version_name"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#ebebeb" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutServerConfig"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#ffffff"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/line1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@string/font_light"
+                    android:gravity="left"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:text="@string/about_Company_line1"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/line2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@string/font_light"
+                    android:gravity="left"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:text="@string/about_Company_line2"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColorLink="#414141" />
+
+                <TextView
+                    android:id="@+id/line3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@string/font_light"
+                    android:gravity="left"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:text="@string/about_Company_line3"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColorLink="#414141" />
+
+                <TextView
+                    android:id="@+id/line4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@string/font_light"
+                    android:gravity="left"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:text="@string/about_Company_line4"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColorLink="#414141" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

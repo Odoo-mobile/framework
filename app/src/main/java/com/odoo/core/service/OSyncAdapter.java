@@ -27,6 +27,10 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.odoo.App;
+import com.odoo.base.addons.ir.IrModel;
+import com.odoo.base.addons.res.ResCompany;
+import com.odoo.core.account.OdooAccountQuickManage;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -36,6 +40,9 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.notification.ONotificationBuilder;
+import com.odoo.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,10 +53,13 @@ import java.util.List;
 
 import odoo.ODomain;
 import odoo.Odoo;
+import odoo.OdooInstance;
+import odoo.OdooSessionExpiredException;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
-
+    public static final Integer REQUEST_SIGN_IN_ERROR = 11244;
+    public static final String KEY_AUTH_ERROR = "key_authentication_error";
     private Context mContext;
     private Class<? extends OModel> mModelClass;
     private OModel mModel;
@@ -60,14 +70,16 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     private HashMap<String, ODomain> mDomain = new HashMap<>();
     private OPreferenceManager preferenceManager;
     private Odoo mOdoo;
-    private HashMap<String, List<Integer>> relationDataIds = new HashMap<>();
+    private HashMap<String, ISyncFinishListener> mSyncFinishListeners = new HashMap<>();
 
-    public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service, boolean autoInitialize) {
+    public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service,
+                        boolean autoInitialize) {
         super(context, autoInitialize);
         init(context, model, service);
     }
 
-    public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service, boolean autoInitialize, boolean allowParallelSyncs) {
+    public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service,
+                        boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
         init(context, model, service);
     }
@@ -102,13 +114,14 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 .createInstance(mModelClass);
         mUser = mModel.getUser();
         // Creating Odoo instance
-        mOdoo = createOdooInstance(mUser);
+        mOdoo = createOdooInstance(mContext, mUser);
         Log.i(TAG, "User        : " + mModel.getUser().getAndroidName());
         Log.i(TAG, "Model       : " + mModel.getModelName());
         Log.i(TAG, "Database    : " + mModel.getDatabaseName());
         Log.i(TAG, "Odoo Version: " + mUser.getVersion_number());
         // Calling service callback
-        mService.performDataSync(this, extras, mUser);
+        if (mService != null)
+            mService.performDataSync(this, extras, mUser);
 
         //Creating domain
         ODomain domain = (mDomain.containsKey(mModel.getModelName())) ?
@@ -118,26 +131,28 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         syncData(mModel, mUser, domain, syncResult, true, true);
     }
 
-    private void syncData(OModel model, OUser user, ODomain domain,
+
+    private void syncData(OModel model, OUser user, ODomain domain_filter,
                           SyncResult result, Boolean checkForDataLimit, Boolean createRelationRecords) {
         Log.v(TAG, "Sync for (" + model.getModelName() + ") Started at " + ODateUtils.getDate());
         try {
-
-            if (domain == null) {
-                domain = new ODomain();
-            }
+            ODomain domain = new ODomain();
             domain.append(model.defaultDomain());
+            if (domain_filter != null) {
+                domain.append(domain_filter);
+            }
 
             if (checkForWriteCreateDate) {
+                List<Integer> serverIds = model.getServerIds();
                 // Model Create date domain filters
                 if (model.checkForCreateDate() && checkForDataLimit) {
-                    List<Integer> serverIds = model.getServerIds();
                     if (serverIds.size() > 0) {
                         if (model.checkForWriteDate()
                                 && !model.isEmptyTable()) {
                             domain.add("|");
                         }
-                        if (createRelationRecords)
+                        if (model.checkForWriteDate() && !model.isEmptyTable()
+                                && createRelationRecords && model.getLastSyncDateTime() != null)
                             domain.add("&");
                     }
                     int data_limit = preferenceManager.getInt("sync_data_limit", 60);
@@ -153,7 +168,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         domain.add("write_date", ">", last_sync_date);
                     }
                 }
-
             }
             // Getting data
             JSONObject response = mOdoo.search_read(model.getModelName(),
@@ -183,13 +197,70 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (model.allowDeleteRecordInLocal()) {
                 removeNonExistRecordFromLocal(model);
             }
+
+            Log.v(TAG, "Sync for (" + model.getModelName() + ") finished at " + ODateUtils.getDate());
+            if (createRelationRecords) {
+                IrModel irModel = new IrModel(mContext, user);
+                irModel.setLastSyncDateTimeToNow(model);
+            }
+        } catch (OdooSessionExpiredException odooSession) {
+            showSignInErrorNotification(user);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.v(TAG, "Sync for (" + model.getModelName() + ") finished at " + ODateUtils.getDate());
-        model.setLastSyncDateTimeToNow();
+        // Performing next sync if any in service
+        if (mSyncFinishListeners.containsKey(model.getModelName())) {
+            OSyncAdapter adapter = mSyncFinishListeners.get(model.getModelName())
+                    .performNextSync(user, result);
+            mSyncFinishListeners.remove(model.getModelName());
+            if (adapter != null) {
+                SyncResult syncResult = new SyncResult();
+                OModel syncModel = model.createInstance(adapter.getModelClass());
+                ContentProviderClient contentProviderClient =
+                        mContext.getContentResolver().acquireContentProviderClient(syncModel.authority());
+                adapter.onPerformSync(user.getAccount(), null, syncModel.authority(),
+                        contentProviderClient, syncResult);
+            }
+        }
+        model.close();
     }
 
+    private void showSignInErrorNotification(OUser user) {
+        ONotificationBuilder builder = new ONotificationBuilder(mContext,
+                REQUEST_SIGN_IN_ERROR);
+        builder.setTitle("Odoo authentication problem");
+        builder.setBigText("May be you have changed your account " +
+                "password or your account does not exists");
+        builder.setIcon(R.drawable.ic_action_alert_warning);
+        builder.setText(user.getAndroidName());
+        builder.allowVibrate(true);
+        builder.withRingTone(false);
+        builder.setOngoing(true);
+        builder.withLargeIcon(false);
+        builder.setColor(OResource.color(mContext, R.color.android_orange_dark));
+
+        Bundle extra = user.getAsBundle();
+        // Actions
+        ONotificationBuilder.NotificationAction actionReset = new ONotificationBuilder.NotificationAction(
+                R.drawable.ic_action_refresh,
+                "Reset",
+                110,
+                "reset_password",
+                OdooAccountQuickManage.class,
+                extra
+        );
+        ONotificationBuilder.NotificationAction deleteAccount = new ONotificationBuilder.NotificationAction(
+                R.drawable.ic_action_navigation_close,
+                "Remove",
+                111,
+                "remove_account",
+                OdooAccountQuickManage.class,
+                extra
+        );
+        builder.addAction(actionReset);
+        builder.addAction(deleteAccount);
+        builder.build().show();
+    }
 
     private void handleRelationRecords(OUser user,
                                        HashMap<String, OSyncDataUtils.SyncRelationRecords> relationRecords,
@@ -197,7 +268,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         for (String key : relationRecords.keySet()) {
             OSyncDataUtils.SyncRelationRecords record = relationRecords.get(key);
             OModel model = record.getBaseModel();
-            OModel rel_model = record.getRelationModel();
+            OModel rel_model = model.createInstance(record.getRelationModel());
+            model.close();
             ODomain domain = new ODomain();
             domain.add("id", "in", record.getUniqueIds());
             syncData(rel_model, user, domain, result, false, false);
@@ -221,14 +293,36 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     // Nothing to do. Already added relation records links
                     break;
             }
+            rel_model.close();
         }
     }
 
-    private Odoo createOdooInstance(OUser user) {
+    public static Odoo createOdooInstance(Context context, OUser user) {
         try {
-            Odoo odoo = new Odoo(mContext, user.isOAauthLogin() ? user.getInstanceUrl() : user.getHost()
-                    , user.isAllowSelfSignedSSL());
-            odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+            App app = (App) context.getApplicationContext();
+            Odoo odoo = app.getOdoo(user);
+            if (odoo == null) {
+                if (user.isOAauthLogin()) {
+                    odoo = new Odoo(context, user.getInstanceUrl(), user.isAllowSelfSignedSSL());
+                    OdooInstance instance = new OdooInstance();
+                    instance.setInstanceUrl(user.getInstanceUrl());
+                    instance.setDatabaseName(user.getInstanceDatabase());
+                    instance.setClientId(user.getClientId());
+                    odoo.oauth_authenticate(instance, user.getUsername(), user.getPassword());
+                } else {
+                    odoo = new Odoo(context, user.getHost(), user.isAllowSelfSignedSSL());
+                    odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+                }
+                app.setOdoo(odoo, user);
+
+                ResCompany company = new ResCompany(context, user);
+                if (company.count("id = ? ", new String[]{user.getCompany_id()}) <= 0) {
+                    ODataRow company_details = new ODataRow();
+                    company_details.put("id", user.getCompany_id());
+                    company.quickCreateRecord(company_details);
+                }
+
+            }
             return odoo;
         } catch (Exception e) {
             e.printStackTrace();
@@ -302,11 +396,13 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         for (ODataRow record : records) {
             serverIds.add(record.getInt("id"));
         }
-        if (removeRecordsFromServer(model, serverIds)) {
-            int counter = model.deleteRecords(serverIds, true);
-            Log.i(TAG, counter + " records removed from server and local database");
-        } else {
-            Log.e(TAG, "Unable to remove records from server");
+        if (serverIds.size() > 0) {
+            if (removeRecordsFromServer(model, serverIds)) {
+                int counter = model.deleteRecords(serverIds, true);
+                Log.i(TAG, counter + " records removed from server and local database");
+            } else {
+                Log.e(TAG, "Unable to remove records from server");
+            }
         }
     }
 
@@ -347,5 +443,22 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Class<? extends OModel> getModelClass() {
+        return mModelClass;
+    }
+
+    public void setModel(OModel model) {
+        mModel = model;
+    }
+
+    public OModel getModel() {
+        return mModel;
+    }
+
+    public OSyncAdapter onSyncFinish(ISyncFinishListener syncFinish) {
+        mSyncFinishListeners.put(mModel.getModelName(), syncFinish);
+        return this;
     }
 }

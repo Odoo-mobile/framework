@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="account_sync_settings"
+        android:title="Sync Settings">
+        <PreferenceScreen
+            android:key="account_settings"
+            android:summary="Enable or disable data synchronization"
+            android:title="Sync Settings">
+            <intent android:action="android.settings.SYNC_SETTINGS" />
+        </PreferenceScreen>
+        <RingtonePreference
+            android:key="notification_ringtone"
+            android:title="Notification ring tone"
+            android:ringtoneType="notification"
+            android:defaultValue="@string/notification_default_ring_tone"
+            android:summary="Set notification ring tone" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="sync_interval_settings"
+        android:title="Sync interval">
+        <ListPreference
+            android:defaultValue="1440"
+            android:entries="@array/syncInterval"
+            android:entryValues="@array/syncIntervalValues"
+            android:key="sync_interval"
+            android:summary="Define how often synchronization will be performed"
+            android:title="Sync interval" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="sync_data_limit_settings"
+        android:title="Data Sync Limit">
+        <ListPreference
+            android:defaultValue="60"
+            android:entries="@array/syncDataLimit"
+            android:entryValues="@array/syncDataLimitValues"
+            android:key="sync_data_limit"
+            android:summary="Define how old data to be synchronized"
+            android:title="Sync data limit" />
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:key="application_about"
+        android:title="@string/title_about">
+        <Preference
+            android:icon="@drawable/ic_odoo_o"
+            android:title="@string/summary_about_odoo_mobile">
+            <intent android:action="com.odoo.ACTION_ABOUT" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>
