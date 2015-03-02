@@ -82,6 +82,7 @@ public class OModel {
     private OdooVersion mOdooVersion = null;
     private String default_name_column = "name";
     public static OModelRegistry modelRegistry = new OModelRegistry();
+    private boolean hasMailChatter = false;
 
     // Relation record command
     public enum Command {
@@ -155,6 +156,14 @@ public class OModel {
     public OModel setModelName(String model_name) {
         this.model_name = model_name;
         return this;
+    }
+
+    public boolean hasMailChatter() {
+        return hasMailChatter;
+    }
+
+    public void setHasMailChatter(boolean hasMailChatter) {
+        this.hasMailChatter = hasMailChatter;
     }
 
     public OUser getUser() {
@@ -978,6 +987,14 @@ public class OModel {
             return row.getString("name");
         }
         return "false";
+    }
+
+    public void quickSyncRecords(ODomain domain) {
+        OSyncAdapter syncAdapter = new OSyncAdapter(mContext, getClass(), null, true);
+        syncAdapter.setModel(this);
+        syncAdapter.setDomain(domain);
+        syncAdapter.checkForWriteCreateDate(false);
+        syncAdapter.onPerformSync(getUser().getAccount(), null, authority(), null, new SyncResult());
     }
 
     public ODataRow quickCreateRecord(ODataRow record) {

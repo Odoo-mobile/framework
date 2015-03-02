@@ -62,6 +62,7 @@ public class ResPartner extends OModel {
 
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);
+        setHasMailChatter(true);
     }
 
     @Override

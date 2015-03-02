@@ -49,9 +49,9 @@
                 android:orientation="vertical"
                 android:background="#ffffff"
                 android:paddingTop="@dimen/default_16dp"
-                android:paddingBottom="@dimen/default_16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <odoo.controls.OForm
                     android:id="@+id/customerForm"
                     android:layout_width="match_parent"
@@ -321,7 +321,10 @@
                         app:fieldName="comment"
                         app:fieldTextAppearance="?android:textAppearanceMedium"
                         android:layout_height="wrap_content"></odoo.controls.OField>
+
                 </LinearLayout>
+
+
             </RelativeLayout>
         </odoo.controls.OForm>
 

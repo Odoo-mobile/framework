@@ -23,6 +23,7 @@ import android.content.Context;
 
 import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.ir.IrModel;
+import com.odoo.base.addons.mail.MailMessage;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
@@ -42,6 +43,7 @@ public class BaseModels {
         models.add(new ResUsers(context, user));
         models.add(new ResCompany(context, user));
         models.add(new IrAttachment(context, user));
+        models.add(new MailMessage(context, user));
         return models;
     }
 }

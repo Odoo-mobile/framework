@@ -28,15 +28,20 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
+import android.widget.SectionIndexer;
 
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.utils.logger.OLog;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import odoo.controls.OForm;
 
-public class OCursorListAdapter extends CursorAdapter implements AdapterView.OnItemClickListener {
+public class OCursorListAdapter extends CursorAdapter implements
+        AdapterView.OnItemClickListener, SectionIndexer {
     public static final String TAG = OCursorListAdapter.class.getSimpleName();
 
     private Integer mLayout = null;
@@ -50,6 +55,10 @@ public class OCursorListAdapter extends CursorAdapter implements AdapterView.OnI
     private Context mContext = null;
     private IOnItemClickListener mIOnItemClickListener = null;
     private AbsListView mListView = null;
+    private Boolean hasIndexers = false;
+    private String mIndexerColumn = null;
+    private HashMap<String, Integer> azIndexers = new HashMap<>();
+    private String[] sections = new String[0];
 
     public OCursorListAdapter(Context context, Cursor c, int layout) {
         super(context, c, false);
@@ -151,7 +160,7 @@ public class OCursorListAdapter extends CursorAdapter implements AdapterView.OnI
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        View view = null;
+        View view;
         if (mCacheViews && getCachedView(cursor) != null) {
             view = getCachedView(cursor);
             if (!view.isDirty()) {
@@ -170,6 +179,31 @@ public class OCursorListAdapter extends CursorAdapter implements AdapterView.OnI
             mViewCache.put("view_" + cursor.getPosition(), view);
         }
         return view;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        if (hasIndexers && mIndexerColumn != null) {
+            Cursor cr = getCursor();
+            if (cr.getCount() > 0) {
+                int pos = 0;
+                if (cr.moveToFirst()) {
+                    List<String> keys = new ArrayList<>();
+                    do {
+                        int index = cr.getColumnIndex(mIndexerColumn);
+                        if (index > -1) {
+                            String colValue = cr.getString(index);
+                            azIndexers.put(colValue.substring(0, 1), pos);
+                            keys.add(colValue.substring(0, 1));
+                        }
+                        pos++;
+                    } while (cr.moveToNext());
+                    Collections.sort(keys);
+                    sections = keys.toArray(new String[keys.size()]);
+                }
+            }
+        }
     }
 
     public View inflate(int resource, ViewGroup viewGroup) {
@@ -246,4 +280,26 @@ public class OCursorListAdapter extends CursorAdapter implements AdapterView.OnI
             }
         }, 500);
     }
+
+    public void setHasSectionIndexers(boolean hasSectionIndexers, String onColumn) {
+        hasIndexers = hasSectionIndexers;
+        mIndexerColumn = onColumn;
+    }
+
+    // Section Indexers
+    @Override
+    public Object[] getSections() {
+        return sections;
+    }
+
+    @Override
+    public int getPositionForSection(int sectionIndex) {
+        return azIndexers.get(sections[sectionIndex]);
+    }
+
+    @Override
+    public int getSectionForPosition(int position) {
+        return azIndexers.get(sections[position]);
+    }
+
 }

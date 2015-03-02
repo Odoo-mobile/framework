@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_marginBottom="4dp"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="top"
+
+        android:layout_height="wrap_content">
+
+        <odoo.controls.BezelImageView
+            android:id="@+id/authorImage"
+            android:layout_width="32dp"
+            android:src="@drawable/avatar"
+            android:layout_marginTop="@dimen/default_16dp"
+            android:layout_marginLeft="@dimen/default_8dp"
+            app:maskDrawable="@drawable/circle_mask"
+            android:layout_height="32dp" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingTop="@dimen/default_16dp"
+            android:paddingBottom="@dimen/default_16dp"
+            android:paddingRight="@dimen/default_16dp"
+            android:paddingLeft="@dimen/default_8dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/chatterSubject"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:fontFamily="@string/font_normal"
+                android:layout_marginBottom="5dp"
+                android:layout_width="match_parent"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:textStyle="bold"
+                android:textColor="@color/body_text_1"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/chatterBody"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:fontFamily="@string/font_normal"
+                android:layout_width="match_parent"
+                android:maxLines="3"
+                android:textColor="#414141"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/chatterAuthor"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:fontFamily="@string/font_condensed"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:ellipsize="middle"
+                    android:textColor="@color/body_text_3"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:singleLine="true"
+                    android:id="@+id/chatterDate"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:fontFamily="@string/font_condensed"
+                    android:textColor="@color/body_text_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View style="@style/ViewSeparator" />
+</LinearLayout>

@@ -40,6 +40,9 @@
     <string name="label_share">Share</string>
     <string name="label_import_contact">Import</string>
     <string name="label_address">Address</string>
+    <string name="label_reply">Reply</string>
+    <string name="label_close">Close</string>
+    <string name="label_send">Send</string>
     <!-- Drawer -->
     <string name="label_drawer_account_add_account">Add Account</string>
     <string name="label_drawer_account_manage_accounts">Manage Accounts</string>

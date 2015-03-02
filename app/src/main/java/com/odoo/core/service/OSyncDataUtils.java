@@ -96,8 +96,7 @@ public class OSyncDataUtils {
 
             // getting local dirty records if server records length = 0
             if (records.length() <= 0) {
-                for (ODataRow row : mModel.select(new String[]{mModel.getDefaultNameColumn()},
-                        "_is_dirty = ? and _is_active = ?",
+                for (ODataRow row : mModel.select(new String[]{}, "_is_dirty = ? and _is_active = ?",
                         new String[]{"true", "true"})) {
                     serverIds.add(row.getInt("id"));
                 }

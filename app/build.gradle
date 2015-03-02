@@ -23,10 +23,10 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile files('libs/odoo-v2.jar')
     compile files('libs/swipe_library.jar')
     compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.android.support:cardview-v7:21.0.+'
     compile project(':intro-slider-lib')
     compile project(':parallax-effect-lib')
+    compile project(':odoo-rpc-v2')
 }

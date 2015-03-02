@@ -5,4 +5,8 @@
     <string name="toast_information_saved">Information Saved</string>
     <string name="toast_image_size_too_large">Image size too large !</string>
     <string name="label_no_customer_found">No Customer Found !</string>
+    <string name="message_to">Message to %s</string>
+    <string name="add_internal_note">Add and internal note</string>
+    <string name="internal_note_hint">Add an internal note that will not be sent to the followers</string>
+    <string name="label_log_an_internal_note">Log note</string>
 </resources>

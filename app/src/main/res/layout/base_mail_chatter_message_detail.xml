@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/recordName"
+        android:textColor="#fff"
+        android:padding="@dimen/default_16dp"
+        android:background="@color/android_blue_dark"
+        android:fontFamily="@string/font_normal"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:paddingTop="@dimen/default_8dp"
+                android:paddingBottom="@dimen/default_8dp"
+                android:paddingLeft="@dimen/default_16dp"
+                android:paddingRight="@dimen/default_16dp"
+                android:background="#fff"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <odoo.controls.BezelImageView
+                    android:id="@+id/author_image"
+                    android:layout_width="40dp"
+                    app:maskDrawable="@drawable/circle_mask"
+                    android:layout_height="40dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/default_8dp"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/authorName"
+                        android:textColor="@color/body_text_2"
+                        android:fontFamily="@string/font_condensed"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/messageDate"
+                        android:textColor="@color/body_text_3"
+                        android:fontFamily="@string/font_condensed"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/messageSubject"
+                android:textColor="@color/body_text_1"
+                android:textStyle="bold"
+                android:padding="@dimen/default_16dp"
+                android:background="#fff"
+                android:fontFamily="@string/font_normal"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View style="@style/ViewSeparator" />
+
+            <WebView
+                android:id="@+id/messageBody"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:background="@android:color/transparent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </WebView>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <View style="@style/ViewSeparator" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:showDividers="middle"
+        android:divider="?android:attr/dividerVertical"
+        android:orientation="horizontal">
+
+
+        <Button
+            android:id="@+id/btnReply"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:fontFamily="@string/font_normal"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:padding="@dimen/default_16dp"
+            android:text="@string/label_reply"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:textColor="@color/body_text_1"
+            android:textSize="@dimen/text_size_medium" />
+
+        <Button
+            android:id="@+id/btnClose"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:fontFamily="@string/font_normal"
+            android:padding="@dimen/default_16dp"
+            android:text="@string/label_close"
+            android:textAllCaps="true"
+            android:textColor="@color/body_text_1"
+            android:textSize="@dimen/text_size_medium" />
+
+    </LinearLayout>
+</LinearLayout>

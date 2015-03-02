@@ -29,17 +29,19 @@ import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.odoo.R;
+import com.odoo.base.addons.mail.widget.MailChatterView;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -56,6 +58,7 @@ public class OForm extends LinearLayout {
     private int icon_tint_color = 0;
     private Boolean mFirstModeChange = true;
     private OValues extraValues = new OValues();
+    private MailChatterView chatterView = null;
 
     public OForm(Context context) {
         super(context);
@@ -174,6 +177,21 @@ public class OForm extends LinearLayout {
                     c.setValue(val);
                 if (icon_tint_color != -1) {
                     c.setIconTintColor(icon_tint_color);
+                }
+            }
+        }
+
+        // Adding chatter view if model requested
+        if (!mEditable) {
+            if (model != null && model.hasMailChatter()
+                    && mRecord != null && mRecord.getInt("id") != 0) {
+                if (chatterView == null) {
+                    chatterView = (MailChatterView) LayoutInflater.from(mContext)
+                            .inflate(R.layout.base_mail_chatter, this, false);
+                    chatterView.setModelName(model.getModelName());
+                    chatterView.setRecordServerId(mRecord.getInt("id"));
+                    chatterView.generateView();
+                    addView(chatterView);
                 }
             }
         }

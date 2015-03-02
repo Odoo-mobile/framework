@@ -51,6 +51,13 @@
         <dex dex="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-c08c472afb0b660f25fd1e3a4fceeb1f9a77f654.jar" />
     </item>
     <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-migrate-in-studio-dpr/app/build/intermediates/exploded-aar/master-migrate-in-studio-dpr/odoo-rpc-v2/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="7d048080e062751ab8d96c2bac4df86b99d2bddb">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-bd903ca964751bc39daf10dce0e6a3e9590b5e61.jar" />
+    </item>
+    <item
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-migrate-in-studio-dpr/app/build/intermediates/exploded-aar/master-migrate-in-studio-dpr/parallax-effect-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -89,7 +96,7 @@
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-migrate-in-studio-dpr/app/build/intermediates/exploded-aar/master-migrate-in-studio-dpr/intro-slider-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="b37c59a9e89a528bfa1f2a1ed3615f4d21febc3f">
+        sha1="fbcc2aab3a1fed2c02471e8311921190cda20f2e">
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-c12f9dcd06a9deb18b1201a6793b62f28a55e3b0.jar" />
     </item>
     <item
@@ -105,13 +112,6 @@
         revision="21.1.2"
         sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
         <dex dex="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-3a156a282599cf7411b95b60ae5f2951e9b642e0.jar" />
-    </item>
-    <item
-        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-migrate-in-studio-dpr/app/libs/odoo-v2.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="ac69c24051df207a3d00758875befeb85a14b155">
-        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/odoo-v2-b65e8bf45533b4fc60c254eb89c27b72c3d79541.jar" />
     </item>
 
 </items>
