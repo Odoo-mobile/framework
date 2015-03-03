@@ -191,6 +191,19 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/termsCondition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@string/font_light"
+                android:gravity="center"
+                android:padding="5dp"
+                android:layout_marginTop="@dimen/default_8dp"
+                android:text="@string/disclaimer_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColorLink="#ffffff"
+                android:textColor="#ffffff" />
+
             <Button
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"

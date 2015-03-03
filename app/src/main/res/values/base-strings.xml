@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="label_login">Login</string>
+    <string name="label_login">Accept &amp; Login</string>
     <string name="label_your_self_hosted_url">Your self-hosted URL</string>
     <string name="label_username_or_email">Username or email</string>
     <string name="label_password">Password</string>
@@ -130,4 +130,5 @@
     <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
     <string name="app_version_name">Version</string>
     <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
+    <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.co.in/">Terms of Service</a> and <a href="http://www.odoo.co.in/">Privacy Policy</a></string>
 </resources>

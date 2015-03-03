@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,6 +61,7 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
     private Spinner databaseSpinner = null;
     private List<String> databases = new ArrayList<String>();
     private TextView mLoginProcessStatus = null;
+    private TextView mTermsCondition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,8 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
         loginHelper = new OdooLoginHelper(this);
         mServerTester = new OdooServerTester(this);
         mLoginProcessStatus = (TextView) findViewById(R.id.login_process_status);
+        mTermsCondition = (TextView) findViewById(R.id.termsCondition);
+        mTermsCondition.setMovementMethod(LinkMovementMethod.getInstance());
         findViewById(R.id.btnLogin).setOnClickListener(this);
         findViewById(R.id.forgot_password).setOnClickListener(this);
         findViewById(R.id.create_account).setOnClickListener(this);
