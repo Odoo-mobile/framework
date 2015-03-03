@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="list_divider">#ddd</color>
+
+    <!-- Odoo Theme Colors -->
+
+    <color name="odoo_primary">#a24689</color>
+    <color name="odoo_secondary">#8f8f8f</color>
+    <color name="odoo_optional">#21b799</color>
+
+    <!-- Drawer Colors -->
+    <color name="drawer_text_color">#282828</color>
+    <color name="drawer_text_color_selected">#414141</color>
+    <color name="drawer_icon_tint">#808080</color>
+    <color name="drawer_icon_tint_selected">#414141</color>
+    <color name="drawer_focused">#f3f3f3</color>
+    <color name="drawer_pressed">#EBEBEB</color>
+    <color name="drawer_background">#ffffffff</color>
+    <color name="drawer_separator_text_color">#acacac</color>
+    <color name="drawer_separator_background">#e5e5e5</color>
+
+    <!-- Android Style Colors -->
+    <color name="android_blue">#33B5E5</color>
+    <color name="android_blue_dark">#0099CC</color>
+    <color name="android_violet">#AA66CC</color>
+    <color name="android_violet_dark">#9933CC</color>
+    <color name="android_green">#99CC00</color>
+    <color name="android_green_dark">#669900</color>
+    <color name="android_orange">#FFBB33</color>
+    <color name="android_orange_dark">#FF8800</color>
+    <color name="android_red">#FF4444</color>
+    <color name="android_red_dark">#CC0000</color>
+
+    <color name="control_focused">#e5e5e5</color>
+    <color name="control_pressed">#acacac</color>
+
+
+    <array name="letter_tile_colors">
+        <item>@color/android_blue</item>
+        <item>@color/android_violet_dark</item>
+        <item>@color/android_red</item>
+        <item>@color/android_green_dark</item>
+        <item>@color/android_blue_dark</item>
+        <item>@color/android_orange</item>
+        <item>@color/android_red_dark</item>
+        <item>@color/android_violet</item>
+        <item>@color/android_green</item>
+        <item>@color/android_orange_dark</item>
+    </array>
+
+    <color name="icon_tint">#5e5e5e</color>
+    <color name="actionbar_spinner_text_color">#414141</color>
+
+    <color name="base_chatter_view_background">#f3f3f3</color>
+</resources>

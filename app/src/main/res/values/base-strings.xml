@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_login">Login</string>
+    <string name="label_your_self_hosted_url">Your self-hosted URL</string>
+    <string name="label_username_or_email">Username or email</string>
+    <string name="label_password">Password</string>
+    <string name="label_forgot_password">Forgot password?</string>
+    <string name="label_add_self_hosted_url">Add self-hosted URL</string>
+    <string name="label_login_with_odoo">Login with Odoo.com</string>
+    <string name="label_create_account">Create account</string>
+    <string name="label_select_database">Select Database</string>
+    <string name="title_ssl_warning">SSL Warning</string>
+    <string name="untrusted_ssl_warning">The site\'s security certificate is not trusted !</string>
+    <string name="error_invalid_odoo_url">Invalid Odoo URL !</string>
+    <string name="error_invalid_username_or_password">Invalid Username or Password</string>
+    <string name="error_provide_username">Provide username</string>
+    <string name="error_provide_password">Provide password</string>
+    <string name="error_provide_server_url">Provide server URL</string>
+    <string name="status_connecting_to_server">Connecting&#8230;</string>
+    <string name="status_connected_to_server">Connected</string>
+    <string name="status_logging_in">Logging in&#8230;</string>
+    <string name="status_logging_in_with_instance">Logging in to instance&#8230;</string>
+    <string name="status_login_success">Login Success</string>
+    <string name="status_logout_success">Logout Success</string>
+    <string name="status_creating_account">Creating account</string>
+    <string name="status_getting_instances">Getting instances&#8230;</string>
+    <string name="status_redirecting">Redirecting&#8230;</string>
+    <string name="title_instance_expired">Instance Expired</string>
+    <string name="label_select_instance">Select Instance</string>
+    <string name="label_select_user">Login to User</string>
+    <string name="label_accounts">Accounts</string>
+    <string name="label_settings">Settings</string>
+    <string name="label_save">Save</string>
+    <string name="label_edit">Edit</string>
+    <string name="label_required">required</string>
+    <string name="label_more">More</string>
+    <string name="label_alert">Alert</string>
+    <string name="label_warning">Warning</string>
+    <string name="label_error">Error</string>
+    <string name="label_share">Share</string>
+    <string name="label_import_contact">Import</string>
+    <string name="label_address">Address</string>
+    <string name="label_reply">Reply</string>
+    <string name="label_close">Close</string>
+    <string name="label_send">Send</string>
+    <!-- Drawer -->
+    <string name="label_drawer_account_add_account">Add Account</string>
+    <string name="label_drawer_account_manage_accounts">Manage Accounts</string>
+    <!-- Common Labels -->
+    <string name="title_application_settings">"Application Settings"</string>
+    <string name="title_select_account">"Select Account"</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_general_settings">General Settings</string>
+    <string name="title_accounts">Accounts</string>
+    <string name="title_about">About</string>
+    <string name="title_confirm">Confirm</string>
+    <string name="title_user_profile">Odoo User Profile</string>
+    <string name="title_configuration">Configuration</string>
+    <string name="title_refresh_details">Refresh Details</string>
+    <string name="title_add_account">Add Account</string>
+    <string name="title_working">Working&#8230;</string>
+    <string name="title_please_wait">Please wait&#8230;</string>
+    <string name="label_new">New</string>
+    <string name="label_ok">OK</string>
+    <string name="label_yes">Yes</string>
+    <string name="label_no">No</string>
+    <string name="label_search">Search</string>
+    <string name="label_delete">Delete</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="label_logout">Logout</string>
+    <string name="label_version">Version</string>
+    <string name="label_update_info">Update Info</string>
+    <string name="label_process_anyway">Process Anyway</string>
+    <string name="label_read_more">Read More</string>
+    <string name="label_read_less">Read Less</string>
+    <string name="label_no_records_found">No Records Found</string>
+    <string name="label_odoo_mobile_on_github">Odoo Mobile on GitHub</string>
+    <string name="label_our_apps">Our apps</string>
+    <!-- Toasts -->
+    <string name="toast_setting_saved">Setting saved.</string>
+    <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
+    <string name="toast_are_you_sure_delete_account">Are you sure want to delete account ?</string>
+    <string name="toast_user_already_exists">User already exists</string>
+    <string name="toast_network_required">Network required</string>
+    <string name="toast_account_removed">Account Removed Successfully</string>
+
+    <!-- Setting pref strings -->
+    <string-array name="syncInterval">
+        <item name="5">Every 5 minutes</item>
+        <item name="10">Every 10 minutes</item>
+        <item name="20">Every 20 minutes</item>
+        <item name="40">Every 40 minutes</item>
+        <item name="60">Every 60 minutes</item>
+        <item name="1440">Once in a day</item>
+    </string-array>
+    <string-array name="syncIntervalValues">
+        <item name="5">5</item>
+        <item name="10">10</item>
+        <item name="20">20</item>
+        <item name="40">40</item>
+        <item name="60">60</item>
+        <item name="1440">1440</item>
+    </string-array>
+    <string-array name="syncDataLimit">
+        <item name="30">1 month old</item>
+        <item name="60">2 months old</item>
+        <item name="90">3 months old</item>
+    </string-array>
+    <string-array name="syncDataLimitValues">
+        <item name="30">30</item>
+        <item name="60">60</item>
+        <item name="90">90</item>
+    </string-array>
+    <string name="general_settings">General Settings</string>
+    <string name="application_settings_summary">Sync settings, Interval settings, sync data limit, and more</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="add_account">Add Account</string>
+    <string name="summary_about_odoo_mobile">Odoo Mobile</string>
+    <string name="build_version">Build Version</string>
+    <string name="label_powered_by">Powered by</string>
+    <string name="odoo_mobile_framework">Odoo Mobile framework</string>
+    <string name="supported_versions">Supported versions</string>
+    <string name="supported_versions_names">Odoo 7.0+</string>
+
+    <!-- About Company Fragment Strings -->
+    <string name="about_Company_line1">Copyright © 2004-TODAY Odoo SA. All Rights Reserved.</string>
+    <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>
+    <string name="about_Company_line3">Licenced under the terms of <a href="http://www.gnu.org/licenses/agpl.html/">GNU Affero General Public License</a></string>
+    <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
+    <string name="app_version_name">Version</string>
+    <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
+</resources>

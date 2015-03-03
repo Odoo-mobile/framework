@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/recordName"
+        android:textColor="#fff"
+        android:padding="@dimen/default_16dp"
+        android:background="@color/theme_secondary_dark"
+        android:fontFamily="@string/font_normal"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:id="@+id/messageSubject"
+                android:padding="@dimen/default_16dp"
+                android:hint="Subject"
+                android:background="@android:color/transparent"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View style="@style/ViewSeparator" />
+
+            <EditText
+                android:padding="@dimen/default_16dp"
+                android:gravity="top"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:id="@+id/messageBody"
+                android:hint="Message"
+                android:minLines="10"
+                android:background="@android:color/transparent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <View style="@style/ViewSeparator" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:showDividers="middle"
+        android:divider="?android:attr/dividerVertical"
+        android:orientation="horizontal">
+
+
+        <Button
+            android:id="@+id/btnSend"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:fontFamily="@string/font_normal"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:padding="@dimen/default_16dp"
+            android:text="@string/label_send"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:textColor="@color/body_text_1"
+            android:textSize="@dimen/text_size_medium" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:fontFamily="@string/font_normal"
+            android:padding="@dimen/default_16dp"
+            android:text="@string/label_cancel"
+            android:textAllCaps="true"
+            android:textColor="@color/body_text_1"
+            android:textSize="@dimen/text_size_medium" />
+
+    </LinearLayout>
+</LinearLayout>

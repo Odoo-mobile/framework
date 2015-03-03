@@ -1,0 +1,427 @@
+/**
+ * Odoo, Open Source Management Solution
+ * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http:www.gnu.org/licenses/>
+ *
+ * Created on 2/1/15 4:15 PM
+ */
+package com.odoo.core.service;
+
+import android.content.Context;
+import android.content.SyncResult;
+import android.util.Log;
+
+import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OValues;
+import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OUser;
+import com.odoo.core.support.OdooFields;
+import com.odoo.core.utils.JSONUtils;
+import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OListUtils;
+import com.odoo.core.utils.StringUtils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+import odoo.ODomain;
+import odoo.Odoo;
+
+public class OSyncDataUtils {
+    public static final String TAG = OSyncDataUtils.class.getSimpleName();
+    private Context mContext;
+    private OModel mModel;
+    private OUser mUser;
+    private JSONObject response;
+    private HashSet<String> recordsId = new HashSet<>();
+    private HashMap<String, SyncRelationRecords> relationRecordsHashMap = new HashMap<>();
+    private Odoo mOdoo;
+    private SyncResult mResult;
+    private HashMap<String, List<Integer>> updateToServerRecords = new HashMap<>();
+    private Boolean mCreateRelationRecords = true;
+
+    public OSyncDataUtils(Context context, Odoo odoo, OModel model, OUser user, JSONObject response,
+                          SyncResult result, Boolean createRelRecord) {
+        mContext = context;
+        mOdoo = odoo;
+        mModel = model;
+        mUser = user;
+        this.response = response;
+        mResult = result;
+        mCreateRelationRecords = createRelRecord;
+        checkLocalUpdatedRecords();
+        handleResult();
+    }
+
+
+    private void checkLocalUpdatedRecords() {
+        try {
+            // Array of records which are new or need to update in local
+            JSONArray finalRecords = new JSONArray();
+
+            // Getting list of ids which are present in local database
+            List<Integer> serverIds = new ArrayList<>();
+            HashMap<String, JSONObject> serverIdRecords = new HashMap<>();
+            JSONArray records = response.getJSONArray("records");
+            for (int i = 0; i < records.length(); i++) {
+                JSONObject record = records.getJSONObject(i);
+                if (mModel.hasServerRecord(record.getInt("id"))
+                        && mModel.isServerRecordDirty(record.getInt("id"))) {
+                    int server_id = record.getInt("id");
+                    serverIds.add(server_id);
+                    serverIdRecords.put("key_" + server_id, record);
+                } else {
+                    finalRecords.put(record);
+                }
+            }
+
+            // getting local dirty records if server records length = 0
+            if (records.length() <= 0) {
+                for (ODataRow row : mModel.select(new String[]{}, "_is_dirty = ? and _is_active = ?",
+                        new String[]{"true", "true"})) {
+                    serverIds.add(row.getInt("id"));
+                }
+            }
+            // Comparing dirty (updated) record
+            List<Integer> updateToServerIds = new ArrayList<>();
+            if (serverIds.size() > 0) {
+                HashMap<String, String> write_dates = getWriteDate(mModel, serverIds);
+                for (Integer server_id : serverIds) {
+                    String key = "key_" + server_id;
+                    String write_date = write_dates.get(key);
+                    ODataRow record = mModel.browse(new String[]{"_write_date"}, "id = ?",
+                            new String[]{server_id + ""});
+                    if (record != null) {
+                        Date write_date_obj = ODateUtils.createDateObject(write_date,
+                                ODateUtils.DEFAULT_FORMAT, false);
+                        Date _write_date_obj = ODateUtils.createDateObject(record.getString("_write_date"),
+                                ODateUtils.DEFAULT_FORMAT, false);
+                        if (_write_date_obj.compareTo(write_date_obj) > 0) {
+                            // Local record is latest
+                            updateToServerIds.add(server_id);
+                        } else {
+                            if (serverIdRecords.containsKey(key))
+                                finalRecords.put(serverIdRecords.get(key));
+                        }
+                    }
+                }
+            }
+            if (updateToServerIds.size() > 0) {
+                updateToServerRecords.put(mModel.getModelName(), updateToServerIds);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private HashMap<String, String> getWriteDate(OModel model, List<Integer> ids) {
+        HashMap<String, String> map = new HashMap<>();
+        try {
+            JSONArray result;
+            if (model.getColumn("write_date") != null) {
+                OdooFields fields = new OdooFields(new String[]{"write_date"});
+                ODomain domain = new ODomain();
+                domain.add("id", "in", ids);
+                JSONObject data = mOdoo.search_read(model.getModelName(), fields.get(), domain.get());
+                result = data.getJSONArray("records");
+            } else {
+                JSONObject data = mOdoo.perm_read(model.getModelName(), ids);
+                result = data.getJSONArray("result");
+            }
+
+            if (result.length() > 0) {
+                for (int i = 0; i < result.length(); i++) {
+                    JSONObject obj = result.getJSONObject(i);
+                    map.put("key_" + obj.getInt("id"), obj.getString("write_date"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    private void handleResult() {
+        try {
+            recordsId.clear();
+            JSONArray records = response.getJSONArray("records");
+            int length = records.length();
+            int counter = 0;
+            List<OColumn> columns = mModel.getColumns(false);
+            columns.addAll(mModel.getFunctionalColumns());
+            for (int i = 0; i < length; i++) {
+                JSONObject record = records.getJSONObject(i);
+                OValues values = new OValues();
+                recordsId.add(mModel.getModelName() + "_" + record.getInt("id"));
+                for (OColumn column : columns) {
+                    String name = column.getName();
+                    if (column.getRelationType() == null) {
+
+                        // checks for functional store fields
+                        if (column.isFunctionalColumn() && column.canFunctionalStore()) {
+                            List<String> depends = column.getFunctionalStoreDepends();
+                            OValues dependValues = new OValues();
+                            for (String depend : depends) {
+                                if (record.has(depend)) {
+                                    dependValues.put(depend, record.get(depend));
+                                }
+                            }
+                            Object value = mModel.getFunctionalMethodValue(column, dependValues);
+                            values.put(column.getName(), value);
+                        } else {
+                            // Normal Columns
+                            values.put(name, record.get(name));
+                        }
+                    } else {
+                        // Relation Columns
+                        if (!(record.get(name) instanceof Boolean)) {
+                            switch (column.getRelationType()) {
+                                case ManyToOne:
+                                    JSONArray m2oData = record.getJSONArray(name);
+                                    OModel m2o_model = mModel.createInstance(column.getType());
+                                    String recKey = m2o_model.getModelName() + "_" + m2oData.get(0);
+                                    int m2oRowId;
+                                    if (!recordsId.contains(recKey)) {
+                                        OValues m2oValue = new OValues();
+                                        m2oValue.put("id", m2oData.get(0));
+                                        m2oValue.put(m2o_model.getDefaultNameColumn(), m2oData.get(1));
+                                        m2oValue.put("_is_dirty", "false");
+                                        m2oRowId = m2o_model.insertOrUpdate(m2oData.getInt(0),
+                                                m2oValue);
+                                    } else {
+                                        m2oRowId = m2o_model.selectRowId(m2oData.getInt(0));
+                                    }
+
+                                    values.put(name, m2oRowId);
+                                    if (mCreateRelationRecords) {
+                                        // Add id to sync if model contains more than (id,name) columns
+                                        if (m2o_model.getColumns(false).size() > 2
+                                                || (m2o_model.getColumns(false).size() > 4
+                                                && mModel.getOdooVersion().getVersion_number() > 7)) {
+                                            List<Integer> m2oIds = new ArrayList<>();
+                                            m2oIds.add(m2oData.getInt(0));
+                                            addUpdateRelationRecord(mModel, m2o_model.getTableName(),
+                                                    column.getType(), name, null,
+                                                    column.getRelationType(), m2oIds);
+                                        }
+                                    }
+                                    m2o_model.close();
+                                    break;
+                                case ManyToMany:
+                                    OModel m2mModel = mModel.createInstance(column.getType());
+                                    List<Integer> m2mIds = JSONUtils.<Integer>toList(record.getJSONArray(name));
+                                    if (mCreateRelationRecords) {
+                                        addUpdateRelationRecord(mModel, m2mModel.getTableName(), column.getType(),
+                                                name, null, column.getRelationType(),
+                                                (column.getRecordSyncLimit() > 0) ?
+                                                        m2mIds.subList(0, column.getRecordSyncLimit()) : m2mIds);
+                                    }
+                                    List<Integer> m2mRowIds = new ArrayList<>();
+                                    for (Integer id : m2mIds) {
+                                        recKey = m2mModel.getModelName() + "_" + id;
+                                        int r_id = OModel.INVALID_ROW_ID;
+                                        if (!recordsId.contains(recKey)) {
+                                            OValues m2mValues = new OValues();
+                                            m2mValues.put("id", id);
+                                            m2mValues.put("_is_dirty", "false");
+                                            r_id = m2mModel.insertOrUpdate(id, m2mValues);
+                                        } else {
+                                            r_id = m2mModel.selectRowId(id);
+                                        }
+                                        m2mRowIds.add(r_id);
+                                    }
+                                    if (m2mRowIds.size() > 0) {
+                                        // Putting many to many related ids
+                                        // (generated _id for each of server ids)
+                                        values.put(name, m2mRowIds);
+                                    }
+                                    m2mModel.close();
+                                    break;
+                                case OneToMany:
+                                    if (mCreateRelationRecords) {
+                                        OModel o2mModel = mModel.createInstance(column.getType());
+                                        List<Integer> o2mIds = JSONUtils.<Integer>toList(record.getJSONArray(name));
+                                        addUpdateRelationRecord(mModel, o2mModel.getTableName(),
+                                                column.getType(), name, column.getRelatedColumn(),
+                                                column.getRelationType(),
+                                                (column.getRecordSyncLimit() > 0) ?
+                                                        o2mIds.subList(0, column.getRecordSyncLimit()) : o2mIds);
+                                        o2mModel.close();
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+                // Some default values
+                values.put("id", record.getInt("id"));
+                values.put("_write_date", ODateUtils.getUTCDate());
+                values.put("_is_active", "true");
+                values.put("_is_dirty", "false");
+                mModel.insertOrUpdate(record.getInt("id"), values);
+                counter++;
+            }
+            Log.i(TAG, counter + " records affected");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public boolean updateRecordsOnServer() {
+        try {
+            // Use key (modal name) from updateToServerRecords
+            // use updateToServerRecords ids
+            int counter = 0;
+            for (String key : updateToServerRecords.keySet()) {
+                OModel model = OModel.get(mContext, key, mUser.getAndroidName());
+                List<String> ids = OListUtils.toStringList(updateToServerRecords.get(key));
+                counter += ids.size();
+                for (ODataRow record : model.select(null,
+                        "id IN ( " + StringUtils.repeat("?, ", ids.size() - 1) + " ?)",
+                        ids.toArray(new String[ids.size()]))) {
+                    mOdoo.updateValues(model.getModelName(),
+                            JSONUtils.createJSONValues(model, record), record.getInt("id"));
+                    OValues value = new OValues();
+                    value.put("_is_dirty", "false");
+                    value.put("_write_date", ODateUtils.getUTCDate());
+                    model.update(record.getInt(OColumn.ROW_ID), value);
+                    model.close();
+                }
+            }
+            Log.i(TAG, counter + " records updated on server");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void addUpdateRelationRecord(OModel baseModel, String relTable, Class<?> model,
+                                         String column, String relatedColumn,
+                                         OColumn.RelationType type, List<Integer> ids) {
+        String key = relTable + "_" + column;
+        if (relationRecordsHashMap.containsKey(key)) {
+            SyncRelationRecords data = relationRecordsHashMap.get(key);
+            data.updateIds(ids);
+            relationRecordsHashMap.put(key, data);
+        } else {
+            relationRecordsHashMap.put(key,
+                    new SyncRelationRecords(baseModel, model, column, relatedColumn, type, ids));
+        }
+    }
+
+    public HashMap<String, SyncRelationRecords> getRelationRecordsHashMap() {
+        if (mCreateRelationRecords)
+            return relationRecordsHashMap;
+        return new HashMap<>();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if (mModel != null)
+            mModel.close();
+    }
+
+    public static class SyncRelationRecords {
+        private OModel baseModel;
+        private Class<?> relationModel;
+        private String relationColumn;
+        private String relatedColumn;
+        private OColumn.RelationType relationType;
+        private List<Integer> serverIds = new ArrayList<>();
+
+        public SyncRelationRecords(OModel baseModel, Class<?> relationModel, String relationColumn, String relatedColumn,
+                                   OColumn.RelationType relationType, List<Integer> serverIds) {
+            this.baseModel = baseModel;
+            this.relationModel = relationModel;
+            this.relationColumn = relationColumn;
+            this.relatedColumn = relatedColumn;
+            this.relationType = relationType;
+            this.serverIds.addAll(serverIds);
+        }
+
+        public OModel getBaseModel() {
+            return baseModel;
+        }
+
+        public void setBaseModel(OModel baseModel) {
+            this.baseModel = baseModel;
+        }
+
+        public Class<?> getRelationModel() {
+            return relationModel;
+        }
+
+        public void setRelationModel(Class<?> relationModel) {
+            this.relationModel = relationModel;
+        }
+
+        public String getRelationColumn() {
+            return relationColumn;
+        }
+
+        public void setRelationColumn(String relationColumn) {
+            this.relationColumn = relationColumn;
+        }
+
+
+        public String getRelatedColumn() {
+            return relatedColumn;
+        }
+
+        public void setRelatedColumn(String relatedColumn) {
+            this.relatedColumn = relatedColumn;
+        }
+
+        public OColumn.RelationType getRelationType() {
+            return relationType;
+        }
+
+        public void setRelationType(OColumn.RelationType relationType) {
+            this.relationType = relationType;
+        }
+
+        public List<Integer> getServerIds() {
+            return serverIds;
+        }
+
+        public void setServerIds(List<Integer> serverIds) {
+            this.serverIds.clear();
+            this.serverIds.addAll(serverIds);
+        }
+
+        public void updateIds(List<Integer> ids) {
+            this.serverIds.addAll(ids);
+        }
+
+
+        public List<Integer> getUniqueIds() {
+            List<Integer> ids = new ArrayList<>();
+            HashSet<Integer> uIds = new HashSet<>(serverIds);
+            ids.addAll(uIds);
+            return ids;
+        }
+    }
+
+
+}

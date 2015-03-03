@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="#fff"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/userAvatar"
+                android:scaleType="centerCrop"
+                android:layout_width="match_parent"
+                android:layout_height="250dp" />
+
+            <LinearLayout
+                android:padding="@dimen/default_16dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textColor="@color/body_text_2"
+                    android:id="@+id/userName"
+                    android:layout_marginBottom="@dimen/default_8dp"
+                    android:textSize="@dimen/text_size_xlarge"
+                    android:fontFamily="@string/font_condensed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:textColor="@color/body_text_3"
+                    android:layout_marginBottom="@dimen/default_8dp"
+                    android:textSize="@dimen/text_size_small"
+                    android:textAllCaps="true"
+                    android:text="New Password"
+                    android:fontFamily="@string/font_normal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/newPassword"
+                    android:hint="New Password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <View style="@style/ViewSeparator" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:showDividers="middle"
+        android:divider="?android:attr/dividerVertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/save_password"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:fontFamily="@string/font_normal"
+            android:padding="@dimen/default_16dp"
+            android:text="Save Password"
+            android:textAllCaps="true"
+            android:textColor="@color/body_text_1"
+            android:textSize="@dimen/text_size_medium" />
+
+        <Button
+            android:id="@+id/cancel"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:fontFamily="@string/font_normal"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:padding="@dimen/default_16dp"
+            android:text="@string/label_cancel"
+            android:textAllCaps="true"
+            android:textColor="@color/body_text_2"
+            android:textSize="@dimen/text_size_medium" />
+    </LinearLayout>
+</LinearLayout>

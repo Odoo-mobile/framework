@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:elevation="3dp"
+    card_view:cardCornerRadius="0dp"
+    android:layout_marginBottom="8dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:padding="@dimen/default_16dp"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="match_parent">
+
+        <odoo.controls.BezelImageView
+            android:id="@+id/profile_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"
+            app:maskDrawable="@drawable/circle_mask"
+            android:src="@drawable/avatar" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="@dimen/default_8dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/accountName"
+                android:fontFamily="@string/font_condensed"
+                android:textStyle="bold"
+                android:textColor="@color/body_text_1"
+                android:textSize="@dimen/text_size_large"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="@dimen/text_size_medium"
+                android:paddingBottom="@dimen/default_8dp"
+                android:id="@+id/accountURL"
+                android:fontFamily="@string/font_normal"
+                android:textColor="@color/body_text_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:gravity="right"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/btnLogin"
+                    android:padding="@dimen/default_8dp"
+                    android:src="@drawable/ic_action_action_done_all"
+                    android:background="@drawable/icon_bg_oval_green"
+                    android:layout_width="40dp"
+                    android:visibility="gone"
+                    android:layout_marginRight="@dimen/default_8dp"
+                    android:layout_height="40dp" />
+
+                <ImageView
+                    android:visibility="gone"
+                    android:id="@+id/btnLogout"
+                    android:layout_marginRight="@dimen/default_8dp"
+                    android:padding="@dimen/default_8dp"
+                    android:src="@drawable/ic_action_logout"
+                    android:background="@drawable/icon_bg_oval_orange"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+
+                <ImageView
+                    android:id="@+id/btnRemoveAccount"
+                    android:padding="@dimen/default_8dp"
+                    android:src="@drawable/ic_action_navigation_close"
+                    android:background="@drawable/icon_bg_oval_red"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

@@ -1,0 +1,1 @@
+include ':app', ':intro-slider-lib', ':parallax-effect-lib', ':odoo-rpc-v2'

@@ -1,0 +1,24 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="ToolBarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="homeAsUpIndicator">@drawable/ic_action_navigation_menu</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_action_navigation_menu</item>
+    </style>
+
+    <style name="StatusBarView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/statusBarHeight</item>
+        <item name="android:background">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="ViewSeparator">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">#cccccc</item>
+    </style>
+</resources>

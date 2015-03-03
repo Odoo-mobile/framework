@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BezelImageView">
+        <attr name="maskDrawable" format="reference" />
+        <attr name="borderDrawable" format="reference" />
+        <attr name="desaturateOnPress" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="ODrawerScrollView">
+        <attr name="insetForeground" format="reference|color" />
+    </declare-styleable>
+
+    <!-- Custom Controls -->
+    <declare-styleable name="OField">
+        <attr name="fieldName" format="string" />
+        <attr name="iconResource" format="reference" />
+        <attr name="showIcon" format="boolean" />
+        <attr name="showLabel" format="boolean" />
+        <attr name="iconTint" format="reference|color" />
+        <attr name="parsePattern" format="string" />
+        <attr name="withOutSidePadding" format="boolean" />
+        <attr name="fieldType">
+            <enum name="Text" value="0" />
+            <enum name="Boolean" value="1" />
+            <enum name="ManyToOne" value="2" />
+            <enum name="Chips" value="3" />
+            <enum name="Selection" value="4" />
+            <enum name="Date" value="5" />
+            <enum name="DateTime" value="6" />
+            <enum name="Blob" value="7" />
+            <enum name="Time" value="8" />
+        </attr>
+        <attr name="widgetType">
+            <enum name="Switch" value="0" />
+            <enum name="RadioGroup" value="1" />
+            <enum name="SelectionDialog" value="2" />
+            <enum name="Searchable" value="3" />
+            <enum name="SearchableLive" value="4" />
+            <enum name="Image" value="5" />
+            <enum name="ImageCircle" value="6" />
+            <enum name="Duration" value="7" />
+        </attr>
+        <attr name="widgetImageSize" format="dimension" />
+        <attr name="withBottomPadding" format="boolean" />
+        <attr name="withTopPadding" format="boolean" />
+        <attr name="controlLabel" format="string|reference" />
+        <attr name="defaultValue" format="reference|string" />
+        <attr name="defaultImage" format="reference" />
+        <attr name="valueArray" format="reference" />
+        <attr name="fieldTextAppearance" format="reference" />
+        <attr name="fieldTextSize" format="dimension" />
+        <attr name="fieldTextColor" format="color" />
+        <attr name="fieldLabelColor" format="color" />
+        <attr name="fieldLabelTextAppearance" format="reference" />
+        <attr name="fieldLabelSize" format="dimension" />
+    </declare-styleable>
+    <declare-styleable name="OForm">
+        <attr name="editableMode" format="boolean" />
+        <attr name="modelName" format="string" />
+        <attr name="autoUIGenerate" format="boolean" />
+        <attr name="controlIconTint" format="color" />
+    </declare-styleable>
+    <declare-styleable name="FloatingActionButton">
+        <attr name="drawable" format="integer" />
+        <attr name="fabColor" format="color" />
+        <attr name="shadowRadius" format="float" />
+        <attr name="shadowDx" format="float" />
+        <attr name="shadowDy" format="float" />
+        <attr name="shadowColor" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="MailChatterView">
+        <attr name="resModelName" format="string" />
+    </declare-styleable>
+</resources>

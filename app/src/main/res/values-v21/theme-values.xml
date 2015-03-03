@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Drawer Properties -->
+    <dimen name="drawerDefaultWidth">295dp</dimen>
+    <dimen name="drawerAccountBottomPadding">8dp</dimen>
+    <dimen name="statusBarHeight">24dp</dimen>
+    <!-- Booleans -->
+    <bool name="fitToScreenWindow">true</bool>
+</resources>

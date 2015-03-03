@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Application Base Theme Colors -->
+    <color name="theme_primary">@color/android_blue</color>
+    <color name="theme_primary_dark">@color/android_blue_dark</color>
+    <color name="theme_primary_light">@color/android_blue_dark</color>
+    <color name="theme_secondary">@color/android_violet</color>
+    <color name="theme_secondary_dark">@color/android_violet_dark</color>
+    <color name="theme_secondary_light">@color/android_violet</color>
+
+    <color name="colorPrimary">@color/theme_primary</color>
+    <color name="colorPrimaryDark">@color/theme_primary_dark</color>
+    <color name="colorAccent">@color/theme_primary_dark</color>
+
+    <!-- Drawer Properties -->
+    <color name="drawerDefaultBackgroundColor">#ffffff</color>
+    <dimen name="drawerDefaultWidth">280dp</dimen>
+    <dimen name="drawerAccountBottomPadding">16dp</dimen>
+    <dimen name="drawerAvatarWidthHeight">60dp</dimen>
+
+    <!-- Dimensions -->
+    <dimen name="statusBarHeight">0dp</dimen>
+
+    <!-- Booleans -->
+    <bool name="fitToScreenWindow">true</bool>
+</resources>

@@ -1,0 +1,5 @@
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="com.odoo.auth"
+    android:contentAuthority="com.odoo.core.provider.content.sync.res_partner"
+    android:supportsUploading="true"
+    android:userVisible="true" />

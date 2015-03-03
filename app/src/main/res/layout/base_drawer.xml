@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.odoo.core.utils.drawer.ODrawerScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navDrawer"
+    android:layout_width="@dimen/drawerDefaultWidth"
+    app:insetForeground="#4000"
+    android:fillViewport="true"
+    android:background="@color/drawerDefaultBackgroundColor"
+    android:layout_gravity="start|left"
+    android:fitsSystemWindows="@bool/fitToScreenWindow"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/statusBarHeight"
+        android:background="@drawable/drawer_background_cover"
+        android:orientation="vertical"
+        android:fitsSystemWindows="@bool/fitToScreenWindow"
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent">
+
+        <!-- Account View -->
+        <FrameLayout
+            android:id="@+id/drawerAccountView"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="@dimen/drawerAccountBottomPadding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <odoo.controls.BezelImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="@dimen/drawerAvatarWidthHeight"
+                    android:layout_height="@dimen/drawerAvatarWidthHeight"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/avatar"
+                    app:maskDrawable="@drawable/circle_mask" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="5dp"
+                    android:gravity="bottom"
+                    android:orientation="vertical"
+                    android:paddingTop="16dp">
+
+                    <TextView
+                        android:id="@+id/profile_name_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="@string/font_normal"
+                        android:singleLine="true"
+                        android:textColor="@color/body_text_1_inverse"
+                        android:textSize="@dimen/text_size_medium"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/profile_url_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="middle"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:textColor="@color/body_text_1_inverse"
+                            android:textSize="@dimen/text_size_medium" />
+
+                        <ImageView
+                            android:id="@+id/expand_account_box_indicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:scaleType="center"
+                            android:src="@drawable/ic_drawer_accounts_expand"
+                            android:tint="@android:color/white"
+                            android:visibility="gone" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Drawer Item Layout -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:background="@color/drawer_background"
+            android:layout_height="0dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_height="1dp" />
+            <!-- Account Items -->
+            <LinearLayout
+                android:id="@+id/accountList"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:visibility="invisible"
+                android:background="@color/drawer_background"
+                android:layout_height="wrap_content">
+                <!-- Account added runtime  -->
+            </LinearLayout>
+
+            <!-- Drawer Items -->
+            <LinearLayout
+                android:background="@color/drawer_background"
+                android:id="@+id/drawerItemList"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+                <!--Drawer item added runtime -->
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</com.odoo.core.utils.drawer.ODrawerScrollView>

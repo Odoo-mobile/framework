@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.odoo">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <permission
+        android:name="com.odoo.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <application
+        android:name="com.odoo.App"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="com.odoo.core.account.OdooLogin"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.odoo.core.account.ManageAccounts" />
+        <activity android:name="com.odoo.OdooActivity" />
+        <activity android:name="odoo.controls.SearchableItemActivity" />
+        <activity android:name="com.odoo.SettingsActivity" />
+        <activity
+            android:name="com.odoo.core.account.AppIntro"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".base.addons.mail.widget.MailDetailDialog"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+        <activity
+            android:name=".base.addons.mail.widget.MailChatterCompose"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+        <activity
+            android:windowSoftInputMode="adjustPan"
+            android:name="com.odoo.core.account.OdooAccountQuickManage"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+        <activity android:name="com.odoo.core.account.About" />
+        <activity android:name="com.odoo.core.account.Profile" />
+
+        <!-- Reminder Receivers// -->
+        <receiver android:name="com.odoo.core.utils.reminder.ReminderReceiver" />
+        <receiver android:name="com.odoo.core.utils.reminder.ReminderActionReceiver" />
+
+        <service android:name="com.odoo.core.auth.OdooAuthService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+        <provider
+            android:name="com.odoo.core.orm.provider.BaseModelProvider"
+            android:authorities="com.odoo.core.provider.content"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.addons.ir.providers.IrModelProvider"
+            android:authorities="com.odoo.core.provider.content.sync.ir_model"
+            android:multiprocess="true" />
+
+        <!-- Sync Provider & Service  // -->
+        <provider
+            android:name="com.odoo.addons.customers.providers.CustomersSyncProvider"
+            android:authorities="com.odoo.core.provider.content.sync.res_partner"
+            android:label="@string/sync_label_customers"
+            android:multiprocess="true" />
+
+        <service
+            android:name="com.odoo.addons.customers.services.CustomerSyncService"
+            android:exported="true"
+            android:process=":sync_customer">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/customer_sync_adapter" />
+        </service>
+
+        <activity
+            android:name="com.odoo.addons.customers.CustomerDetails"
+            android:windowSoftInputMode="adjustPan" />
+
+    </application>
+
+</manifest>

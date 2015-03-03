@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:background="?android:selectableItemBackground"
+    android:gravity="start|center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/default_16dp"
+    android:clickable="true"
+    android:paddingRight="@dimen/default_16dp">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:tint="@color/drawer_icon_tint"
+        android:layout_width="32dp"
+        android:layout_marginRight="24dp"
+        android:layout_height="32dp" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:layout_weight="1"
+        android:singleLine="true"
+        android:fontFamily="@string/font_normal"
+        android:textColor="@color/drawer_text_color"
+        android:gravity="start|center_vertical"
+        android:textSize="@dimen/text_size_medium" />
+
+    <TextView
+        android:textColor="@color/drawer_text_color"
+        android:id="@+id/counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:fontFamily="@string/font_normal"
+        android:gravity="start|center_vertical"
+        android:textSize="@dimen/text_size_medium" />
+
+</LinearLayout>
