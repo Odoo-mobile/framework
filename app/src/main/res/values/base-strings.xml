@@ -122,6 +122,7 @@
     <string name="odoo_mobile_framework">Odoo Mobile framework</string>
     <string name="supported_versions">Supported versions</string>
     <string name="supported_versions_names">Odoo 7.0+</string>
+    <string name="label_access_odoo_mobile">Connect Odoo Mobile</string>
 
     <!-- About Company Fragment Strings -->
     <string name="about_Company_line1">Copyright © 2004-TODAY Odoo SA. All Rights Reserved.</string>
