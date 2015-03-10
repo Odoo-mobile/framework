@@ -22,12 +22,12 @@
 
             <TextView
                 android:id="@+id/chatterSendMessage"
-                android:text="Send a message"
+                android:text="@string/label_send_message"
                 android:background="?android:attr/selectableItemBackground"
                 android:textAppearance="?android:textAppearanceSmall"
                 android:padding="@dimen/default_8dp"
                 android:layout_width="wrap_content"
-                android:textColor="@color/body_text_2"
+                android:textColor="@color/android_blue_dark"
                 android:fontFamily="@string/font_condensed"
                 android:layout_height="wrap_content" />
 
@@ -55,10 +55,10 @@
             <TextView
                 android:id="@+id/chatterLogInternalNote"
                 android:background="?android:attr/selectableItemBackground"
-                android:textColor="@color/body_text_2"
+                android:textColor="@color/android_blue_dark"
                 android:textAppearance="?android:textAppearanceSmall"
                 android:padding="@dimen/default_8dp"
-                android:text="Log an internal note"
+                android:text="@string/label_log_an_internal_note"
                 android:fontFamily="@string/font_condensed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

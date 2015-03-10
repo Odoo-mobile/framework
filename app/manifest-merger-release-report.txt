@@ -15,176 +15,267 @@ ADDED from AndroidManifest.xml:2:1
 		INJECTED from AndroidManifest.xml:0:0
 uses-permission#android.permission.INTERNET
 ADDED from AndroidManifest.xml:5:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:11:5
 	android:name
 		ADDED from AndroidManifest.xml:5:22
 uses-permission#android.permission.VIBRATE
 ADDED from AndroidManifest.xml:6:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:14:5
 	android:name
 		ADDED from AndroidManifest.xml:6:22
 uses-permission#android.permission.ACCESS_WIFI_STATE
 ADDED from AndroidManifest.xml:7:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:15:5
 	android:name
 		ADDED from AndroidManifest.xml:7:22
 uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from AndroidManifest.xml:8:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:16:5
 	android:name
 		ADDED from AndroidManifest.xml:8:22
 uses-permission#android.permission.GET_TASKS
 ADDED from AndroidManifest.xml:9:5
 	android:name
 		ADDED from AndroidManifest.xml:9:22
-uses-permission#android.permission.READ_PHONE_STATE
+uses-permission#android.permission.AUTHENTICATE_ACCOUNTS
 ADDED from AndroidManifest.xml:10:5
 	android:name
 		ADDED from AndroidManifest.xml:10:22
-uses-permission#android.permission.AUTHENTICATE_ACCOUNTS
+uses-permission#android.permission.GET_ACCOUNTS
 ADDED from AndroidManifest.xml:11:5
 	android:name
 		ADDED from AndroidManifest.xml:11:22
-uses-permission#android.permission.GET_ACCOUNTS
+uses-permission#android.permission.USE_CREDENTIALS
 ADDED from AndroidManifest.xml:12:5
 	android:name
 		ADDED from AndroidManifest.xml:12:22
-uses-permission#android.permission.USE_CREDENTIALS
+uses-permission#android.permission.MANAGE_ACCOUNTS
 ADDED from AndroidManifest.xml:13:5
 	android:name
 		ADDED from AndroidManifest.xml:13:22
-uses-permission#android.permission.MANAGE_ACCOUNTS
+uses-permission#android.permission.READ_SYNC_SETTINGS
 ADDED from AndroidManifest.xml:14:5
 	android:name
 		ADDED from AndroidManifest.xml:14:22
-uses-permission#android.permission.READ_SYNC_SETTINGS
+uses-permission#android.permission.READ_SYNC_STATS
 ADDED from AndroidManifest.xml:15:5
 	android:name
 		ADDED from AndroidManifest.xml:15:22
-uses-permission#android.permission.READ_SYNC_STATS
+uses-permission#android.permission.READ_PHONE_STATE
 ADDED from AndroidManifest.xml:16:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:12:5
 	android:name
 		ADDED from AndroidManifest.xml:16:22
-uses-permission#android.permission.WRITE_SYNC_SETTINGS
+uses-permission#android.permission.CALL_PHONE
 ADDED from AndroidManifest.xml:17:5
 	android:name
 		ADDED from AndroidManifest.xml:17:22
-uses-permission#android.permission.WAKE_LOCK
+uses-permission#android.permission.WRITE_SYNC_SETTINGS
 ADDED from AndroidManifest.xml:18:5
 	android:name
 		ADDED from AndroidManifest.xml:18:22
-uses-permission#com.google.android.c2dm.permission.RECEIVE
+uses-permission#android.permission.WAKE_LOCK
 ADDED from AndroidManifest.xml:19:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:17:5
 	android:name
 		ADDED from AndroidManifest.xml:19:22
-permission#com.odoo.permission.C2D_MESSAGE
-ADDED from AndroidManifest.xml:21:5
-	android:protectionLevel
-		ADDED from AndroidManifest.xml:23:9
+uses-permission#com.google.android.c2dm.permission.RECEIVE
+ADDED from AndroidManifest.xml:20:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:13:5
 	android:name
-		ADDED from AndroidManifest.xml:22:9
+		ADDED from AndroidManifest.xml:20:22
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:21:5
+	android:name
+		ADDED from AndroidManifest.xml:21:22
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:22:5
+	android:name
+		ADDED from AndroidManifest.xml:22:22
+permission#com.odoo.permission.C2D_MESSAGE
+ADDED from AndroidManifest.xml:24:5
+	android:protectionLevel
+		ADDED from AndroidManifest.xml:26:9
+	android:name
+		ADDED from AndroidManifest.xml:25:9
 application
-ADDED from AndroidManifest.xml:25:5
+ADDED from AndroidManifest.xml:28:5
 MERGED from com.android.support:appcompat-v7:21.0.3:16:5
 MERGED from com.android.support:support-v4:21.0.3:16:5
 MERGED from com.google.android.gms:play-services:6.5.87:20:5
 MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from com.android.support:cardview-v7:21.0.3:16:5
+MERGED from master-framework:intro-slider-lib:unspecified:11:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from master-framework:parallax-effect-lib:unspecified:11:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:24:5
 	android:label
-		ADDED from AndroidManifest.xml:31:9
+		ADDED from AndroidManifest.xml:33:9
 	android:allowBackup
-		ADDED from AndroidManifest.xml:27:9
-	android:icon
-		ADDED from AndroidManifest.xml:28:9
-	android:theme
-		ADDED from AndroidManifest.xml:32:9
-	android:hardwareAccelerated
 		ADDED from AndroidManifest.xml:30:9
+	android:icon
+		ADDED from AndroidManifest.xml:32:9
+	android:theme
+		ADDED from AndroidManifest.xml:35:9
+	android:hardwareAccelerated
+		ADDED from AndroidManifest.xml:31:9
 	android:largeHeap
+		ADDED from AndroidManifest.xml:34:9
+	android:name
 		ADDED from AndroidManifest.xml:29:9
-	android:name
-		ADDED from AndroidManifest.xml:26:9
 activity#com.odoo.core.account.OdooLogin
-ADDED from AndroidManifest.xml:33:9
+ADDED from AndroidManifest.xml:36:9
 	android:screenOrientation
-		ADDED from AndroidManifest.xml:35:13
+		ADDED from AndroidManifest.xml:38:13
 	android:name
-		ADDED from AndroidManifest.xml:34:13
+		ADDED from AndroidManifest.xml:37:13
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:36:13
+ADDED from AndroidManifest.xml:39:13
 action#android.intent.action.MAIN
-ADDED from AndroidManifest.xml:37:17
+ADDED from AndroidManifest.xml:40:17
 	android:name
-		ADDED from AndroidManifest.xml:37:25
+		ADDED from AndroidManifest.xml:40:25
 category#android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:39:17
+ADDED from AndroidManifest.xml:42:17
 	android:name
-		ADDED from AndroidManifest.xml:39:27
+		ADDED from AndroidManifest.xml:42:27
 activity#com.odoo.core.account.ManageAccounts
-ADDED from AndroidManifest.xml:43:9
+ADDED from AndroidManifest.xml:45:9
 	android:name
-		ADDED from AndroidManifest.xml:43:19
+		ADDED from AndroidManifest.xml:45:19
 activity#com.odoo.OdooActivity
-ADDED from AndroidManifest.xml:44:9
-	android:name
-		ADDED from AndroidManifest.xml:44:19
-service#com.odoo.core.auth.OdooAuthService
 ADDED from AndroidManifest.xml:46:9
 	android:name
-		ADDED from AndroidManifest.xml:46:18
-intent-filter#android.accounts.AccountAuthenticator
-ADDED from AndroidManifest.xml:47:13
-action#android.accounts.AccountAuthenticator
-ADDED from AndroidManifest.xml:48:17
+		ADDED from AndroidManifest.xml:46:19
+activity#odoo.controls.SearchableItemActivity
+ADDED from AndroidManifest.xml:47:9
 	android:name
-		ADDED from AndroidManifest.xml:48:25
-meta-data#android.accounts.AccountAuthenticator
-ADDED from AndroidManifest.xml:51:13
-	android:resource
-		ADDED from AndroidManifest.xml:53:17
+		ADDED from AndroidManifest.xml:47:19
+activity#com.odoo.SettingsActivity
+ADDED from AndroidManifest.xml:48:9
 	android:name
-		ADDED from AndroidManifest.xml:52:17
-provider#com.odoo.core.orm.provider.BaseModelProvider
-ADDED from AndroidManifest.xml:56:9
-	android:authorities
+		ADDED from AndroidManifest.xml:48:19
+activity#com.odoo.core.account.AppIntro
+ADDED from AndroidManifest.xml:49:9
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:51:13
+	android:name
+		ADDED from AndroidManifest.xml:50:13
+activity#com.odoo.base.addons.mail.widget.MailDetailDialog
+ADDED from AndroidManifest.xml:52:9
+	android:theme
+		ADDED from AndroidManifest.xml:54:13
+	android:name
+		ADDED from AndroidManifest.xml:53:13
+activity#com.odoo.base.addons.mail.widget.MailChatterCompose
+ADDED from AndroidManifest.xml:55:9
+	android:theme
 		ADDED from AndroidManifest.xml:57:13
 	android:name
-		ADDED from AndroidManifest.xml:58:13
-provider#com.odoo.addons.partners.providers.PartnersSyncProvider
+		ADDED from AndroidManifest.xml:56:13
+activity#com.odoo.core.account.OdooAccountQuickManage
+ADDED from AndroidManifest.xml:58:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:59:13
+	android:theme
+		ADDED from AndroidManifest.xml:61:13
+	android:name
+		ADDED from AndroidManifest.xml:60:13
+activity#com.odoo.core.account.About
 ADDED from AndroidManifest.xml:62:9
-	android:label
-		ADDED from AndroidManifest.xml:63:13
-	android:authorities
-		ADDED from AndroidManifest.xml:64:13
 	android:name
-		ADDED from AndroidManifest.xml:65:13
-service#com.odoo.addons.partners.services.PartnerSyncService
+		ADDED from AndroidManifest.xml:62:19
+activity#com.odoo.core.account.Profile
+ADDED from AndroidManifest.xml:63:9
+	android:name
+		ADDED from AndroidManifest.xml:63:19
+receiver#com.odoo.core.utils.reminder.ReminderReceiver
 ADDED from AndroidManifest.xml:66:9
-	android:process
-		ADDED from AndroidManifest.xml:69:13
-	android:exported
-		ADDED from AndroidManifest.xml:68:13
 	android:name
-		ADDED from AndroidManifest.xml:67:13
-intent-filter#android.content.SyncAdapter
+		ADDED from AndroidManifest.xml:66:19
+receiver#com.odoo.core.utils.reminder.ReminderActionReceiver
+ADDED from AndroidManifest.xml:67:9
+	android:name
+		ADDED from AndroidManifest.xml:67:19
+service#com.odoo.core.auth.OdooAuthService
+ADDED from AndroidManifest.xml:69:9
+	android:name
+		ADDED from AndroidManifest.xml:69:18
+intent-filter#android.accounts.AccountAuthenticator
 ADDED from AndroidManifest.xml:70:13
-action#android.content.SyncAdapter
+action#android.accounts.AccountAuthenticator
 ADDED from AndroidManifest.xml:71:17
 	android:name
 		ADDED from AndroidManifest.xml:71:25
-meta-data#model
+meta-data#android.accounts.AccountAuthenticator
 ADDED from AndroidManifest.xml:74:13
+	android:resource
+		ADDED from AndroidManifest.xml:76:17
 	android:name
 		ADDED from AndroidManifest.xml:75:17
-	android:value
-		ADDED from AndroidManifest.xml:76:17
-meta-data#android.content.SyncAdapter
-ADDED from AndroidManifest.xml:77:13
-	android:resource
-		ADDED from AndroidManifest.xml:79:17
+provider#com.odoo.core.orm.provider.BaseModelProvider
+ADDED from AndroidManifest.xml:79:9
+	android:multiprocess
+		ADDED from AndroidManifest.xml:82:13
+	android:authorities
+		ADDED from AndroidManifest.xml:81:13
 	android:name
-		ADDED from AndroidManifest.xml:78:17
+		ADDED from AndroidManifest.xml:80:13
+provider#com.odoo.base.addons.ir.providers.IrModelProvider
+ADDED from AndroidManifest.xml:83:9
+	android:multiprocess
+		ADDED from AndroidManifest.xml:86:13
+	android:authorities
+		ADDED from AndroidManifest.xml:85:13
+	android:name
+		ADDED from AndroidManifest.xml:84:13
+provider#com.odoo.addons.customers.providers.CustomersSyncProvider
+ADDED from AndroidManifest.xml:89:9
+	android:label
+		ADDED from AndroidManifest.xml:92:13
+	android:multiprocess
+		ADDED from AndroidManifest.xml:93:13
+	android:authorities
+		ADDED from AndroidManifest.xml:91:13
+	android:name
+		ADDED from AndroidManifest.xml:90:13
+service#com.odoo.addons.customers.services.CustomerSyncService
+ADDED from AndroidManifest.xml:95:9
+	android:process
+		ADDED from AndroidManifest.xml:98:13
+	android:exported
+		ADDED from AndroidManifest.xml:97:13
+	android:name
+		ADDED from AndroidManifest.xml:96:13
+intent-filter#android.content.SyncAdapter
+ADDED from AndroidManifest.xml:99:13
+action#android.content.SyncAdapter
+ADDED from AndroidManifest.xml:100:17
+	android:name
+		ADDED from AndroidManifest.xml:100:25
+meta-data#android.content.SyncAdapter
+ADDED from AndroidManifest.xml:103:13
+	android:resource
+		ADDED from AndroidManifest.xml:105:17
+	android:name
+		ADDED from AndroidManifest.xml:104:17
+activity#com.odoo.addons.customers.CustomerDetails
+ADDED from AndroidManifest.xml:108:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:110:13
+	android:name
+		ADDED from AndroidManifest.xml:109:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:21.0.3:15:5
 MERGED from com.android.support:support-v4:21.0.3:15:5
 MERGED from com.google.android.gms:play-services:6.5.87:18:5
 MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from com.android.support:cardview-v7:21.0.3:15:5
+MERGED from master-framework:intro-slider-lib:unspecified:7:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from master-framework:parallax-effect-lib:unspecified:7:5
+MERGED from master-framework:odoo-rpc-v2:unspecified:7:5
 	android:targetSdkVersion
 		INJECTED from AndroidManifest.xml:0:0
 		INJECTED from AndroidManifest.xml:0:0
@@ -197,3 +288,39 @@ ADDED from com.google.android.gms:play-services:6.5.87:21:9
 		ADDED from com.google.android.gms:play-services:6.5.87:22:13
 	android:value
 		ADDED from com.google.android.gms:play-services:6.5.87:23:13
+uses-permission#android.permission.CAMERA
+ADDED from master-framework:odoo-rpc-v2:unspecified:18:5
+	android:name
+		ADDED from master-framework:odoo-rpc-v2:unspecified:18:22
+permission#odoo.android.permission.C2D_MESSAGE
+ADDED from master-framework:odoo-rpc-v2:unspecified:20:5
+	android:protectionLevel
+		ADDED from master-framework:odoo-rpc-v2:unspecified:22:9
+	android:name
+		ADDED from master-framework:odoo-rpc-v2:unspecified:21:9
+receiver#odoo.kernel.handler.ActionHandler
+ADDED from master-framework:odoo-rpc-v2:unspecified:28:9
+	android:permission
+		ADDED from master-framework:odoo-rpc-v2:unspecified:30:13
+	android:name
+		ADDED from master-framework:odoo-rpc-v2:unspecified:29:13
+intent-filter#com.google.android.c2dm.intent.RECEIVE+com.google.android.c2dm.intent.REGISTRATION
+ADDED from master-framework:odoo-rpc-v2:unspecified:31:13
+action#com.google.android.c2dm.intent.RECEIVE
+ADDED from master-framework:odoo-rpc-v2:unspecified:32:17
+	android:name
+		ADDED from master-framework:odoo-rpc-v2:unspecified:32:25
+action#com.google.android.c2dm.intent.REGISTRATION
+ADDED from master-framework:odoo-rpc-v2:unspecified:33:17
+	android:name
+		ADDED from master-framework:odoo-rpc-v2:unspecified:33:25
+service#odoo.kernel.handler.ActionHandlerService
+ADDED from master-framework:odoo-rpc-v2:unspecified:37:9
+	android:name
+		ADDED from master-framework:odoo-rpc-v2:unspecified:37:18
+activity#odoo.zxing.handler.OdooMobileQRReader
+ADDED from master-framework:odoo-rpc-v2:unspecified:39:9
+	android:screenOrientation
+		ADDED from master-framework:odoo-rpc-v2:unspecified:41:13
+	android:name
+		ADDED from master-framework:odoo-rpc-v2:unspecified:40:13

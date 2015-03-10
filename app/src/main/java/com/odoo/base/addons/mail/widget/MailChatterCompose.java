@@ -33,8 +33,10 @@ import android.widget.TextView;
 
 import com.odoo.R;
 import com.odoo.base.addons.mail.MailMessage;
+import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OStringColorUtil;
@@ -48,6 +50,7 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
     public static final String TAG = MailChatterCompose.class.getSimpleName();
     private OModel mModel;
     private int server_id = -1;
+    private int partner_id = -1;
 
     public enum MessageType {
         Message, InternalNote
@@ -69,6 +72,25 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
         mModel = OModel.get(this, extra.getString("model"), null);
         mailMessage = new MailMessage(this, null);
         server_id = extra.getInt("server_id");
+        if (mModel.getModelName().equals("res.partner")) {
+            partner_id = server_id;
+        } else {
+            ODataRow row = mModel.browse(mModel.selectRowId(server_id));
+            for (OColumn col : mModel.getColumns(false)) {
+                if (col.getType().isAssignableFrom(ResPartner.class)) {
+                    if (col.getRelationType() != null
+                            && col.getRelationType() == OColumn.RelationType.ManyToOne) {
+                        ODataRow partner = null;
+                        if (!row.getString(col.getName()).equals("false")) {
+                            partner = row.getM2ORecord(col.getName()).browse();
+                        }
+                        if (partner != null && partner.getInt("id") != 0) {
+                            partner_id = partner.getInt("id");
+                        }
+                    }
+                }
+            }
+        }
         findViewById(R.id.btnSend).setOnClickListener(this);
         findViewById(R.id.btnCancel).setOnClickListener(this);
         edtSubject = (EditText) findViewById(R.id.messageSubject);
@@ -89,7 +111,7 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
             recordName.setText(R.string.add_internal_note);
             edtSubject.setVisibility(View.GONE);
             edtBody.setHint(R.string.internal_note_hint);
-            OControls.setText(parent, R.id.btnSend, R.string.label_log_an_internal_note);
+            OControls.setText(parent, R.id.btnSend, R.string.label_log_note);
         }
         edtBody.requestFocus();
     }
@@ -154,7 +176,11 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
                 data.put("subject", (subject.equals("false")) ? false : subject);
                 data.put("parent_id", false);
                 data.put("attachment_ids", new JSONArray());
-                data.put("partner_ids", new JSONArray());
+                JSONArray partner_ids = new JSONArray();
+                if (partner_id != -1 && mType == MessageType.Message) {
+                    partner_ids.put(partner_id);
+                }
+                data.put("partner_ids", partner_ids);
                 JSONObject context = new JSONObject();
                 context.put("mail_read_set_read", true);
                 context.put("default_res_id", server_id);
@@ -167,6 +193,7 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
                 data.put("subtype", (mType == MessageType.Message) ? "mail.mt_comment" : false);
                 int newId = (int)
                         mModel.getServerDataHelper().callMethod("message_post", args, null, data);
+                Thread.sleep(500);
                 ODataRow row = new ODataRow();
                 row.put("id", newId);
                 mailMessage.quickCreateRecord(row);

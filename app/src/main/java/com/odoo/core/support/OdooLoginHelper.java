@@ -50,7 +50,7 @@ public class OdooLoginHelper {
         try {
             mOdoo = new Odoo(mContext, serverURL, forceConnect);
             JSONObject res = mOdoo.authenticate(username, password, database);
-            int user_id = 0;
+            int user_id;
             if (res.get("uid") instanceof Integer) {
                 user_id = res.getInt("uid");
                 OUser user = new OUser();
@@ -110,6 +110,7 @@ public class OdooLoginHelper {
                 user.setInstanceUrl(instance.getInstanceUrl());
                 user.setClientId(instance.getClientId());
             }
+            user.setUser_id(userData.getInt("id"));
             user.setName(userData.getString("name"));
             user.setAvatar(userData.getString("image"));
             user.setIsactive(true);

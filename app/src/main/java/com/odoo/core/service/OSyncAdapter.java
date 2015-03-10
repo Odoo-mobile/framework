@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.App;
+import com.odoo.R;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.core.account.OdooAccountQuickManage;
@@ -42,7 +43,6 @@ import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
-import com.odoo.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -71,6 +71,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     private OPreferenceManager preferenceManager;
     private Odoo mOdoo;
     private HashMap<String, ISyncFinishListener> mSyncFinishListeners = new HashMap<>();
+    private App app = null;
 
     public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service,
                         boolean autoInitialize) {
@@ -89,6 +90,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         mModelClass = model;
         mService = service;
         preferenceManager = new OPreferenceManager(mContext);
+        app = (App) context.getApplicationContext();
     }
 
     public OSyncAdapter setDomain(ODomain domain) {
@@ -204,7 +206,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 irModel.setLastSyncDateTimeToNow(model);
             }
         } catch (OdooSessionExpiredException odooSession) {
-            showSignInErrorNotification(user);
+            app.setOdoo(null, user);
+            // FIXME: Show sign in dialog for re login with different password
+//            showSignInErrorNotification(user);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -16,18 +16,39 @@
         <dex dex="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-43516464b85ed7eae1e69c3c9d6b1f7dbbc54370.jar" />
     </item>
     <item
-        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/exploded-aar/master-framework/odoo-rpc-v2/unspecified/libs/core.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="f3c7e89b5124329cddba83bcf7c26c1c636c16b8">
-        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/pre-dexed/debug/core-3b9f9362027d9522b1bb1d4da3a967972d7f424d.jar" />
-    </item>
-    <item
         jar="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/libs/odoo-v2.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="0e1ea050e9840b84f56887fba02c42f126a5cb7a">
         <dex dex="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/odoo-v2-91d20eaff350785cab597f528d89baf025f4ad1f.jar" />
+    </item>
+    <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/exploded-aar/master-framework/intro-slider-lib/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="8a0c9102c73193da720d31c868728a51e680eded">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/pre-dexed/debug/classes-a02295e6b7b63b6ae70511a01ec51b657544f729.jar" />
+    </item>
+    <item
+        jar="/home/dpr/eclipse-adt/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-6515be3f88e71b7f70573506152fe671c63bb5da.jar" />
+    </item>
+    <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-691b7af67f0bf5c501665b187c3b3582861f920e.jar" />
+    </item>
+    <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/exploded-aar/master-framework/odoo-rpc-v2/unspecified/libs/core.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="f3c7e89b5124329cddba83bcf7c26c1c636c16b8">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/pre-dexed/debug/core-3b9f9362027d9522b1bb1d4da3a967972d7f424d.jar" />
     </item>
     <item
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
@@ -49,20 +70,6 @@
         revision="21.1.2"
         sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
         <dex dex="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-c08c472afb0b660f25fd1e3a4fceeb1f9a77f654.jar" />
-    </item>
-    <item
-        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/exploded-aar/master-framework/intro-slider-lib/unspecified/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="db5b90986d15ba729f97cb3d8110e8cce873e048">
-        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/pre-dexed/debug/classes-a02295e6b7b63b6ae70511a01ec51b657544f729.jar" />
-    </item>
-    <item
-        jar="/home/dpr/eclipse-adt/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
-        <dex dex="/home/dpr/odoo-mobile/odoo/master-migrate-in-studio-dpr/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-6515be3f88e71b7f70573506152fe671c63bb5da.jar" />
     </item>
     <item
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/libs/swipe_library.jar"
@@ -112,13 +119,6 @@
         revision="21.1.2"
         sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/pre-dexed/debug/classes-c0e41429e6aa565c88b5e635224664d47e0664e9.jar" />
-    </item>
-    <item
-        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
-        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-framework/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-691b7af67f0bf5c501665b187c3b3582861f920e.jar" />
     </item>
 
 </items>

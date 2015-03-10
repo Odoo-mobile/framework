@@ -8,5 +8,7 @@
     <string name="message_to">Message to %s</string>
     <string name="add_internal_note">Add and internal note</string>
     <string name="internal_note_hint">Add an internal note that will not be sent to the followers</string>
-    <string name="label_log_an_internal_note">Log note</string>
+    <string name="label_log_note">Log note</string>
+    <string name="label_send_message"><u>Send a message</u></string>
+    <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
 </resources>

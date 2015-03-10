@@ -15,3 +15,6 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable
+-dontobfuscate

@@ -6,7 +6,6 @@
 
     <LinearLayout
         android:id="@+id/data_list_container"
-        android:layout_below="@+id/customer_data_filter_container"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
