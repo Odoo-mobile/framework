@@ -65,6 +65,7 @@
                         app:fieldLabelColor="@color/theme_primary"
                         app:fieldTextSize="@dimen/text_size_xmedium"
                         app:showIcon="false"
+                        android:id="@+id/user_login"
                         android:layout_height="wrap_content"></odoo.controls.OField>
 
                     <odoo.controls.OField

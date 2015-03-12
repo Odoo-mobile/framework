@@ -23,26 +23,34 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
+import odoo.controls.OField;
 import odoo.controls.OForm;
 
-public class Profile extends ActionBarActivity {
+public class Profile extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = Profile.class.getSimpleName();
     private OUser user;
     private OForm form;
     private ParallaxScrollView parallaxScrollView;
     private TextView title;
+    private Handler handler = null;
+    private int click_count = 0;
+    public static String CONNECT_WITH_ODOO = "enable_connect_with_odoo";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +59,7 @@ public class Profile extends ActionBarActivity {
         OActionBarUtils.setActionBar(this, false);
         user = OUser.current(this);
         form = (OForm) findViewById(R.id.profileDetails);
+        OField user_login = (OField) findViewById(R.id.user_login);
         parallaxScrollView = (ParallaxScrollView) findViewById(R.id.parallaxScrollView);
         parallaxScrollView.setActionBar(getSupportActionBar());
         setTitle("");
@@ -77,6 +86,28 @@ public class Profile extends ActionBarActivity {
         }
         ImageView imageView = (ImageView) findViewById(android.R.id.icon);
         imageView.setImageBitmap(avatar);
+        user_login.setOnClickListener(this);
 
     }
+
+    @Override
+    public void onClick(View v) {
+        handler = getWindow().getDecorView().getHandler();
+        click_count = click_count + 1;
+        Runnable r = new Runnable() {
+            public void run() {
+                click_count = 0;
+            }
+        };
+        handler.postDelayed(r, 7000);
+
+        if (click_count == 3) {
+            Toast.makeText(this, "Need 2 Tap to connect with odoo", Toast.LENGTH_SHORT).show();
+        }
+        if (click_count == 5) {
+            OPreferenceManager pref = new OPreferenceManager(this);
+            pref.setBoolean(CONNECT_WITH_ODOO, true);
+        }
+    }
 }
+

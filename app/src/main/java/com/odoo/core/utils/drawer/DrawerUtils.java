@@ -35,6 +35,7 @@ import com.odoo.core.support.addons.OAddon;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.utils.OControls;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class DrawerUtils {
 
     public static List<ODrawerItem> baseSettingsItems(Context context) {
         String key = "base.settings";
+        OPreferenceManager pref = new OPreferenceManager(context);
         List<ODrawerItem> settings = new ArrayList<>();
         settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_settings))
                 .setGroupTitle());
@@ -69,9 +71,10 @@ public class DrawerUtils {
         settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_settings))
                 .setIcon(R.drawable.ic_action_settings)
                 .setInstance(SettingsActivity.class));
-        settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_access_odoo_mobile))
-                .setInstance(OdooMobileQRReader.class).setIcon(R.drawable.ic_action_qrcode)
-                .setExtra(OUser.current(context).getAsBundle()));
+        if (pref.getBoolean(Profile.CONNECT_WITH_ODOO, false))
+            settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_access_odoo_mobile))
+                    .setInstance(OdooMobileQRReader.class).setIcon(R.drawable.ic_action_qrcode)
+                    .setExtra(OUser.current(context).getAsBundle()));
         return settings;
     }
 
