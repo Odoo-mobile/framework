@@ -54,7 +54,7 @@
         jar="/home/dso/odoo-mobile/master-framework/app/build/intermediates/exploded-aar/master-framework/intro-slider-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="12d8614b43abc1b754dda89f2cd9bbc609b01108">
+        sha1="fd8ede5ed3cfb7e80be4664e2f0c5253fc9d435f">
         <dex dex="/home/dso/odoo-mobile/master-framework/app/build/intermediates/pre-dexed/debug/classes-1c6261b87d7e7c92550bf3be1a3988ad206c7061.jar" />
     </item>
     <item

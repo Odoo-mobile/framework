@@ -180,6 +180,8 @@ public class OSyncDataUtils {
                         if (column.isFunctionalColumn() && column.canFunctionalStore()) {
                             List<String> depends = column.getFunctionalStoreDepends();
                             OValues dependValues = new OValues();
+                            if (!column.isLocal())
+                                dependValues.put(column.getName(), record.get(column.getName()));
                             for (String depend : depends) {
                                 if (record.has(depend)) {
                                     dependValues.put(depend, record.get(depend));
