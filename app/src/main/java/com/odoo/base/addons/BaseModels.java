@@ -29,6 +29,7 @@ import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.support.OUser;
+import com.odoo.news.models.OdooNews;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class BaseModels {
 
     public static List<OModel> baseModels(Context context, OUser user) {
         List<OModel> models = new ArrayList<>();
+        models.add(new OdooNews(context, user));
         models.add(new IrModel(context, user));
         models.add(new ResPartner(context, user));
         models.add(new ResUsers(context, user));
