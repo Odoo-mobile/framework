@@ -22,11 +22,18 @@ package com.odoo.news.models;
 import android.content.Context;
 
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.OText;
+import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
 public class OdooNews extends OModel {
     public static final String TAG = OdooNews.class.getSimpleName();
-    
+
+    OColumn message = new OColumn("Message", OText.class);
+    OColumn sender = new OColumn("sender", OVarchar.class);
+    OColumn subject = new OColumn("Subject", OVarchar.class);
+
     public OdooNews(Context context, OUser user) {
         super(context, "odoo.news", user);
     }

@@ -23,6 +23,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.odoo.core.orm.OValues;
+import com.odoo.news.models.OdooNews;
+
 /**
  * Odoo News Receiver
  */
@@ -32,5 +35,11 @@ public class OdooNewsReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // Use Keys: subject, from, message
+        OdooNews news = new OdooNews(context, null);
+        OValues values = new OValues();
+        values.put("sender", intent.getExtras().getString("from"));
+        values.put("subject", intent.getExtras().getString("subject"));
+        values.put("message", intent.getExtras().getString("message"));
+        news.insert(values);
     }
 }
