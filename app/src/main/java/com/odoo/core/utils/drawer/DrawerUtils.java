@@ -37,6 +37,8 @@ import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
+import com.odoo.news.News;
+import com.odoo.news.models.OdooNews;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +77,12 @@ public class DrawerUtils {
             settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_access_odoo_mobile))
                     .setInstance(OdooMobileQRReader.class).setIcon(R.drawable.ic_action_qrcode)
                     .setExtra(OUser.current(context).getAsBundle()));
+        OdooNews news = new OdooNews(context, null);
+        if (!news.isEmptyTable()) {
+            settings.add(new ODrawerItem(key).setTitle("Odoo News")
+                            .setInstance(new News()).setIcon(R.drawable.ic_odoo_o)
+            );
+        }
         return settings;
     }
 
