@@ -35,7 +35,6 @@ import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +86,6 @@ public class SettingsActivity extends ActionBarActivity {
         List<String> default_authorities = new ArrayList<>();
         default_authorities.add("com.android.calendar");
         default_authorities.add("com.android.contacts");
-
         SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
         Account mAccount = OUser.current(this).getAccount();
         for (SyncAdapterType lst : list) {
