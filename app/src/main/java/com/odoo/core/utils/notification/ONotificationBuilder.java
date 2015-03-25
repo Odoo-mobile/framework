@@ -32,9 +32,9 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
+import com.odoo.R;
 import com.odoo.core.account.BaseSettings;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +57,10 @@ public class ONotificationBuilder {
     private Boolean withLargeIcon = true;
     private Boolean withRingTone = true;
     private int notification_color = R.color.theme_secondary;
+    private int maxProgress = -1;
+    private int currentProgress = -1;
+    private boolean indeterminate = false;
+    private Bitmap bigPictureStyle = null;
 
     public ONotificationBuilder(Context context, int notification_id) {
         mContext = context;
@@ -96,6 +100,11 @@ public class ONotificationBuilder {
         return withRingTone;
     }
 
+    public ONotificationBuilder setBigPicture(Bitmap bitmap) {
+        bigPictureStyle = bitmap;
+        return this;
+    }
+
     public ONotificationBuilder setBigText(String bigText) {
         this.bigText = bigText;
         return this;
@@ -123,6 +132,13 @@ public class ONotificationBuilder {
 
     public ONotificationBuilder setColor(int res_id) {
         notification_color = res_id;
+        return this;
+    }
+
+    public ONotificationBuilder setProgress(int max, int progress, boolean indeterminate) {
+        maxProgress = max;
+        currentProgress = progress;
+        this.indeterminate = indeterminate;
         return this;
     }
 
@@ -154,6 +170,14 @@ public class ONotificationBuilder {
             notiStyle.setSummaryText(text);
             notiStyle.bigText(bigText);
             mNotificationBuilder.setStyle(notiStyle);
+        }
+        if (bigPictureStyle != null) {
+            mNotificationBuilder.setStyle(new NotificationCompat.BigPictureStyle()
+                    .bigPicture(bigPictureStyle));
+        }
+
+        if (maxProgress != -1) {
+            mNotificationBuilder.setProgress(maxProgress, currentProgress, indeterminate);
         }
     }
 

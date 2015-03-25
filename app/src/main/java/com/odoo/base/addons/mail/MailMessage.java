@@ -28,6 +28,7 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OText;
@@ -56,8 +57,24 @@ public class MailMessage extends OModel {
     @Odoo.Functional(method = "authorName", depends = {"author_id", "email_from"}, store = true)
     OColumn author_name = new OColumn("Author Name", OVarchar.class).setLocalColumn();
 
+    @Odoo.Functional(method = "hasAttachment", depends = {"attachment_ids"}, store = true)
+    OColumn has_attachments = new OColumn("Has Attachments", OBoolean.class).setLocalColumn()
+            .setDefaultValue(false);
+
     public MailMessage(Context context, OUser user) {
         super(context, "mail.message", user);
+    }
+
+    public boolean hasAttachment(OValues values) {
+        try {
+            JSONArray attachment_ids = (JSONArray) values.get("attachment_ids");
+            if (attachment_ids.length() > 0) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public String authorName(OValues values) {

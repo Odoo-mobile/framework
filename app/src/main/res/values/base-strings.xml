@@ -77,6 +77,7 @@
     <string name="label_no_records_found">No Records Found</string>
     <string name="label_odoo_mobile_on_github">Odoo Mobile on GitHub</string>
     <string name="label_our_apps">Our apps</string>
+    <string name="label_attach_a_file"> + Attach a file</string>
     <!-- Toasts -->
     <string name="toast_setting_saved">Setting saved.</string>
     <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
@@ -84,7 +85,7 @@
     <string name="toast_user_already_exists">User already exists</string>
     <string name="toast_network_required">Network required</string>
     <string name="toast_account_removed">Account Removed Successfully</string>
-
+    <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <!-- Setting pref strings -->
     <string-array name="syncInterval">
         <item name="5">Every 5 minutes</item>

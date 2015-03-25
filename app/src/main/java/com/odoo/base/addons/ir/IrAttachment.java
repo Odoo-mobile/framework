@@ -23,11 +23,17 @@ import android.content.Context;
 
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import odoo.ODomain;
 
 public class IrAttachment extends OModel {
     public static final String TAG = IrAttachment.class.getSimpleName();
@@ -49,5 +55,58 @@ public class IrAttachment extends OModel {
 
     public IrAttachment(Context context, OUser user) {
         super(context, "ir.attachment", user);
+    }
+
+    public boolean createAttachment(OValues value, String rel_model, int res_id) {
+        OValues values = new OValues();
+        values.put("name", value.get("name"));
+        values.put("datas_fname", value.getString("name"));
+        values.put("file_size", value.get("file_size"));
+        values.put("file_type", value.get("file_type"));
+        values.put("company_id", getUser().getCompany_id());
+        values.put("res_id", res_id);
+        values.put("res_model", rel_model);
+        values.put("file_uri", value.getString("file_uri"));
+        values.put("type", value.getString("file_type"));
+        values.put("id", value.get("id"));
+        insert(values);
+        return true;
+    }
+
+    public static JSONObject valuesToData(OModel model, OValues value) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("name", value.get("name"));
+            data.put("db_datas", value.getString("datas"));
+            data.put("datas_fname", value.get("name"));
+            data.put("file_size", value.get("file_size"));
+            data.put("res_model", false);
+            data.put("res_id", false);
+            data.put("file_type", value.get("file_type"));
+            data.put("company_id", model.getUser().getCompany_id());
+            return data;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getDatasFromServer(Integer row_id) {
+        try {
+            ODomain domain = new ODomain();
+            domain.add("id", "=", selectServerId(row_id));
+            JSONObject fields = new JSONObject();
+            fields.accumulate("fields", "datas");
+            JSONObject result = getServerDataHelper().getOdoo().search_read(getModelName(), fields,
+                    domain.get());
+            if (result.getJSONArray("records").length() > 0) {
+                JSONObject row = result.getJSONArray("records")
+                        .getJSONObject(0);
+                return row.getString("datas");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "false";
     }
 }
