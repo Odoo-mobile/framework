@@ -22,32 +22,39 @@ package com.odoo.core.support;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.odoo.R;
+import com.odoo.core.account.OdooLogin;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
-import com.odoo.R;
 
 import java.util.List;
 
 import odoo.controls.BezelImageView;
 
+import static android.text.InputType.TYPE_CLASS_TEXT;
+import static android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD;
+
 public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListener {
     private Context mContext;
     private ExpandableHeightGridView mGrid;
     private ArrayAdapter<OUser> mAdapter;
-    private AlertDialog dialog;
-    private AlertDialog.Builder builder;
-    private OUser mUser;
+    private AlertDialog login_dialog, passwordDialog;
+    private AlertDialog.Builder builder, builder_password;
     private IUserLoginSelectListener mIUserLoginSelectListener = null;
 
     public OdooUserLoginSelectorDialog(Context context) {
@@ -94,9 +101,11 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
 
 
     public void show() {
-        if (dialog != null)
-            dialog.dismiss();
-        dialog = null;
+        if (login_dialog != null)
+            login_dialog.dismiss();
+        if (passwordDialog != null)
+            passwordDialog.dismiss();
+        login_dialog = null;
         builder = new AlertDialog.Builder(mContext);
         builder.setTitle(R.string.label_select_user);
         builder.setView(mGrid);
@@ -121,17 +130,60 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
                         dialog.dismiss();
                     }
                 });
-        dialog = builder.create();
-        dialog.show();
+        login_dialog = builder.create();
+        login_dialog.show();
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        OUser user = mAdapter.getItem(position);
-        if (mIUserLoginSelectListener != null) {
-            mIUserLoginSelectListener.onUserSelected(user);
-        }
-        dialog.dismiss();
+        final OdooUserLoginSelectorDialog lDialog = new OdooUserLoginSelectorDialog(mContext);
+        if (login_dialog != null)
+            login_dialog.dismiss();
+        passwordDialog = null;
+        final OUser user = mAdapter.getItem(position);
+        AbsListView.LayoutParams params = new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
+                AbsListView.LayoutParams.WRAP_CONTENT);
+        LinearLayout linearLayout = new LinearLayout(mContext);
+        linearLayout.setLayoutParams(params);
+        linearLayout.setPadding(10, 10, 10, 10);
+        final EditText edt_password = new EditText(mContext);
+        edt_password.setLayoutParams(params);
+        edt_password.setHint(OResource.string(mContext, R.string.label_password));
+        edt_password.setInputType(TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_PASSWORD);
+        linearLayout.addView(edt_password);
+        builder_password = new AlertDialog.Builder(mContext);
+        builder_password.setTitle(R.string.label_enter_password);
+        builder_password.setView(linearLayout);
+        builder_password.setCancelable(false);
+        builder_password.setPositiveButton(OResource.string(mContext, R.string.label_login), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (!TextUtils.isEmpty(edt_password.getText())) {
+                    if (edt_password.getText().toString().equals(user.getPassword())) {
+                        if (mIUserLoginSelectListener != null) {
+                            mIUserLoginSelectListener.onUserSelected(user);
+                        }
+                    } else {
+                        Toast.makeText(mContext, OResource.string(mContext, R.string.toast_invalid_password), Toast.LENGTH_LONG).show();
+                        lDialog.show();
+                    }
+                } else {
+                    Toast.makeText(mContext, OResource.string(mContext, R.string.error_provide_password), Toast.LENGTH_LONG).show();
+                    lDialog.setUserLoginSelectListener(new OdooLogin());
+                    lDialog.show();
+                }
+                dialog.dismiss();
+            }
+        });
+        builder_password.setNegativeButton(OResource.string(mContext, R.string.label_cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                lDialog.show();
+            }
+        });
+        passwordDialog = builder_password.create();
+        passwordDialog.show();
     }
 
     public interface IUserLoginSelectListener {

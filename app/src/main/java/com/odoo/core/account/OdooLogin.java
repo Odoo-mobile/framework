@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.OdooActivity;
+import com.odoo.R;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
@@ -32,7 +33,6 @@ import com.odoo.core.support.OdooUserLoginSelectorDialog;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OAlertDialog;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 import com.odoo.datas.OConstants;
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
                 OdooUserLoginSelectorDialog dialog = new OdooUserLoginSelectorDialog(this);
                 dialog.setUserLoginSelectListener(this);
                 dialog.show();
-                return;
+//                return;
             }
         }
         init();
