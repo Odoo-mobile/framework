@@ -41,7 +41,6 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
-import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 
 import org.json.JSONArray;
@@ -207,8 +206,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         } catch (OdooSessionExpiredException odooSession) {
             app.setOdoo(null, user);
-            // FIXME: Show sign in dialog for re login with different password
-//            showSignInErrorNotification(user);
+            showSignInErrorNotification(user);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -241,8 +239,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         builder.withRingTone(false);
         builder.setOngoing(true);
         builder.withLargeIcon(false);
-        builder.setColor(OResource.color(mContext, R.color.android_orange_dark));
-
+        builder.setColor(R.color.android_orange_dark);
         Bundle extra = user.getAsBundle();
         // Actions
         ONotificationBuilder.NotificationAction actionReset = new ONotificationBuilder.NotificationAction(

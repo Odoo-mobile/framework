@@ -223,7 +223,6 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
                 edtSelfHosted.requestFocus();
                 return;
             }
-
             if (databaseSpinner != null && databases.size() > 1 && databaseSpinner.getSelectedItemPosition() == 0) {
                 Toast.makeText(this, OResource.string(this, R.string.label_select_database), Toast.LENGTH_LONG).show();
                 return;
