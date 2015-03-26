@@ -86,6 +86,7 @@
     <string name="toast_network_required">Network required</string>
     <string name="toast_account_removed">Account Removed Successfully</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
+    <string name="toast_updating_password">Updating password</string>
     <!-- Setting pref strings -->
     <string-array name="syncInterval">
         <item name="5">Every 5 minutes</item>
@@ -124,7 +125,6 @@
     <string name="supported_versions">Supported versions</string>
     <string name="supported_versions_names">Odoo 7.0+</string>
     <string name="label_access_odoo_mobile">Connect Odoo Mobile</string>
-
     <!-- About Company Fragment Strings -->
     <string name="about_Company_line1">Copyright © 2004-TODAY Odoo SA. All Rights Reserved.</string>
     <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>
@@ -132,5 +132,5 @@
     <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
     <string name="app_version_name">Version</string>
     <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
-    <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.co.in/">Terms of Service</a> and <a href="http://www.odoo.co.in/">Privacy Policy</a></string>
+    <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.com/">Terms of Service</a> and <a href="http://www.odoo.com/">Privacy Policy</a></string>
 </resources>

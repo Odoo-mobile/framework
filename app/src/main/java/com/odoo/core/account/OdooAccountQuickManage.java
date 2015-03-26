@@ -20,11 +20,13 @@
 package com.odoo.core.account;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -40,7 +42,7 @@ import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooLoginHelper;
 import com.odoo.core.utils.BitmapUtils;
-import com.odoo.core.utils.IntentUtils;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 
 public class OdooAccountQuickManage extends ActionBarActivity implements View.OnClickListener {
@@ -91,8 +93,25 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
         builder.setPositiveButton(R.string.label_delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                OdooAccountManager.removeAccount(OdooAccountQuickManage.this, user.getAndroidName());
-                IntentUtils.startActivity(OdooAccountQuickManage.this, OdooLogin.class, null);
+                if (OdooAccountManager.removeAccount(
+                        OdooAccountQuickManage.this, user.getAndroidName())) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent loginActivity = new Intent(OdooAccountQuickManage.this,
+                                    OdooLogin.class);
+                            loginActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(loginActivity);
+                            finish();
+                        }
+                    }, 500);
+                }
+            }
+        });
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
                 finish();
             }
         });
@@ -134,6 +153,18 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
 
     private class LoginProcess extends AsyncTask<String, Void, OUser> {
 
+        private ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(OdooAccountQuickManage.this);
+            progressDialog.setTitle(R.string.title_working);
+            progressDialog.setMessage(OResource.string(OdooAccountQuickManage.this,
+                    R.string.toast_updating_password));
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
 
         @Override
         protected OUser doInBackground(String... params) {
@@ -149,6 +180,7 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
         @Override
         protected void onPostExecute(OUser oUser) {
             super.onPostExecute(oUser);
+            progressDialog.dismiss();
             if (oUser != null) {
                 OdooAccountManager.updateUserData(OdooAccountQuickManage.this, user);
                 finish();

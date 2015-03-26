@@ -81,7 +81,6 @@ public class OdooActivity extends ActionBarActivity {
     public static final Integer REQUEST_ACCOUNTS_MANAGE = 1102;
     public static final String KEY_FRESH_LOGIN = "key_fresh_login";
 
-
     private DrawerLayout mDrawerLayout = null;
     private ActionBarDrawerToggle mDrawerToggle = null;
     private IOnBackPressListener backPressListener = null;
@@ -98,8 +97,8 @@ public class OdooActivity extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSavedInstanceState = savedInstanceState;
         Log.i(TAG, "OdooActivity->onCreate");
+        mSavedInstanceState = savedInstanceState;
         OPreferenceManager preferenceManager = new OPreferenceManager(this);
         if (!preferenceManager.getBoolean(KEY_FRESH_LOGIN, false)) {
             preferenceManager.setBoolean(KEY_FRESH_LOGIN, true);

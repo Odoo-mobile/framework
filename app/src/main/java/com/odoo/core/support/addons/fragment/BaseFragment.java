@@ -166,7 +166,11 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
             ContentResolver.removeStatusChangeListener(mSyncObserverHandle);
             mSyncObserverHandle = null;
         }
-        parent().unregisterReceiver(syncFinishReceiver);
+        try {
+            parent().unregisterReceiver(syncFinishReceiver);
+        } catch (Exception e) {
+            // Skipping issue related to unregister receiver
+        }
     }
 
     @Override

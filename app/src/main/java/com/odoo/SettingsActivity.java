@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.odoo.core.account.About;
+import com.odoo.core.account.OdooLogin;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OActionBarUtils;
@@ -81,27 +82,35 @@ public class SettingsActivity extends ActionBarActivity {
     }
 
     private void settingUpdated() {
-        OPreferenceManager mPref = new OPreferenceManager(this);
-        int sync_interval = mPref.getInt("sync_interval", 1440);
-        List<String> default_authorities = new ArrayList<>();
-        default_authorities.add("com.android.calendar");
-        default_authorities.add("com.android.contacts");
-        SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
-        Account mAccount = OUser.current(this).getAccount();
-        for (SyncAdapterType lst : list) {
-            if (lst.authority.contains("com.odoo")
-                    && lst.authority.contains("providers")) {
-                default_authorities.add(lst.authority);
+        OUser user = OUser.current(this);
+        if (user == null) {
+            Intent loginActivity = new Intent(this, OdooLogin.class);
+            loginActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(loginActivity);
+            finish();
+        } else {
+            Account mAccount = user.getAccount();
+            OPreferenceManager mPref = new OPreferenceManager(this);
+            int sync_interval = mPref.getInt("sync_interval", 1440);
+            List<String> default_authorities = new ArrayList<>();
+            default_authorities.add("com.android.calendar");
+            default_authorities.add("com.android.contacts");
+            SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
+            for (SyncAdapterType lst : list) {
+                if (lst.authority.contains("com.odoo")
+                        && lst.authority.contains("providers")) {
+                    default_authorities.add(lst.authority);
+                }
             }
-        }
-        for (String authority : default_authorities) {
-            boolean isSyncActive = ContentResolver.getSyncAutomatically(
-                    mAccount, authority);
-            if (isSyncActive) {
-                SyncUtils.get(this).setSyncPeriodic(authority, sync_interval, 60, 1);
+            for (String authority : default_authorities) {
+                boolean isSyncActive = ContentResolver.getSyncAutomatically(
+                        mAccount, authority);
+                if (isSyncActive) {
+                    SyncUtils.get(this).setSyncPeriodic(authority, sync_interval, 60, 1);
+                }
             }
+            Toast.makeText(this, OResource.string(this, R.string.toast_setting_saved),
+                    Toast.LENGTH_LONG).show();
         }
-        Toast.makeText(this, OResource.string(this, R.string.toast_setting_saved),
-                Toast.LENGTH_LONG).show();
     }
 }
