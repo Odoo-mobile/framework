@@ -21,14 +21,20 @@ package com.odoo.base.addons.mail.widget;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.odoo.R;
+import com.odoo.base.addons.ir.feature.OFileManager;
 import com.odoo.base.addons.mail.MailMessage;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -39,6 +45,9 @@ import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OStringColorUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MailDetailDialog extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = MailDetailDialog.class.getSimpleName();
     private Bundle extra;
@@ -46,6 +55,10 @@ public class MailDetailDialog extends ActionBarActivity implements View.OnClickL
     private OModel baseModel;
     private TextView recordName;
     private View parent;
+    private List<ODataRow> attachments = new ArrayList<>();
+    private LoadAttachments loadAttachments = null;
+    private LinearLayout horizontalScrollView;
+    private OFileManager fileManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +66,7 @@ public class MailDetailDialog extends ActionBarActivity implements View.OnClickL
         setContentView(R.layout.base_mail_chatter_message_detail);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         getSupportActionBar().hide();
+        fileManager = new OFileManager(this);
         mailMessage = new MailMessage(this, null);
         extra = getIntent().getExtras();
         findViewById(R.id.btnClose).setOnClickListener(this);
@@ -64,6 +78,12 @@ public class MailDetailDialog extends ActionBarActivity implements View.OnClickL
         recordName = (TextView) findViewById(R.id.recordName);
         parent = (View) recordName.getParent();
         ODataRow row = mailMessage.browse(extra.getInt(OColumn.ROW_ID));
+        attachments.addAll(row.getM2MRecord("attachment_ids").browseEach());
+        if (attachments.size() > 0) {
+            loadAttachments = new LoadAttachments();
+            loadAttachments.execute();
+        }
+        horizontalScrollView = (LinearLayout) findViewById(R.id.attachmentsList);
         baseModel = OModel.get(this, row.getString("model"), mailMessage.getUser().getAndroidName());
         ODataRow record = baseModel.browse(baseModel.selectRowId(row.getInt("res_id")));
         String name = record.getString(baseModel.getDefaultNameColumn());
@@ -91,17 +111,72 @@ public class MailDetailDialog extends ActionBarActivity implements View.OnClickL
         OControls.setText(parent, R.id.messageDate, date);
     }
 
+    private class LoadAttachments extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (ODataRow row : attachments) {
+                        addAttachment(row);
+                    }
+                }
+            });
+            return null;
+        }
+    }
+
+    private void addAttachment(ODataRow values) {
+        View attachmentView = LayoutInflater.from(this)
+                .inflate(R.layout.base_attachment_item, horizontalScrollView, false);
+        String fileName = values.getString("name");
+        String type = values.getString("file_type");
+        ImageView imgPreview = (ImageView) attachmentView.findViewById(R.id.attachmentPreview);
+        if (type.contains("image")) {
+            if (!values.getString("file_uri").equals("false")) {
+                Uri uri = Uri.parse(values.getString("file_uri"));
+                imgPreview.setImageBitmap(fileManager.getBitmapFromURI(uri));
+            } else
+                imgPreview.setImageResource(R.drawable.image);
+        } else if (type.contains("audio")) {
+            imgPreview.setImageResource(R.drawable.audio);
+        } else if (type.contains("video")) {
+            imgPreview.setImageResource(R.drawable.video);
+        } else {
+            imgPreview.setImageResource(R.drawable.file);
+        }
+        OControls.setText(attachmentView, R.id.attachmentFileName, fileName);
+        attachmentView.setTag(values);
+        attachmentView.findViewById(R.id.btnRemoveAttachment).setVisibility(View.GONE);
+        attachmentView.setOnClickListener(this);
+        horizontalScrollView.addView(attachmentView);
+    }
+
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnClose:
-                finish();
-                break;
-            case R.id.btnReply:
-                extra.putString("type", MailChatterCompose.MessageType.Message.toString());
-                IntentUtils.startActivity(this, MailChatterCompose.class, extra);
-                finish();
-                break;
+        if (v.getTag() != null) {
+            ODataRow attachment = (ODataRow) v.getTag();
+            fileManager.downloadAttachment(attachment.getInt(OColumn.ROW_ID));
+        } else {
+            switch (v.getId()) {
+                case R.id.btnClose:
+                    finish();
+                    break;
+                case R.id.btnReply:
+                    extra.putString("type", MailChatterCompose.MessageType.Message.toString());
+                    IntentUtils.startActivity(this, MailChatterCompose.class, extra);
+                    finish();
+                    break;
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (loadAttachments != null) {
+            loadAttachments.cancel(true);
         }
     }
 }

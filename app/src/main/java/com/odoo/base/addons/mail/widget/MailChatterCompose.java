@@ -22,35 +22,52 @@ package com.odoo.base.addons.mail.widget;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.odoo.R;
+import com.odoo.base.addons.ir.IrAttachment;
+import com.odoo.base.addons.ir.feature.OFileManager;
 import com.odoo.base.addons.mail.MailMessage;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.utils.BitmapUtils;
+import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OStringColorUtil;
+import com.odoo.core.utils.logger.OLog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import odoo.OArguments;
 
 public class MailChatterCompose extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = MailChatterCompose.class.getSimpleName();
     private OModel mModel;
+    private IrAttachment irAttachment;
     private int server_id = -1;
     private int partner_id = -1;
+    private OFileManager fileManager;
+    private LinearLayout horizontalScrollView;
+    private List<Integer> attachmentIds = new ArrayList<>();
 
     public enum MessageType {
         Message, InternalNote
@@ -67,9 +84,11 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
         setContentView(R.layout.base_mail_chatter_message_compose);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         getSupportActionBar().hide();
+        fileManager = new OFileManager(this);
         Bundle extra = getIntent().getExtras();
         mType = MessageType.valueOf(extra.getString("type"));
         mModel = OModel.get(this, extra.getString("model"), null);
+        irAttachment = new IrAttachment(this, null);
         mailMessage = new MailMessage(this, null);
         server_id = extra.getInt("server_id");
         if (mModel.getModelName().equals("res.partner")) {
@@ -91,19 +110,22 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
                 }
             }
         }
+        findViewById(R.id.btnAttachment).setOnClickListener(this);
         findViewById(R.id.btnSend).setOnClickListener(this);
         findViewById(R.id.btnCancel).setOnClickListener(this);
         edtSubject = (EditText) findViewById(R.id.messageSubject);
         edtBody = (EditText) findViewById(R.id.messageBody);
+        horizontalScrollView = (LinearLayout) findViewById(R.id.attachmentsList);
         init();
     }
 
     private void init() {
         TextView recordName = (TextView) findViewById(R.id.recordName);
-        parent = (View) recordName.getParent();
+        parent = (View) recordName.getParent().getParent();
         ODataRow record = mModel.browse(mModel.selectRowId(server_id));
         String name = record.getString(mModel.getDefaultNameColumn());
-        recordName.setBackgroundColor(OStringColorUtil.getStringColor(this, name));
+        findViewById(R.id.dialogHeader)
+                .setBackgroundColor(OStringColorUtil.getStringColor(this, name));
         if (mType == MessageType.Message) {
             edtSubject.setText("Re: " + name);
             recordName.setText(String.format(OResource.string(this, R.string.message_to), name));
@@ -125,7 +147,49 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
             case R.id.btnCancel:
                 finish();
                 break;
+            case R.id.btnAttachment:
+                fileManager.requestForFile(OFileManager.RequestType.ALL_FILE_TYPE);
+                break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        OValues response = fileManager.handleResult(requestCode, resultCode, data);
+        if (response != null) {
+            addAttachment(response);
+        }
+    }
+
+    private void addAttachment(OValues values) {
+        View attachmentView = LayoutInflater.from(this)
+                .inflate(R.layout.base_attachment_item, horizontalScrollView, false);
+        String fileName = values.getString("name");
+        String type = values.getString("file_type");
+        ImageView imgPreview = (ImageView) attachmentView.findViewById(R.id.attachmentPreview);
+        if (type.contains("image")) {
+            OLog.log(values.getString("file_uri"));
+            imgPreview.setImageURI(Uri.parse(values.getString("file_uri")));
+        } else if (type.contains("audio")) {
+            imgPreview.setImageResource(R.drawable.audio);
+        } else if (type.contains("video")) {
+            imgPreview.setImageResource(R.drawable.video);
+        } else {
+            imgPreview.setImageResource(R.drawable.file);
+        }
+        OControls.setText(attachmentView, R.id.attachmentFileName, fileName);
+        attachmentView.setTag(values);
+        attachmentView.findViewById(R.id.btnRemoveAttachment)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        horizontalScrollView.removeView(
+                                (View) v.getParent()
+                        );
+                    }
+                });
+        horizontalScrollView.addView(attachmentView);
     }
 
     private void sendMessage() {
@@ -143,12 +207,86 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
             edtBody.requestFocus();
             return;
         }
+
+        int attachments_count = horizontalScrollView.getChildCount();
+        if (attachments_count > 0) {
+            // Has attachments
+            List<OValues> attachments = new ArrayList<>();
+            for (int i = 0; i < attachments_count; i++) {
+                attachments.add((OValues) horizontalScrollView.getChildAt(i).getTag());
+            }
+            CreateAttachments createAttachments = new CreateAttachments();
+            createAttachments.execute(attachments);
+        } else {
+            postMessage();
+        }
+    }
+
+    private void postMessage() {
         String subject = (mType == MessageType.Message) ?
                 edtSubject.getText().toString() : "false";
         MessagePost messagePost = new MessagePost();
         messagePost.execute(subject, edtBody.getText().toString());
     }
 
+    private class CreateAttachments extends AsyncTask<List<OValues>, Void, List<Integer>> {
+        private ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(MailChatterCompose.this);
+            progressDialog.setTitle(R.string.title_working);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.setMessage("Uploading attachments...");
+            progressDialog.setMax(horizontalScrollView.getChildCount());
+            progressDialog.setCancelable(false);
+            progressDialog.setProgress(1);
+            progressDialog.show();
+        }
+
+        @Override
+        protected List<Integer> doInBackground(final List<OValues>... params) {
+            try {
+                List<Integer> ids = new ArrayList<>();
+                for (final OValues value : params[0]) {
+                    boolean isImage = (value.getString("file_type").contains("image"));
+                    value.put("datas", BitmapUtils.uriToBase64(
+                            Uri.parse(value.getString("file_uri"))
+                            , getContentResolver(), isImage
+                    ));
+                    JSONObject data = IrAttachment.valuesToData(irAttachment, value);
+                    if (data != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setProgress(params[0].indexOf(value) + 1);
+                            }
+                        });
+                        int newId = irAttachment.getServerDataHelper().createOnServer(data);
+                        value.put("id", newId);
+                        irAttachment.createAttachment(value, mailMessage.getModelName(),
+                                0);
+                        ids.add(newId);
+                    }
+                }
+                return ids;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<Integer> ids) {
+            super.onPostExecute(ids);
+            progressDialog.dismiss();
+            attachmentIds.clear();
+            attachmentIds.addAll(ids);
+            if (ids != null)
+                postMessage();
+        }
+    }
 
     private class MessagePost extends AsyncTask<String, Void, Boolean> {
         private ProgressDialog progressDialog;
@@ -175,7 +313,7 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
                 data.put("body", body);
                 data.put("subject", (subject.equals("false")) ? false : subject);
                 data.put("parent_id", false);
-                data.put("attachment_ids", new JSONArray());
+                data.put("attachment_ids", JSONUtils.toArray(attachmentIds));
                 JSONArray partner_ids = new JSONArray();
                 if (partner_id != -1 && mType == MessageType.Message) {
                     partner_ids.put(partner_id);

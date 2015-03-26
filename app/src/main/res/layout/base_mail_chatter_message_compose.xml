@@ -4,16 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/recordName"
-        android:textColor="#fff"
-        android:padding="@dimen/default_16dp"
-        android:background="@color/theme_secondary_dark"
-        android:fontFamily="@string/font_normal"
-        android:textStyle="bold"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+    <LinearLayout
+        android:id="@+id/dialogHeader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/theme_secondary_dark"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/recordName"
+            android:textColor="#fff"
+            android:padding="@dimen/default_16dp"
+            android:fontFamily="@string/font_normal"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -48,8 +60,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+
         </LinearLayout>
     </ScrollView>
+
+    <View style="@style/ViewSeparator" />
+
+    <TextView
+        android:id="@+id/btnAttachment"
+        android:padding="@dimen/default_16dp"
+        android:background="?attr/selectableItemBackground"
+        android:textColor="@color/android_blue_dark"
+        android:fontFamily="@string/font_condensed"
+        android:text="@string/label_attach_a_file"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/attachmentsList"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
     <View style="@style/ViewSeparator" />
 

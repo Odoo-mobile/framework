@@ -59,7 +59,7 @@ public class OForm extends LinearLayout {
     private Boolean mFirstModeChange = true;
     private OValues extraValues = new OValues();
     private MailChatterView chatterView = null;
-
+    private Boolean loadChatter = true;
     public OForm(Context context) {
         super(context);
         init(context, null, 0, 0);
@@ -182,19 +182,25 @@ public class OForm extends LinearLayout {
         }
 
         // Adding chatter view if model requested
-        if (!mEditable) {
-            if (model != null && model.hasMailChatter()
-                    && mRecord != null && mRecord.getInt("id") != 0) {
-                if (chatterView == null) {
-                    chatterView = (MailChatterView) LayoutInflater.from(mContext)
-                            .inflate(R.layout.base_mail_chatter, this, false);
-                    chatterView.setModelName(model.getModelName());
-                    chatterView.setRecordServerId(mRecord.getInt("id"));
-                    chatterView.generateView();
-                    addView(chatterView);
+        if(loadChatter) {
+            if (!mEditable) {
+                if (model != null && model.hasMailChatter()
+                        && mRecord != null && mRecord.getInt("id") != 0) {
+                    if (chatterView == null) {
+                        chatterView = (MailChatterView) LayoutInflater.from(mContext)
+                                .inflate(R.layout.base_mail_chatter, this, false);
+                        chatterView.setModelName(model.getModelName());
+                        chatterView.setRecordServerId(mRecord.getInt("id"));
+                        chatterView.generateView();
+                        addView(chatterView);
+                    }
                 }
             }
         }
+    }
+    
+    public void loadChatter(boolean loadChatter){
+        this.loadChatter = loadChatter;
     }
 
     private void findAllFields(ViewGroup view) {
