@@ -53,7 +53,7 @@ public class MailMessage extends OModel {
     OColumn attachment_ids = new OColumn("Attachments", IrAttachment.class,
             OColumn.RelationType.ManyToMany);
     OColumn type = new OColumn("Type", OVarchar.class);
-
+    OColumn subtype_id = new OColumn("Subtype", MailMessageSubType.class, OColumn.RelationType.ManyToOne);
     @Odoo.Functional(method = "authorName", depends = {"author_id", "email_from"}, store = true)
     OColumn author_name = new OColumn("Author Name", OVarchar.class).setLocalColumn();
 
@@ -107,5 +107,25 @@ public class MailMessage extends OModel {
             ids.add(row.getInt("id"));
         }
         return ids;
+    }
+
+    @Override
+    public boolean checkForWriteDate() {
+        return false;
+    }
+
+    @Override
+    public boolean allowCreateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowDeleteRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return false;
     }
 }

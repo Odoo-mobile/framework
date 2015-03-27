@@ -26,6 +26,7 @@ import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -181,7 +182,11 @@ public class MailChatterView extends LinearLayout implements
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         ODataRow row = (ODataRow) chatterItems.get(position);
-
+        if (row.getString("subtype_id").equals("false")) {
+            view.setBackgroundResource(R.color.base_chatter_view_note_background);
+        } else {
+            view.setBackgroundColor(Color.WHITE);
+        }
         view.findViewById(R.id.imgAttachments).setVisibility(
                 (row.getBoolean("has_attachments")) ?
                         View.VISIBLE :
@@ -189,8 +194,9 @@ public class MailChatterView extends LinearLayout implements
         );
 
         if (row.getString("subject").equals("false")) {
-            OControls.setText(view, R.id.chatterSubject, "");
+            OControls.setGone(view, R.id.chatterSubject);
         } else {
+            OControls.setVisible(view, R.id.chatterSubject);
             OControls.setText(view, R.id.chatterSubject, row.getString("subject"));
         }
         String date = ODateUtils.convertToDefault(row.getString("date"),
