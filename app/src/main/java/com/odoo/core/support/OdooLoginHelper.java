@@ -76,10 +76,8 @@ public class OdooLoginHelper {
 
     public OUser instanceLogin(OdooInstance instance, OUser uData) throws OdooAccountExpireException {
         try {
-            String odooServer = mOdoo.getServerURL();
-            String odooDB = mOdoo.getDatabaseName();
             JSONObject res = mOdoo.oauth_authenticate(instance, uData.getUsername(), uData.getPassword());
-            int user_id = 0;
+            int user_id;
             if (res.get("uid") instanceof Integer) {
                 user_id = res.getInt("uid");
                 ODomain domain = new ODomain();
@@ -99,7 +97,9 @@ public class OdooLoginHelper {
     private OUser getUserDetails(ODomain domain, OUser data, OdooInstance instance) {
         OUser user = data;
         try {
-            OdooFields fields = new OdooFields(new String[]{"name", "partner_id", "tz", "image", "company_id"});
+            OdooFields fields = new OdooFields(new String[]{
+                    "name", "partner_id", "tz", "image_medium", "company_id"
+            });
             JSONObject res = mOdoo.search_read("res.users", fields.get(), domain.get());
             JSONObject userData = res.getJSONArray("records").getJSONObject(0);
             String database = user.getDatabase();
@@ -112,7 +112,7 @@ public class OdooLoginHelper {
             }
             user.setUser_id(userData.getInt("id"));
             user.setName(userData.getString("name"));
-            user.setAvatar(userData.getString("image"));
+            user.setAvatar(userData.getString("image_medium"));
             user.setIsactive(true);
             user.setAndroidName(androidName(user.getUsername(), database));
             user.setPartner_id(userData.getJSONArray("partner_id").getInt(0));
