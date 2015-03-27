@@ -11,4 +11,6 @@
     <string name="label_log_note">Log note</string>
     <string name="label_send_message"><u>Send a message</u></string>
     <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
+    <string name="label_enter_password">Enter your Password</string>
+    <string name="toast_invalid_password">Invalid password</string>
 </resources>
