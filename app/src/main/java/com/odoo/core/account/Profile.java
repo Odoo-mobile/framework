@@ -28,14 +28,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
-import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
@@ -92,22 +90,24 @@ public class Profile extends ActionBarActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        handler = getWindow().getDecorView().getHandler();
-        click_count = click_count + 1;
-        Runnable r = new Runnable() {
-            public void run() {
-                click_count = 0;
-            }
-        };
-        handler.postDelayed(r, 7000);
-
-        if (click_count == 3) {
-            Toast.makeText(this, "Need 2 Tap to connect with odoo", Toast.LENGTH_SHORT).show();
-        }
-        if (click_count == 5) {
-            OPreferenceManager pref = new OPreferenceManager(this);
-            pref.setBoolean(CONNECT_WITH_ODOO, true);
-        }
+//        FIXME:
+//
+//          handler = getWindow().getDecorView().getHandler();
+//        click_count = click_count + 1;
+//        Runnable r = new Runnable() {
+//            public void run() {
+//                click_count = 0;
+//            }
+//        };
+//        handler.postDelayed(r, 7000);
+//
+//        if (click_count == 3) {
+//            Toast.makeText(this, "Need 2 Tap to connect with odoo", Toast.LENGTH_SHORT).show();
+//        }
+//        if (click_count == 5) {
+//            OPreferenceManager pref = new OPreferenceManager(this);
+//            pref.setBoolean(CONNECT_WITH_ODOO, true);
+//        }
     }
 }
 
