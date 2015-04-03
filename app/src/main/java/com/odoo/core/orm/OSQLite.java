@@ -22,8 +22,10 @@ package com.odoo.core.orm;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
+import com.odoo.App;
 import com.odoo.base.addons.BaseModels;
 import com.odoo.config.Addons;
 import com.odoo.core.orm.fields.OColumn;
@@ -151,4 +153,11 @@ public class OSQLite extends SQLiteOpenHelper {
             Log.i(TAG, getDatabaseName() + " database dropped.");
         }
     }
+
+    public String databaseLocalPath() {
+        App app = (App) mContext.getApplicationContext();
+        return Environment.getDataDirectory().getPath() +
+                "/data/" + app.getPackageName() + "/databases/" + getDatabaseName();
+    }
+
 }

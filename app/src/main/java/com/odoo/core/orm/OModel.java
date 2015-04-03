@@ -21,6 +21,7 @@ package com.odoo.core.orm;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -44,16 +45,22 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.OStorageUtils;
 import com.odoo.core.utils.StringUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1055,5 +1062,36 @@ public class OModel {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public String getDatabaseLocalPath() {
+        return sqLite.databaseLocalPath();
+    }
+
+    public void exportDB() {
+        FileChannel source = null;
+        FileChannel destination = null;
+        String currentDBPath = getDatabaseLocalPath();
+        String backupDBPath = OStorageUtils.getDirectoryPath("file")
+                + "/" + getDatabaseName();
+        File currentDB = new File(currentDBPath);
+        File backupDB = new File(backupDBPath);
+        try {
+            source = new FileInputStream(currentDB).getChannel();
+            destination = new FileOutputStream(backupDB).getChannel();
+            destination.transferFrom(source, 0, source.size());
+            source.close();
+            destination.close();
+            String subject = "Database Export: " + getDatabaseName();
+            Uri uri = Uri.fromFile(backupDB);
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            intent.setType("message/rfc822");
+            mContext.startActivity(intent);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
