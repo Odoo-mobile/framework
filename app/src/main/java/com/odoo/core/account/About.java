@@ -39,12 +39,13 @@ import com.odoo.datas.OConstants;
 
 public class About extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = About.class.getSimpleName();
-
+    private final static String DEVELOPER_MODE = "developer_mode";
     private TextView versionName = null, aboutLine2 = null, aboutLine3 = null,
             aboutLine4 = null;
     private Handler handler = null;
     private int click_count = 0;
-    private final static String DEVELOPER_MODE = "developer_mode";
+    Runnable r = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,14 +116,15 @@ public class About extends ActionBarActivity implements View.OnClickListener {
     public void onClick(View v) {
 
         handler = getWindow().getDecorView().getHandler();
+        if (r == null) {
+            r = new Runnable() {
+                public void run() {
+                    click_count = 0;
+                }
+            };
+            handler.postDelayed(r, 7000);
+        }
         click_count = click_count + 1;
-        Runnable r = new Runnable() {
-            public void run() {
-                click_count = 0;
-            }
-        };
-        handler.postDelayed(r, 7000);
-
         if (click_count == 3) {
             Toast.makeText(this, R.string.developer_2_tap, Toast.LENGTH_SHORT).show();
         }
