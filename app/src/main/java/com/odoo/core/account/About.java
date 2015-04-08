@@ -20,6 +20,7 @@
 package com.odoo.core.account;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
@@ -40,11 +41,9 @@ import com.odoo.datas.OConstants;
 public class About extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = About.class.getSimpleName();
     private final static String DEVELOPER_MODE = "developer_mode";
-    private TextView versionName = null, aboutLine2 = null, aboutLine3 = null,
-            aboutLine4 = null;
     private Handler handler = null;
     private int click_count = 0;
-    Runnable r = null;
+    private Runnable runnable = null;
 
 
     @Override
@@ -54,15 +53,20 @@ public class About extends ActionBarActivity implements View.OnClickListener {
         OActionBarUtils.setActionBar(this, true);
         setTitle("");
         findViewById(R.id.abtus_header).setOnClickListener(this);
+        TextView versionName, aboutLine2, aboutLine3, aboutLine4;
         versionName = (TextView) findViewById(R.id.txvVersionName);
+        handler = getWindow().getDecorView().getHandler();
         try {
+            PackageManager packageManager = getPackageManager();
             // setting version name from manifest file
-            String version = getPackageManager().getPackageInfo(
+            String version = packageManager.getPackageInfo(
                     getPackageName(), 0).versionName;
+            String versionCode = packageManager.getPackageInfo(
+                    getPackageName(), 0).versionCode + "";
             versionName.setText(getResources()
-                    .getString(R.string.label_version) + " " + version);
+                    .getString(R.string.label_version) + " " + version + " (Build : " + versionCode + " )");
 
-            // setting link in textview
+            // setting link in textView
             aboutLine2 = (TextView) findViewById(R.id.line2);
             if (aboutLine2 != null) {
                 aboutLine2.setMovementMethod(LinkMovementMethod.getInstance());
@@ -115,14 +119,13 @@ public class About extends ActionBarActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 
-        handler = getWindow().getDecorView().getHandler();
-        if (r == null) {
-            r = new Runnable() {
+        if (runnable == null) {
+            runnable = new Runnable() {
                 public void run() {
                     click_count = 0;
                 }
             };
-            handler.postDelayed(r, 7000);
+            handler.postDelayed(runnable, 7000);
         }
         click_count = click_count + 1;
         if (click_count == 3) {

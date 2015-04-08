@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="label_accounts_settings">Odoo</string>
     <string name="label_login">Accept &amp; Login</string>
     <string name="label_your_self_hosted_url">Your self-hosted URL</string>
     <string name="label_username_or_email">Username or email</string>

@@ -206,7 +206,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         } catch (OdooSessionExpiredException odooSession) {
             app.setOdoo(null, user);
-            showSignInErrorNotification(user);
+            if (user.isOAauthLogin()) {
+                // FIXME: Saas not working with multi login. Facing issue of session expired.
+            } else {
+                showSignInErrorNotification(user);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
