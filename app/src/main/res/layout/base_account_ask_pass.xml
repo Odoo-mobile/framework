@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/userAvatar"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:layout_height="180dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="@dimen/default_16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txvUsername"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/theme_secondary_dark"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="@dimen/default_8dp"
+            android:fontFamily="@string/font_condensed"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/edtPassword"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:fontFamily="@string/font_light"
+            android:layout_width="match_parent"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:hint="@string/error_provide_password"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

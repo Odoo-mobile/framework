@@ -48,6 +48,7 @@ import android.widget.TextView;
 import com.odoo.core.account.AppIntro;
 import com.odoo.core.account.ManageAccounts;
 import com.odoo.core.account.OdooLogin;
+import com.odoo.core.account.OdooUserAskPassword;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
 import com.odoo.core.orm.OModel;
@@ -57,6 +58,7 @@ import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OFragmentUtils;
 import com.odoo.core.utils.OPreferenceManager;
@@ -361,15 +363,35 @@ public class OdooActivity extends ActionBarActivity {
                     @Override
                     public void onClick(View v) {
 
-                        // Logging in to other account
-                        OdooAccountManager.login(OdooActivity.this, user.getAndroidName());
-                        OModel.sqLite = null;
+                        OdooUserAskPassword.get(OdooActivity.this, user)
+                                .setOnUserPasswordValidateListener(
+                                        new OdooUserAskPassword.OnUserPasswordValidateListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                // Logging in to other account
+                                                OdooAccountManager.login(OdooActivity.this,
+                                                        user.getAndroidName());
+                                                OModel.sqLite = null;
 
-                        mAccountBoxExpanded = false;
-                        accountBoxToggle();
-                        mDrawerLayout.closeDrawer(Gravity.START);
-                        // Restarting activity
-                        restartActivity();
+                                                mAccountBoxExpanded = false;
+                                                accountBoxToggle();
+                                                mDrawerLayout.closeDrawer(Gravity.START);
+                                                // Restarting activity
+                                                restartActivity();
+                                            }
+
+                                            @Override
+                                            public void onCancel() {
+                                            }
+
+                                            @Override
+                                            public void onFail() {
+                                                OAlert.showError(OdooActivity.this,
+                                                        OResource.string(OdooActivity.this,
+                                                                R.string.error_invalid_password));
+                                            }
+                                        }).show();
+
                     }
                 });
                 mDrawerAccountContainer.addView(view);

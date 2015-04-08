@@ -41,18 +41,30 @@ public class OAlert {
     }
 
     public static void showAlert(Context context, String message) {
-        show(context, message, Type.Alert);
+        showAlert(context, message, null);
     }
 
     public static void showWarning(Context context, String message) {
-        show(context, message, Type.Warning);
+        showWarning(context, message, null);
     }
 
     public static void showError(Context context, String message) {
-        show(context, message, Type.Error);
+        showError(context, message, null);
     }
 
-    private static void show(Context context, String message, Type type) {
+    public static void showAlert(Context context, String message, OnAlertDismissListener listener) {
+        show(context, message, Type.Alert, listener);
+    }
+
+    public static void showWarning(Context context, String message, OnAlertDismissListener listener) {
+        show(context, message, Type.Warning, listener);
+    }
+
+    public static void showError(Context context, String message, OnAlertDismissListener listener) {
+        show(context, message, Type.Error, listener);
+    }
+
+    private static void show(Context context, String message, Type type, final OnAlertDismissListener listener) {
         AlertDialog.Builder mBuilder;
         mBuilder = new AlertDialog.Builder(context);
         switch (type) {
@@ -66,7 +78,15 @@ public class OAlert {
                 mBuilder.setTitle(R.string.label_warning);
         }
         mBuilder.setMessage(message);
-        mBuilder.setPositiveButton(R.string.label_ok, null);
+        mBuilder.setPositiveButton(R.string.label_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.onAlertDismiss();
+                }
+            }
+        });
         mBuilder.create().show();
     }
 
@@ -140,6 +160,10 @@ public class OAlert {
 
     public static interface OnAlertConfirmListener {
         public void onConfirmChoiceSelect(ConfirmType type);
+    }
+
+    public static interface OnAlertDismissListener {
+        public void onAlertDismiss();
     }
 
     public static interface OnUserInputListener {

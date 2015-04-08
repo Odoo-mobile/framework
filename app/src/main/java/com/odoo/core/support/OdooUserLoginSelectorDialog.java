@@ -30,12 +30,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.odoo.R;
+import com.odoo.core.account.OdooUserAskPassword;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.utils.BitmapUtils;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
-import com.odoo.R;
 
 import java.util.List;
 
@@ -49,6 +51,7 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
     private AlertDialog.Builder builder;
     private OUser mUser;
     private IUserLoginSelectListener mIUserLoginSelectListener = null;
+    private OdooUserAskPassword askPassword = null;
 
     public OdooUserLoginSelectorDialog(Context context) {
         mContext = context;
@@ -127,12 +130,37 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        OUser user = mAdapter.getItem(position);
-        if (mIUserLoginSelectListener != null) {
-            mIUserLoginSelectListener.onUserSelected(user);
-        }
+        final OUser user = mAdapter.getItem(position);
         dialog.dismiss();
+        if (mIUserLoginSelectListener != null) {
+            // Ask for password of account
+            askPassword = OdooUserAskPassword.get(mContext, user);
+            askPassword.setOnUserPasswordValidateListener(new OdooUserAskPassword.OnUserPasswordValidateListener() {
+                @Override
+                public void onSuccess() {
+                    mIUserLoginSelectListener.onUserSelected(user);
+                }
+
+                @Override
+                public void onCancel() {
+                    mIUserLoginSelectListener.onRequestAccountSelect();
+                }
+
+                @Override
+                public void onFail() {
+                    OAlert.showError(mContext, OResource.string(mContext,
+                            R.string.error_invalid_password), new OAlert.OnAlertDismissListener() {
+                        @Override
+                        public void onAlertDismiss() {
+                            onCancel();
+                        }
+                    });
+                }
+            });
+            askPassword.show();
+        }
     }
+
 
     public interface IUserLoginSelectListener {
         public void onUserSelected(OUser user);
@@ -140,5 +168,7 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
         public void onNewAccountRequest();
 
         public void onCancelSelect();
+
+        public void onRequestAccountSelect();
     }
 }

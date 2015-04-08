@@ -214,7 +214,7 @@
                 android:layout_marginTop="15dp"
                 android:background="@drawable/login_signup_button"
                 android:fontFamily="@string/font_light"
-                android:text="@string/label_login"
+                android:text="@string/label_accept_login"
                 android:textColor="#fff" />
 
             <TextView

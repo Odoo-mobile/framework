@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="label_accounts_settings">Odoo</string>
-    <string name="label_login">Accept &amp; Login</string>
+    <string name="label_login">Login</string>
+    <string name="label_accept_login">Accept &amp; Login</string>
     <string name="label_your_self_hosted_url">Your self-hosted URL</string>
+    <string name="label_username">Username</string>
     <string name="label_username_or_email">Username or email</string>
     <string name="label_password">Password</string>
     <string name="label_forgot_password">Forgot password?</string>
@@ -14,6 +16,7 @@
     <string name="untrusted_ssl_warning">The site\'s security certificate is not trusted !</string>
     <string name="error_invalid_odoo_url">Invalid Odoo URL !</string>
     <string name="error_invalid_username_or_password">Invalid Username or Password</string>
+    <string name="error_invalid_password">Invalid password</string>
     <string name="error_provide_username">Provide username</string>
     <string name="error_provide_password">Provide password</string>
     <string name="error_provide_server_url">Provide server URL</string>
