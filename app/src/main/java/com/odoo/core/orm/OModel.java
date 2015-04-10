@@ -38,6 +38,7 @@ import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.provider.BaseModelProvider;
+import com.odoo.core.service.ISyncServiceListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooFields;
@@ -63,6 +64,8 @@ import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -71,7 +74,7 @@ import java.util.Locale;
 import odoo.ODomain;
 import odoo.OdooVersion;
 
-public class OModel {
+public class OModel implements ISyncServiceListener {
 
     public static final String TAG = OModel.class.getSimpleName();
     public String BASE_AUTHORITY = "com.odoo.core.provider.content";
@@ -609,7 +612,17 @@ public class OModel {
         IrModel model = new IrModel(mContext, mUser);
         List<ODataRow> records = model.select(null, "model = ?", new String[]{getModelName()});
         if (records.size() > 0) {
-            return records.get(0).getString("last_synced");
+            String date = records.get(0).getString("last_synced");
+            Date write_date = ODateUtils.createDateObject(date, ODateUtils.DEFAULT_FORMAT, true);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(write_date);
+            /*
+                Fixed for Postgres SQL
+                It stores milliseconds so comparing date wrong. 
+             */
+            cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) + 2);
+            write_date = cal.getTime();
+            return ODateUtils.getDate(write_date, ODateUtils.DEFAULT_FORMAT);
         }
         return null;
     }
@@ -1069,8 +1082,8 @@ public class OModel {
     }
 
     public void exportDB() {
-        FileChannel source = null;
-        FileChannel destination = null;
+        FileChannel source;
+        FileChannel destination;
         String currentDBPath = getDatabaseLocalPath();
         String backupDBPath = OStorageUtils.getDirectoryPath("file")
                 + "/" + getDatabaseName();
@@ -1089,9 +1102,18 @@ public class OModel {
             intent.putExtra(Intent.EXTRA_SUBJECT, subject);
             intent.setType("message/rfc822");
             mContext.startActivity(intent);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onSyncStarted() {
+        // Will be over ride by extending model
+    }
+
+    @Override
+    public void onSyncFinished() {
+        // Will be over ride by extending model
     }
 }

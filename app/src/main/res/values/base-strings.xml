@@ -85,8 +85,8 @@
     <string name="label_our_apps">Our apps</string>
     <string name="label_attach_a_file"> + Attach a file</string>
     <!-- Toasts -->
-    <string name="developer_2_tap">Need 2 Tap For Developer Mode</string>
-    <string name="developer_5_tap">Developer Mode Activated</string>
+    <string name="developer_2_tap">Need 2 tap for developer mode</string>
+    <string name="developer_5_tap">Developer mode activated</string>
     <string name="toast_setting_saved">Setting saved.</string>
     <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
     <string name="toast_are_you_sure_delete_account">Are you sure want to delete account ?</string>
