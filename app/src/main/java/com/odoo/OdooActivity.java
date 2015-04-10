@@ -595,4 +595,8 @@ public class OdooActivity extends ActionBarActivity {
         return spinner;
     }
 
+    public void refreshDrawer() {
+        setupDrawerBox();
+    }
+
 }
