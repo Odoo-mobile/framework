@@ -82,6 +82,12 @@ public class JSONUtils {
         try {
             values = new JSONObject();
             for (OColumn col : model.getColumns(false)) {
+                if (col.getName().equals("id") && row.getInt("id") == 0) {
+                    /* FIXME: 7.0 not supporting
+                    Response from server : column "id" specified more than once
+                     */
+                    continue;
+                }
                 if (col.getRelationType() == null) {
                     if (!col.getName().equals("create_date") || !col.getName().equals("write_date")) {
                         Object val = row.get(col.getName());
@@ -122,7 +128,7 @@ public class JSONUtils {
                             JSONArray m2mRecords = new JSONArray();
                             List<ODataRow> m2mRecordList = row.getM2MRecord(
                                     col.getName()).browseEach();
-                            if (m2mRecordList.size() > 0) {
+                            if (!m2mRecordList.isEmpty()) {
                                 JSONArray rec_ids = new JSONArray();
                                 for (ODataRow o2mR : m2mRecordList) {
                                     if (o2mR.getInt("id") != 0)

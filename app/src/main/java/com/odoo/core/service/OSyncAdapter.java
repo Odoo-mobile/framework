@@ -41,6 +41,7 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 
 import org.json.JSONArray;
@@ -136,6 +137,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     private void syncData(OModel model, OUser user, ODomain domain_filter,
                           SyncResult result, Boolean checkForDataLimit, Boolean createRelationRecords) {
         Log.v(TAG, "Sync for (" + model.getModelName() + ") Started at " + ODateUtils.getDate());
+        model.onSyncStarted();
         try {
             ODomain domain = new ODomain();
             domain.append(model.defaultDomain());
@@ -178,7 +180,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             // Updating records on server if local are latest updated.
             // if model allowed update record to server
             if (model.allowUpdateRecordOnServer()) {
-                dataUtils.updateRecordsOnServer();
+                dataUtils.updateRecordsOnServer(this);
             }
 
             // Creating or updating relation records
@@ -204,6 +206,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 IrModel irModel = new IrModel(mContext, user);
                 irModel.setLastSyncDateTimeToNow(model);
             }
+            model.onSyncFinished();
         } catch (OdooSessionExpiredException odooSession) {
             app.setOdoo(null, user);
             if (user.isOAauthLogin()) {
@@ -243,7 +246,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         builder.withRingTone(false);
         builder.setOngoing(true);
         builder.withLargeIcon(false);
-        builder.setColor(R.color.android_orange_dark);
+        builder.setColor(OResource.color(mContext, R.color.android_orange_dark));
         Bundle extra = user.getAsBundle();
         // Actions
         ONotificationBuilder.NotificationAction actionReset = new ONotificationBuilder.NotificationAction(
@@ -347,7 +350,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         return fields;
     }
 
-
     /**
      * Creates locally created record on server (id with zero)
      *
@@ -358,21 +360,96 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 "(id = ? or id = ?)", new String[]{"0", "false"});
         int counter = 0;
         for (ODataRow record : records) {
-            int id = createOnServer(model, JSONUtils.createJSONValues(model, record));
-            if (id != OModel.INVALID_ROW_ID) {
-                OValues values = new OValues();
-                values.put("id", id);
-                values.put("_is_dirty", "false");
-                values.put("_write_date", ODateUtils.getUTCDate());
-                model.update(record.getInt(OColumn.ROW_ID), values);
-                counter++;
-            } else {
-                Log.e(TAG, "Unable to create record on server.");
+            if (validateRelationRecords(model, record)) {
+                /*
+                 Need to check server id for record.
+                 It is possible that record created on server by validating main record.
+                 */
+                if (model.selectServerId(record.getInt(OColumn.ROW_ID)) == 0) {
+                    int id = createOnServer(model, JSONUtils.createJSONValues(model, record));
+                    if (id != OModel.INVALID_ROW_ID) {
+                        OValues values = new OValues();
+                        values.put("id", id);
+                        values.put("_is_dirty", "false");
+                        values.put("_write_date", ODateUtils.getUTCDate());
+                        model.update(record.getInt(OColumn.ROW_ID), values);
+                        counter++;
+                    } else {
+                        Log.e(TAG, "Unable to create record on server.");
+                    }
+                }
             }
         }
         if (counter == records.size()) {
             Log.i(TAG, counter + " records created on server.");
         }
+    }
+
+    /**
+     * Validate relation record for the record. And if relation record not created on server.
+     * It will be created on server before syncing original record
+     *
+     * @param model
+     * @param row
+     * @return updatedRow
+     */
+    public boolean validateRelationRecords(OModel model, ODataRow row) {
+        Log.d(TAG, "Validating relation records for record");
+        // Check for relation local record
+        for (OColumn column : model.getRelationColumns()) {
+            OModel relModel = model.createInstance(column.getType());
+            switch (column.getRelationType()) {
+                case ManyToOne:
+                    if (!row.getString(column.getName()).equals("false")) {
+                        ODataRow m2oRec = row.getM2ORecord(column.getName()).browse();
+                        if (m2oRec.getInt("id") == 0) {
+                            int new_id = relModel.getServerDataHelper().createOnServer(
+                                    JSONUtils.createJSONValues(relModel, m2oRec));
+                            updateRecordServerId(relModel, m2oRec.getInt(OColumn.ROW_ID), new_id);
+                        }
+                    }
+                    break;
+                case ManyToMany:
+                    List<ODataRow> m2mRecs = row.getM2MRecord(column.getName()).browseEach();
+                    if (!m2mRecs.isEmpty()) {
+                        for (ODataRow m2mRec : m2mRecs) {
+                            if (m2mRec.getInt("id") == 0) {
+                                int new_id = relModel.getServerDataHelper().createOnServer(
+                                        JSONUtils.createJSONValues(relModel, m2mRec));
+                                updateRecordServerId(relModel, m2mRec.getInt(OColumn.ROW_ID), new_id);
+                            }
+                        }
+                    }
+                    break;
+                case OneToMany:
+                    List<ODataRow> o2mRecs = row.getM2MRecord(column.getName()).browseEach();
+                    if (!o2mRecs.isEmpty()) {
+                        for (ODataRow o2mRec : o2mRecs) {
+                            if (o2mRec.getInt("id") == 0) {
+                                int new_id = relModel.getServerDataHelper().createOnServer(
+                                        JSONUtils.createJSONValues(relModel, o2mRec));
+                                updateRecordServerId(relModel, o2mRec.getInt(OColumn.ROW_ID), new_id);
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Updating local record with server id
+     *
+     * @param model
+     * @param row_id
+     * @param server_id
+     */
+    private void updateRecordServerId(OModel model, int row_id, int server_id) {
+        OValues values = new OValues();
+        values.put("id", server_id);
+        values.put("_is_dirty", "false");
+        model.update(row_id, values);
     }
 
     private int createOnServer(OModel model, JSONObject values) {

@@ -31,6 +31,9 @@ import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class IrModel extends OModel {
     public static final String TAG = IrModel.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.core.provider.content.sync.ir_model";
@@ -64,7 +67,16 @@ public class IrModel extends OModel {
         Log.i(TAG, "Model Sync Update : " + model.getModelName());
         OValues values = new OValues();
         values.put("model", model.getModelName());
-        values.put("last_synced", ODateUtils.getUTCDate());
+        Date last_sync = ODateUtils.createDateObject(ODateUtils.getUTCDate(), ODateUtils.DEFAULT_FORMAT, true);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(last_sync);
+        /*
+                Fixed for Postgres SQL
+                It stores milliseconds so comparing date wrong.
+             */
+        cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) + 2);
+        last_sync = cal.getTime();
+        values.put("last_synced", ODateUtils.getDate(last_sync, ODateUtils.DEFAULT_FORMAT));
         insertOrUpdate("model = ?", new String[]{model.getModelName()}, values);
     }
 }
