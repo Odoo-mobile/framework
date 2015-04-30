@@ -30,11 +30,9 @@ import com.odoo.core.support.OUser;
 public class SyncUtils {
     public static final String TAG = SyncUtils.class.getSimpleName();
 
-    private Context mContext;
     private OUser mUser;
 
     public SyncUtils(Context context, OUser user) {
-        mContext = context;
         mUser = (user != null) ? user : OUser.current(context);
     }
 

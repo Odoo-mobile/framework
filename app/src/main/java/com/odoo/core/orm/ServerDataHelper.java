@@ -25,17 +25,18 @@ import com.odoo.App;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooFields;
-import com.odoo.core.utils.JSONUtils;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.odoo.core.utils.OdooRecordUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import odoo.OArguments;
-import odoo.ODomain;
 import odoo.Odoo;
+import odoo.helper.OArguments;
+import odoo.helper.ODomain;
+import odoo.helper.ORecordValues;
+import odoo.helper.utils.gson.OdooRecord;
+import odoo.helper.utils.gson.OdooResult;
 
 public class ServerDataHelper {
     public static final String TAG = ServerDataHelper.class.getSimpleName();
@@ -55,45 +56,39 @@ public class ServerDataHelper {
 
     public List<ODataRow> nameSearch(String name, ODomain domain, int limit) {
         List<ODataRow> items = new ArrayList<>();
-        try {
-            if (mApp.inNetwork()) {
-                JSONObject kwargs = new JSONObject();
-                kwargs.put("name", name);
-                kwargs.put("args", domain.getArray());
-                kwargs.put("operator", "ilike");
-                JSONArray records = (JSONArray) callMethod("name_search", new OArguments(),
-                        null, kwargs);
-                if (records.length() > 0) {
-                    for (int i = 0; i < records.length(); i++) {
-                        ODataRow row = new ODataRow();
-                        JSONArray record = records.getJSONArray(i);
-                        row.put("id", record.get(0));
-                        row.put(mModel.getDefaultNameColumn(), record.get(1));
-                        items.add(row);
-                    }
+        if (mApp.inNetwork()) {
+            OdooResult result = mOdoo.nameSearch(mModel.getModelName(), name, domain, limit);
+            if (!result.getRecords().isEmpty()) {
+                for (OdooRecord record : result.getRecords()) {
+                    // FIXME : What response i'll get. I DON'T KNOW YET
+                        /*ODataRow row = new ODataRow();
+                        row.put("id", record.getInt("id"));
+                        row.put(mModel.getDefaultNameColumn(), record.getString("name"));
+                        items.add(row); */
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return items;
     }
 
+    public OdooRecord read(odoo.helper.OdooFields fields, int id) {
+        if (mApp.inNetwork()) {
+            OdooResult result = mOdoo.read(mModel.getModelName(), id, fields);
+            List<OdooRecord> records = result.getArray("result");
+            return records.get(0);
+        }
+        return null;
+    }
+
     public List<ODataRow> searchRecords(OdooFields fields, ODomain domain, int limit) {
         List<ODataRow> items = new ArrayList<>();
-        try {
-            if (mApp.inNetwork()) {
-                JSONObject result = mOdoo.search_read(mModel.getModelName(),
-                        fields.get(), domain.get(), 0, limit, null, null);
-                JSONArray records = result.getJSONArray("records");
-                if (records.length() > 0) {
-                    for (int i = 0; i < records.length(); i++) {
-                        items.add(JSONUtils.toDataRow(records.getJSONObject(i)));
-                    }
+        if (mApp.inNetwork()) {
+            OdooResult result = mOdoo.searchRead(mModel.getModelName(), fields, domain, 0, limit, null);
+            if (!result.getRecords().isEmpty()) {
+                for (OdooRecord record : result.getRecords()) {
+                    items.add(OdooRecordUtils.toDataRow(record));
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return items;
     }
@@ -102,66 +97,43 @@ public class ServerDataHelper {
         return mOdoo;
     }
 
-    public Object executeWorkFlow(int server_id, String signal) {
-        try {
-            return mOdoo.exec_workflow(mModel.getModelName(), server_id, signal);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public OdooResult executeWorkFlow(int server_id, String signal) {
+        return mOdoo.executeWorkFlow(mModel.getModelName(), server_id, signal);
     }
 
     public Object callMethod(String method, OArguments args) {
         return callMethod(method, args, null, null);
     }
 
-    public Object callMethod(String method, OArguments args, JSONObject context) {
+    public Object callMethod(String method, OArguments args, HashMap<String, Object> context) {
         return callMethod(mModel.getModelName(), method, args, context, null);
     }
 
     public Object callMethod(String method, OArguments args,
-                             JSONObject context, JSONObject kwargs) {
+                             HashMap<String, Object> context, HashMap<String, Object> kwargs) {
         return callMethod(mModel.getModelName(), method, args, context, kwargs);
     }
 
     public Object callMethod(String model, String method, OArguments args,
-                             JSONObject context, JSONObject kwargs) {
-        try {
-            if (kwargs == null)
-                kwargs = new JSONObject();
-            if (context != null) {
-                args.add(mOdoo.updateContext(context));
-            }
-            JSONObject result = mOdoo.call_kw(model, method, args.getArray(),
-                    kwargs);
-            if (result.has("result")) {
-                return result.get("result");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+                             HashMap<String, Object> context, HashMap<String, Object> kwargs) {
+        if (context != null) {
+            args.add(mOdoo.updateContext(context));
+        }
+        OdooResult result = mOdoo.callMethod(model, method, args, kwargs, context);
+        if (result.has("result")) {
+            return result.get("result");
         }
         return false;
     }
 
 
-    public int createOnServer(JSONObject data) {
-        try {
-            JSONObject result = mOdoo.createNew(mModel.getModelName(), data);
-            return result.getInt("result");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return OModel.INVALID_ROW_ID;
+    public int createOnServer(ORecordValues data) {
+        OdooResult result = mOdoo.createRecord(mModel.getModelName(), data);
+        return result.getInt("result");
     }
 
-    public int updateOnServer(JSONObject data, Integer id) {
-        try {
-            if (mOdoo.updateValues(mModel.getModelName(), data, id)) {
-                return mModel.selectRowId(id);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return OModel.INVALID_ROW_ID;
+    public int updateOnServer(ORecordValues data, Integer id) {
+        mOdoo.updateRecord(mModel.getModelName(), data, id);
+        return mModel.selectRowId(id);
     }
 }

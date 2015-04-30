@@ -38,23 +38,22 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
-import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.core.utils.notification.ONotificationBuilder;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import odoo.ODomain;
 import odoo.Odoo;
-import odoo.OdooInstance;
-import odoo.OdooSessionExpiredException;
+import odoo.helper.ODomain;
+import odoo.helper.ORecordValues;
+import odoo.helper.OdooFields;
+import odoo.helper.utils.gson.OdooRecord;
+import odoo.helper.utils.gson.OdooResult;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
@@ -120,7 +119,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "User        : " + mModel.getUser().getAndroidName());
         Log.i(TAG, "Model       : " + mModel.getModelName());
         Log.i(TAG, "Database    : " + mModel.getDatabaseName());
-        Log.i(TAG, "Odoo Version: " + mUser.getVersion_number());
+        Log.i(TAG, "Odoo Version: " + mUser.getOdooVersion().getServerSerie());
         // Calling service callback
         if (mService != null)
             mService.performDataSync(this, extras, mUser);
@@ -132,7 +131,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         // Ready for sync data from server
         syncData(mModel, mUser, domain, syncResult, true, true);
     }
-
 
     private void syncData(OModel model, OUser user, ODomain domain_filter,
                           SyncResult result, Boolean checkForDataLimit, Boolean createRelationRecords) {
@@ -161,7 +159,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     int data_limit = preferenceManager.getInt("sync_data_limit", 60);
                     domain.add("create_date", ">=", ODateUtils.getDateBefore(data_limit));
                     if (serverIds.size() > 0) {
-                        domain.add("id", "not in", new JSONArray(serverIds.toString()));
+                        domain.add("id", "not in", serverIds);
                     }
                 }
                 // Model write date domain filters
@@ -173,8 +171,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
             // Getting data
-            JSONObject response = mOdoo.search_read(model.getModelName(),
-                    getFields(model), domain.get(), 0, mSyncDataLimit, "create_date", "DESC");
+            OdooResult response = mOdoo.searchRead(model.getModelName(), getFields(model)
+                    , domain, 0, mSyncDataLimit, "create_date DESC");
+            Log.v(TAG, "Processing " + response.getRecords().size() + " records");
             OSyncDataUtils dataUtils = new OSyncDataUtils(mContext, mOdoo, model, user, response,
                     result, createRelationRecords);
             // Updating records on server if local are latest updated.
@@ -207,14 +206,14 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 irModel.setLastSyncDateTimeToNow(model);
             }
             model.onSyncFinished();
-        } catch (OdooSessionExpiredException odooSession) {
+        } /*catch (OdooSessionExpiredException odooSession) {
             app.setOdoo(null, user);
-            if (user.isOAauthLogin()) {
+            if (user.isOAuthLogin()) {
                 // FIXME: Saas not working with multi login. Facing issue of session expired.
             } else {
                 showSignInErrorNotification(user);
             }
-        } catch (Exception e) {
+        } */ catch (Exception e) {
             e.printStackTrace();
         }
         // Performing next sync if any in service
@@ -234,6 +233,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         model.close();
     }
 
+    //FIXME:
     private void showSignInErrorNotification(OUser user) {
         ONotificationBuilder builder = new ONotificationBuilder(mContext,
                 REQUEST_SIGN_IN_ERROR);
@@ -305,48 +305,30 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    public static Odoo createOdooInstance(Context context, OUser user) {
-        try {
-            App app = (App) context.getApplicationContext();
-            Odoo odoo = app.getOdoo(user);
-            if (odoo == null) {
-                if (user.isOAauthLogin()) {
-                    odoo = new Odoo(context, user.getInstanceUrl(), user.isAllowSelfSignedSSL());
-                    OdooInstance instance = new OdooInstance();
-                    instance.setInstanceUrl(user.getInstanceUrl());
-                    instance.setDatabaseName(user.getInstanceDatabase());
-                    instance.setClientId(user.getClientId());
-                    odoo.oauth_authenticate(instance, user.getUsername(), user.getPassword());
-                } else {
-                    odoo = new Odoo(context, user.getHost(), user.isAllowSelfSignedSSL());
-                    odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
-                }
-                app.setOdoo(odoo, user);
-
-                ResCompany company = new ResCompany(context, user);
-                if (company.count("id = ? ", new String[]{user.getCompany_id()}) <= 0) {
-                    ODataRow company_details = new ODataRow();
-                    company_details.put("id", user.getCompany_id());
-                    company.quickCreateRecord(company_details);
-                }
-
+    public static Odoo createOdooInstance(final Context context, final OUser user) {
+        final App app = (App) context.getApplicationContext();
+        Odoo odoo = app.getOdoo(user);
+        if (odoo == null) {
+            odoo = Odoo.createInstance(context, user.getHost());
+            odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+            app.setOdoo(odoo, user);
+            ResCompany company = new ResCompany(context, user);
+            if (company.count("id = ? ", new String[]{user.getCompanyId() + ""}) <= 0) {
+                ODataRow company_details = new ODataRow();
+                company_details.put("id", user.getCompanyId());
+                company.quickCreateRecord(company_details);
             }
-            return odoo;
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return null;
+        return odoo;
     }
 
-    private JSONObject getFields(OModel model) {
-        JSONObject fields = new JSONObject();
-        try {
-            for (OColumn column : model.getColumns(false)) {
-                fields.accumulate("fields", column.getName());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    private OdooFields getFields(OModel model) {
+        OdooFields fields = new OdooFields();
+        List<String> names = new ArrayList<>();
+        for (OColumn column : model.getColumns(false)) {
+            names.add(column.getSyncColumn());
         }
+        fields.addAll(names.toArray(new String[names.size()]));
         return fields;
     }
 
@@ -366,7 +348,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                  It is possible that record created on server by validating main record.
                  */
                 if (model.selectServerId(record.getInt(OColumn.ROW_ID)) == 0) {
-                    int id = createOnServer(model, JSONUtils.createJSONValues(model, record));
+                    int id = createOnServer(model, OdooRecordUtils.createRecordValues(model, record));
                     if (id != OModel.INVALID_ROW_ID) {
                         OValues values = new OValues();
                         values.put("id", id);
@@ -404,7 +386,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         ODataRow m2oRec = row.getM2ORecord(column.getName()).browse();
                         if (m2oRec.getInt("id") == 0) {
                             int new_id = relModel.getServerDataHelper().createOnServer(
-                                    JSONUtils.createJSONValues(relModel, m2oRec));
+                                    OdooRecordUtils.createRecordValues(relModel, m2oRec));
                             updateRecordServerId(relModel, m2oRec.getInt(OColumn.ROW_ID), new_id);
                         }
                     }
@@ -415,7 +397,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         for (ODataRow m2mRec : m2mRecs) {
                             if (m2mRec.getInt("id") == 0) {
                                 int new_id = relModel.getServerDataHelper().createOnServer(
-                                        JSONUtils.createJSONValues(relModel, m2mRec));
+                                        OdooRecordUtils.createRecordValues(relModel, m2mRec));
                                 updateRecordServerId(relModel, m2mRec.getInt(OColumn.ROW_ID), new_id);
                             }
                         }
@@ -427,7 +409,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         for (ODataRow o2mRec : o2mRecs) {
                             if (o2mRec.getInt("id") == 0) {
                                 int new_id = relModel.getServerDataHelper().createOnServer(
-                                        JSONUtils.createJSONValues(relModel, o2mRec));
+                                        OdooRecordUtils.createRecordValues(relModel, o2mRec));
                                 updateRecordServerId(relModel, o2mRec.getInt(OColumn.ROW_ID), new_id);
                             }
                         }
@@ -452,12 +434,12 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         model.update(row_id, values);
     }
 
-    private int createOnServer(OModel model, JSONObject values) {
+    private int createOnServer(OModel model, ORecordValues values) {
         int id = OModel.INVALID_ROW_ID;
         try {
             if (values != null) {
-                JSONObject response = mOdoo.createNew(model.getModelName(), values);
-                id = response.getInt("result");
+                OdooResult result = mOdoo.createRecord(model.getModelName(), values);
+                id = result.getInt("result");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -490,7 +472,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private boolean removeRecordsFromServer(OModel model, List<Integer> serverIds) {
         try {
-            mOdoo.unlink(model.getModelName(), serverIds);
+            mOdoo.unlinkRecord(model.getModelName(), serverIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -507,13 +489,13 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         List<Integer> ids = model.getServerIds();
         try {
             ODomain domain = new ODomain();
-            domain.add("id", "in", new JSONArray(ids.toString()));
-            JSONObject result = mOdoo.search_read(model.getModelName(),
-                    new JSONObject(), domain.get());
-            JSONArray records = result.getJSONArray("records");
-            if (records.length() > 0) {
-                for (int i = 0; i < records.length(); i++) {
-                    JSONObject record = records.getJSONObject(i);
+            domain.add("id", "in", ids);
+            OdooFields fields = new OdooFields();
+            fields.addAll(new String[]{"id"});
+            OdooResult result = mOdoo.searchRead(model.getModelName(), fields, domain, 0, 0, null);
+            List<OdooRecord> records = result.getRecords();
+            if (!records.isEmpty()) {
+                for (OdooRecord record : records) {
                     ids.remove(ids.indexOf(record.getInt("id")));
                 }
             }

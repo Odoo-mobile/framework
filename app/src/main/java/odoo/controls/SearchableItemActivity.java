@@ -35,20 +35,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.odoo.R;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.support.OdooFields;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.ODomain;
 
 public class SearchableItemActivity extends ActionBarActivity implements
         AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener,
@@ -230,17 +228,17 @@ public class SearchableItemActivity extends ActionBarActivity implements
         protected List<ODataRow> doInBackground(String... params) {
             try {
                 ServerDataHelper helper = mRelModel.getServerDataHelper();
-                ODomain domain = new ODomain();
-                domain.add(mRelModel.getDefaultNameColumn(), "ilike", params[0]);
-                if (mCol != null) {
-                    for (String key : mCol.getDomains().keySet()) {
-                        OColumn.ColumnDomain dom = mCol.getDomains().get(key);
-                        domain.add(dom.getColumn(), dom.getOperator(),
-                                dom.getValue());
-                    }
-                }
-                OdooFields fields = new OdooFields(mRelModel.getColumns());
-                return helper.searchRecords(fields, domain, 10);
+//                ODomain domain = new ODomain();
+//                domain.add(mRelModel.getDefaultNameColumn(), "ilike", params[0]);
+//                if (mCol != null) {
+//                    for (String key : mCol.getDomains().keySet()) {
+//                        OColumn.ColumnDomain dom = mCol.getDomains().get(key);
+//                        domain.add(dom.getColumn(), dom.getOperator(),
+//                                dom.getValue());
+//                    }
+//                }
+//                OdooFields fields = new OdooFields(mRelModel.getColumns());
+//                return helper.searchRecords(fields, domain, 10);
             } catch (Exception e) {
                 e.printStackTrace();
             }

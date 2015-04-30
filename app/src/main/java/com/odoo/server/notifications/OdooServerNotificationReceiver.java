@@ -24,9 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.odoo.core.utils.notification.ONotificationBuilder;
-
-import odoo.OdooServerNotification;
+//import odoo.OdooServerNotification;
 
 public class OdooServerNotificationReceiver extends BroadcastReceiver {
     public static final String TAG = OdooServerNotificationReceiver.class.getSimpleName();
@@ -34,11 +32,11 @@ public class OdooServerNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle data = intent.getExtras();
-        int message_id = Integer.parseInt(data.getString(OdooServerNotification.KEY_MESSAGE_ID));
-        ONotificationBuilder builder = new ONotificationBuilder(context,
-                message_id);
-        builder.setTitle(data.getString(OdooServerNotification.KEY_MESSAGE_AUTHOR_NAME));
-        builder.setBigText(data.getString(OdooServerNotification.KEY_MESSAGE_BODY));
-        builder.build().show();
+//        int message_id = Integer.parseInt(data.getString(OdooServerNotification.KEY_MESSAGE_ID));
+//        ONotificationBuilder builder = new ONotificationBuilder(context,
+//                message_id);
+//        builder.setTitle(data.getString(OdooServerNotification.KEY_MESSAGE_AUTHOR_NAME));
+//        builder.setBigText(data.getString(OdooServerNotification.KEY_MESSAGE_BODY));
+//        builder.build().show();
     }
 }

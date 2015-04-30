@@ -44,7 +44,8 @@ import java.util.List;
 
 import odoo.controls.ExpandableListControl;
 
-public class ManageAccounts extends ActionBarActivity implements View.OnClickListener, ExpandableListControl.ExpandableListAdapterGetViewListener {
+public class ManageAccounts extends ActionBarActivity implements View.OnClickListener,
+        ExpandableListControl.ExpandableListAdapterGetViewListener {
 
     private List<Object> accounts = new ArrayList<>();
     private ExpandableListControl mList = null;
@@ -66,14 +67,14 @@ public class ManageAccounts extends ActionBarActivity implements View.OnClickLis
 
     private void generateView(View view, OUser user) {
         OControls.setText(view, R.id.accountName, user.getName());
-        OControls.setText(view, R.id.accountURL, (user.isOAauthLogin()) ? user.getInstanceUrl() : user.getHost());
+        OControls.setText(view, R.id.accountURL, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
         OControls.setImage(view, R.id.profile_image, R.drawable.avatar);
         if (!user.getAvatar().equals("false")) {
             Bitmap bmp = BitmapUtils.getBitmapImage(this, user.getAvatar());
             if (bmp != null)
                 OControls.setImage(view, R.id.profile_image, bmp);
         }
-        if (user.isIsactive()) {
+        if (user.isActive()) {
             OControls.setVisible(view, R.id.btnLogout);
             OControls.setGone(view, R.id.btnLogin);
         } else {

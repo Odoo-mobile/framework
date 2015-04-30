@@ -30,10 +30,11 @@ import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import odoo.helper.ODomain;
+import odoo.helper.ORecordValues;
+import odoo.helper.OdooFields;
+import odoo.helper.utils.gson.OdooRecord;
 
-import odoo.ODomain;
 
 public class IrAttachment extends OModel {
     public static final String TAG = IrAttachment.class.getSimpleName();
@@ -63,7 +64,7 @@ public class IrAttachment extends OModel {
         values.put("datas_fname", value.getString("name"));
         values.put("file_size", value.get("file_size"));
         values.put("file_type", value.get("file_type"));
-        values.put("company_id", getUser().getCompany_id());
+        values.put("company_id", getUser().getCompanyId());
         values.put("res_id", res_id);
         values.put("res_model", rel_model);
         values.put("file_uri", value.getString("file_uri"));
@@ -73,39 +74,27 @@ public class IrAttachment extends OModel {
         return true;
     }
 
-    public static JSONObject valuesToData(OModel model, OValues value) {
-        JSONObject data = new JSONObject();
-        try {
-            data.put("name", value.get("name"));
-            data.put("db_datas", value.getString("datas"));
-            data.put("datas_fname", value.get("name"));
-            data.put("file_size", value.get("file_size"));
-            data.put("res_model", false);
-            data.put("res_id", false);
-            data.put("file_type", value.get("file_type"));
-            data.put("company_id", model.getUser().getCompany_id());
-            return data;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static ORecordValues valuesToData(OModel model, OValues value) {
+        ORecordValues data = new ORecordValues();
+        data.put("name", value.get("name"));
+        data.put("db_datas", value.getString("datas"));
+        data.put("datas_fname", value.get("name"));
+        data.put("file_size", value.get("file_size"));
+        data.put("res_model", false);
+        data.put("res_id", false);
+        data.put("file_type", value.get("file_type"));
+        data.put("company_id", model.getUser().getCompanyId());
+        return data;
     }
 
     public String getDatasFromServer(Integer row_id) {
-        try {
-            ODomain domain = new ODomain();
-            domain.add("id", "=", selectServerId(row_id));
-            JSONObject fields = new JSONObject();
-            fields.accumulate("fields", "datas");
-            JSONObject result = getServerDataHelper().getOdoo().search_read(getModelName(), fields,
-                    domain.get());
-            if (result.getJSONArray("records").length() > 0) {
-                JSONObject row = result.getJSONArray("records")
-                        .getJSONObject(0);
-                return row.getString("datas");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        ODomain domain = new ODomain();
+        domain.add("id", "=", selectServerId(row_id));
+        OdooFields fields = new OdooFields();
+        fields.addAll(new String[]{"datas"});
+        OdooRecord result = getServerDataHelper().read(fields, selectServerId(row_id));
+        if (result != null) {
+            return result.getString("datas");
         }
         return "false";
     }

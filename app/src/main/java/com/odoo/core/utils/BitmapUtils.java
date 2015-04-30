@@ -132,13 +132,14 @@ public class BitmapUtils {
         Rect mBounds = new Rect();
         canvas.setBitmap(bitmap);
         canvas.drawColor(OStringColorUtil.getStringColor(context, content));
-        if (content != null) {
-            char[] alphabet = {Character.toUpperCase(content.charAt(0))};
-            mPaint.setTextSize(textSize);
-            mPaint.getTextBounds(alphabet, 0, 1, mBounds);
-            canvas.drawText(alphabet, 0, 1, 0 + width / 2,
-                    0 + height / 2 + (mBounds.bottom - mBounds.top) / 2, mPaint);
+        if (content == null || content.trim().length() == 0) {
+            content = "?";
         }
+        char[] alphabet = {Character.toUpperCase(content.trim().charAt(0))};
+        mPaint.setTextSize(textSize);
+        mPaint.getTextBounds(alphabet, 0, 1, mBounds);
+        canvas.drawText(alphabet, 0, 1, 0 + width / 2,
+                0 + height / 2 + (mBounds.bottom - mBounds.top) / 2, mPaint);
         return bitmap;
     }
 }

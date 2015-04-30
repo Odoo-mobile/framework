@@ -69,9 +69,9 @@ public class Profile extends ActionBarActivity implements View.OnClickListener {
         ODataRow userData = new ODataRow();
         userData.put("name", user.getName());
         userData.put("user_login", user.getUsername());
-        userData.put("server_url", (user.isOAauthLogin()) ? user.getInstanceUrl() : user.getHost());
-        userData.put("database", (user.isOAauthLogin()) ? user.getInstanceDatabase() : user.getDatabase());
-        userData.put("version", user.getVersion_serie());
+        userData.put("server_url", (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
+        userData.put("database", (user.isOAuthLogin()) ? user.getInstanceDatabase() : user.getDatabase());
+        userData.put("version", user.getOdooVersion().getServerSerie());
         userData.put("timezone", user.getTimezone());
         form.initForm(userData);
         title.setText(userData.getString("name"));

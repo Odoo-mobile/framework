@@ -32,16 +32,17 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import com.odoo.R;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
-import com.odoo.R;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OdooInstance;
+import odoo.helper.OdooInstance;
+
 
 public class OdooInstancesSelectorDialog implements AdapterView.OnItemClickListener {
     private Context mContext;
@@ -51,12 +52,10 @@ public class OdooInstancesSelectorDialog implements AdapterView.OnItemClickListe
     private AlertDialog dialog;
     private AlertDialog.Builder builder;
     private OnInstanceSelectListener mOnInstanceSelectListener = null;
-    private OUser mUser;
     private List<ImageLoader> imageLoaderLists = new ArrayList<>();
 
-    public OdooInstancesSelectorDialog(Context context, OUser user) {
+    public OdooInstancesSelectorDialog(Context context) {
         mContext = context;
-        mUser = user;
         AbsListView.LayoutParams params = new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
                 AbsListView.LayoutParams.WRAP_CONTENT);
         mGrid = new ExpandableHeightGridView(mContext);
@@ -84,9 +83,9 @@ public class OdooInstancesSelectorDialog implements AdapterView.OnItemClickListe
     }
 
     private void generateView(int position, View view, OdooInstance instance) {
-        OControls.setText(view, R.id.txvInstanceUrl, instance.getInstanceUrl());
+        OControls.setText(view, R.id.txvInstanceUrl, instance.getUrl());
         OControls.setText(view, R.id.txvInstanceName, instance.getCompanyName());
-        String imageURL = instance.getInstanceUrl() + "/web/binary/company_logo?dbname=" + instance.getDatabaseName();
+        String imageURL = instance.getUrl() + "/web/binary/company_logo?dbname=" + instance.getDbName();
         ImageLoader imageLoader = new ImageLoader(position, imageURL, R.id.imgInstance);
         imageLoaderLists.add(imageLoader);
         imageLoader.execute();
@@ -123,7 +122,7 @@ public class OdooInstancesSelectorDialog implements AdapterView.OnItemClickListe
             for (ImageLoader imageLoader : imageLoaderLists) {
                 imageLoader.cancel(true);
             }
-            mOnInstanceSelectListener.instanceSelected(instance, mUser);
+            mOnInstanceSelectListener.instanceSelected(instance);
         }
     }
 
@@ -132,7 +131,7 @@ public class OdooInstancesSelectorDialog implements AdapterView.OnItemClickListe
     }
 
     public interface OnInstanceSelectListener {
-        public void instanceSelected(OdooInstance instance, OUser user);
+        public void instanceSelected(OdooInstance instance);
 
         public void canceledInstanceSelect();
     }

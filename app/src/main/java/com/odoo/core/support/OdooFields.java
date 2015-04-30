@@ -21,14 +21,10 @@ package com.odoo.core.support;
 
 import com.odoo.core.orm.fields.OColumn;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class OdooFields {
-
-    private JSONObject jFields = new JSONObject();
+public class OdooFields extends odoo.helper.OdooFields {
 
     public OdooFields(List<OColumn> columns) {
         List<String> fields = new ArrayList<>();
@@ -44,22 +40,5 @@ public class OdooFields {
 
     public OdooFields(String[] fields) {
         addAll(fields);
-    }
-
-    public void addAll(String[] fields) {
-        try {
-            for (String field : fields) {
-                jFields.accumulate("fields", field);
-            }
-            if (fields.length == 1) {
-                jFields.accumulate("fields", fields[0]);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public JSONObject get() {
-        return jFields;
     }
 }

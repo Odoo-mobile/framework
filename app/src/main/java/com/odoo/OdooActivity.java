@@ -92,7 +92,6 @@ public class OdooActivity extends ActionBarActivity {
     private LinearLayout mDrawerItemContainer = null;
     private Boolean mAccountBoxExpanded = false;
     private Bundle mSavedInstanceState = null;
-    private Spinner spinner_nav = null;
     private Integer mDrawerSelectedIndex = -1;
     private Boolean mHasActionBarSpinner = false;
 
@@ -254,7 +253,7 @@ public class OdooActivity extends ActionBarActivity {
         TextView url = (TextView) chosenAccountView.findViewById(R.id.profile_url_text);
 
         name.setText(currentUser.getName());
-        url.setText((currentUser.isOAauthLogin()) ? currentUser.getInstanceUrl() : currentUser.getHost());
+        url.setText((currentUser.isOAuthLogin()) ? currentUser.getInstanceURL() : currentUser.getHost());
 
         if (!currentUser.getAvatar().equals("false")) {
             Bitmap bitmap = BitmapUtils.getBitmapImage(this, currentUser.getAvatar());
@@ -357,7 +356,7 @@ public class OdooActivity extends ActionBarActivity {
                         avatar.setImageBitmap(img);
                 }
                 OControls.setText(view, R.id.profile_name_text, user.getName());
-                OControls.setText(view, R.id.profile_url_text, (user.isOAauthLogin()) ? user.getInstanceUrl() : user.getHost());
+                OControls.setText(view, R.id.profile_url_text, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
                 // Setting login event for other account
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override

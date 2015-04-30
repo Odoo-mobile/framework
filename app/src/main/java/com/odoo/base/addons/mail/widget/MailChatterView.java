@@ -55,8 +55,8 @@ import com.odoo.core.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.ODomain;
 import odoo.controls.ExpandableListControl;
+import odoo.helper.ODomain;
 
 public class MailChatterView extends LinearLayout implements
         ExpandableListControl.ExpandableListAdapterGetViewListener, View.OnClickListener {

@@ -15,19 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 18/12/14 11:28 AM
+ * Created on 28/4/15 4:32 PM
  */
-package com.odoo.datas;
+package com.odoo.config;
 
-public class OConstants {
-    public static final String URL_ODOO = "https://www.odoo.com";
-    public static final String URL_ODOO_RESET_PASSWORD = URL_ODOO + "/web/reset_password";
-    public static final String URL_ODOO_SIGN_UP = URL_ODOO + "/web/signup";
-    public static final String URL_ODOO_MOBILE_GIT_HUB = "https://github.com/Odoo-mobile";
-    public static final String URL_ODOO_APPS_ON_PLAY_STORE = "https://play.google.com/store/apps/developer?id=Odoo+SA";
+import android.content.Context;
 
-    public static final String ODOO_COMPANY_NAME = "Odoo";
+import com.odoo.core.support.OUser;
 
-    public static final int RPC_REQUEST_TIME_OUT = 30000; // 30 Seconds
-    public static final int RPC_REQUEST_RETRIES = 1; // Retries when timeout
+public class FirstLaunchConfig {
+
+    public static void onFirstLaunch(Context context, OUser user) {
+
+    }
+
 }

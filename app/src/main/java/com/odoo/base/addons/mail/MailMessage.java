@@ -35,8 +35,6 @@ import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
-import org.json.JSONArray;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +65,8 @@ public class MailMessage extends OModel {
 
     public boolean hasAttachment(OValues values) {
         try {
-            JSONArray attachment_ids = (JSONArray) values.get("attachment_ids");
-            if (attachment_ids.length() > 0) {
+            List<Integer> attachment_ids = (ArrayList<Integer>) values.get("attachment_ids");
+            if (attachment_ids.size() > 0) {
                 return true;
             }
         } catch (Exception e) {
@@ -80,8 +78,8 @@ public class MailMessage extends OModel {
     public String authorName(OValues values) {
         try {
             if (!values.getString("author_id").equals("false")) {
-                JSONArray author_id = new JSONArray(values.getString("author_id"));
-                return author_id.getString(1);
+                List<Object> author_id = (ArrayList<Object>) values.get("author_id");
+                return author_id.get(1) + "";
             } else {
                 return values.getString("email_from");
             }

@@ -77,7 +77,8 @@ public class OdooAccountManager {
     public static boolean createAccount(Context context, OUser user) {
         AccountManager accountManager = AccountManager.get(context);
         Account account = new Account(user.getAndroidName(), KEY_ACCOUNT_TYPE);
-        return accountManager.addAccountExplicitly(account, String.valueOf(user.getPassword()), user.getAsBundle());
+        return accountManager.addAccountExplicitly(account, String.valueOf(user.getPassword()),
+                user.getAsBundle());
     }
 
     /**
@@ -123,7 +124,7 @@ public class OdooAccountManager {
      */
     public static boolean anyActiveUser(Context context) {
         for (OUser user : getAllAccounts(context)) {
-            if (user.isIsactive()) {
+            if (user.isActive()) {
                 return true;
             }
         }
@@ -138,7 +139,7 @@ public class OdooAccountManager {
      */
     public static OUser getActiveUser(Context context) {
         for (OUser user : getAllAccounts(context)) {
-            if (user.isIsactive()) {
+            if (user.isActive()) {
                 return user;
             }
         }
@@ -215,7 +216,7 @@ public class OdooAccountManager {
     }
 
     private static boolean cancelUserSync(Account account) {
-        //Cancel user's sync services. if any.
+        //TODO: Cancel user's sync services. if any.
         return true;
     }
 }

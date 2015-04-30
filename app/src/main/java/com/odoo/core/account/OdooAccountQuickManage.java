@@ -40,7 +40,6 @@ import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
-import com.odoo.core.support.OdooLoginHelper;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
@@ -50,7 +49,6 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
     private OUser user = null;
     private ImageView userAvatar;
     private TextView txvName;
-    private OdooLoginHelper loginHelper;
     private LoginProcess loginProcess = null;
     private EditText edtPassword;
     private String action;
@@ -147,7 +145,6 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
         }
         user.setPassword(edtPassword.getText().toString());
         loginProcess = new LoginProcess();
-        loginHelper = new OdooLoginHelper(getApplicationContext());
         loginProcess.execute(user.getDBName(), user.getHost());
     }
 
@@ -170,7 +167,7 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
         protected OUser doInBackground(String... params) {
 
             try {
-                return loginHelper.login(user.getUsername(), user.getPassword(), user.getDatabase(), params[1], user.isAllowSelfSignedSSL());
+//                return loginHelper.login(user.getUsername(), user.getPassword(), user.getDatabase(), params[1], user.isAllowSelfSignedSSL());
             } catch (Exception e) {
                 e.printStackTrace();
             }

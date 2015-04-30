@@ -53,6 +53,6 @@ public class ResUsers extends OModel {
 
     public static int myId(Context context) {
         ResUsers users = new ResUsers(context, null);
-        return users.selectRowId(users.getUser().getUser_id());
+        return users.selectRowId(users.getUser().getUserId());
     }
 }

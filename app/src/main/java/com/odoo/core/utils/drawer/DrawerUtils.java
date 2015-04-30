@@ -30,7 +30,6 @@ import com.odoo.R;
 import com.odoo.SettingsActivity;
 import com.odoo.config.Addons;
 import com.odoo.core.account.Profile;
-import com.odoo.core.support.OUser;
 import com.odoo.core.support.addons.OAddon;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
@@ -43,7 +42,6 @@ import com.odoo.news.models.OdooNews;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.zxing.handler.OdooMobileQRReader;
 
 public class DrawerUtils {
 
@@ -73,10 +71,10 @@ public class DrawerUtils {
         settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_settings))
                 .setIcon(R.drawable.ic_action_settings)
                 .setInstance(SettingsActivity.class));
-        if (pref.getBoolean(Profile.CONNECT_WITH_ODOO, false))
-            settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_access_odoo_mobile))
-                    .setInstance(OdooMobileQRReader.class).setIcon(R.drawable.ic_action_qrcode)
-                    .setExtra(OUser.current(context).getAsBundle()));
+//        if (pref.getBoolean(Profile.CONNECT_WITH_ODOO, false))
+//            settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_access_odoo_mobile))
+//                    .setInstance(OdooMobileQRReader.class).setIcon(R.drawable.ic_action_qrcode)
+//                    .setExtra(OUser.current(context).getAsBundle()));
         OdooNews news = new OdooNews(context, null);
         if (!news.isEmptyTable()) {
             settings.add(new ODrawerItem(key).setTitle("Odoo News")
