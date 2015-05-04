@@ -52,7 +52,7 @@ public class ResPartner extends OModel {
     OColumn email = new OColumn("Email", OVarchar.class);
     OColumn company_id = new OColumn("Company", ResCompany.class, OColumn.RelationType.ManyToOne);
     OColumn parent_id = new OColumn("Related Company", ResPartner.class, OColumn.RelationType.ManyToOne)
-            .addDomain("im_company", "=", true);
+            .addDomain("is_company", "=", true);
     OColumn country_id = new OColumn("Country", ResCountry.class, OColumn.RelationType.ManyToOne);
     OColumn customer = new OColumn("Customer", OBoolean.class).setDefaultValue("true");
     OColumn supplier = new OColumn("Supplier", OBoolean.class).setDefaultValue("false");

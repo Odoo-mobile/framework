@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 1/1/15 3:17 PM
  */
 package com.odoo.core.service;
@@ -31,6 +31,7 @@ import com.odoo.App;
 import com.odoo.R;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.base.addons.res.ResCompany;
+import com.odoo.core.account.About;
 import com.odoo.core.account.OdooAccountQuickManage;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.ODataRow;
@@ -40,7 +41,6 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
-import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 
@@ -173,6 +173,16 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             // Getting data
             OdooResult response = mOdoo.searchRead(model.getModelName(), getFields(model)
                     , domain, 0, mSyncDataLimit, "create_date DESC");
+            if (response.containsKey("error")) {
+                app.setOdoo(null, user);
+                OPreferenceManager pref = new OPreferenceManager(mContext);
+                OdooResult record = (OdooResult) response.get("error");
+                if (pref.getBoolean(About.DEVELOPER_MODE, false)) {
+                    // TODO: Show developer error if enabled
+                }
+                return;
+            }
+
             Log.v(TAG, "Processing " + response.getRecords().size() + " records");
             OSyncDataUtils dataUtils = new OSyncDataUtils(mContext, mOdoo, model, user, response,
                     result, createRelationRecords);
@@ -206,14 +216,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 irModel.setLastSyncDateTimeToNow(model);
             }
             model.onSyncFinished();
-        } /*catch (OdooSessionExpiredException odooSession) {
-            app.setOdoo(null, user);
-            if (user.isOAuthLogin()) {
-                // FIXME: Saas not working with multi login. Facing issue of session expired.
-            } else {
-                showSignInErrorNotification(user);
-            }
-        } */ catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         // Performing next sync if any in service
@@ -233,9 +236,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         model.close();
     }
 
-    //FIXME:
-    private void showSignInErrorNotification(OUser user) {
-        ONotificationBuilder builder = new ONotificationBuilder(mContext,
+    private static void showSignInErrorNotification(Context context, OUser user) {
+        ONotificationBuilder builder = new ONotificationBuilder(context,
                 REQUEST_SIGN_IN_ERROR);
         builder.setTitle("Odoo authentication problem");
         builder.setBigText("May be you have changed your account " +
@@ -246,7 +248,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         builder.withRingTone(false);
         builder.setOngoing(true);
         builder.withLargeIcon(false);
-        builder.setColor(OResource.color(mContext, R.color.android_orange_dark));
+        builder.setColor(R.color.android_orange_dark);
         Bundle extra = user.getAsBundle();
         // Actions
         ONotificationBuilder.NotificationAction actionReset = new ONotificationBuilder.NotificationAction(
@@ -309,14 +311,20 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         final App app = (App) context.getApplicationContext();
         Odoo odoo = app.getOdoo(user);
         if (odoo == null) {
-            odoo = Odoo.createInstance(context, user.getHost());
-            odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+            odoo = Odoo.createInstance(context,
+                    (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
+            odoo.helper.OUser mUser =
+                    odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
             app.setOdoo(odoo, user);
-            ResCompany company = new ResCompany(context, user);
-            if (company.count("id = ? ", new String[]{user.getCompanyId() + ""}) <= 0) {
-                ODataRow company_details = new ODataRow();
-                company_details.put("id", user.getCompanyId());
-                company.quickCreateRecord(company_details);
+            if (mUser != null) {
+                ResCompany company = new ResCompany(context, user);
+                if (company.count("id = ? ", new String[]{user.getCompanyId() + ""}) <= 0) {
+                    ODataRow company_details = new ODataRow();
+                    company_details.put("id", user.getCompanyId());
+                    company.quickCreateRecord(company_details);
+                }
+            } else {
+                showSignInErrorNotification(context, user);
             }
         }
         return odoo;

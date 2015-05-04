@@ -327,10 +327,10 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
         loginProcess(instance, null, null);
     }
 
-    private void loginProcess(OdooInstance instance, String url, final String database) {
+    private void loginProcess(final OdooInstance instance, String url, final String database) {
         Log.v("", "LoginProcess");
-        String username = edtUsername.getText().toString();
-        String password = edtPassword.getText().toString();
+        final String username = edtUsername.getText().toString();
+        final String password = edtPassword.getText().toString();
         if (instance == null && url.equals(OConstants.URL_ODOO)) {
             // OAuth Login or Odoo.com Login
             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_getting_instances));
@@ -375,7 +375,20 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
             Log.v("", "Processing Odoo Instance Login");
             mLoginProcessStatus.setText(OResource.string(OdooLogin.this,
                     R.string.status_logging_in_with_instance));
-            mOdoo.oAuthLogin(instance, username, password, this, null);
+            new AsyncTask<Void, Void, odoo.helper.OUser>() {
+
+                @Override
+                protected odoo.helper.OUser doInBackground(Void... params) {
+                    // Need to execute in background task.
+                    return mOdoo.oAuthLogin(instance, username, password);
+                }
+
+                @Override
+                protected void onPostExecute(odoo.helper.OUser oUser) {
+                    super.onPostExecute(oUser);
+                    onLoginSuccess(mOdoo, oUser);
+                }
+            }.execute();
         }
     }
 

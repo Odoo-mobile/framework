@@ -113,7 +113,7 @@ public class OdooAccountManager {
                 accountManager.setUserData(user.getAccount(), key, newData.getAsBundle().getString(key));
             }
         }
-        return newData;
+        return user;
     }
 
     /**

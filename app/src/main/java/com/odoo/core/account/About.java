@@ -40,7 +40,7 @@ import com.odoo.datas.OConstants;
 
 public class About extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = About.class.getSimpleName();
-    private final static String DEVELOPER_MODE = "developer_mode";
+    public final static String DEVELOPER_MODE = "developer_mode";
     private Handler handler = null;
     private int click_count = 0;
     private Runnable runnable = null;
