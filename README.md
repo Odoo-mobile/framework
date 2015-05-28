@@ -14,4 +14,4 @@ This framework contains its own ORM to handle mobile’s local database. So you 
 Documentation:
 --------------
 
-http://mobile.odoo.co.in/
+http://mobile.odoo.co.in/v1
