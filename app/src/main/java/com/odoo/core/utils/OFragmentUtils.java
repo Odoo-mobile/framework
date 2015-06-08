@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.odoo.R;
@@ -32,18 +32,18 @@ import com.odoo.R;
 public class OFragmentUtils {
     public static final String TAG = OFragmentUtils.class.getSimpleName();
 
-    private ActionBarActivity mActivity;
+    private AppCompatActivity mActivity;
     private Context mContext;
     private Bundle savedInstance = null;
     private FragmentManager fragmentManager;
 
-    public OFragmentUtils(ActionBarActivity activity, Bundle savedInstance) {
+    public OFragmentUtils(AppCompatActivity activity, Bundle savedInstance) {
         mActivity = activity;
         mContext = activity;
         fragmentManager = mActivity.getSupportFragmentManager();
     }
 
-    public static OFragmentUtils get(ActionBarActivity activity, Bundle savedInstance) {
+    public static OFragmentUtils get(AppCompatActivity activity, Bundle savedInstance) {
         return new OFragmentUtils(activity, savedInstance);
     }
 

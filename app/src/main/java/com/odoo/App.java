@@ -1,27 +1,25 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 17/12/14 6:06 PM
  */
 package com.odoo;
 
-import android.app.ActivityManager;
 import android.app.Application;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -30,7 +28,6 @@ import android.net.NetworkInfo;
 import com.odoo.datas.OConstants;
 
 import java.util.HashMap;
-import java.util.List;
 
 import odoo.Odoo;
 import odoo.helper.OUser;
@@ -38,11 +35,15 @@ import odoo.helper.OUser;
 public class App extends Application {
 
     public static final String TAG = App.class.getSimpleName();
+    public static String APPLICATION_ID;
+    public static String APPLICATION_NAME;
     private static HashMap<String, Odoo> mOdooInstances = new HashMap<>();
 
     @Override
     public void onCreate() {
         super.onCreate();
+        App.APPLICATION_ID= getPackageName();
+        App.APPLICATION_NAME = getPackageManager().getApplicationLabel(getApplicationInfo()).toString();
         Odoo.REQUEST_TIMEOUT_MS = OConstants.RPC_REQUEST_TIME_OUT;
         Odoo.DEFAULT_MAX_RETRIES = OConstants.RPC_REQUEST_RETRIES;
     }
@@ -91,22 +92,4 @@ public class App extends Application {
         }
         return mInstalled;
     }
-
-    /**
-     * Check for app is on top of screen
-     *
-     * @return true, if application is running on top
-     */
-    public boolean meOnTop() {
-        boolean meOnTop = false;
-        ActivityManager aManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> taskInfo = aManager.getRunningTasks(1);
-        ComponentName componentName = taskInfo.get(0).topActivity;
-        if (componentName.getPackageName().equalsIgnoreCase(getPackageName())) {
-            meOnTop = true;
-        }
-        return meOnTop;
-    }
-
-
 }

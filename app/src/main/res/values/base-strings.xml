@@ -47,6 +47,12 @@
     <string name="label_reply">Reply</string>
     <string name="label_close">Close</string>
     <string name="label_send">Send</string>
+
+    <!-- package warning -->
+    <string name="changes_required">Changes required in \n<b>app/build.gradle</b> for</string>
+    <string name="label_app_name">Application Name</string>
+    <string name="label_package_name">Application Id</string>
+    <string name="label_dialog_disappear">Panel will disappear when configuration changed.</string>
     <!-- Drawer -->
     <string name="label_drawer_account_add_account">Add Account</string>
     <string name="label_drawer_account_manage_accounts">Manage Accounts</string>

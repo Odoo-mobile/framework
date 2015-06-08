@@ -25,7 +25,7 @@ import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -40,7 +40,7 @@ import com.odoo.core.utils.OResource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingsActivity extends ActionBarActivity {
+public class SettingsActivity extends AppCompatActivity {
     public static final String TAG = SettingsActivity.class.getSimpleName();
     public static final String ACTION_ABOUT = "com.odoo.ACTION_ABOUT";
 
@@ -50,9 +50,11 @@ public class SettingsActivity extends ActionBarActivity {
         setContentView(R.layout.base_setting_activity);
         OActionBarUtils.setActionBar(this, true);
         ActionBar actionbar = getSupportActionBar();
-        actionbar.setHomeButtonEnabled(true);
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setTitle(R.string.title_application_settings);
+        if(actionbar!=null) {
+            actionbar.setHomeButtonEnabled(true);
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setTitle(R.string.title_application_settings);
+        }
     }
 
     @Override

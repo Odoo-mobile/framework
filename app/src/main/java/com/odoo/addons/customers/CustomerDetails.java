@@ -26,7 +26,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +55,7 @@ import odoo.controls.OForm;
 import odoo.helper.OdooFields;
 import odoo.helper.utils.gson.OdooRecord;
 
-public class CustomerDetails extends ActionBarActivity
+public class CustomerDetails extends AppCompatActivity
         implements View.OnClickListener, OField.IOnFieldValueChangeListener {
     public static final String TAG = CustomerDetails.class.getSimpleName();
     private final String KEY_MODE = "key_edit_mode";

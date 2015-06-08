@@ -31,12 +31,13 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -70,8 +71,9 @@ import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.List;
+import java.util.Locale;
 
-public class OdooActivity extends ActionBarActivity {
+public class OdooActivity extends AppCompatActivity {
 
     public static final String TAG = OdooActivity.class.getSimpleName();
     public static final Integer DRAWER_ITEM_LAUNCH_DELAY = 300;
@@ -119,8 +121,24 @@ public class OdooActivity extends ActionBarActivity {
         OActionBarUtils.setActionBar(this, true);
         setupDrawer();
 
+        /* Validating package
+            com.odoo not allowed, App name Odoo also not allowed
+         */
+        validatePackage();
+
         // Validating user object
         validateUserObject();
+    }
+
+    private void validatePackage() {
+        String packageName = app.getPackageName();
+        String appName = System.getProperty("applicationName", null);
+        if (packageName.equals("com.odoo") || appName.toLowerCase(Locale.getDefault())
+                .equals("odoo")) {
+            findViewById(R.id.packageWarning).setVisibility(View.VISIBLE);
+            TextView applicationName = (TextView) findViewById(R.id.appName);
+            applicationName.setText(App.APPLICATION_NAME);
+        }
     }
 
     private void validateUserObject() {
@@ -177,7 +195,7 @@ public class OdooActivity extends ActionBarActivity {
                 invalidateOptionsMenu();
             }
         };
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mDrawerToggle.syncState();
 
         setupAccountBox();
@@ -221,7 +239,7 @@ public class OdooActivity extends ActionBarActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                mDrawerLayout.closeDrawer(Gravity.START);
+                mDrawerLayout.closeDrawer(GravityCompat.START);
             }
         }, DRAWER_ITEM_LAUNCH_DELAY);
 
@@ -405,7 +423,7 @@ public class OdooActivity extends ActionBarActivity {
 
                                                 mAccountBoxExpanded = false;
                                                 accountBoxToggle();
-                                                mDrawerLayout.closeDrawer(Gravity.START);
+                                                mDrawerLayout.closeDrawer(GravityCompat.START);
                                                 // Restarting activity
                                                 restartActivity();
                                             }
@@ -518,7 +536,7 @@ public class OdooActivity extends ActionBarActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_ACCOUNT_CREATE) {
                 if (mDrawerLayout != null) {
-                    mDrawerLayout.closeDrawer(Gravity.START);
+                    mDrawerLayout.closeDrawer(GravityCompat.START);
                     accountBoxToggle();
                 }
                 OdooAccountManager.login(this, data.getStringExtra(KEY_NEW_USER_NAME));
