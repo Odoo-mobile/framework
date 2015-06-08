@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 18/12/14 5:25 PM
  */
 package com.odoo;
@@ -44,11 +44,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.odoo.core.account.AppIntro;
 import com.odoo.core.account.ManageAccounts;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.account.OdooUserAskPassword;
+import com.odoo.core.account.OdooUserObjectUpdater;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
 import com.odoo.core.orm.OModel;
@@ -95,11 +97,14 @@ public class OdooActivity extends ActionBarActivity {
     private Integer mDrawerSelectedIndex = -1;
     private Boolean mHasActionBarSpinner = false;
 
+    private App app;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "OdooActivity->onCreate");
         mSavedInstanceState = savedInstanceState;
+        app = (App) getApplicationContext();
         OPreferenceManager preferenceManager = new OPreferenceManager(this);
         if (!preferenceManager.getBoolean(KEY_FRESH_LOGIN, false)) {
             preferenceManager.setBoolean(KEY_FRESH_LOGIN, true);
@@ -113,6 +118,32 @@ public class OdooActivity extends ActionBarActivity {
         setContentView(R.layout.odoo_activity);
         OActionBarUtils.setActionBar(this, true);
         setupDrawer();
+
+        // Validating user object
+        validateUserObject();
+    }
+
+    private void validateUserObject() {
+        if (OdooAccountManager.anyActiveUser(this)) {
+            OUser user = OUser.current(this);
+            if (!OdooAccountManager.isValidUserObj(this, user)
+                    && app.inNetwork()) {
+                OdooUserObjectUpdater.showUpdater(this, new OdooUserObjectUpdater.OnUpdateFinish() {
+                    @Override
+                    public void userObjectUpdateFinished() {
+                        startActivity(new Intent(OdooActivity.this, OdooLogin.class));
+                        finish();
+                    }
+
+                    @Override
+                    public void userObjectUpdateFail() {
+                        Toast.makeText(OdooActivity.this, OResource.string(OdooActivity.this,
+                                R.string.toast_something_gone_wrong), Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                });
+            }
+        }
     }
 
     // Creating drawer

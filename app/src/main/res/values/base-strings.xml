@@ -84,6 +84,7 @@
     <string name="label_export_db">Export Database</string>
     <string name="label_our_apps">Our apps</string>
     <string name="label_attach_a_file"> + Attach a file</string>
+    <string name="label_be_patient_we_are_configuring_account_update">Be patient, We are configuring your account updates</string>
     <!-- Toasts -->
     <string name="developer_2_tap">Need 2 tap for developer mode</string>
     <string name="developer_5_tap">Developer mode activated</string>
@@ -95,6 +96,7 @@
     <string name="toast_account_removed">Account Removed Successfully</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <string name="toast_updating_password">Updating password</string>
+    <string name="toast_something_gone_wrong">Something gone wrong</string>
     <!-- Setting pref strings -->
     <string-array name="syncInterval">
         <item name="5">Every 5 minutes</item>

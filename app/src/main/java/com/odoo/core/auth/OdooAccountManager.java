@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 17/12/14 6:21 PM
  */
 package com.odoo.core.auth;
@@ -27,6 +27,7 @@ import android.util.Log;
 import com.odoo.App;
 import com.odoo.core.orm.OModelRegistry;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.sys.OCacheUtils;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class OdooAccountManager {
 
     public static final String TAG = OdooAccountManager.class.getSimpleName();
     public static final String KEY_ACCOUNT_TYPE = "com.odoo.auth";
+    public static final String KEY_USER_ACCOUNT_VERSION = "key_user_account_version";
 
     /**
      * Gets all the account related Odoo Auth
@@ -67,6 +69,11 @@ public class OdooAccountManager {
         return false;
     }
 
+    public static boolean isValidUserObj(Context context, OUser user) {
+        OPreferenceManager pref = new OPreferenceManager(context);
+        return (pref.getInt(userObjectKEY(user), 0) == OUser.USER_ACCOUNT_VERSION);
+    }
+
     /**
      * Creates Odoo account for app
      *
@@ -74,11 +81,23 @@ public class OdooAccountManager {
      * @param user    user instance (OUser)
      * @return true, if account created successfully
      */
+
     public static boolean createAccount(Context context, OUser user) {
         AccountManager accountManager = AccountManager.get(context);
         Account account = new Account(user.getAndroidName(), KEY_ACCOUNT_TYPE);
-        return accountManager.addAccountExplicitly(account, String.valueOf(user.getPassword()),
-                user.getAsBundle());
+        if (accountManager.addAccountExplicitly(account, String.valueOf(user.getPassword()),
+                user.getAsBundle())) {
+            OPreferenceManager pref = new OPreferenceManager(context);
+            if (pref.getInt(userObjectKEY(user), 0) != OUser.USER_ACCOUNT_VERSION) {
+                pref.putInt(userObjectKEY(user), OUser.USER_ACCOUNT_VERSION);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static String userObjectKEY(OUser user) {
+        return KEY_USER_ACCOUNT_VERSION + "_" + user.getAndroidName();
     }
 
     /**
@@ -98,6 +117,20 @@ public class OdooAccountManager {
         return false;
     }
 
+    public static OUser updateUserData(Context context, OUser user, OUser newData) {
+        if (user != null) {
+            AccountManager accountManager = AccountManager.get(context);
+            for (String key : newData.getAsBundle().keySet()) {
+                accountManager.setUserData(user.getAccount(), key, newData.getAsBundle().get(key) + "");
+            }
+            OPreferenceManager pref = new OPreferenceManager(context);
+            if (pref.getInt(userObjectKEY(user), 0) != OUser.USER_ACCOUNT_VERSION) {
+                pref.putInt(userObjectKEY(user), OUser.USER_ACCOUNT_VERSION);
+            }
+        }
+        return getDetails(context, newData.getAndroidName());
+    }
+
     /**
      * Updates user bundle data in accounts
      *
@@ -107,13 +140,7 @@ public class OdooAccountManager {
      */
     public static OUser updateUserData(Context context, OUser newData) {
         OUser user = getDetails(context, newData.getAndroidName());
-        if (user != null) {
-            AccountManager accountManager = AccountManager.get(context);
-            for (String key : newData.getAsBundle().keySet()) {
-                accountManager.setUserData(user.getAccount(), key, newData.getAsBundle().getString(key));
-            }
-        }
-        return user;
+        return updateUserData(context, user, newData);
     }
 
     /**

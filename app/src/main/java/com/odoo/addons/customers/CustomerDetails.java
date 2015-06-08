@@ -55,7 +55,8 @@ import odoo.controls.OForm;
 import odoo.helper.OdooFields;
 import odoo.helper.utils.gson.OdooRecord;
 
-public class CustomerDetails extends ActionBarActivity implements View.OnClickListener, OField.IOnFieldValueChangeListener {
+public class CustomerDetails extends ActionBarActivity
+        implements View.OnClickListener, OField.IOnFieldValueChangeListener {
     public static final String TAG = CustomerDetails.class.getSimpleName();
     private final String KEY_MODE = "key_edit_mode";
     private final String KEY_NEW_IMAGE = "key_new_image";

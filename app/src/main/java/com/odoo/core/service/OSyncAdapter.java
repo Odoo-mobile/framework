@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.odoo.App;
 import com.odoo.R;
@@ -41,6 +42,7 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 
@@ -114,22 +116,24 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         mModel = new OModel(mContext, null, OdooAccountManager.getDetails(mContext, account.name))
                 .createInstance(mModelClass);
         mUser = mModel.getUser();
-        // Creating Odoo instance
-        mOdoo = createOdooInstance(mContext, mUser);
-        Log.i(TAG, "User        : " + mModel.getUser().getAndroidName());
-        Log.i(TAG, "Model       : " + mModel.getModelName());
-        Log.i(TAG, "Database    : " + mModel.getDatabaseName());
-        Log.i(TAG, "Odoo Version: " + mUser.getOdooVersion().getServerSerie());
-        // Calling service callback
-        if (mService != null)
-            mService.performDataSync(this, extras, mUser);
+        if (OdooAccountManager.isValidUserObj(mContext, mUser)) {
+            // Creating Odoo instance
+            mOdoo = createOdooInstance(mContext, mUser);
+            Log.i(TAG, "User        : " + mModel.getUser().getAndroidName());
+            Log.i(TAG, "Model       : " + mModel.getModelName());
+            Log.i(TAG, "Database    : " + mModel.getDatabaseName());
+            Log.i(TAG, "Odoo Version: " + mUser.getOdooVersion().getServerSerie());
+            // Calling service callback
+            if (mService != null)
+                mService.performDataSync(this, extras, mUser);
 
-        //Creating domain
-        ODomain domain = (mDomain.containsKey(mModel.getModelName())) ?
-                mDomain.get(mModel.getModelName()) : null;
+            //Creating domain
+            ODomain domain = (mDomain.containsKey(mModel.getModelName())) ?
+                    mDomain.get(mModel.getModelName()) : null;
 
-        // Ready for sync data from server
-        syncData(mModel, mUser, domain, syncResult, true, true);
+            // Ready for sync data from server
+            syncData(mModel, mUser, domain, syncResult, true, true);
+        }
     }
 
     private void syncData(OModel model, OUser user, ODomain domain_filter,
@@ -314,7 +318,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             odoo = Odoo.createInstance(context,
                     (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
             odoo.helper.OUser mUser =
-                    odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+                    odoo.authenticate(user.getUsername(), user.getPassword(), (user.isOAuthLogin()) ?
+                            user.getInstanceDatabase() : user.getDatabase());
             app.setOdoo(odoo, user);
             if (mUser != null) {
                 ResCompany company = new ResCompany(context, user);
@@ -324,7 +329,10 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     company.quickCreateRecord(company_details);
                 }
             } else {
-                showSignInErrorNotification(context, user);
+                // FIXME: Need to check again. Not working properly
+                //showSignInErrorNotification(context, user);
+                Toast.makeText(context, OResource.string(context, R.string.toast_something_gone_wrong),
+                        Toast.LENGTH_LONG).show();
             }
         }
         return odoo;

@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 30/12/14 3:31 PM
  */
 package com.odoo.core.orm;
@@ -33,6 +33,7 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.support.addons.OAddon;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.datas.OConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,6 @@ import java.util.List;
 public class OSQLite extends SQLiteOpenHelper {
     public static final String TAG = OSQLite.class.getSimpleName();
     public static final String KEY_MODEL_CLASS_REGISTER = "key_model_class_register";
-    public static final int DATABASE_VERSION = 1;
     private Context mContext;
     private OUser mUser = null;
     private Addons mAddons;
@@ -48,7 +48,7 @@ public class OSQLite extends SQLiteOpenHelper {
 
     public OSQLite(Context context, OUser user) {
         super(context, (user != null) ? user.getDBName() : OUser.current(context).getDBName(), null
-                , DATABASE_VERSION);
+                , OConstants.DATABASE_VERSION);
         mContext = context;
         mAddons = new Addons();
         mUser = (user != null) ? user : OUser.current(context);
