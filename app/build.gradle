@@ -9,8 +9,8 @@ android {
         applicationId "com.odoo"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 3
-        versionName "2.0.1"
+        versionCode 4
+        versionName "2.1.0"
     }
     buildTypes {
         release {
@@ -22,11 +22,10 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/swipe_library.jar')
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:cardview-v7:22.0.0'
     compile 'com.google.android.gms:play-services:7.0.0'
     compile project(':intro-slider-lib')
     compile project(':parallax-effect-lib')
-    compile project(':odoo-rpc-v2')
+    compile project(':odoo-rpc-v3')
 }

@@ -33,8 +33,8 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
-import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OdooRecordUtils;
 
 import java.io.InvalidObjectException;
 import java.util.Arrays;
@@ -251,7 +251,7 @@ public class BaseModelProvider extends ContentProvider {
         for (String key : values.keySet()) {
             try {
                 mModel.storeManyToManyRecord(key,
-                        row_id, JSONUtils.<Integer>toList(values.getAsString(key)),
+                        row_id, OdooRecordUtils.<Integer>toList(values.getAsString(key)),
                         OModel.Command.Replace);
             } catch (InvalidObjectException e) {
                 e.printStackTrace();

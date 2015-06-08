@@ -238,6 +238,12 @@ public class ONotificationBuilder {
         mNotificationManager.notify(notification_id, mNotificationBuilder.build());
     }
 
+    public static  void cancelNotification(Context context){
+        NotificationManager nMgr = (NotificationManager) context.getSystemService(
+                Context.NOTIFICATION_SERVICE
+        );
+        nMgr.cancelAll();;
+    }
     public static void cancelNotification(Context context, int id) {
         NotificationManager nMgr = (NotificationManager) context.getSystemService(
                 Context.NOTIFICATION_SERVICE

@@ -33,10 +33,12 @@ import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
-import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResPartner extends OModel {
     public static final String AUTHORITY = "com.odoo.core.provider.content.sync.res_partner";
+
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();
     OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefaultValue(false);
     OColumn image_small = new OColumn("Avatar", OBlob.class).setDefaultValue(false);
@@ -73,8 +75,8 @@ public class ResPartner extends OModel {
     public String storeCompanyName(OValues value) {
         try {
             if (!value.getString("parent_id").equals("false")) {
-                JSONArray parent_id = new JSONArray(value.getString("parent_id"));
-                return parent_id.getString(1);
+                List<Object> parent_id = (ArrayList<Object>) value.get("parent_id");
+                return parent_id.get(1) + "";
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -41,16 +41,12 @@ import com.odoo.core.orm.provider.BaseModelProvider;
 import com.odoo.core.service.ISyncServiceListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
-import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OStorageUtils;
 import com.odoo.core.utils.StringUtils;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,8 +67,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
-import odoo.ODomain;
-import odoo.OdooVersion;
+import odoo.helper.ODomain;
+import odoo.helper.OdooVersion;
+import odoo.listeners.IModuleInstallListener;
+
 
 public class OModel implements ISyncServiceListener {
 
@@ -130,9 +128,7 @@ public class OModel implements ISyncServiceListener {
         mUser = (user == null) ? OUser.current(context) : user;
         this.model_name = model_name;
         if (mUser != null) {
-            mOdooVersion = new OdooVersion();
-            mOdooVersion.setVersion_number(mUser.getVersion_number());
-            mOdooVersion.setServer_serie(mUser.getVersion_serie());
+            mOdooVersion = mUser.getOdooVersion();
             if (sqLite == null) {
                 sqLite = new OSQLite(mContext, mUser);
             }
@@ -217,7 +213,7 @@ public class OModel implements ISyncServiceListener {
     }
 
     private OColumn getColumn(Field field) {
-        OColumn column = null;
+        OColumn column;
         if (field != null) {
             try {
                 field.setAccessible(true);
@@ -244,6 +240,10 @@ public class OModel implements ISyncServiceListener {
                         column.setOnChangeMethod(onChangeMethod);
                         column.setOnChangeBGProcess(checkForOnChangeBGProcess(field));
                     }
+
+                    // Adding sync column name (if local column name is different)
+                    String syncColumnName = checkForSyncColumnName(field);
+                    column.setSyncColumnName(syncColumnName);
 
                     // domain filter on column
                     column.setHasDomainFilterColumn(isDomainFilterColumn(field));
@@ -273,6 +273,17 @@ public class OModel implements ISyncServiceListener {
             return onChange.bg_process();
         }
         return false;
+    }
+
+    private String checkForSyncColumnName(Field field) {
+        Annotation annotation = field.getAnnotation(Odoo.SyncColumnName.class);
+        if (annotation != null) {
+            Odoo.SyncColumnName syncColumnName = (Odoo.SyncColumnName) annotation;
+            if (syncColumnName.value().length() != 0) {
+                return syncColumnName.value();
+            }
+        }
+        return null;
     }
 
     private Method checkForOnChangeMethod(Field field) {
@@ -346,7 +357,7 @@ public class OModel implements ISyncServiceListener {
                     // Check for odoo api annotation
                     Class<? extends Annotation> type = annotation.annotationType();
                     if (type.getDeclaringClass().isAssignableFrom(Odoo.api.class)) {
-                        switch (mOdooVersion.getVersion_number()) {
+                        switch (mOdooVersion.getVersionNumber()) {
                             case 9:
                                 if (type.isAssignableFrom(Odoo.api.v9alpha.class)) {
                                     version++;
@@ -367,7 +378,8 @@ public class OModel implements ISyncServiceListener {
                     // Check for functional annotation
                     if (type.isAssignableFrom(Odoo.Functional.class)
                             || type.isAssignableFrom(Odoo.onChange.class)
-                            || type.isAssignableFrom(Odoo.hasDomainFilter.class)) {
+                            || type.isAssignableFrom(Odoo.hasDomainFilter.class)
+                            || type.isAssignableFrom(Odoo.SyncColumnName.class)) {
                         version++;
                     }
                 }
@@ -1041,40 +1053,19 @@ public class OModel implements ISyncServiceListener {
         }
     }
 
-    public boolean isInstalledOnServer(String module_name) {
-        try {
-            App app = (App) mContext.getApplicationContext();
-            IrModel model = new IrModel(mContext, getUser());
-            List<ODataRow> modules = model.select(null, "name = ?", new String[]{module_name.trim()});
-            if (modules.size() > 0) {
-                if (modules.get(0).getString("state").equals("installed")) {
-                    return true;
-                }
+    public void isInstalledOnServer(final String module_name, IModuleInstallListener callback) {
+        App app = (App) mContext.getApplicationContext();
+        app.getOdoo(getUser()).installedOnServer(module_name, new IModuleInstallListener() {
+            @Override
+            public void installedOnServer(boolean isInstalled) {
+                IrModel model = new IrModel(mContext, getUser());
+                OValues values = new OValues();
+                values.put("id", 0);
+                values.put("name", module_name);
+                values.put("state", "installed");
+                model.insertOrUpdate("name = ?", new String[]{module_name}, values);
             }
-            if (app.inNetwork()) {
-                odoo.Odoo odoo = app.getOdoo(getUser());
-                OdooFields fields = new OdooFields(new String[]{"state", "name"});
-                ODomain domain = new ODomain();
-                domain.add("name", "=", module_name);
-                JSONArray result = odoo.search_read("ir.module.module", fields.get(), domain.get())
-                        .getJSONArray("records");
-                if (result.length() > 0) {
-                    JSONObject record = result.getJSONObject(0);
-                    if (record.getString("state").equals("installed")) {
-                        OValues values = new OValues();
-                        values.put("id", record.getInt("id"));
-                        values.put("name", record.getString("name"));
-                        values.put("state", record.getString("state"));
-                        model.insertOrUpdate(record.getInt("id"), values);
-                        return true;
-                    }
-                }
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
+        });
     }
 
     public String getDatabaseLocalPath() {

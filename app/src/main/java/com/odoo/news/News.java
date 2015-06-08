@@ -22,7 +22,6 @@ package com.odoo.news;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -47,8 +46,6 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.news.models.OdooNews;
 
 import java.util.List;
-
-import odoo.Odoo;
 
 public class News extends BaseFragment implements OCursorListAdapter.
         OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
@@ -117,7 +114,7 @@ public class News extends BaseFragment implements OCursorListAdapter.
     @Override
     public void onResume() {
         super.onResume();
-        parent().registerReceiver(dataRefreshReceiver, new IntentFilter(Odoo.ACTION_ODOO_UPDATES));
+//        parent().registerReceiver(dataRefreshReceiver, new IntentFilter(Odoo.ACTION_ODOO_UPDATES));
         getLoaderManager().restartLoader(0, null, News.this);
     }
 

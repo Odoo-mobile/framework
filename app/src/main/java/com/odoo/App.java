@@ -27,12 +27,13 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.odoo.core.support.OUser;
+import com.odoo.datas.OConstants;
 
 import java.util.HashMap;
 import java.util.List;
 
 import odoo.Odoo;
+import odoo.helper.OUser;
 
 public class App extends Application {
 
@@ -42,6 +43,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Odoo.REQUEST_TIMEOUT_MS = OConstants.RPC_REQUEST_TIME_OUT;
+        Odoo.DEFAULT_MAX_RETRIES = OConstants.RPC_REQUEST_RETRIES;
     }
 
     public Odoo getOdoo(OUser user) {

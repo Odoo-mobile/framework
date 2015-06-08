@@ -57,6 +57,7 @@ public class OColumn {
     private Boolean use_annotation = true;
     private Boolean functional_store = false;
     private String[] functional_store_depends = null;
+    private String syncColumnName = null;
 
     public OColumn(String label, Class<?> type) {
         this.label = label;
@@ -294,6 +295,21 @@ public class OColumn {
     public OColumn addSelection(String key, String value) {
         mSelectionMap.put(key, value);
         return this;
+    }
+
+    public String getSyncColumnName() {
+        return syncColumnName;
+    }
+
+    public void setSyncColumnName(String syncColumnName) {
+        this.syncColumnName = syncColumnName;
+    }
+
+    public String getSyncColumn() {
+        if (getSyncColumnName() != null) {
+            return getSyncColumnName();
+        }
+        return getName();
     }
 
     @Override

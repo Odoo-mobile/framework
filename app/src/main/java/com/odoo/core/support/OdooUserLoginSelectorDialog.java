@@ -87,7 +87,7 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
         imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imgView.autoSetMaskDrawable();
         OControls.setText(view, R.id.txvInstanceName, user.getName());
-        OControls.setText(view, R.id.txvInstanceUrl, (user.isOAauthLogin()) ? user.getInstanceUrl() : user.getHost());
+        OControls.setText(view, R.id.txvInstanceUrl, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
 
     }
 

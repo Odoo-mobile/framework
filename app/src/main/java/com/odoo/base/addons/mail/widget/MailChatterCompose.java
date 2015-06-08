@@ -45,19 +45,18 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.BitmapUtils;
-import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.core.utils.logger.OLog;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import odoo.OArguments;
+import odoo.helper.OArguments;
+import odoo.helper.ORecordValues;
+
 
 public class MailChatterCompose extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = MailChatterCompose.class.getSimpleName();
@@ -255,7 +254,7 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
                             Uri.parse(value.getString("file_uri"))
                             , getContentResolver(), isImage
                     ));
-                    JSONObject data = IrAttachment.valuesToData(irAttachment, value);
+                    ORecordValues data = IrAttachment.valuesToData(irAttachment, value);
                     if (data != null) {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -309,22 +308,22 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
                 String body = params[1];
                 OArguments args = new OArguments();
                 args.add(server_id);
-                JSONObject data = new JSONObject();
+                HashMap<String, Object> data = new HashMap<>();
                 data.put("body", body);
                 data.put("subject", (subject.equals("false")) ? false : subject);
                 data.put("parent_id", false);
-                data.put("attachment_ids", JSONUtils.toArray(attachmentIds));
-                JSONArray partner_ids = new JSONArray();
+                data.put("attachment_ids", attachmentIds);
+                List<Integer> partner_ids = new ArrayList<>();
                 if (partner_id != -1 && mType == MessageType.Message) {
-                    partner_ids.put(partner_id);
+                    partner_ids.add(partner_id);
                 }
                 data.put("partner_ids", partner_ids);
-                JSONObject context = new JSONObject();
+                HashMap<String, Object> context = new HashMap<>();
                 context.put("mail_read_set_read", true);
                 context.put("default_res_id", server_id);
                 context.put("default_model", mModel.getModelName());
                 context.put("mail_post_autofollow", true);
-                context.put("mail_post_autofollow_partner_ids", new JSONArray());
+                context.put("mail_post_autofollow_partner_ids", new ArrayList<>());
                 data.put("context", context);
                 data.put("type", "comment");
                 data.put("content_subtype", "plaintext");

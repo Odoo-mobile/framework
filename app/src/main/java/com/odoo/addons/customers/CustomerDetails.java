@@ -44,22 +44,19 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.service.OSyncAdapter;
-import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
-import org.json.JSONObject;
-
-import odoo.ODomain;
-import odoo.Odoo;
 import odoo.controls.OField;
 import odoo.controls.OForm;
+import odoo.helper.OdooFields;
+import odoo.helper.utils.gson.OdooRecord;
 
-public class CustomerDetails extends ActionBarActivity implements View.OnClickListener, OField.IOnFieldValueChangeListener {
+public class CustomerDetails extends ActionBarActivity
+        implements View.OnClickListener, OField.IOnFieldValueChangeListener {
     public static final String TAG = CustomerDetails.class.getSimpleName();
     private final String KEY_MODE = "key_edit_mode";
     private final String KEY_NEW_IMAGE = "key_new_image";
@@ -297,19 +294,11 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
             String image = null;
             try {
                 Thread.sleep(300);
-                Odoo odoo = app.getOdoo(resPartner.getUser());
-                if (odoo == null) {
-                    odoo = OSyncAdapter.createOdooInstance(CustomerDetails.this, resPartner.getUser());
-                }
-                ODomain domain = new ODomain();
-                domain.add("id", "=", params[0]);
-                JSONObject result = odoo.search_read(resPartner.getModelName(),
-                        new OdooFields(new String[]{"image_medium"}).get(),
-                        domain.get());
-                JSONObject records = result.getJSONArray("records")
-                        .getJSONObject(0);
-                if (!records.getString("image_medium").equals("false")) {
-                    image = records.getString("image_medium");
+                OdooFields fields = new OdooFields();
+                fields.addAll(new String[]{"image_medium"});
+                OdooRecord record = resPartner.getServerDataHelper().read(null, params[0]);
+                if (!record.getString("image_medium").equals("false")) {
+                    image = record.getString("image_medium");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

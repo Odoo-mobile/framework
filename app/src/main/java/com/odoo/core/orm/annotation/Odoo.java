@@ -27,6 +27,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Odoo {
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface SyncColumnName {
+        String value() default "";
+    }
 
     /**
      * The Interface Functional.

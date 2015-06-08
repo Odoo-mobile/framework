@@ -15,30 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 18/12/14 4:23 PM
+ * Created on 28/4/15 4:32 PM
  */
-package com.odoo.core.support;
+package com.odoo.config;
 
-import com.odoo.core.orm.fields.OColumn;
+import android.content.Context;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.odoo.core.support.OUser;
 
-public class OdooFields extends odoo.helper.OdooFields {
+public class FirstLaunchConfig {
 
-    public OdooFields(List<OColumn> columns) {
-        List<String> fields = new ArrayList<>();
-        if (columns != null) {
-            for (OColumn column : columns) {
-                if (!column.isLocal() && !column.isFunctionalColumn()) {
-                    fields.add(column.getName());
-                }
-            }
-        }
-        addAll(fields.toArray(new String[fields.size()]));
+    public static void onFirstLaunch(Context context, OUser user) {
+
     }
 
-    public OdooFields(String[] fields) {
-        addAll(fields);
-    }
 }
