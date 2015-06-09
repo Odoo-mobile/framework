@@ -28,7 +28,7 @@
         android:name="com.odoo.App"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:largeHeap="true"
         android:theme="@style/AppTheme">
         <activity

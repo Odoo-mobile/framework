@@ -71,7 +71,6 @@ import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.List;
-import java.util.Locale;
 
 public class OdooActivity extends AppCompatActivity {
 
@@ -121,24 +120,8 @@ public class OdooActivity extends AppCompatActivity {
         OActionBarUtils.setActionBar(this, true);
         setupDrawer();
 
-        /* Validating package
-            com.odoo not allowed, App name Odoo also not allowed
-         */
-        validatePackage();
-
         // Validating user object
         validateUserObject();
-    }
-
-    private void validatePackage() {
-        String packageName = app.getPackageName();
-        String appName = System.getProperty("applicationName", null);
-        if (packageName.equals("com.odoo") || appName.toLowerCase(Locale.getDefault())
-                .equals("odoo")) {
-            findViewById(R.id.packageWarning).setVisibility(View.VISIBLE);
-            TextView applicationName = (TextView) findViewById(R.id.appName);
-            applicationName.setText(App.APPLICATION_NAME);
-        }
     }
 
     private void validateUserObject() {

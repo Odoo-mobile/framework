@@ -71,7 +71,12 @@ public class OdooAccountManager {
 
     public static boolean isValidUserObj(Context context, OUser user) {
         OPreferenceManager pref = new OPreferenceManager(context);
-        return (pref.getInt(userObjectKEY(user), 0) == OUser.USER_ACCOUNT_VERSION);
+        int version = pref.getInt(userObjectKEY(user), 0);
+        if (version == 0) {
+            updateUserData(context, user, user);
+            version = OUser.USER_ACCOUNT_VERSION;
+        }
+        return (version == OUser.USER_ACCOUNT_VERSION);
     }
 
     /**

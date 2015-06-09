@@ -6,29 +6,23 @@
     android:background="@color/theme_primary_dark"
     android:fitsSystemWindows="@bool/fitToScreenWindow">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <!-- Base Toolbar -->
+        <include layout="@layout/base_toolbar" />
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/white">
 
-            <!-- Base Toolbar -->
-            <include layout="@layout/base_toolbar" />
-
-            <FrameLayout
-                android:id="@+id/fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@android:color/white">
-
-            </FrameLayout>
-        </LinearLayout>
-        <include layout="@layout/base_update_package" />
-    </FrameLayout>
+        </FrameLayout>
+    </LinearLayout>
 
     <include layout="@layout/base_drawer" />
 </android.support.v4.widget.DrawerLayout>
