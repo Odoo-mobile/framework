@@ -1,13 +1,13 @@
 package com.odoo.core.account;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.odoo.R;
 import com.odoo.config.IntroSliderItems;
 import com.odoo.widgets.slider.SliderView;
 
-public class AppIntro extends ActionBarActivity {
+public class AppIntro extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

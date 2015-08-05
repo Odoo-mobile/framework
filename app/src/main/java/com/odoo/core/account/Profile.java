@@ -24,7 +24,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,7 +40,7 @@ import com.odoo.widgets.parallax.ParallaxScrollView;
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
-public class Profile extends ActionBarActivity implements View.OnClickListener {
+public class Profile extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = Profile.class.getSimpleName();
     private OUser user;
     private OForm form;

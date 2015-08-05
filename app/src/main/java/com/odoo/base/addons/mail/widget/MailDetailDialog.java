@@ -24,10 +24,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -48,7 +49,7 @@ import com.odoo.core.utils.OStringColorUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MailDetailDialog extends ActionBarActivity implements View.OnClickListener {
+public class MailDetailDialog extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = MailDetailDialog.class.getSimpleName();
     private Bundle extra;
     private MailMessage mailMessage;
@@ -63,9 +64,9 @@ public class MailDetailDialog extends ActionBarActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.base_mail_chatter_message_detail);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        getSupportActionBar().hide();
         fileManager = new OFileManager(this);
         mailMessage = new MailMessage(this, null);
         extra = getIntent().getExtras();

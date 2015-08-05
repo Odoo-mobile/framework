@@ -24,27 +24,27 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.odoo.OdooActivity;
+import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.ExpandableListControl;
 
-public class ManageAccounts extends ActionBarActivity implements View.OnClickListener,
+public class ManageAccounts extends AppCompatActivity implements View.OnClickListener,
         ExpandableListControl.ExpandableListAdapterGetViewListener {
 
     private List<Object> accounts = new ArrayList<>();

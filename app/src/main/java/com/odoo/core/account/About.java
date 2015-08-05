@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +38,7 @@ import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.datas.OConstants;
 
-public class About extends ActionBarActivity implements View.OnClickListener {
+public class About extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = About.class.getSimpleName();
     public final static String DEVELOPER_MODE = "developer_mode";
     private Handler handler = null;

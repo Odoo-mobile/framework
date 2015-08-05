@@ -28,6 +28,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ import com.odoo.core.utils.notification.ONotificationBuilder;
 import odoo.Odoo;
 import odoo.helper.OUser;
 
-public class OdooAccountQuickManage extends ActionBarActivity implements View.OnClickListener {
+public class OdooAccountQuickManage extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = OdooAccountQuickManage.class.getSimpleName();
     private OUser user = null;
     private ImageView userAvatar;
