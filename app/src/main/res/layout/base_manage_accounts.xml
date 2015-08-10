@@ -6,7 +6,7 @@
 
     <View style="@style/StatusBarView" />
 
-    <include layout="@layout/base_toolbar" />
+    <include layout="@layout/base_appbar" />
 
     <odoo.controls.ExpandableListControl
         android:id="@+id/accountList"

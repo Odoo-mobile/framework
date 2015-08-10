@@ -6,7 +6,7 @@
     android:background="@color/theme_primary"
     android:layout_height="match_parent">
 
-    <include layout="@layout/base_toolbar" />
+    <include layout="@layout/base_appbar" />
 
     <LinearLayout
         android:layout_width="match_parent"
