@@ -35,7 +35,7 @@ import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 
@@ -56,7 +56,7 @@ public class ManageAccounts extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.base_manage_accounts);
         setTitle(R.string.label_accounts);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this, true);
         setResult(RESULT_CANCELED);
         accounts.clear();
         accounts.addAll(OdooAccountManager.getAllAccounts(this));

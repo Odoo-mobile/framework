@@ -8,16 +8,24 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <include layout="@layout/base_appbar" />
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-         <FrameLayout
+            <include layout="@layout/base_appbar" />
+        </android.support.design.widget.AppBarLayout>
+
+        <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:background="@android:color/white">
 
         </FrameLayout>
+
+
     </LinearLayout>
 
     <LinearLayout

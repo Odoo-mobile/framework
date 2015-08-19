@@ -26,6 +26,7 @@ import android.content.IntentFilter;
 import android.content.SyncStatusObserver;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -43,7 +44,6 @@ import com.odoo.core.service.receivers.ISyncFinishReceiver;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
 
-import odoo.controls.fab.FloatingActionButton;
 
 public abstract class BaseFragment extends Fragment implements IBaseFragment {
     private Context mContext;
@@ -246,8 +246,8 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
                                      View.OnClickListener clickListener) {
         mFab = (FloatingActionButton) view.findViewById(res_id);
         if (mFab != null) {
-            if (list != null)
-                mFab.listenTo(list);
+//            if (list != null)
+//                mFab.listenTo(list);
             mFab.setOnClickListener(clickListener);
         }
     }

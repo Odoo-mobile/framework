@@ -33,7 +33,7 @@ import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.sync.SyncUtils;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 
@@ -48,7 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.base_setting_activity);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this, true);
         ActionBar actionbar = getSupportActionBar();
         if(actionbar!=null) {
             actionbar.setHomeButtonEnabled(true);

@@ -54,4 +54,9 @@
 
     <color name="base_chatter_view_background">#f3f3f3</color>
     <color name="base_chatter_view_note_background">#dadada</color>
+
+    <color name="translucent_scrim_top">#26000000</color>
+    <color name="translucent_scrim_top_center">#0C000000</color>
+    <color name="translucent_scrim_bottom">#2A000000</color>
+    <color name="translucent_scrim_bottom_center">#0D000000</color>
 </resources>

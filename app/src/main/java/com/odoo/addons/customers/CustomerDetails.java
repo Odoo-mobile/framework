@@ -46,7 +46,7 @@ import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
@@ -78,7 +78,7 @@ public class CustomerDetails extends AppCompatActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.customer_detail);
-        OActionBarUtils.setActionBar(this, false);
+        OAppBarUtils.setAppBar(this, false);
         fileManager = new OFileManager(this);
         actionBar = getSupportActionBar();
         actionBar.setTitle("");

@@ -60,7 +60,7 @@ import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.BitmapUtils;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OFragmentUtils;
@@ -117,7 +117,7 @@ public class OdooActivity extends AppCompatActivity {
             }, 1000);
         }
         setContentView(R.layout.odoo_activity);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this, true);
         setupDrawer();
 
         // Validating user object

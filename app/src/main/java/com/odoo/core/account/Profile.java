@@ -20,51 +20,32 @@
 package com.odoo.core.account;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.odoo.R;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
-import com.odoo.widgets.parallax.ParallaxScrollView;
 
-import odoo.controls.OField;
 import odoo.controls.OForm;
 
-public class Profile extends AppCompatActivity implements View.OnClickListener {
+public class Profile extends AppCompatActivity {
     public static final String TAG = Profile.class.getSimpleName();
-    private OUser user;
-    private OForm form;
-    private ParallaxScrollView parallaxScrollView;
-    private TextView title;
-    private Handler handler = null;
-    private int click_count = 0;
-    public static String CONNECT_WITH_ODOO = "enable_connect_with_odoo";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.base_profile);
-        OActionBarUtils.setActionBar(this, false);
-        user = OUser.current(this);
-        form = (OForm) findViewById(R.id.profileDetails);
-        OField user_login = (OField) findViewById(R.id.user_login);
-        parallaxScrollView = (ParallaxScrollView) findViewById(R.id.parallaxScrollView);
-        parallaxScrollView.setActionBar(getSupportActionBar());
-        setTitle("");
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable((Color.parseColor("#00000000"))));
-        title = (TextView) findViewById(android.R.id.title);
+        OAppBarUtils.setAppBar(this, true);
+        OUser user = OUser.current(this);
+        OForm form = (OForm) findViewById(R.id.profileDetails);
         int color = OStringColorUtil.getStringColor(this, user.getName());
-        parallaxScrollView.setParallaxOverLayColor(color);
         form.setIconTintColor(color);
         ODataRow userData = new ODataRow();
         userData.put("name", user.getName());
@@ -74,40 +55,28 @@ public class Profile extends AppCompatActivity implements View.OnClickListener {
         userData.put("version", user.getOdooVersion().getServerSerie());
         userData.put("timezone", user.getTimezone());
         form.initForm(userData);
-        title.setText(userData.getString("name"));
 
+        CollapsingToolbarLayout collapsing_toolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsing_toolbar.setTitle(userData.getString("name"));
+        setTitle(userData.getString("name"));
         Bitmap avatar;
         if (user.getAvatar().equals("false")) {
             avatar = BitmapUtils.getAlphabetImage(this, user.getName());
         } else {
             avatar = BitmapUtils.getBitmapImage(this, user.getAvatar());
         }
-        ImageView imageView = (ImageView) findViewById(android.R.id.icon);
+        ImageView imageView = (ImageView) findViewById(R.id.image);
         imageView.setImageBitmap(avatar);
-        user_login.setOnClickListener(this);
-
     }
 
     @Override
-    public void onClick(View v) {
-//        FIXME:
-//
-//          handler = getWindow().getDecorView().getHandler();
-//        click_count = click_count + 1;
-//        Runnable r = new Runnable() {
-//            public void run() {
-//                click_count = 0;
-//            }
-//        };
-//        handler.postDelayed(r, 7000);
-//
-//        if (click_count == 3) {
-//            Toast.makeText(this, "Need 2 Tap to connect with odoo", Toast.LENGTH_SHORT).show();
-//        }
-//        if (click_count == 5) {
-//            OPreferenceManager pref = new OPreferenceManager(this);
-//            pref.setBoolean(CONNECT_WITH_ODOO, true);
-//        }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
 
