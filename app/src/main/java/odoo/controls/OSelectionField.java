@@ -403,7 +403,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             if (!row.getString(mModel.getDefaultNameColumn()).equals("false"))
                 txvView.setText(row.getString(mModel.getDefaultNameColumn()));
         }
-        if (mValueUpdateListener != null && mValue != -1) {
+        if (mValueUpdateListener != null && !mValue.toString().equals("-1")) {
             mValueUpdateListener.onValueUpdate(row);
         }
     }
