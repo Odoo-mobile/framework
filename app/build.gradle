@@ -4,7 +4,7 @@ android {
     signingConfigs {
     }
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.1"
     defaultConfig {
         //FIXME: Change application name as your requirement
         manifestPlaceholders = [applicationName: "Odoo"]
@@ -25,10 +25,10 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:23.0.0'
-    compile 'com.android.support:cardview-v7:23.0.0'
-    compile 'com.google.android.gms:play-services:7.8.0'
-    compile 'com.android.support:design:23.0.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:cardview-v7:23.1.1'
+    compile 'com.google.android.gms:play-services:8.3.0'
+    compile 'com.android.support:design:23.1.1'
     compile project(':intro-slider-lib')
     compile project(':parallax-effect-lib')
     compile project(':odoo-rpc-v3')
