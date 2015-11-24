@@ -329,11 +329,11 @@ public class MailChatterCompose extends AppCompatActivity implements View.OnClic
                 data.put("type", "comment");
                 data.put("content_subtype", "plaintext");
                 data.put("subtype", (mType == MessageType.Message) ? "mail.mt_comment" : false);
-                int newId = (int)
+                Double newId = (double)
                         mModel.getServerDataHelper().callMethod("message_post", args, null, data);
                 Thread.sleep(500);
                 ODataRow row = new ODataRow();
-                row.put("id", newId);
+                row.put("id", newId.intValue());
                 mailMessage.quickCreateRecord(row);
                 return true;
             } catch (Exception e) {
