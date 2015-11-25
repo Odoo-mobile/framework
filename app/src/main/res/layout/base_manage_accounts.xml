@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="match_parent">
-
-    <View style="@style/StatusBarView" />
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include layout="@layout/base_appbar" />
 
     <odoo.controls.ExpandableListControl
         android:id="@+id/accountList"
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_height="wrap_content"></odoo.controls.ExpandableListControl>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"></odoo.controls.ExpandableListControl>
 
 </LinearLayout>
