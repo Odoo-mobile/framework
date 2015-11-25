@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.odoo.App;
 import com.odoo.R;
@@ -331,8 +330,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             } else {
                 // FIXME: Need to check again. Not working properly
                 //showSignInErrorNotification(context, user);
-                Toast.makeText(context, OResource.string(context, R.string.toast_something_gone_wrong),
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, OResource.string(context, R.string.toast_something_gone_wrong),
+//                        Toast.LENGTH_LONG).show();
+                Log.e(TAG, OResource.string(context, R.string.toast_something_gone_wrong));
             }
         }
         return odoo;
