@@ -1,28 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/theme_primary_dark"
-    android:fitsSystemWindows="@bool/fitToScreenWindow">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Base Toolbar -->
-        <include layout="@layout/base_toolbar" />
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <include layout="@layout/base_appbar" />
+        </android.support.design.widget.AppBarLayout>
 
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:background="@android:color/white">
 
         </FrameLayout>
+
+
     </LinearLayout>
 
-    <include layout="@layout/base_drawer" />
+    <LinearLayout
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#ccc"
+        android:orientation="vertical">
+
+        <include layout="@layout/base_drawer" />
+    </LinearLayout>
+
 </android.support.v4.widget.DrawerLayout>

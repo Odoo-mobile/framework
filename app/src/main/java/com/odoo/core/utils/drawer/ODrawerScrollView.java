@@ -40,7 +40,7 @@ public class ODrawerScrollView extends ScrollView {
             return;
         }
         mInsetForeground = a
-                .getDrawable(R.styleable.ODrawerScrollView_insetForeground);
+                .getDrawable(R.styleable.ODrawerScrollView__insetForeground);
         a.recycle();
 
         setWillNotDraw(true);

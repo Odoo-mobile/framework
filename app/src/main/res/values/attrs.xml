@@ -6,7 +6,7 @@
         <attr name="desaturateOnPress" format="boolean" />
     </declare-styleable>
     <declare-styleable name="ODrawerScrollView">
-        <attr name="insetForeground" format="reference|color" />
+        <attr name="_insetForeground" format="reference|color" />
     </declare-styleable>
 
     <!-- Custom Controls -->

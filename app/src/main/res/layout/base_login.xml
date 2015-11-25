@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/theme_primary"
-    android:paddingTop="@dimen/statusBarHeight"
+    android:paddingTop="@dimen/app_bar_top_padding"
     android:fillViewport="true">
 
     <LinearLayout

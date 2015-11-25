@@ -25,9 +25,9 @@ import android.support.v7.widget.Toolbar;
 
 import com.odoo.R;
 
-public class OActionBarUtils {
+public class OAppBarUtils {
 
-    public static void setActionBar(AppCompatActivity activity, Boolean withHomeButtonEnabled) {
+    public static void setAppBar(AppCompatActivity activity, Boolean withHomeButtonEnabled) {
         Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
         if (toolbar != null) {
             activity.setSupportActionBar(toolbar);

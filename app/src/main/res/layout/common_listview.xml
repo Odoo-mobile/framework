@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#fff">
 
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/data_list_container"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/customer_no_items"
@@ -28,7 +29,7 @@
             <ListView
                 android:id="@+id/listview"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></ListView>
+                android:layout_height="fill_parent" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <include
@@ -36,14 +37,14 @@
             layout="@layout/listview_data_loading_progress" />
     </LinearLayout>
 
-    <odoo.controls.fab.FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabButton"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="@dimen/default_8dp"
-        android:layout_marginRight="@dimen/default_8dp"
-        odoo:drawable="@drawable/ic_action_content_add"
-        odoo:fabColor="@color/theme_primary" />
+        android:layout_margin="@dimen/default_16dp"
+        android:src="@drawable/ic_action_content_add"
+        app:borderWidth="0dp"
+        app:layout_behavior="odoo.controls.fab.FABScrollBehaviour" />
 </RelativeLayout>

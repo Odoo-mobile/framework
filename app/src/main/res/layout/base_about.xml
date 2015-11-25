@@ -44,7 +44,7 @@
                     android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="20dp"
-                    android:src="@drawable/odoo_small"
+                    android:src="@drawable/odoo_mobile_small"
                     android:tint="#ffffff" />
 
                 <TextView
@@ -53,11 +53,21 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@string/font_condensed"
                     android:gravity="center"
-                    android:paddingBottom="10dp"
+                    android:paddingBottom="5dp"
                     android:paddingTop="25dp"
                     android:text="@string/app_version_name"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textColor="#ebebeb" />
+                <TextView
+                    android:id="@+id/txvVersionCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@string/font_light"
+                    android:gravity="center"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="5dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#77ebebeb" />
             </LinearLayout>
 
             <LinearLayout

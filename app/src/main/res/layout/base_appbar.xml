@@ -5,17 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/theme_primary"
-    android:minHeight="?attr/actionBarSize"
-    app:titleMarginStart="@dimen/default_16dp"
     android:paddingRight="@dimen/default_8dp"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    app:theme="@style/ToolBarTheme">
+    android:paddingTop="@dimen/app_bar_top_padding"
+    android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+    android:theme="@style/AppBar.Dark"
+    app:layout_scrollFlags="scroll|enterAlways"
+    app:titleMarginStart="@dimen/default_16dp">
 
     <Spinner
         android:id="@+id/spinner_nav"
-        android:visibility="gone"
-        android:layout_marginLeft="@dimen/default_16dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/default_16dp"
+        android:visibility="gone" />
 
 </android.support.v7.widget.Toolbar>
