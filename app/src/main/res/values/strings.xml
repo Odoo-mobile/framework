@@ -12,4 +12,7 @@
     <string name="label_send_message"><u>Send a message</u></string>
     <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
     <string name="label_version_build">Build</string>
+    <string name="toast_permission_download_storage">Storage permission required to create downloaded file on your sdcard.</string>
+    <string name="toast_permission_download_storage_help">Storage permission required to store downloaded files on sdcard of your phone. Please grant permission for use this feature</string>
+    <string name="alert_permission_help">Some of permission required to start application. Please grant permission from application settings.</string>
 </resources>

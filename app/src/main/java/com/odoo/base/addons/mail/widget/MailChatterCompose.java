@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +44,7 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
@@ -59,7 +59,7 @@ import odoo.helper.OArguments;
 import odoo.helper.ORecordValues;
 
 
-public class MailChatterCompose extends AppCompatActivity implements View.OnClickListener {
+public class MailChatterCompose extends OdooCompatActivity implements View.OnClickListener {
     public static final String TAG = MailChatterCompose.class.getSimpleName();
     private OModel mModel;
     private IrAttachment irAttachment;

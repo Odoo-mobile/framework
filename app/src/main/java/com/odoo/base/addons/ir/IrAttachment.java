@@ -30,9 +30,12 @@ import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
+import java.util.ArrayList;
+
 import odoo.helper.ODomain;
 import odoo.helper.ORecordValues;
 import odoo.helper.OdooFields;
+import odoo.helper.utils.gson.OdooRecord;
 import odoo.helper.utils.gson.OdooResult;
 
 
@@ -93,8 +96,9 @@ public class IrAttachment extends OModel {
         OdooFields fields = new OdooFields();
         fields.addAll(new String[]{"datas"});
         OdooResult result = getServerDataHelper().read(fields, selectServerId(row_id));
-        if (result != null) {
-            return result.getString("datas");
+        if (result != null && result.has("result") && result.get("result") instanceof ArrayList) {
+            OdooRecord res = (OdooRecord) result.getArray("result").get(0);
+            return res.getString("datas");
         }
         return "false";
     }
