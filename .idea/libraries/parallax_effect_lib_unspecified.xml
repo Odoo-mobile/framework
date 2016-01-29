@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="parallax-effect-lib-unspecified">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/Mob_framework/parallax-effect-lib/unspecified/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/Mob_framework/parallax-effect-lib/unspecified/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
