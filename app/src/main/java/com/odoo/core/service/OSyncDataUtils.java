@@ -144,8 +144,9 @@ public class OSyncDataUtils {
                         mOdoo.searchRead(model.getModelName(), fields, domain, 0, 0, null);
                 result = response.getRecords();
             } else {
+                Log.i(TAG, "Perm Read hidden fields for write_date and create_date : (Only in Odoo 7.0) for " + ids);
                 OdooResult response = mOdoo.permRead(model.getModelName(), ids);
-                result = response.getRecords();
+                result = response.getArray("result");
             }
 
             if (!result.isEmpty()) {
