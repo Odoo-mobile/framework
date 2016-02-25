@@ -153,4 +153,6 @@
     <string name="app_version_name">Version</string>
     <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
     <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.com/">Terms of Service</a> and <a href="http://www.odoo.com/">Privacy Policy</a></string>
+    <string name="label_follow_on_twitter">Follow us on Twitter !</string>
+    <string name="label_contact_us">Contact Us</string>
 </resources>

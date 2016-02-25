@@ -1,26 +1,31 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 30/12/14 4:27 PM
  */
 package com.odoo.core.utils.drawer;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.support.v4.app.ShareCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,10 +41,13 @@ import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
+import com.odoo.datas.OConstants;
 import com.odoo.news.News;
 import com.odoo.news.models.OdooNews;
+import com.om.DeviceInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -57,12 +65,12 @@ public class DrawerUtils {
             }
         }
         items.addAll(DrawerUtils.baseSettingsItems(context));
+        items.addAll(DrawerUtils.odooMobileItems(context));
         return items;
     }
 
     public static List<ODrawerItem> baseSettingsItems(Context context) {
         String key = "base.settings";
-        OPreferenceManager pref = new OPreferenceManager(context);
         List<ODrawerItem> settings = new ArrayList<>();
         settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_settings))
                 .setGroupTitle());
@@ -71,10 +79,6 @@ public class DrawerUtils {
         settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_settings))
                 .setIcon(R.drawable.ic_action_settings)
                 .setInstance(SettingsActivity.class));
-//        if (pref.getBoolean(Profile.CONNECT_WITH_ODOO, false))
-//            settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_access_odoo_mobile))
-//                    .setInstance(OdooMobileQRReader.class).setIcon(R.drawable.ic_action_qrcode)
-//                    .setExtra(OUser.current(context).getAsBundle()));
         OdooNews news = new OdooNews(context, null);
         if (!news.isEmptyTable()) {
             settings.add(new ODrawerItem(key).setTitle("Odoo News")
@@ -82,6 +86,54 @@ public class DrawerUtils {
             );
         }
         return settings;
+    }
+
+    public static List<ODrawerItem> odooMobileItems(Context context) {
+        String key = "odoo.mobile.options";
+        String appName = OResource.string(context, R.string.app_name);
+        String versionAndBuild = "";
+        PackageManager packageManager = context.getPackageManager();
+        try {
+            String packageName = context.getPackageName();
+            String versionName = packageManager.getPackageInfo(packageName, 0).versionName + "";
+            String versionCode = packageManager.getPackageInfo(packageName, 0).versionCode + "";
+            versionAndBuild = versionName + "[" + versionCode + "]";
+            appName += " " + versionName;
+        } catch (Exception e) {
+            Log.w(key, e.getMessage());
+        }
+
+        DeviceInfo deviceInfo = new DeviceInfo(context);
+        String deviceLog = "";
+        deviceLog += ("Brand: " + deviceInfo.getDeviceBrand() + " " + deviceInfo.getDeviceModel() + "\n");
+        deviceLog += ("Application: " + deviceInfo.getAppName() +
+                " (" + deviceInfo.getAppPackage() + ") : " + versionAndBuild + "\n");
+        deviceLog += "OS Version: " + deviceInfo.androidOSVersion() + "\n";
+        Intent followOnTwitter = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://twitter.com/intent/follow?screen_name="
+                        + OConstants.TWITTER_ACCOUNT_NAME));
+        Intent contactUs = new Intent(Intent.ACTION_SENDTO);
+        contactUs.setData(Uri.parse("mailto:" + OConstants.FEEDBACK_EMAIL));
+//        contactUs.setType("message/rfc822");
+        contactUs.putExtra(Intent.EXTRA_EMAIL, new String[]{OConstants.FEEDBACK_EMAIL});
+        contactUs.putExtra(Intent.EXTRA_SUBJECT, appName + " report");
+        contactUs.putExtra(Intent.EXTRA_TEXT, deviceLog);
+        if (contactUs.resolveActivity(packageManager) == null) {
+            contactUs.setAction(Intent.ACTION_SEND);
+        }
+        return Arrays.asList(
+                new ODrawerItem(key)
+                        .setTitle(appName)
+                        .setGroupTitle(),
+                new ODrawerItem(key)
+                        .setTitle(OResource.string(context, R.string.label_follow_on_twitter))
+                        .setInstance(followOnTwitter)
+                        .setIcon(R.drawable.ic_action_social_twitter),
+                new ODrawerItem(key)
+                        .setTitle(OResource.string(context, R.string.label_contact_us))
+                        .setIcon(R.drawable.ic_action_help)
+                        .setInstance(contactUs)
+        );
     }
 
     public static View fillDrawerItemValue(View view, ODrawerItem item) {

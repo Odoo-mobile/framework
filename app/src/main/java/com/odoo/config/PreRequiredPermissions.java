@@ -1,9 +1,4 @@
 package com.odoo.config;
-
-import android.Manifest;
-
-import com.odoo.core.tools.permissions.DevicePermissionHelper;
-
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
@@ -23,16 +18,21 @@ import com.odoo.core.tools.permissions.DevicePermissionHelper;
  * <p/>
  * Created on 30/11/15
  */
+
+import android.Manifest;
+
+import com.odoo.core.tools.permissions.DevicePermissionHelper;
+
 public class PreRequiredPermissions implements DevicePermissionHelper.DevicePermissionImpl {
     public static final String TAG = PreRequiredPermissions.class.getSimpleName();
-
 
     /**
      * Provide permission list used by device, This method invoked only in API23+ devices.
      * Used by runtime permission model of Odoo Mobile to identify default required permissions
      * before start using application.
-     *
+     * <p/>
      * If, user not grant any of this permission; application will not start.
+     *
      * @return String[] array of required permissions.
      */
     @Override

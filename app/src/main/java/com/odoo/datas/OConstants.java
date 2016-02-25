@@ -36,4 +36,9 @@ public class OConstants {
      * when you change your database model in case of released apk.
      */
     public static final int DATABASE_VERSION = 1;
+
+
+    // Social & feedback
+    public static final String FEEDBACK_EMAIL = "";
+    public static final String TWITTER_ACCOUNT_NAME = "odoomobile";
 }

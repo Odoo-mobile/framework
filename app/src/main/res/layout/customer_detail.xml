@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="#ffffff"
     android:layout_height="match_parent">
-
+<!--
 
     <com.odoo.widgets.parallax.ParallaxScrollView
         android:id="@+id/parallaxScrollView"
@@ -144,7 +144,7 @@
                 </odoo.controls.OForm>
             </LinearLayout>
         </RelativeLayout>
-    </com.odoo.widgets.parallax.ParallaxScrollView>
+    </com.odoo.widgets.parallax.ParallaxScrollView> //-->
 
     <ScrollView
         android:id="@+id/customerScrollViewEdit"
@@ -152,7 +152,6 @@
         android:layout_marginTop="56dp"
         android:paddingTop="@dimen/statusBarHeight"
         android:clipToPadding="false"
-        android:visibility="gone"
         android:layout_height="wrap_content">
 
         <odoo.controls.OForm

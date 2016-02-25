@@ -29,7 +29,6 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,15 +44,15 @@ import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.BitmapUtils;
-import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
-import com.odoo.widgets.parallax.ParallaxScrollView;
 
 import odoo.controls.OField;
 import odoo.controls.OForm;
 import odoo.helper.OdooFields;
 import odoo.helper.utils.gson.OdooResult;
+
+//import com.odoo.widgets.parallax.ParallaxScrollView;
 
 public class CustomerDetails extends OdooCompatActivity
         implements View.OnClickListener, OField.IOnFieldValueChangeListener {
@@ -64,7 +63,7 @@ public class CustomerDetails extends OdooCompatActivity
     private Bundle extras;
     private ResPartner resPartner;
     private ODataRow record = null;
-    private ParallaxScrollView parallaxScrollView;
+//    private ParallaxScrollView parallaxScrollView;
     private ImageView userImage = null, captureImage = null;
     private TextView mTitleView = null;
     private OForm mForm;
@@ -88,10 +87,10 @@ public class CustomerDetails extends OdooCompatActivity
             newImage = savedInstanceState.getString(KEY_NEW_IMAGE);
         }
         app = (App) getApplicationContext();
-        parallaxScrollView = (ParallaxScrollView) findViewById(R.id.parallaxScrollView);
-        parallaxScrollView.setActionBar(actionBar);
-        userImage = (ImageView) findViewById(android.R.id.icon);
-        mTitleView = (TextView) findViewById(android.R.id.title);
+//        parallaxScrollView = (ParallaxScrollView) findViewById(R.id.parallaxScrollView);
+//        parallaxScrollView.setActionBar(actionBar);
+//        userImage = (ImageView) findViewById(android.R.id.icon);
+//        mTitleView = (TextView) findViewById(android.R.id.title);
         resPartner = new ResPartner(this, null);
         extras = getIntent().getExtras();
         if (extras == null)
@@ -110,6 +109,7 @@ public class CustomerDetails extends OdooCompatActivity
         if (record != null) {
             color = OStringColorUtil.getStringColor(this, record.getString("name"));
         }
+        edit  = true;
         if (edit) {
             if (extras != null)
                 actionBar.setTitle(R.string.label_edit);
@@ -120,16 +120,16 @@ public class CustomerDetails extends OdooCompatActivity
             captureImage = (ImageView) findViewById(R.id.captureImage);
             captureImage.setOnClickListener(this);
             userImage = (ImageView) findViewById(android.R.id.icon1);
-            findViewById(R.id.parallaxScrollView).setVisibility(View.GONE);
+//            findViewById(R.id.parallaxScrollView).setVisibility(View.GONE);
             findViewById(R.id.customerScrollViewEdit).setVisibility(View.VISIBLE);
             OField is_company = (OField) findViewById(R.id.is_company_edit);
             is_company.setOnValueChangeListener(this);
         } else {
-            actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.action_bar_shade));
-            userImage = (ImageView) findViewById(android.R.id.icon);
-            mForm = (OForm) findViewById(R.id.customerForm);
-            findViewById(R.id.customerScrollViewEdit).setVisibility(View.GONE);
-            findViewById(R.id.parallaxScrollView).setVisibility(View.VISIBLE);
+//            actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.action_bar_shade));
+//            userImage = (ImageView) findViewById(android.R.id.icon);
+//            mForm = (OForm) findViewById(R.id.customerForm);
+//            findViewById(R.id.customerScrollViewEdit).setVisibility(View.GONE);
+//            findViewById(R.id.parallaxScrollView).setVisibility(View.VISIBLE);
         }
         setColor(color);
     }
@@ -148,7 +148,7 @@ public class CustomerDetails extends OdooCompatActivity
             setMode(mEditMode);
             mForm.setEditable(mEditMode);
             mForm.initForm(record);
-            mTitleView.setText(record.getString("name"));
+//            mTitleView.setText(record.getString("name"));
             setCustomerImage();
             if (record.getInt("id") != 0 && record.getString("large_image").equals("false")) {
                 BigImageLoader bigImageLoader = new BigImageLoader();
@@ -160,21 +160,21 @@ public class CustomerDetails extends OdooCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.full_address:
-                IntentUtils.redirectToMap(this, record.getString("full_address"));
-                break;
-            case R.id.website:
-                IntentUtils.openURLInBrowser(this, record.getString("website"));
-                break;
-            case R.id.email:
-                IntentUtils.requestMessage(this, record.getString("email"));
-                break;
-            case R.id.phone_number:
-                IntentUtils.requestCall(this, record.getString("phone"));
-                break;
-            case R.id.mobile_number:
-                IntentUtils.requestCall(this, record.getString("mobile"));
-                break;
+//            case R.id.full_address:
+//                IntentUtils.redirectToMap(this, record.getString("full_address"));
+//                break;
+//            case R.id.website:
+//                IntentUtils.openURLInBrowser(this, record.getString("website"));
+//                break;
+//            case R.id.email:
+//                IntentUtils.requestMessage(this, record.getString("email"));
+//                break;
+//            case R.id.phone_number:
+//                IntentUtils.requestCall(this, record.getString("phone"));
+//                break;
+//            case R.id.mobile_number:
+//                IntentUtils.requestCall(this, record.getString("mobile"));
+//                break;
             case R.id.captureImage:
                 fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
                 break;
@@ -182,11 +182,11 @@ public class CustomerDetails extends OdooCompatActivity
     }
 
     private void checkControls() {
-        findViewById(R.id.full_address).setOnClickListener(this);
-        findViewById(R.id.website).setOnClickListener(this);
-        findViewById(R.id.email).setOnClickListener(this);
-        findViewById(R.id.phone_number).setOnClickListener(this);
-        findViewById(R.id.mobile_number).setOnClickListener(this);
+//        findViewById(R.id.full_address).setOnClickListener(this);
+//        findViewById(R.id.website).setOnClickListener(this);
+//        findViewById(R.id.email).setOnClickListener(this);
+//        findViewById(R.id.phone_number).setOnClickListener(this);
+//        findViewById(R.id.mobile_number).setOnClickListener(this);
     }
 
     private void setCustomerImage() {
@@ -208,13 +208,13 @@ public class CustomerDetails extends OdooCompatActivity
     }
 
     private void setColor(int color) {
-        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.parallax_view);
-        frameLayout.setBackgroundColor(color);
-        parallaxScrollView.setParallaxOverLayColor(color);
-        parallaxScrollView.setBackgroundColor(color);
+//        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.parallax_view);
+//        frameLayout.setBackgroundColor(color);
+//        parallaxScrollView.setParallaxOverLayColor(color);
+//        parallaxScrollView.setBackgroundColor(color);
         mForm.setIconTintColor(color);
-        findViewById(R.id.parallax_view).setBackgroundColor(color);
-        findViewById(R.id.parallax_view_edit).setBackgroundColor(color);
+//        findViewById(R.id.parallax_view).setBackgroundColor(color);
+//        findViewById(R.id.parallax_view_edit).setBackgroundColor(color);
         findViewById(R.id.customerScrollViewEdit).setBackgroundColor(color);
         if (captureImage != null) {
             GradientDrawable shapeDrawable =
