@@ -33,6 +33,7 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OControls;
 
 import odoo.Odoo;
+import odoo.handler.OdooVersionException;
 
 public class OdooUserObjectUpdater extends AlertDialog {
     public static final String TAG = OdooUserObjectUpdater.class.getSimpleName();
@@ -85,22 +86,25 @@ public class OdooUserObjectUpdater extends AlertDialog {
 
         @Override
         protected Boolean doInBackground(OUser... params) {
-            OUser user = params[0];
-            Odoo odoo = Odoo.createInstance(mContext, (user.isOAuthLogin())
-                    ? user.getInstanceURL() : user.getHost());
-            odoo.helper.OUser mUser = odoo.authenticate(user.getUsername(), user.getPassword(),
-                    (user.isOAuthLogin()) ? user.getInstanceDatabase() :
-                            user.getDatabase());
-            if (mUser != null) {
-                OUser updatedUser = new OUser();
-                updatedUser.setFromBundle(mUser.getAsBundle());
-                OdooAccountManager.updateUserData(mContext, user, updatedUser);
-                try {
-                    Thread.sleep(1500);
-                } catch (Exception e) {
+            try {
+                OUser user = params[0];
+                Odoo odoo = Odoo.createInstance(mContext, (user.isOAuthLogin())
+                        ? user.getInstanceURL() : user.getHost());
+                odoo.helper.OUser mUser = odoo.authenticate(user.getUsername(), user.getPassword(),
+                        (user.isOAuthLogin()) ? user.getInstanceDatabase() :
+                                user.getDatabase());
+                if (mUser != null) {
+                    OUser updatedUser = new OUser();
+                    updatedUser.setFromBundle(mUser.getAsBundle());
+                    OdooAccountManager.updateUserData(mContext, user, updatedUser);
 
+                    Thread.sleep(1500);
+                    return true;
                 }
-                return true;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (OdooVersionException e) {
+                e.printStackTrace();
             }
             return false;
         }

@@ -24,7 +24,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,16 +39,18 @@ import com.odoo.base.addons.mail.MailMessage;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OStringColorUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MailDetailDialog extends AppCompatActivity implements View.OnClickListener {
+public class MailDetailDialog extends OdooCompatActivity implements View.OnClickListener {
     public static final String TAG = MailDetailDialog.class.getSimpleName();
     private Bundle extra;
     private MailMessage mailMessage;
@@ -136,7 +137,7 @@ public class MailDetailDialog extends AppCompatActivity implements View.OnClickL
         ImageView imgPreview = (ImageView) attachmentView.findViewById(R.id.attachmentPreview);
         if (type.contains("image")) {
             if (!values.getString("file_uri").equals("false")) {
-                Uri uri = Uri.parse(values.getString("file_uri"));
+                Uri uri = Uri.parse(new File(values.getString("file_uri")).toString());
                 imgPreview.setImageBitmap(fileManager.getBitmapFromURI(uri));
             } else
                 imgPreview.setImageResource(R.drawable.image);

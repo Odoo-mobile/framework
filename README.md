@@ -35,4 +35,4 @@ GIVE FEEDBACK
 =============
 
  - Please report bug or issues [https://github.com/Odoo-mobile/framework/issues](https://github.com/Odoo-mobile/framework/issues)
- - You can also write us on **android@odoo.co.in**
+ - You can also write us on **android@mail.odoo.co.in**

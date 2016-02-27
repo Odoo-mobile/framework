@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import odoo.Odoo;
+import odoo.handler.OdooVersionException;
 import odoo.helper.OdooInstance;
 import odoo.listeners.IDatabaseListListener;
 import odoo.listeners.IOdooConnectionListener;
@@ -171,7 +172,11 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         findViewById(R.id.layoutDatabase).setVisibility(View.GONE);
                         String test_url = createServerURL(edtSelfHosted.getText().toString());
                         Log.v("", "Testing URL :" + test_url);
-                        Odoo.createInstance(OdooLogin.this, test_url).setOnConnect(OdooLogin.this);
+                        try {
+                            Odoo.createInstance(OdooLogin.this, test_url).setOnConnect(OdooLogin.this);
+                        } catch (OdooVersionException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -239,7 +244,11 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
         } else {
             mAutoLogin = true;
             Log.v("", "Testing URL: " + serverURL);
-            Odoo.createInstance(OdooLogin.this, serverURL).setOnConnect(OdooLogin.this);
+            try {
+                Odoo.createInstance(OdooLogin.this, serverURL).setOnConnect(OdooLogin.this);
+            } catch (OdooVersionException e) {
+                e.printStackTrace();
+            }
         }
     }
 

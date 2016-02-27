@@ -36,7 +36,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -56,6 +55,7 @@ import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.support.OUser;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.sync.SyncUtils;
@@ -72,7 +72,7 @@ import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.List;
 
-public class OdooActivity extends AppCompatActivity {
+public class OdooActivity extends OdooCompatActivity {
 
     public static final String TAG = OdooActivity.class.getSimpleName();
     public static final Integer DRAWER_ITEM_LAUNCH_DELAY = 300;
@@ -97,7 +97,6 @@ public class OdooActivity extends AppCompatActivity {
     private Bundle mSavedInstanceState = null;
     private Integer mDrawerSelectedIndex = -1;
     private Boolean mHasActionBarSpinner = false;
-
     private App app;
 
     @Override
@@ -106,6 +105,10 @@ public class OdooActivity extends AppCompatActivity {
         Log.i(TAG, "OdooActivity->onCreate");
         mSavedInstanceState = savedInstanceState;
         app = (App) getApplicationContext();
+        startApp(savedInstanceState);
+    }
+
+    private void startApp(Bundle savedInstanceState) {
         OPreferenceManager preferenceManager = new OPreferenceManager(this);
         if (!preferenceManager.getBoolean(KEY_FRESH_LOGIN, false)) {
             preferenceManager.setBoolean(KEY_FRESH_LOGIN, true);

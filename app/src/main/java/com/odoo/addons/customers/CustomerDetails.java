@@ -26,7 +26,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +43,7 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OAppBarUtils;
@@ -55,7 +55,7 @@ import odoo.controls.OForm;
 import odoo.helper.OdooFields;
 import odoo.helper.utils.gson.OdooResult;
 
-public class CustomerDetails extends AppCompatActivity
+public class CustomerDetails extends OdooCompatActivity
         implements View.OnClickListener, OField.IOnFieldValueChangeListener {
     public static final String TAG = CustomerDetails.class.getSimpleName();
     private final String KEY_MODE = "key_edit_mode";
@@ -81,7 +81,8 @@ public class CustomerDetails extends AppCompatActivity
         OAppBarUtils.setAppBar(this, false);
         fileManager = new OFileManager(this);
         actionBar = getSupportActionBar();
-        actionBar.setTitle("");
+        if (actionBar != null)
+            actionBar.setTitle("");
         if (savedInstanceState != null) {
             mEditMode = savedInstanceState.getBoolean(KEY_MODE);
             newImage = savedInstanceState.getString(KEY_NEW_IMAGE);
