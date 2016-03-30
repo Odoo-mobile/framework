@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 31/12/14 11:20 AM
  */
 package com.odoo.core.orm.fields;
@@ -58,6 +58,11 @@ public class OColumn {
     private Boolean functional_store = false;
     private String[] functional_store_depends = null;
     private String syncColumnName = null;
+
+    // Custom table name and custom column names for many to many type column
+    private String rel_table_name = null;
+    private String rel_base_column = null;
+    private String rel_relation_column = null;
 
     public OColumn(String label, Class<?> type) {
         this.label = label;
@@ -310,6 +315,33 @@ public class OColumn {
             return getSyncColumnName();
         }
         return getName();
+    }
+
+    public String getRelTableName() {
+        return rel_table_name;
+    }
+
+    public OColumn setRelTableName(String tableName) {
+        this.rel_table_name = tableName;
+        return this;
+    }
+
+    public String getRelBaseColumn() {
+        return rel_base_column;
+    }
+
+    public OColumn setRelBaseColumn(String rel_base_column) {
+        this.rel_base_column = rel_base_column;
+        return this;
+    }
+
+    public String getRelRelationColumn() {
+        return rel_relation_column;
+    }
+
+    public OColumn setRelRelationColumn(String rel_relation_column) {
+        this.rel_relation_column = rel_relation_column;
+        return this;
     }
 
     @Override

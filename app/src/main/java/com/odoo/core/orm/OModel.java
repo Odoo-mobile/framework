@@ -441,7 +441,7 @@ public class OModel implements ISyncServiceListener {
         return model_name;
     }
 
-    public List<OColumn> getManyToManyColumns(OModel relation_model) {
+    public List<OColumn> getManyToManyColumns(OColumn column, OModel relation_model) {
         List<OColumn> cols = new ArrayList<OColumn>();
         _write_date.setName("_write_date");
         cols.add(_write_date);
@@ -451,10 +451,12 @@ public class OModel implements ISyncServiceListener {
         cols.add(_is_active);
 
         OColumn base_id = new OColumn("Base Id", OInteger.class);
-        base_id.setName(getTableName() + "_id");
+        base_id.setName(column.getRelBaseColumn() != null ? column.getRelBaseColumn()
+                : getTableName() + "_id");
         cols.add(base_id);
         OColumn relation_id = new OColumn("Relation Id", OInteger.class);
-        relation_id.setName(relation_model.getTableName() + "_id");
+        relation_id.setName(column.getRelRelationColumn() != null ?
+                column.getRelRelationColumn() : relation_model.getTableName() + "_id");
         cols.add(relation_id);
         return cols;
     }
@@ -989,9 +991,12 @@ public class OModel implements ISyncServiceListener {
     public List<ODataRow> selectManyToManyRecords(String[] projection, String column_name, int row_id) {
         OColumn column = getColumn(column_name);
         OModel rel_model = createInstance(column.getType());
-        String table = getTableName() + "_" + rel_model.getTableName() + "_rel";
-        String base_column = getTableName() + "_id";
-        String rel_column = rel_model.getTableName() + "_id";
+        String table = column.getRelTableName() != null ? column.getRelTableName() :
+                getTableName() + "_" + rel_model.getTableName() + "_rel";
+        String base_column = column.getRelBaseColumn() != null ? column.getRelBaseColumn() :
+                getTableName() + "_id";
+        String rel_column = column.getRelRelationColumn() != null ? column.getRelRelationColumn() :
+                rel_model.getTableName() + "_id";
 
         // Getting relation table ids
         List<String> ids = new ArrayList<>();
