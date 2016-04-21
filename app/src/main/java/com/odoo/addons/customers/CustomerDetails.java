@@ -26,6 +26,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,6 +59,7 @@ import odoo.helper.utils.gson.OdooResult;
 public class CustomerDetails extends OdooCompatActivity
         implements View.OnClickListener, OField.IOnFieldValueChangeListener {
     public static final String TAG = CustomerDetails.class.getSimpleName();
+    public static String KEY_PARTNER_TYPE = "partner_type";
     private final String KEY_MODE = "key_edit_mode";
     private final String KEY_NEW_IMAGE = "key_new_image";
     private ActionBar actionBar;
@@ -73,6 +75,7 @@ public class CustomerDetails extends OdooCompatActivity
     private Menu mMenu;
     private OFileManager fileManager;
     private String newImage = null;
+    private Customers.Type partnerType = Customers.Type.Customer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,9 +97,15 @@ public class CustomerDetails extends OdooCompatActivity
         mTitleView = (TextView) findViewById(android.R.id.title);
         resPartner = new ResPartner(this, null);
         extras = getIntent().getExtras();
-        if (extras == null)
+        if (extras != null)
+            partnerType = Customers.Type.valueOf(extras.getString(KEY_PARTNER_TYPE));
+        if (!hasRecordInExtra())
             mEditMode = true;
         setupActionBar();
+    }
+
+    private boolean hasRecordInExtra() {
+        return extras != null && extras.containsKey(OColumn.ROW_ID);
     }
 
     private void setMode(Boolean edit) {
@@ -111,9 +120,9 @@ public class CustomerDetails extends OdooCompatActivity
             color = OStringColorUtil.getStringColor(this, record.getString("name"));
         }
         if (edit) {
-            if (extras != null)
+            if (hasRecordInExtra()) {
                 actionBar.setTitle(R.string.label_edit);
-            else
+            } else
                 actionBar.setTitle(R.string.label_new);
             actionBar.setBackgroundDrawable(new ColorDrawable(color));
             mForm = (OForm) findViewById(R.id.customerFormEdit);
@@ -135,7 +144,7 @@ public class CustomerDetails extends OdooCompatActivity
     }
 
     private void setupActionBar() {
-        if (extras == null) {
+        if (!hasRecordInExtra()) {
             setMode(mEditMode);
             userImage.setColorFilter(Color.parseColor("#ffffff"));
             mForm.setEditable(mEditMode);
@@ -230,6 +239,15 @@ public class CustomerDetails extends OdooCompatActivity
             case R.id.menu_customer_save:
                 OValues values = mForm.getValues();
                 if (values != null) {
+                    switch (partnerType) {
+                        case Supplier:
+                            values.put("customer", "false");
+                            values.put("supplier", "true");
+                            break;
+                        default:
+                            values.put("customer", "true");
+                            break;
+                    }
                     if (newImage != null) {
                         values.put("image_small", newImage);
                         values.put("large_image", newImage);
@@ -240,7 +258,6 @@ public class CustomerDetails extends OdooCompatActivity
                         mEditMode = !mEditMode;
                         setupActionBar();
                     } else {
-                        values.put("customer", "true");
                         final int row_id = resPartner.insert(values);
                         if (row_id != OModel.INVALID_ROW_ID) {
                             finish();
