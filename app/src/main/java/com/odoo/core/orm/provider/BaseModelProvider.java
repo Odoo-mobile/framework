@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 31/12/14 6:54 PM
  */
 package com.odoo.core.orm.provider;
@@ -31,12 +31,14 @@ import android.net.Uri;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
+import com.odoo.core.orm.RelValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
-import com.odoo.core.utils.OdooRecordUtils;
+import com.odoo.core.utils.OObjectUtils;
+import com.odoo.core.utils.logger.OLog;
 
-import java.io.InvalidObjectException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -159,14 +161,13 @@ public class BaseModelProvider extends ContentProvider {
         switch (match) {
             case COLLECTION:
                 SQLiteDatabase db = mModel.getWritableDatabase();
-                long new_id = 0;
-                new_id = db.insert(mModel.getTableName(), null, value_to_insert);
+                OLog.log(value_to_insert + "");
+                long new_id = db.insert(mModel.getTableName(), null, value_to_insert);
                 // Updating relation columns for record
                 if (values[1].size() > 0) {
                     storeUpdateRelationRecords(values[1], OColumn.ROW_ID + "  = ?", new String[]{new_id + ""});
                 }
-
-                return uri.withAppendedPath(uri, new_id + "");
+                return Uri.withAppendedPath(uri, new_id + "");
             case SINGLE_ROW:
                 throw new UnsupportedOperationException(
                         "Insert not supported on URI: " + uri);
@@ -250,10 +251,35 @@ public class BaseModelProvider extends ContentProvider {
         int row_id = mModel.selectRowId(selection, args);
         for (String key : values.keySet()) {
             try {
-                mModel.storeManyToManyRecord(key,
-                        row_id, OdooRecordUtils.<Integer>toList(values.getAsString(key)),
-                        OModel.Command.Replace);
-            } catch (InvalidObjectException e) {
+                OColumn column = mModel.getColumn(key);
+                RelValues relValues = (RelValues) OObjectUtils.byteToObject(
+                        (byte[]) values.get(key));
+                mModel.handleRelationValues(row_id, column, relValues);
+//                for (RelCommands command : relValues.getColumnValues().keySet()) {
+//                    switch (command) {
+//                        case Append:
+//                            break;
+//                        case Replace:
+//                            break;
+//                        case Delete:
+//                            break;
+//                        case Unlink:
+//                            break;
+//                    }
+//                }
+//                switch (column.getRelationType()) {
+//                    case ManyToMany:
+//                        break;
+//                    case OneToMany:
+//
+//                        break;
+//                    default:
+//                        mModel.storeManyToManyRecord(key,
+//                                row_id, OdooRecordUtils.<Integer>toList(values.getAsString(key)),
+//                                OModel.Command.Replace);
+//                }
+
+            } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -269,9 +295,22 @@ public class BaseModelProvider extends ContentProvider {
                     data_value.put(key, values.get(key));
                 } else {
                     if (column.getRelationType() == OColumn.RelationType.ManyToOne) {
-                        data_value.put(key, values.get(key));
+                        if (!(values.get(key) instanceof byte[]))
+                            data_value.put(key, values.get(key));
+                        else {
+                            // Creating many to one record and assigning id to record
+                            OModel m2oModel = mModel.createInstance(column.getType());
+                            try {
+                                OValues m2oVal = (OValues) OObjectUtils.byteToObject(
+                                        (byte[]) values.get(key));
+                                int id = m2oModel.insert(m2oVal);
+                                data_value.put(key, id);
+                            } catch (IOException | ClassNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     } else {
-                        rel_value.put(key, values.get(key).toString());
+                        rel_value.put(key, values.get(key));
                     }
                 }
             }

@@ -64,6 +64,12 @@ public class ResPartner extends OModel {
             .setLocalColumn();
     OColumn large_image = new OColumn("Image", OBlob.class).setDefaultValue("false").setLocalColumn();
 
+    OColumn category_id = new OColumn("Tags", ResPartnerCategory.class,
+            OColumn.RelationType.ManyToMany);
+
+    OColumn child_ids = new OColumn("Contacts", ResPartner.class, OColumn.RelationType.OneToMany)
+            .setRelatedColumn("parent_id");
+
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);
         setHasMailChatter(true);

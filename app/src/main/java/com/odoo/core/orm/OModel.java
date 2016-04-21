@@ -892,7 +892,7 @@ public class OModel implements ISyncServiceListener {
             update(row_id, values);
             count++;
         }
-        return (count > 0) ? true : false;
+        return count > 0;
     }
 
     public int update(String selection, String[] args, OValues values) {
@@ -900,9 +900,9 @@ public class OModel implements ISyncServiceListener {
     }
 
     public boolean update(int row_id, OValues values) {
-        int count = mContext.getContentResolver().update(uri().withAppendedPath(uri(), row_id + ""),
+        int count = mContext.getContentResolver().update(Uri.withAppendedPath(uri(), row_id + ""),
                 values.toContentValues(), null, null);
-        return (count > 0) ? true : false;
+        return count > 0;
     }
 
 
@@ -940,6 +940,107 @@ public class OModel implements ISyncServiceListener {
         return count;
     }
 
+
+    /**
+     * Handle record values for insert, update, delete operation with relation columns
+     * Each record have different behaviour, appending, deleting, unlink reference and
+     * replacing with new list
+     *
+     * @param record_id Main record id on which relation values affected
+     * @param column    column object of the record (for relation column only)
+     * @param values    values list with commands (@see RelCommands)
+     */
+    public void handleRelationValues(int record_id, OColumn column, RelValues values) {
+        OModel relModel = createInstance(column.getType());
+        HashMap<RelCommands, List<Object>> columnValues = values.getColumnValues();
+        for (RelCommands commands : columnValues.keySet()) {
+            switch (column.getRelationType()) {
+                case OneToMany:
+                    handleOneToManyRecords(column, commands, relModel, record_id, columnValues);
+                case ManyToMany:
+//                    handleManyToManyRecords(column, commands, relModel, record_id, columnValues);
+                    break;
+            }
+        }
+    }
+
+    private void handleOneToManyRecords(OColumn column, RelCommands commands, OModel relModel,
+                                        int record_id, HashMap<RelCommands, List<Object>> values) {
+        if (commands == RelCommands.Replace) {
+            // Force to unlink record even no any other record values available.
+            OValues old_values = new OValues();
+            old_values.put(column.getRelatedColumn(), 0);
+            int count = relModel.update(column.getRelatedColumn() + " = ?", new String[]{record_id + ""},
+                    old_values);
+            Log.i(TAG, String.format("#%d references removed " + relModel.getModelName(), count));
+        }
+        for (Object rowObj : values.get(commands)) {
+            switch (commands) {
+                case Append:
+                    OValues value;
+                    if (rowObj instanceof OValues) {
+                        value = (OValues) rowObj;
+                        value.put(column.getRelatedColumn(), record_id);
+                        relModel.insert(value);
+                    } else {
+                        int rec_id = (int) rowObj;
+                        value = new OValues();
+                        value.put(column.getRelatedColumn(), record_id);
+                        relModel.update(rec_id, value);
+                    }
+                    break;
+                case Replace:
+                    if (rowObj instanceof OValues) {
+                        value = (OValues) rowObj;
+                        value.put(column.getRelatedColumn(), record_id);
+                        relModel.insert(value);
+                    } else {
+                        int rec_id = (int) rowObj;
+                        value = new OValues();
+                        value.put(column.getRelatedColumn(), record_id);
+                        relModel.update(rec_id, value);
+                    }
+                    break;
+                case Delete:
+                    relModel.delete((int) rowObj);
+                    break;
+                case Unlink:
+                    // Removing all older references
+                    OValues old_update = new OValues();
+                    old_update.put(column.getRelatedColumn(), 0);
+                    relModel.update((int) rowObj, old_update);
+                    break;
+            }
+        }
+    }
+
+    private void handleManyToManyRecords(OColumn column, RelCommands commands, OModel relModel,
+                                         int record_id, HashMap<RelCommands, List<Object>> values) {
+
+        String table = column.getRelTableName() != null ? column.getRelTableName() :
+                getTableName() + "_" + relModel.getTableName() + "_rel";
+        String base_column = column.getRelBaseColumn() != null ? column.getRelBaseColumn() :
+                getTableName() + "_id";
+        String rel_column = column.getRelRelationColumn() != null ? column.getRelRelationColumn() :
+                relModel.getTableName() + "_id";
+        SQLiteDatabase db = getWritableDatabase();
+        switch (commands) {
+            case Append:
+                ContentValues vals = new ContentValues();
+                vals.put(base_column, record_id);
+                vals.put(rel_column, 0);
+                vals.put("_write_date", ODateUtils.getDate());
+                db.insert(table, null, vals);
+                break;
+            case Replace:
+                break;
+            case Delete:
+                break;
+            case Unlink:
+                break;
+        }
+        db.close();
+    }
 
     public void storeManyToManyRecord(String column_name, int row_id, List<Integer> relationIds,
                                       Command command)

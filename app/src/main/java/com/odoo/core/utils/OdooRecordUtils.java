@@ -106,37 +106,38 @@ public class OdooRecordUtils {
                         List<Object> o2mRecords = new ArrayList<>();
                         List<ODataRow> o2mRecordList = row.getO2MRecord(
                                 col.getName()).browseEach();
+                        List<Integer> rec_ids = new ArrayList<>();
                         if (o2mRecordList.size() > 0) {
-                            List<Integer> rec_ids = new ArrayList<>();
                             for (ODataRow o2mR : o2mRecordList) {
                                 if (o2mR.getInt("id") != 0)
                                     rec_ids.add(o2mR.getInt("id"));
                             }
-                            o2mRecords.add(6);
-                            o2mRecords.add(false);
-                            o2mRecords.add(rec_ids);
-                            List<Object> oneToManyValue = new ArrayList<>();
-                            oneToManyValue.add(o2mRecords);
-                            values.put(col.getSyncColumn(), oneToManyValue);
                         }
+                        o2mRecords.add(6);
+                        o2mRecords.add(false);
+                        o2mRecords.add(rec_ids);
+                        List<Object> oneToManyValue = new ArrayList<>();
+                        oneToManyValue.add(o2mRecords);
+                        values.put(col.getSyncColumn(), oneToManyValue);
+
                         break;
                     case ManyToMany:
                         List<Object> m2mRecords = new ArrayList<>();
                         List<ODataRow> m2mRecordList = row.getM2MRecord(
                                 col.getName()).browseEach();
+                        rec_ids = new ArrayList<>();
                         if (!m2mRecordList.isEmpty()) {
-                            List<Integer> rec_ids = new ArrayList<>();
                             for (ODataRow o2mR : m2mRecordList) {
                                 if (o2mR.getInt("id") != 0)
                                     rec_ids.add(o2mR.getInt("id"));
                             }
-                            m2mRecords.add(6);
-                            m2mRecords.add(false);
-                            m2mRecords.add(rec_ids);
-                            List<Object> manyToManyRecord = new ArrayList<>();
-                            manyToManyRecord.add(m2mRecords);
-                            values.put(col.getSyncColumn(), manyToManyRecord);
                         }
+                        m2mRecords.add(6);
+                        m2mRecords.add(false);
+                        m2mRecords.add(rec_ids);
+                        List<Object> manyToManyRecord = new ArrayList<>();
+                        manyToManyRecord.add(m2mRecords);
+                        values.put(col.getSyncColumn(), manyToManyRecord);
                         break;
                 }
             }

@@ -96,6 +96,40 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         mPartnersList.setOnItemClickListener(this);
         setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
         getLoaderManager().initLoader(0, null, this);
+
+//        OValues values = new OValues();
+//        values.put("name", "Odoo Mobile");
+//        values.put("email", "contact@odoomobile.com");
+//        values.put("is_company", true);
+//
+//
+//        OValues dpr = new OValues();
+//        dpr.put("name", "Dharmang Soni");
+//        dpr.put("email", "dpr@odoomobile.com");
+//
+//
+//        OValues pga = new OValues();
+//        pga.put("name", "Parth Gajjar");
+//        pga.put("email", "pga@odoomobile.com");
+//
+//        OValues ptr = new OValues();
+//        ptr.put("name", "Pariket Trivedi");
+//        ptr.put("email", "ptr@odoomobile.com");
+//
+//        Toast.makeText(getActivity(), "Working", Toast.LENGTH_SHORT).show();
+//        values.put("child_ids", new RelValues().replace(ptr));
+////        OValues tag_1 = new OValues();
+////        tag_1.put("name", "Odoo IN");
+////
+////        values.put("category_id", new RelValues().append(tag_1));
+//
+//        ODataRow row = db().browse(null, "email = ?", new String[]{"contact@odoomobile.com"});
+//        if (row != null) {
+//            db().update(row.getInt(OColumn.ROW_ID), values);
+//        } else {
+//            db().insert(values);
+//        }
+
     }
 
     @Override

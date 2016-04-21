@@ -92,12 +92,13 @@ public class OSyncDataUtils {
             }
 
             // getting local dirty records if server records length = 0
-            if (records.size() <= 0) {
-                for (ODataRow row : mModel.select(new String[]{}, "_is_dirty = ? and _is_active = ? and id != ?",
-                        new String[]{"true", "true", "0"})) {
-                    serverIds.add(row.getInt("id"));
-                }
+//            if (records.size() <= 0) {
+            for (ODataRow row : mModel.select(new String[]{}, "_is_dirty = ? and _is_active = ? and id != ?",
+                    new String[]{"true", "true", "0"})) {
+                Log.e(TAG, row + "");
+                serverIds.add(row.getInt("id"));
             }
+//            }
             // Comparing dirty (updated) record
             List<Integer> updateToServerIds = new ArrayList<>();
             if (serverIds.size() > 0) {
