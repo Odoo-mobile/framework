@@ -26,7 +26,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,7 +46,9 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OAppBarUtils;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
@@ -282,6 +283,23 @@ public class CustomerDetails extends OdooCompatActivity
                 break;
             case R.id.menu_customer_import:
                 ShareUtil.shareContact(this, record, false);
+                break;
+            case R.id.menu_customer_delete:
+                OAlert.showConfirm(this, OResource.string(this,
+                        R.string.confirm_are_you_sure_want_to_delete),
+                        new OAlert.OnAlertConfirmListener() {
+                            @Override
+                            public void onConfirmChoiceSelect(OAlert.ConfirmType type) {
+                                if (type == OAlert.ConfirmType.POSITIVE) {
+                                    // Deleting record and finishing activity if success.
+                                    if (resPartner.delete(record.getInt(OColumn.ROW_ID))) {
+                                        Toast.makeText(CustomerDetails.this, R.string.toast_record_deleted,
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                }
+                            }
+                        });
                 break;
         }
         return super.onOptionsItemSelected(item);

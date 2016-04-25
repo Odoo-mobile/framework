@@ -15,4 +15,6 @@
     <string name="toast_permission_download_storage">Storage permission required to create downloaded file on your sdcard.</string>
     <string name="toast_permission_download_storage_help">Storage permission required to store downloaded files on sdcard of your phone. Please grant permission for use this feature</string>
     <string name="alert_permission_help">Some of permission required to start application. Please grant permission from application settings.</string>
+    <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
+    <string name="toast_record_deleted">Record deleted</string>
 </resources>
