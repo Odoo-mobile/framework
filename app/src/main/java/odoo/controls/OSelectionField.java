@@ -383,7 +383,10 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             }
         } else {
             if (mResourceArray != -1 || mCol.getType().isAssignableFrom(OSelection.class)) {
-                row = items.get(getPos());
+                int position = getPos();
+                // Ignoring if default value not set for field.
+                if (position != -1)
+                    row = items.get(position);
             } else {
                 if (mValue instanceof OM2ORecord) {
                     row = ((OM2ORecord) mValue).browse();
