@@ -1,0 +1,6 @@
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="com.odoo.auth"
+    android:contentAuthority="com.corepd.addons.intervention.Intervention"
+    android:supportsUploading="true"
+    android:isAlwaysSyncable="true"
+    android:userVisible="true" />

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_equipment_edit"
+        android:icon="@drawable/ic_action_edit"
+        android:title="@string/label_edit"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_equipment_save"
+        android:title="@string/label_save"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_equipment_cancel"
+        android:title="@string/label_cancel"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_equipment_detail_more"
+        android:icon="@drawable/ic_action_more"
+        app:showAsAction="always"
+        android:title="@string/label_more">
+        <menu>
+            <item
+                android:id="@+id/menu_equipment_share"
+                android:title="@string/label_share" />
+            <item
+                android:id="@+id/menu_equipment_import"
+                android:title="@string/label_import_contact" />
+        </menu>
+    </item>
+</menu>

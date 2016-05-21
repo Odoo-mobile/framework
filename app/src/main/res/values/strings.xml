@@ -17,4 +17,25 @@
     <string name="alert_permission_help">Some of permission required to start application. Please grant permission from application settings.</string>
     <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
     <string name="toast_record_deleted">Record deleted</string>
+
+
+
+
+
+
+    <string name="drawer_timesheet_title">Timesheet</string>
+    <string name="drawer_timesheet_activities">Activities</string>
+    <string name="label_spinner_select_task">Select Task</string>
+    <string name="label_create_new">New</string>
+    <string name="label_detail_save">Save</string>
+    <string name="label_detail_cancel">Discard</string>
+    <string name="toast_record_inserted">Record Inserted</string>
+    <string name="toast_invalid_choice">Invalid Choice</string>
+    <string name="toast_max_limit_crossed">Max Limit Crossed Re-enter Time</string>
+    <string name="label_hh">HH</string>
+    <string name="label_mm">MM</string>
+    <string name="label_work_summary">Enter Work Summary</string>
+    <string name="label_select_task">Select Task</string>
+    <string name="label_time_spent">Time Spent</string>
+
 </resources>

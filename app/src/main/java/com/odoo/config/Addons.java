@@ -19,7 +19,12 @@
  */
 package com.odoo.config;
 
+import com.odoo.addons.Equipment.Equipment;
 import com.odoo.addons.customers.Customers;
+import com.odoo.addons.intervention.Intervention;
+import com.odoo.addons.timesheet.Timesheet;
+import com.odoo.addons.trip.Trip;
+import com.odoo.addons.tripdestination.TripDestination;
 import com.odoo.core.support.addons.AddonsHelper;
 import com.odoo.core.support.addons.OAddon;
 
@@ -31,5 +36,10 @@ public class Addons extends AddonsHelper {
      * Ex.:
      * OAddon partners = new OAddon(Partners.class).setDefault();
      */
-    OAddon customers = new OAddon(Customers.class).setDefault();
+    OAddon customers = new OAddon(Customers.class);
+    OAddon equipment = new OAddon(Equipment.class);
+    OAddon intervention = new OAddon(Intervention.class);
+    OAddon trips = new OAddon(Trip.class);
+    OAddon tripdestination = new OAddon(TripDestination.class).setDefault();
+  //  OAddon a_timesheet = new OAddon(Timesheet.class);
 }

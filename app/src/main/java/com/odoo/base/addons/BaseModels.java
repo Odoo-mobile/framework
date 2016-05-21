@@ -21,9 +21,17 @@ package com.odoo.base.addons;
 
 import android.content.Context;
 
+
+import com.odoo.addons.trip.providers.CmmsTrips;
+import com.odoo.addons.tripdestination.providers.CmmsTripDestination;
 import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.base.addons.mail.MailMessage;
+import com.odoo.addons.Equipment.providers.CmmsEquipment;
+import com.odoo.base.addons.res.CmmsFailure;
+import com.odoo.base.addons.res.CmmsHistory;
+import com.odoo.addons.intervention.providers.CmmsIntervention;
+import com.odoo.addons.preventive.providers.CmmsPreventive;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
@@ -46,6 +54,14 @@ public class BaseModels {
         models.add(new ResCompany(context, user));
         models.add(new IrAttachment(context, user));
         models.add(new MailMessage(context, user));
+        models.add(new CmmsEquipment(context, user));
+        models.add(new CmmsFailure(context, user));
+        models.add(new CmmsHistory(context, user));
+        models.add(new CmmsIntervention(context, user));
+        models.add(new CmmsPreventive(context, user));
+        models.add(new CmmsTripDestination(context, user));
+        models.add(new CmmsTrips(context, user));
+       // models.add(new CmmsTimesheet(context,user));
         return models;
     }
 }

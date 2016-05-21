@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:prefix="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+
+    <com.odoo.widgets.parallax.ParallaxScrollView
+        android:id="@+id/parallaxScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/statusBarHeight">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!--<FrameLayout-->
+            <!--android:id="@+id/parallax_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginBottom="-56dp">-->
+
+            <!--<ImageView-->
+            <!--android:id="@android:id/icon"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="380dp"-->
+            <!--android:scaleType="centerInside"-->
+            <!--android:src="@drawable/user_xlarge" />-->
+            <!--</FrameLayout>-->
+
+            <TextView
+                android:id="@android:id/title"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_below="@+id/parallax_view"
+                android:fontFamily="@string/font_normal"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/default_16dp"
+                android:singleLine="true"
+                android:textColor="#ffffff"
+                android:textSize="30sp" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@android:id/title"
+                android:background="#ffffff"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/default_16dp">
+
+                <odoo.controls.OForm
+                    android:id="@+id/tripDestinationsForm"
+                    prefix:modelName="cmms.trip_destination"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+
+
+                    <odoo.controls.OField
+                        android:id="@+id/startdate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:fieldLabelColor="@color/theme_secondary"
+                        app:fieldName="startdate"
+                        app:fieldTextAppearance="?android:textAppearanceLarge"></odoo.controls.OField>
+
+
+
+
+                    <odoo.controls.OField
+                        prefix:fieldName="state"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent">
+                    </odoo.controls.OField>
+                    <!--<odoo.controls.OField-->
+                    <!--app:fieldTextAppearance="?android:textAppearanceMedium"-->
+                    <!--app:fieldLabelColor="@color/theme_secondary"-->
+                    <!--app:iconResource="@drawable/ic_action_mobile"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--app:fieldName="trip_destination"-->
+                    <!--android:id="@+id/trip_destinations"-->
+                    <!--android:layout_height="wrap_content"></odoo.controls.OField>-->
+
+                    <!-- CVooooooooooomens -->
+
+                    <View
+                        style="@style/ViewSeparator"
+                        android:layout_marginLeft="72dp" />
+
+
+                </odoo.controls.OForm>
+            </RelativeLayout>
+        </RelativeLayout>
+
+
+    </com.odoo.widgets.parallax.ParallaxScrollView>
+
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/android_orange"
+        android:minHeight="?attr/actionBarSize"
+        android:paddingRight="@dimen/default_8dp"
+        android:paddingTop="@dimen/statusBarHeight"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+        app:theme="@style/ToolBarTheme" />
+
+</RelativeLayout>

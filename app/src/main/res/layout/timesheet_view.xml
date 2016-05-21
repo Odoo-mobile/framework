@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/default_16dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <!--<com.odoo.addons.timesheet.utils.OChronometer-->
+        <!--android:id="@+id/chn_Ochronometer"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_horizontal"-->
+        <!--android:paddingTop="20dp"-->
+        <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
+        <!--android:textSize="35dp" />-->
+
+        <!--<Button-->
+        <!--android:id="@+id/btn_start_stop"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:backgroundTint="@color/background_material_dark"-->
+        <!--android:drawableRight="@drawable/ic_action_play"-->
+        <!--android:text="Start"-->
+        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+        <!--android:textColor="#ffffff"-->
+        <!--android:textStyle="bold" />-->
+
+        <TextView
+            android:id="@+id/txv_motivation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@string/font_normal"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:text="Good Morning Have a Nice Day :)"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textStyle="bold" />
+
+        <ListView
+            android:id="@+id/lst_task_listview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"></ListView>
+    </LinearLayout>
+
+    <odoo.controls.fab.FloatingActionButton
+        android:id="@+id/fab_button"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        odoo:drawable="@drawable/ic_action_content_add"
+        odoo:fabColor="@color/theme_primary" />
+
+</RelativeLayout>
