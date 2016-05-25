@@ -3,12 +3,9 @@ package com.odoo.addons.trip.providers;
 import android.content.Context;
 import android.net.Uri;
 
-import com.odoo.addons.tripdestination.providers.CmmsTripDestination;
 import com.odoo.base.addons.res.ResUsers;
-import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OSelection;
@@ -27,11 +24,12 @@ public class CmmsTrips extends OModel {
     OColumn description = new OColumn("Description", OVarchar.class);
     OColumn startdate = new OColumn("Start Date", ODateTime.class);
     OColumn enddate = new OColumn("End Date", ODateTime.class);
+    OColumn user_id = new OColumn("Manager", ResUsers.class, OColumn.RelationType.ManyToOne);
     OColumn user1 = new OColumn("User 1", ResUsers.class, OColumn.RelationType.ManyToOne);
     OColumn user2 = new OColumn("User 2", ResUsers.class, OColumn.RelationType.ManyToOne);
     OColumn user3 = new OColumn("User 3", ResUsers.class, OColumn.RelationType.ManyToOne);
     OColumn user4 = new OColumn("User 4", ResUsers.class, OColumn.RelationType.ManyToOne);
-    OColumn trip_destination = new OColumn("Trip Dest..", CmmsTripDestination.class, OColumn.RelationType.OneToMany).setRelatedColumn("_id");
+    //OColumn trip_destination = new OColumn("Trip Dest..", CmmsTripDestination.class, OColumn.RelationType.OneToMany).setRelatedColumn("_id");
 
 
 
@@ -43,6 +41,11 @@ public class CmmsTrips extends OModel {
     public CmmsTrips(Context context, OUser user) {
         super(context, "cmms.trips", user);
         setDefaultNameColumn("name");
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return true;
     }
     @Override
     public Uri uri() {

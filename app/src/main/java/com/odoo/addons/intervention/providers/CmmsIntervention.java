@@ -20,12 +20,12 @@ public class CmmsIntervention extends OModel {
     OColumn name = new OColumn("name", OVarchar.class);
     OColumn equipment_id = new OColumn("equipment_id", CmmsEquipment.class, OColumn.RelationType.ManyToOne)
             .setRelatedColumn("equipment_id");
-    OColumn user = new OColumn("user_id", ResUsers.class, OColumn.RelationType.ManyToOne).setRequired();
+    OColumn user_id = new OColumn("user_id", ResUsers.class, OColumn.RelationType.ManyToOne).setRequired();
     OColumn date = new OColumn("date", ODate.class);
     OColumn observation = new OColumn("observation", OVarchar.class);
     OColumn motif = new OColumn("motif", OVarchar.class);
-    OColumn intervention_date = new OColumn("date_inter", ODate.class);
-    OColumn end_date = new OColumn("date_end", ODate.class);
+    OColumn date_inter = new OColumn("date_inter", ODate.class);
+    OColumn date_end = new OColumn("date_end", ODate.class);
   //  OColumn issue = new OColumn("issue", CmmsFailure.class, OColumn.RelationType.ManyToOne).setRequired();
      // OColumn equipment = new OColumn("equipment", CmmsEquipment.class, OColumn.RelationType.ManyToOne);
     OColumn state = new OColumn("state", OSelection.class)

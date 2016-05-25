@@ -3,7 +3,6 @@ package com.odoo.addons.tripdestination;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -14,16 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Switch;
 
 import com.odoo.R;
-
 import com.odoo.addons.Equipment.providers.CmmsEquipment;
 import com.odoo.addons.tripdestination.providers.CmmsTripDestination;
 import com.odoo.core.orm.ODataRow;
-import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -44,6 +40,9 @@ public class TripDestination extends BaseFragment implements ISyncStatusObserver
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener, View.OnClickListener,
         AdapterView.OnItemClickListener,OCursorListAdapter.OnViewBindListener {
     //private View mView;
+    public static final String KEY = TripDestination.class.getSimpleName();
+    ///////////////////////////////////////
+    public static final String TAG = TripDestination.class.getSimpleName();
     private String mCurFilter = null;
     private ListView mPartnersList = null;
     private boolean syncRequested = false;
@@ -51,11 +50,8 @@ public class TripDestination extends BaseFragment implements ISyncStatusObserver
     private ListView listView;
     private OCursorListAdapter listAdapter;
     private ODataRow record = null;
-    private Bundle extra;
     //private CmmsIntervention cmmsIntervention;
-
-    ///////////////////////////////////////
-    public static final String TAG = CmmsTripDestination.class.getSimpleName();
+    private Bundle extra;
 
     @Override
     public List<ODrawerItem> drawerMenus(Context context) {
@@ -77,8 +73,8 @@ public class TripDestination extends BaseFragment implements ISyncStatusObserver
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setHasSyncStatusObserver(TAG, this, db());
-        hideFab();
-//    getLoaderManager().initLoader(0, null, this);
+
+
         setHasSwipeRefreshView(view, R.id.swipe_container, this);
         mView = view;
         // mType = Type.valueOf(getArguments().getString(EXTRA_KEY_TYPE));
@@ -89,9 +85,10 @@ public class TripDestination extends BaseFragment implements ISyncStatusObserver
         mPartnersList.setAdapter(listAdapter);
         mPartnersList.setFastScrollAlwaysVisible(true);
         mPartnersList.setOnItemClickListener(this);
-
+        setHasSyncStatusObserver(KEY, this, db());
         // setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
         getLoaderManager().initLoader(0, null, this);
+        hideFab();
         // Log.i("oVC", "intervention OnViewCreated");
     }
 
@@ -152,7 +149,7 @@ public class TripDestination extends BaseFragment implements ISyncStatusObserver
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i("OC", "started onCreateLoader");
-        return new CursorLoader(getActivity(), db().uri(), null, null, null, null);
+        return new CursorLoader(getActivity(), db().uri(), null, null, null, "order1");
     }
 
     private void loadActivity(ODataRow row) {
@@ -195,11 +192,8 @@ try{
 //        Log.i("oVB","on View Bind started inervention");
     int id = getResources().getIdentifier("com.odoo:drawable/complete.png" , null, null);
     CmmsEquipment cmmsEquipment = new CmmsEquipment(getContext(),null);
-    ODataRow oDataRowEquipment = cmmsEquipment.select(
-            new String[]{"name","type"},
-            "_id = ?",
-            new String[]{row.getString("equipment_id")}
-    ).get(0); // always first element (should be only one)
+    ODataRow oDataRowEquipment = cmmsEquipment.browse(row.getInt(OColumn.ROW_ID));
+
 
 //    String distanceraw= row.getString("distance");
 //    String timeRaw = row.getString("driving_time");

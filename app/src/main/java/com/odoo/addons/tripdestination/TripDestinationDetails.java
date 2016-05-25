@@ -1,12 +1,11 @@
 package com.odoo.addons.tripdestination;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +23,6 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OdooCompatActivity;
-import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.widgets.parallax.ParallaxScrollView;
@@ -58,16 +56,7 @@ public class TripDestinationDetails extends OdooCompatActivity
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.equipment_detail);
-//        cmmsTripDestination = new CmmsEquipment(this, null);
-//        extras = getIntent().getExtras();
-//        record = cmmsTripDestination.browse(extras.getInt(OColumn.ROW_ID));
-//        OForm mform  = (OForm) findViewById(R.id.equipmentForm);
-//       // mform.setEditable(true);
-//        mform.initForm(record);
-//
-//        newImage = "fdsfdsfds";
+
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trip_destination_details);
@@ -89,6 +78,7 @@ public class TripDestinationDetails extends OdooCompatActivity
         if (extras == null)
             mEditMode = true;
         // mEditMode = true;
+
         setupActionBar();
 
 
@@ -192,6 +182,8 @@ public class TripDestinationDetails extends OdooCompatActivity
                         Toast.makeText(this, com.odoo.R.string.toast_information_saved, Toast.LENGTH_LONG).show();
                         mEditMode = !mEditMode;
                         setupActionBar();
+
+
                     } else {
                         // values.put("customer", "true");
                         final int row_id = cmmsTripDestination.insert(values);
@@ -206,6 +198,10 @@ public class TripDestinationDetails extends OdooCompatActivity
                     finish();
                     return true;
                 }
+            case R.id.menu_trip_plan: {
+                Log.i("Menu Plan", "Menu Plan Clicked");
+            }
+
             case R.id.menu_trip_destination_edit:
                 mEditMode = !mEditMode;
                 setMode(mEditMode);
@@ -215,6 +211,17 @@ public class TripDestinationDetails extends OdooCompatActivity
                 break;
             case R.id.menu_trip_destination_share:
                 // ShareUtil.shareContact(this, record, true);
+                CmmsTripDestination cmmsTripDestination = new CmmsTripDestination(this, null);
+                //  ODataRow oDataRow = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
+                ODataRow oDataRow = cmmsTripDestination.browse(1);
+
+
+                // ODataRow oDataRowDest = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
+                OValues oValues = oDataRow.toValues();
+                String updatedState = "5";
+                oValues.put("state", updatedState);
+                oValues.put("description", "Test!!!!!!!!");
+                boolean t = cmmsTripDestination.update(oDataRow.getInt(OColumn.ROW_ID), oValues);
                 break;
             case R.id.menu_trip_destination_import:
                 //  ShareUtil.shareContact(this, record, false);

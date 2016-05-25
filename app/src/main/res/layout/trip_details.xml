@@ -56,10 +56,10 @@
 
                 <odoo.controls.OForm
                     android:id="@+id/tripForm"
-                    prefix:modelName="cmms.trips"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    prefix:modelName="cmms.trips"
                     >
 
                     <!--<ImageView-->
@@ -70,21 +70,21 @@
                         <!--android:layout_alignParentTop="true"-->
                         <!--android:layout_alignParentRight="true"-->
                         <!--android:layout_alignParentEnd="true"-->
-                        <!--android:clickable="true" />-->
+                    <!--/>-->
 
                     <odoo.controls.OField
-                        prefix:fieldName="state"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent">
-                    </odoo.controls.OField>
-
-                    <odoo.controls.OField
-                        android:id="@+id/startdate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:fieldLabelColor="@color/theme_secondary"
-                        app:fieldName="startdate"
-                        app:fieldTextAppearance="?android:textAppearanceLarge"></odoo.controls.OField>
+                        prefix:fieldName="state">
+                    </odoo.controls.OField>
+
+                    <!--<odoo.controls.OField-->
+                    <!--android:id="@+id/startdate"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--app:fieldLabelColor="@color/theme_secondary"-->
+                    <!--app:fieldName="startdate"-->
+                    <!--app:fieldTextAppearance="?android:textAppearanceLarge"></odoo.controls.OField>-->
 
 
                     <!--<odoo.controls.OField-->
@@ -111,9 +111,10 @@
     </com.odoo.widgets.parallax.ParallaxScrollView>
 
     <ListView android:id="@+id/list"
-        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_below="@id/parallaxScrollView">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/parallaxScrollView">
+
 
     </ListView>
 

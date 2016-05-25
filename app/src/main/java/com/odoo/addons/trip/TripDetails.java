@@ -1,15 +1,9 @@
 package com.odoo.addons.trip;
 
-import android.content.ClipData;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,35 +12,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.App;
 import com.odoo.R;
-import com.odoo.addons.Equipment.Equipment;
 import com.odoo.addons.Equipment.providers.CmmsEquipment;
-import com.odoo.addons.intervention.providers.CmmsIntervention;
-import com.odoo.addons.preventive.providers.CmmsPreventive;
 import com.odoo.addons.trip.providers.CmmsTrips;
-import com.odoo.addons.tripdestination.TripDestination;
 import com.odoo.addons.tripdestination.providers.CmmsTripDestination;
 import com.odoo.base.addons.ir.feature.OFileManager;
-import com.odoo.base.addons.res.ResCompany;
-import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
-import com.odoo.core.orm.OSQLite;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooCompatActivity;
-import com.odoo.core.support.list.OCursorListAdapter;
+import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OAppBarUtils;
-import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
@@ -78,6 +63,8 @@ public class TripDetails extends OdooCompatActivity
     private Menu mMenu;
     private OFileManager fileManager;
     private String newImage = null;
+    private boolean UserPlan = false;
+
 
 
     @Override
@@ -143,20 +130,10 @@ public class TripDetails extends OdooCompatActivity
             setMode(mEditMode);
             mForm.setEditable(mEditMode);
             mForm.initForm(record);
-        final ListView yourListView = (ListView) findViewById(R.id.list);
 
-// get data from the table by the ListAdapter
-        ListAdapter customAdapter = new ListAdapter(this, R.layout.tripdestination_row_item, tripDestinations);
 
-        yourListView.setAdapter(customAdapter);
-            yourListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position,
-                                        long id) {
-                    Toast.makeText(getApplicationContext(),String.valueOf(position),Toast.LENGTH_SHORT);
 
-                }
-            });
+
 
 
             mTitleView.setText(record.getString("name"));
@@ -183,6 +160,25 @@ public class TripDetails extends OdooCompatActivity
         {
             Log.e("error",e.getMessage());
         }
+//        CmmsTrips cmmsTrips1 = new CmmsTrips(this, null);
+//       // OModel oModelTripDest = new OModel(getContext(), cmmsTripDestination.getModelName(), null);
+//        //  ODataRow oDataRow = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
+//        ODataRow oDataRow2 = cmmsTrips1.browse(2);
+//        OValues oValues;
+//        if(oDataRow2 != null)
+//            // ODataRow oDataRowDest = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
+//         oValues   = oDataRow2.toValues();
+//        else
+//        {
+//            oValues = new OValues();
+//            oValues.put("id",2);
+//        }
+//            String updatedState = "2";
+//            oValues.put("state", updatedState);
+//            oValues.put("description","Test!!!!!!!!");
+//            cmmsTrips1.insertOrUpdate(2,oValues);
+//           // boolean t = cmmsTrips1.update(1, oValues);
+//            SyncUtils.get(getApplicationContext()).requestSync(cmmsTrips1.authority());
      //   ResUsers resUsers = new ResUsers(getApplicationContext(),null);
        // ODataRow oDataRow = resUsers.browse(record.getInt(record.getString("user1")));
 
@@ -212,34 +208,45 @@ public class TripDetails extends OdooCompatActivity
 
     }
     private void setMode(Boolean edit) {
-//        if (mMenu != null) {
-//            mMenu.findItem(com.odoo.R.id.menu_equipment_detail_more).setVisible(!edit);
-//            mMenu.findItem(com.odoo.R.id.menu_equipment_edit).setVisible(!edit);
-//            mMenu.findItem(com.odoo.R.id.menu_equipment_save).setVisible(edit);
-//            mMenu.findItem(com.odoo.R.id.menu_equipment_cancel).setVisible(edit);
-//        }
+        if (mMenu != null) {
+            mMenu.findItem(com.odoo.R.id.menu_trip_detail_more).setVisible(!edit);
+            mMenu.findItem(com.odoo.R.id.menu_trip_edit).setVisible(!edit);
+            mMenu.findItem(com.odoo.R.id.menu_trip_save).setVisible(edit);
+            mMenu.findItem(com.odoo.R.id.menu_trip_cancel).setVisible(edit);
+        }
         int color = Color.DKGRAY;
         if (record != null) {
             color = OStringColorUtil.getStringColor(this, record.getString("name"));
         }
         if (edit) {
-//            if (extras != null)
-//                actionBar.setTitle(com.odoo.R.string.label_edit);
-//            else
-//                actionBar.setTitle(com.odoo.R.string.label_new);
-//            actionBar.setBackgroundDrawable(new ColorDrawable(color));
-//            mForm = (OForm) findViewById(R.id.tripForm);
-//            captureImage = (ImageView) findViewById(com.odoo.R.id.captureImage);
-//            captureImage.setOnClickListener(this);
-//            userImage = (ImageView) findViewById(android.R.id.icon1);
+            if (extras != null)
+                actionBar.setTitle(com.odoo.R.string.label_edit);
+            else
+                actionBar.setTitle(com.odoo.R.string.label_new);
+            // actionBar.setBackgroundDrawable(new ColorDrawable(color));
+            mForm = (OForm) findViewById(R.id.tripForm);
+
+            //  userImage = (ImageView) findViewById(android.R.id.icon1);
 //            findViewById(com.odoo.R.id.parallaxScrollView).setVisibility(View.GONE);
 //            findViewById(com.odoo.R.id.equipmentScrollViewEdit).setVisibility(View.VISIBLE);
-            // OField is_company = (OField) findViewById(R.id.is_company_edit);
-            //  is_company.setOnValueChangeListener(this);
+//
         } else {
             actionBar.setBackgroundDrawable(getResources().getDrawable(com.odoo.R.drawable.action_bar_shade));
             userImage = (ImageView) findViewById(android.R.id.icon);
             mForm = (OForm) findViewById(R.id.tripForm);
+            // get data from the table by the ListAdapter
+            ListAdapter customAdapter = new ListAdapter(this, R.layout.tripdestination_row_item, tripDestinations);
+
+            final ListView yourListView = (ListView) findViewById(R.id.list);
+            yourListView.setAdapter(customAdapter);
+            yourListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position,
+                                        long id) {
+                    Toast.makeText(getApplicationContext(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+
+                }
+            });
          //   findViewById(com.odoo.R.id.equipmentScrollViewEdit).setVisibility(View.GONE);
          //   findViewById(com.odoo.R.id.parallaxScrollView).setVisibility(View.VISIBLE);
         }
@@ -270,51 +277,52 @@ public class TripDetails extends OdooCompatActivity
     public void onClick(View v) {
 
     }
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case com.odoo.R.id.menu_equipment_save:
-//                OValues values = mForm.getValues();
-//                if (values != null) {
-////                    if (newImage != null) {
-////                        values.put("image_small", newImage);
-////                        values.put("large_image", newImage);
-////                    }
-//                    if (record != null) {
-//                        cmmsTrips.update(record.getInt(OColumn.ROW_ID), values);
-//                        Toast.makeText(this, com.odoo.R.string.toast_information_saved, Toast.LENGTH_LONG).show();
-//                        mEditMode = !mEditMode;
-//                        setupActionBar();
-//                    } else {
-//                        // values.put("customer", "true");
-//                        final int row_id = cmmsTrips.insert(values);
-//                        if (row_id != OModel.INVALID_ROW_ID) {
-//                            finish();
-//                        }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case com.odoo.R.id.menu_trip_save:
+                OValues values = mForm.getValues();
+                if (values != null) {
+//                    if (newImage != null) {
+//                        values.put("image_small", newImage);
+//                        values.put("large_image", newImage);
 //                    }
-//                }
-//                break;
-//            case com.odoo.R.id.menu_equipment_cancel:
-//                if (record == null) {
-//                    finish();
-//                    return true;
-//                }
-//            case com.odoo.R.id.menu_equipment_edit:
-//                mEditMode = !mEditMode;
-//                setMode(mEditMode);
-//                mForm.setEditable(mEditMode);
-//                mForm.initForm(record);
-//                setCustomerImage();
-//                break;
-//            case com.odoo.R.id.menu_equipment_share:
-//                // ShareUtil.shareContact(this, record, true);
-//                break;
-//            case com.odoo.R.id.menu_equipment_import:
-//                //  ShareUtil.shareContact(this, record, false);
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+                    if (record != null) {
+                        cmmsTrips.update(record.getInt(OColumn.ROW_ID), values);
+                        Toast.makeText(this, com.odoo.R.string.toast_information_saved, Toast.LENGTH_LONG).show();
+                        mEditMode = !mEditMode;
+                        setupActionBar();
+                    } else {
+                        // values.put("customer", "true");
+                        final int row_id = cmmsTrips.insert(values);
+                        if (row_id != OModel.INVALID_ROW_ID) {
+                            finish();
+                        }
+                    }
+                }
+                break;
+            case com.odoo.R.id.menu_trip_cancel:
+                if (record == null) {
+                    finish();
+                    return true;
+                }
+            case com.odoo.R.id.menu_trip_edit:
+                mEditMode = !mEditMode;
+                setMode(mEditMode);
+                mForm.setEditable(mEditMode);
+                mForm.initForm(record);
+                // setCustomerImage();
+                break;
+            case com.odoo.R.id.menu_trip_share:
+                // ShareUtil.shareContact(this, record, true);
+                break;
+            case com.odoo.R.id.menu_trip_import:
+                //  ShareUtil.shareContact(this, record, false);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 //    @Override
 //    public void onClick(View v) {
 //        switch (v.getId()) {
@@ -341,13 +349,33 @@ public class TripDetails extends OdooCompatActivity
 //            userImage.setColorFilter(Color.parseColor("#ffffff"));
 //        }
 //    }
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(com.odoo.R.menu.menu_equipment_detail, menu);
-//        mMenu = menu;
-//        setMode(mEditMode);
-//        return true;
-//    }
+public void hidePlanForUser() {
+    if (!UserPlan) {
+        OUser cUser = OUser.current(this);
+        String test = record.getString("user_id");
+        String test1 = String.valueOf(cUser.getPartnerId());
+        if (!test.equals(test1)) {
+            MenuItem item = mMenu.findItem(R.id.menu_trip_plan);
+            item.setVisible(false);
+            UserPlan = true;
+            mForm.invalidate();
+        } else {
+
+
+            UserPlan = true;
+        }
+    }
+
+}
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(com.odoo.R.menu.menu_trip_detail, menu);
+        mMenu = menu;
+        setMode(mEditMode);
+        hidePlanForUser();
+        return true;
+    }
 
     public class ListAdapter extends ArrayAdapter<ODataRow> {
 
@@ -425,18 +453,22 @@ public class TripDetails extends OdooCompatActivity
                     {
                         Log.i("State img", "State onclick");
                         CmmsTripDestination cmmsTripDestination = new CmmsTripDestination(getContext(), null);
-                        OModel oModelTripDest = new OModel(getContext(), cmmsTripDestination.getModelName(), null);
-                      //  ODataRow oDataRow = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
-                         ODataRow oDataRow = cmmsTripDestination.browse(row.getInt(OColumn.ROW_ID));
+
+                        int rowId = row.getInt(OColumn.ROW_ID);
+                        ODataRow oDataRow = cmmsTripDestination.browse(rowId);
+
+                        OValues oValues = oDataRow.toModelValues(CmmsTripDestination.class);
                         if(!oDataRow.getString("state").equals("5")) {
 
-                       // ODataRow oDataRowDest = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
-                        OValues oValues = oDataRow.toValues();
                         String updatedState = changeState(oDataRow.getString("state"));
-                        oValues.put("state", updatedState);
+                            oValues.put("state", updatedState);
 
-                        boolean t = cmmsTripDestination.update(oDataRow.getInt(OColumn.ROW_ID), oValues);
-                            Toast.makeText(getContext(),String.valueOf(t),Toast.LENGTH_SHORT).show();
+
+                            boolean t = cmmsTripDestination.update(rowId, oValues);
+                            SyncUtils.get(getApplicationContext()).requestSync(cmmsTripDestination.authority());
+                            //  Toast.makeText(getContext(),String.valueOf(t),Toast.LENGTH_SHORT).show();
+
+
 
                            // String current_state = row.getString("state");
                             switch(updatedState){
@@ -466,17 +498,18 @@ public class TripDetails extends OdooCompatActivity
                     @Override
                     public boolean onLongClick(View v) {
                         Log.i("State img", "State onLongClick");
-                        CmmsTripDestination cmmsTripDestination = new CmmsTripDestination(getApplicationContext(), null);
+                        CmmsTripDestination cmmsTripDestination = (CmmsTripDestination) OModel.get(getContext(), "cmms.trip_destination", OUser.current(getContext()).getUsername());
                        // OModel oModelTripDest = new OModel(getApplicationContext(), cmmsTripDestination.getModelName(), null);
                        // ODataRow oDataRow = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
                         ODataRow oDataRow = cmmsTripDestination.browse(row.getInt(OColumn.ROW_ID));
                         if(!oDataRow.getString("state").equals("1")) {
 
                             // ODataRow oDataRowDest = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
-                            OValues oValues = oDataRow.toValues();
+                            OValues oValues = oDataRow.toModelValues(CmmsTripDestination.class);
                             String updatedState = reverseState(oDataRow.getString("state"));
                             oValues.put("state", updatedState);
                             cmmsTripDestination.update(row.getInt(OColumn.ROW_ID), oValues);
+                            SyncUtils.get(getApplicationContext()).requestSync(cmmsTripDestination.authority());
                             switch(updatedState){
                                 case "1":
                                     state.setImageDrawable(getResources().getDrawable(R.drawable.notstarted));

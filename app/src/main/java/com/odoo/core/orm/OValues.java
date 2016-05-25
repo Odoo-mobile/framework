@@ -34,6 +34,14 @@ public class OValues {
         _values = new HashMap<String, Object>();
     }
 
+    public static OValues from(ContentValues contentValues) {
+        OValues values = new OValues();
+        for (String key : contentValues.keySet()) {
+            values.put(key, contentValues.get(key));
+        }
+        return values;
+    }
+
     public void put(String key, Object value) {
         _values.put(key, value);
     }
@@ -106,13 +114,5 @@ public class OValues {
 
     public void addAll(HashMap<String, Object> data) {
         _values.putAll(data);
-    }
-
-    public static OValues from(ContentValues contentValues) {
-        OValues values = new OValues();
-        for (String key : contentValues.keySet()) {
-            values.put(key, contentValues.get(key));
-        }
-        return values;
     }
 }

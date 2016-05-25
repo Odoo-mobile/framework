@@ -25,6 +25,7 @@ import android.os.Parcelable;
 
 import com.odoo.core.orm.fields.OColumn;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,6 +113,49 @@ public class ODataRow implements Parcelable {
 
     }
 
+    public void addAll(HashMap<String, Object> data) {
+        _data.putAll(data);
+    }
+
+    public void addAll(ODataRow row) {
+        _data.putAll(row.getAll());
+    }
+
+    public HashMap<String, Object> getAll() {
+        return _data;
+    }
+
+    public OValues toValues() {
+        OValues values = new OValues();
+        values.addAll(getAll());
+        return values;
+    }
+
+    /*
+
+    */
+    public OValues toModelValues(Class c) {
+        Field[] fields = c.getFields();
+        OValues values = new OValues();
+        HashMap<String, Object> data = getAll();
+        for (int i = 0; i < fields.length; i++) {
+            if (fields[i].getType() == OColumn.class) {
+                if (fields[i].getName().charAt(0) != '_')
+                    values.put(fields[i].getName(), data.get(fields[i].getName()));
+                else if (fields[i].getName().equals("_id"))
+                    values.put(fields[i].getName(), data.get(fields[i].getName()));
+            }
+        }
+        return values;
+    }
+
+    public Bundle getPrimaryBundleData() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", getInt("id"));
+        bundle.putInt(OColumn.ROW_ID, getInt(OColumn.ROW_ID));
+        return bundle;
+    }
+
     public class IdName {
         Integer id;
         String name;
@@ -138,31 +182,6 @@ public class ODataRow implements Parcelable {
             this.name = name;
         }
 
-    }
-
-    public void addAll(HashMap<String, Object> data) {
-        _data.putAll(data);
-    }
-
-    public void addAll(ODataRow row) {
-        _data.putAll(row.getAll());
-    }
-
-    public HashMap<String, Object> getAll() {
-        return _data;
-    }
-
-    public OValues toValues() {
-        OValues values = new OValues();
-        values.addAll(getAll());
-        return values;
-    }
-
-    public Bundle getPrimaryBundleData() {
-        Bundle bundle = new Bundle();
-        bundle.putInt("id", getInt("id"));
-        bundle.putInt(OColumn.ROW_ID, getInt(OColumn.ROW_ID));
-        return bundle;
     }
 
 }

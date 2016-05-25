@@ -74,6 +74,7 @@
     <string name="label_new">New</string>
     <string name="label_ok">OK</string>
     <string name="label_yes">Yes</string>
+    <string name="label_plan">Plan</string>
     <string name="label_no">No</string>
     <string name="label_search">Search</string>
     <string name="label_delete">Delete</string>
