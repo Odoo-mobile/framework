@@ -154,6 +154,7 @@ public class CustomerDetails extends OdooCompatActivity
             int rowId = extras.getInt(OColumn.ROW_ID);
             record = resPartner.browse(rowId);
             record.put("full_address", resPartner.getAddress(record));
+            record.put("coords", resPartner.getCoords(record));
             checkControls();
             setMode(mEditMode);
             mForm.setEditable(mEditMode);
@@ -171,7 +172,11 @@ public class CustomerDetails extends OdooCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.full_address:
-                IntentUtils.redirectToMap(this, record.getString("full_address"));
+                String coords = record.getString("coords");
+                if (coords.equals(""))
+                    IntentUtils.redirectToMap(this, record.getString("full_address"));
+                else
+                    IntentUtils.redirectToMap(this, coords);
                 break;
             case R.id.website:
                 IntentUtils.openURLInBrowser(this, record.getString("website"));
@@ -322,6 +327,26 @@ public class CustomerDetails extends OdooCompatActivity
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(KEY_MODE, mEditMode);
+        outState.putString(KEY_NEW_IMAGE, newImage);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        OValues values = fileManager.handleResult(requestCode, resultCode, data);
+        if (values != null && !values.contains("size_limit_exceed")) {
+            newImage = values.getString("datas");
+            userImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            userImage.setColorFilter(null);
+            userImage.setImageBitmap(BitmapUtils.getBitmapImage(this, newImage));
+        } else if (values != null) {
+            Toast.makeText(this, R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
+        }
+    }
 
     private class BigImageLoader extends AsyncTask<Integer, Void, String> {
 
@@ -354,27 +379,6 @@ public class CustomerDetails extends OdooCompatActivity
                     setCustomerImage();
                 }
             }
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(KEY_MODE, mEditMode);
-        outState.putString(KEY_NEW_IMAGE, newImage);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        OValues values = fileManager.handleResult(requestCode, resultCode, data);
-        if (values != null && !values.contains("size_limit_exceed")) {
-            newImage = values.getString("datas");
-            userImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            userImage.setColorFilter(null);
-            userImage.setImageBitmap(BitmapUtils.getBitmapImage(this, newImage));
-        } else if (values != null) {
-            Toast.makeText(this, R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
         }
     }
 }

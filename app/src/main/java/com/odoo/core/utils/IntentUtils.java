@@ -19,10 +19,16 @@
  */
 package com.odoo.core.utils;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import com.odoo.R;
+import com.odoo.core.support.OdooCompatActivity;
+import com.odoo.core.tools.permissions.DevicePermissionHelper;
 
 public class IntentUtils {
 
@@ -61,11 +67,38 @@ public class IntentUtils {
         }
     }
 
-    public static void requestCall(Context context, String number) {
+    public static void requestCall(OdooCompatActivity context1, String number) {
+        final OdooCompatActivity context = context1;
         if (!number.equals("false") && !number.equals("")) {
-            Intent intent = new Intent(Intent.ACTION_CALL);
+            DevicePermissionHelper devicePermissionHelper;
+            devicePermissionHelper = new DevicePermissionHelper(context);
+            final Intent intent = new Intent(Intent.ACTION_CALL);
             intent.setData(Uri.parse("tel:" + number));
-            context.startActivity(intent);
+            if (devicePermissionHelper.hasPermission(Manifest.permission.CALL_PHONE)) {
+                context.startActivity(intent);
+
+
+            } else {
+                devicePermissionHelper.requestToGrantPermission(new DevicePermissionHelper
+                        .PermissionGrantListener() {
+                    @Override
+                    public void onPermissionGranted() {
+                        context.startActivity(intent);
+                    }
+
+                    @Override
+                    public void onPermissionDenied() {
+                        Toast.makeText(context, R.string.toast_permission_call_phone,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onPermissionRationale() {
+                        Toast.makeText(context, R.string.toast_permission_download_storage_help,
+                                Toast.LENGTH_LONG).show();
+                    }
+                }, Manifest.permission.CALL_PHONE);
+            }
         }
     }
 }

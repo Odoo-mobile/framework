@@ -42,6 +42,10 @@ public class CmmsTripDestination extends OModel {
     OColumn loler = new OColumn("LOLER", OBoolean.class);
     OColumn customer = new OColumn("Customer", ResCompany.class, OColumn.RelationType.ManyToOne);
     OColumn intervention = new OColumn("Intervention", CmmsIntervention.class, OColumn.RelationType.ManyToOne);
+    //v3
+    OColumn equipment_id1 = new OColumn("Replace with", CmmsEquipment.class, OColumn.RelationType.ManyToOne);
+    OColumn pick_up = new OColumn("Pick up", OBoolean.class);
+    OColumn replacement = new OColumn("Replacement", OBoolean.class);
 // preventive = new OColumn("Preventive",CmmsPreventive.class, OColumn.RelationType.ManyToOne);
 
 

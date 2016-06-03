@@ -227,6 +227,17 @@ catch (Exception e ){}
                 img3 = BitmapUtils.getAlphabetImage(getActivity(), "L");
                 OControls.setImage(view, R.id.image_small_loler, img3);
             }
+        Bitmap img4;
+        if (!row.getString("pick_up").equals("false")) {
+            img3 = BitmapUtils.getAlphabetImage(getActivity(), "P");
+            OControls.setImage(view, R.id.image_small_pick_up, img3);
+        }
+        Bitmap img5;
+        if (!row.getString("replacement").equals("false")) {
+            img3 = BitmapUtils.getAlphabetImage(getActivity(), "R");
+            OControls.setImage(view, R.id.image_small_replacement, img3);
+        }
+
 
         String current_state = row.getString("state");
         switch(current_state){

@@ -38,7 +38,8 @@ public class PreRequiredPermissions implements DevicePermissionHelper.DevicePerm
     @Override
     public String[] permissions() {
         return new String[]{
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.INTERNET
         };
     }
 }

@@ -30,6 +30,7 @@ import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBlob;
 import com.odoo.core.orm.fields.types.OBoolean;
+import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
@@ -64,9 +65,23 @@ public class ResPartner extends OModel {
             .setLocalColumn();
     OColumn large_image = new OColumn("Image", OBlob.class).setDefaultValue("false").setLocalColumn();
 
+    OColumn partner_latitude = new OColumn("Latitude", OFloat.class);
+    OColumn partner_longitude = new OColumn("Longitude", OFloat.class);
+
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);
         setHasMailChatter(true);
+    }
+
+    public static String getContact(Context context, int row_id) {
+        ODataRow row = new ResPartner(context, null).browse(row_id);
+        String contact;
+        if (row.getString("mobile").equals("false")) {
+            contact = row.getString("phone");
+        } else {
+            contact = row.getString("mobile");
+        }
+        return contact;
     }
 
     @Override
@@ -86,17 +101,16 @@ public class ResPartner extends OModel {
         return "";
     }
 
-    public static String getContact(Context context, int row_id) {
-        ODataRow row = new ResPartner(context, null).browse(row_id);
-        String contact;
-        if (row.getString("mobile").equals("false")) {
-            contact = row.getString("phone");
-        } else {
-            contact = row.getString("mobile");
-        }
-        return contact;
+    public String getCoords(ODataRow row) {
+        String lat = row.getString("partner_latitude");
+        String longi = row.getString("partner_longitude");
+        if (lat.equals("false"))
+            return "";
+        else if (longi.equals("false"))
+            return "";
+        else
+            return lat + ", " + longi;
     }
-
     public String getAddress(ODataRow row) {
         String add = "";
         if (!row.getString("street").equals("false"))

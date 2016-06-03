@@ -2,6 +2,7 @@ package com.odoo.addons.trip;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,12 +31,13 @@ import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooCompatActivity;
-import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import odoo.controls.OField;
@@ -154,7 +157,7 @@ public class TripDetails extends OdooCompatActivity
         OModel oModelDestination = new OModel(getApplicationContext(),cmmsTripDestination.getModelName(),null);
         String stest = record.getString("_id");
         try {
-            tripDestinations = oModelDestination.query("select * from " + cmmsTripDestination.getTableName()+ " where trip = " + stest);
+            tripDestinations = oModelDestination.query("select * from " + cmmsTripDestination.getTableName() + " where trip = " + stest + " ORDER BY order1 ASC");
            // tripDestinations = oModelDestination.
         } catch (Exception e)
         {
@@ -227,47 +230,56 @@ public class TripDetails extends OdooCompatActivity
             mForm = (OForm) findViewById(R.id.tripForm);
 
             //  userImage = (ImageView) findViewById(android.R.id.icon1);
-//            findViewById(com.odoo.R.id.parallaxScrollView).setVisibility(View.GONE);
-//            findViewById(com.odoo.R.id.equipmentScrollViewEdit).setVisibility(View.VISIBLE);
+            findViewById(com.odoo.R.id.parallaxScrollView).setVisibility(View.GONE);
+            // findViewById(com.odoo.R.id.equipmentScrollViewEdit).setVisibility(View.VISIBLE);
 //
         } else {
             actionBar.setBackgroundDrawable(getResources().getDrawable(com.odoo.R.drawable.action_bar_shade));
             userImage = (ImageView) findViewById(android.R.id.icon);
             mForm = (OForm) findViewById(R.id.tripForm);
             // get data from the table by the ListAdapter
-            ListAdapter customAdapter = new ListAdapter(this, R.layout.tripdestination_row_item, tripDestinations);
+            if (tripDestinations != null) {
+                ListAdapter customAdapter = new ListAdapter(this, R.layout.tripdestination_row_item, tripDestinations);
 
-            final ListView yourListView = (ListView) findViewById(R.id.list);
-            yourListView.setAdapter(customAdapter);
-            yourListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position,
-                                        long id) {
-                    Toast.makeText(getApplicationContext(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+                final ListView yourListView = (ListView) findViewById(R.id.list);
+                yourListView.setAdapter(customAdapter);
+                yourListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position,
+                                            long id) {
+                        Toast.makeText(getApplicationContext(), String.valueOf(position), Toast.LENGTH_SHORT).show();
 
-                }
-            });
+                    }
+                });
+            }
+
+
+
+
+
+
          //   findViewById(com.odoo.R.id.equipmentScrollViewEdit).setVisibility(View.GONE);
          //   findViewById(com.odoo.R.id.parallaxScrollView).setVisibility(View.VISIBLE);
         }
-       // setColor(color);
+        setColor(color);
     }
-//    private void setColor(int color) {
-//        FrameLayout frameLayout = (FrameLayout) findViewById(com.odoo.R.id.parallax_view);
-//        frameLayout.setBackgroundColor(color);
-//        parallaxScrollView.setParallaxOverLayColor(color);
-//        parallaxScrollView.setBackgroundColor(color);
-//        mForm.setIconTintColor(color);
-//        findViewById(com.odoo.R.id.parallax_view).setBackgroundColor(color);
-//        findViewById(com.odoo.R.id.parallax_view_edit).setBackgroundColor(color);
-//        findViewById(com.odoo.R.id.equipmentScrollViewEdit).setBackgroundColor(color);
-//        if (captureImage != null) {
-//            GradientDrawable shapeDrawable =
-//                    (GradientDrawable) getResources().getDrawable(com.odoo.R.drawable.circle_mask_primary);
-//            shapeDrawable.setColor(color);
-//            captureImage.setBackgroundDrawable(shapeDrawable);
-//        }
-//    }
+
+    private void setColor(int color) {
+        FrameLayout frameLayout = (FrameLayout) findViewById(com.odoo.R.id.parallax_view);
+        frameLayout.setBackgroundColor(color);
+        parallaxScrollView.setParallaxOverLayColor(color);
+        parallaxScrollView.setBackgroundColor(color);
+        mForm.setIconTintColor(color);
+        findViewById(com.odoo.R.id.parallax_view).setBackgroundColor(color);
+        //  findViewById(com.odoo.R.id.parallax_view_edit).setBackgroundColor(color);
+        // findViewById(com.odoo.R.id.tripScrollViewEdit).setBackgroundColor(color);
+        if (captureImage != null) {
+            GradientDrawable shapeDrawable =
+                    (GradientDrawable) getResources().getDrawable(com.odoo.R.drawable.circle_mask_primary);
+            shapeDrawable.setColor(color);
+            captureImage.setBackgroundDrawable(shapeDrawable);
+        }
+    }
     @Override
     public void onFieldValueChange(OField field, Object value) {
 
@@ -395,8 +407,8 @@ public void hidePlanForUser() {
                     return "3";
                 case "3":
                     return "4";
-                case "4":
-                    return "5";
+//                case "4":
+//                    return "5";
                 case "":
                     return "1";
             }
@@ -405,8 +417,8 @@ public void hidePlanForUser() {
         private String reverseState(String currentState)
         {
             switch (currentState) {
-                case "5":
-                    return "4";
+//                case "5":
+//                    return "4";
                 case "4":
                     return "3";
                 case "3":
@@ -440,10 +452,12 @@ public void hidePlanForUser() {
 //                TextView distance = (TextView) v.findViewById(R.id.item_distance);
 //                TextView time = (TextView) v.findViewById(R.id.item_time);
 
-                ImageView t = (ImageView) v.findViewById(R.id.image_small_loler);
+                ImageView t = (ImageView) v.findViewById(R.id.image_small_training);
                 ImageView i = (ImageView) v.findViewById(R.id.image_small_install);
                 ImageView a = (ImageView) v.findViewById(R.id.image_small_action);
                 ImageView l = (ImageView) v.findViewById(R.id.image_small_loler);
+                ImageView p = (ImageView) v.findViewById(R.id.image_small_pick_up);
+                ImageView r = (ImageView) v.findViewById(R.id.image_small_replacement);
                 final ImageView state = (ImageView) v.findViewById(R.id.imageState);
 
                 state.setOnClickListener(new View.OnClickListener()
@@ -458,14 +472,30 @@ public void hidePlanForUser() {
                         ODataRow oDataRow = cmmsTripDestination.browse(rowId);
 
                         OValues oValues = oDataRow.toModelValues(CmmsTripDestination.class);
-                        if(!oDataRow.getString("state").equals("5")) {
+                        if (!oDataRow.getString("state").equals("4")) {
 
                         String updatedState = changeState(oDataRow.getString("state"));
+                            if (updatedState.equals("4")) //if state complete change end date
+                            {
+                                //FIXME - Chnage for proper time ( +1)
+                                Calendar c = Calendar.getInstance();
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                String strDate = sdf.format(c.getTime());
+                                oValues.put("enddate", strDate);
+                            }
+                            if (updatedState.equals("3")) //if state working change date  "start date"
+                            {
+                                //FIXME - Chnage for proper time ( +1)
+                                Calendar c = Calendar.getInstance();
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                String strDate = sdf.format(c.getTime());
+                                oValues.put("startdate", strDate);
+                            }
                             oValues.put("state", updatedState);
 
 
                             boolean t = cmmsTripDestination.update(rowId, oValues);
-                            SyncUtils.get(getApplicationContext()).requestSync(cmmsTripDestination.authority());
+                            // SyncUtils.get(getApplicationContext()).requestSync(cmmsTripDestination.authority());
                             //  Toast.makeText(getContext(),String.valueOf(t),Toast.LENGTH_SHORT).show();
 
 
@@ -509,7 +539,7 @@ public void hidePlanForUser() {
                             String updatedState = reverseState(oDataRow.getString("state"));
                             oValues.put("state", updatedState);
                             cmmsTripDestination.update(row.getInt(OColumn.ROW_ID), oValues);
-                            SyncUtils.get(getApplicationContext()).requestSync(cmmsTripDestination.authority());
+                            // SyncUtils.get(getApplicationContext()).requestSync(cmmsTripDestination.authority());
                             switch(updatedState){
                                 case "1":
                                     state.setImageDrawable(getResources().getDrawable(R.drawable.notstarted));
@@ -545,20 +575,24 @@ public void hidePlanForUser() {
 //                distance.setText(row.getString("distance"));
 //                time.setText(row.getString("time"));
 
-                if (!row.getString("action").equals("false")) {
+                if (row.getString("action").equals("true")) {
                    a.setImageBitmap(BitmapUtils.getAlphabetImage(getApplicationContext(), "A"));
                 }
-
-                if (!row.getString("installation").equals("false")) {
+                if (row.getString("installation").equals("true")) {
                     i.setImageBitmap(BitmapUtils.getAlphabetImage(getApplicationContext(), "I"));
                 }
-                if (!row.getString("training").equals("false")) {
+                if (row.getString("training").equals("true")) {
                    t.setImageBitmap(BitmapUtils.getAlphabetImage(getApplicationContext(), "T"));
                 }
-                if (!row.getString("loler").equals("false")) {
+                if (row.getString("loler").equals("true")) {
                     l.setImageBitmap(BitmapUtils.getAlphabetImage(getApplicationContext(), "L"));
                 }
-
+                if (row.getString("pick_up").equals("true")) {
+                    p.setImageBitmap(BitmapUtils.getAlphabetImage(getApplicationContext(), "P"));
+                }
+                if (row.getString("replacement").equals("true")) {
+                    r.setImageBitmap(BitmapUtils.getAlphabetImage(getApplicationContext(), "R"));
+                }
                 String current_state = row.getString("state");
                 switch(current_state){
                     case "1":
@@ -585,7 +619,39 @@ public void hidePlanForUser() {
 
     }
 
-
+//    public void InputDialog()
+//    {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Enter City Name");
+//        builder.setMessage("App needs to be restarted before any changes appear. Sorry ;(");
+//
+//// Set up the input
+//        final EditText input = new EditText(this);
+//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//        input.setInputType(InputType.TYPE_CLASS_TEXT );
+//        builder.setView(input);
+//
+//// Set up the buttons
+//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//
+//                String city = input.getText().toString();
+//                if (!city.isEmpty()) {
+//                    getLatLonFromGoogleAddDB(city);
+//                    Toast.makeText(getApplicationContext(), "City Added to Database", Toast.LENGTH_SHORT).show(); //test
+//                }
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.cancel();
+//            }
+//        });
+//
+//        builder.show();
+//    }
 
 }
 

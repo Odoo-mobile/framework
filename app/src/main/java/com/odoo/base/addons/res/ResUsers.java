@@ -23,6 +23,7 @@ import android.content.Context;
 
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.OBlob;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
@@ -31,6 +32,16 @@ public class ResUsers extends OModel {
 
     OColumn name = new OColumn("Name", OVarchar.class);
     OColumn login = new OColumn("User Login name", OVarchar.class);
+    OColumn image = new OColumn("Avatar", OBlob.class).setDefaultValue(false);
+
+    public ResUsers(Context context, OUser user) {
+        super(context, "res.users", user);
+    }
+
+    public static int myId(Context context) {
+        ResUsers users = new ResUsers(context, null);
+        return users.selectRowId(users.getUser().getUserId());
+    }
 
     @Override
     public boolean allowCreateRecordOnServer() {
@@ -45,14 +56,5 @@ public class ResUsers extends OModel {
     @Override
     public boolean allowDeleteRecordInLocal() {
         return false;
-    }
-
-    public ResUsers(Context context, OUser user) {
-        super(context, "res.users", user);
-    }
-
-    public static int myId(Context context) {
-        ResUsers users = new ResUsers(context, null);
-        return users.selectRowId(users.getUser().getUserId());
     }
 }

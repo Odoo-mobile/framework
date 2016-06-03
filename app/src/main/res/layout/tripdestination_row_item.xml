@@ -2,39 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:orientation="horizontal"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
     <RelativeLayout
         android:id="@+id/tripdestinationView"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingLeft="@dimen/default_8dp"
-        android:paddingTop="@dimen/default_8dp"
         android:paddingBottom="@dimen/default_8dp"
+        android:paddingLeft="@dimen/default_8dp"
         android:paddingRight="@dimen/default_16dp"
-        android:layout_height="match_parent">
+        android:paddingTop="@dimen/default_8dp">
 
         <TextView
             android:id="@+id/item_txtName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Poolpod Warehouse"
             android:layout_alignParentTop="true"
+            android:layout_marginEnd="87dp"
             android:layout_marginRight="87dp"
-            android:layout_marginEnd="87dp" />
+            android:adjustViewBounds="true"
+            android:text="Poolpod Warehouse"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
             android:id="@+id/item_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="PP1-43-21"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_marginTop="30dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="30dp"
+            android:text="PP1-43-21"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <!--<TextView-->
             <!--android:id="@+id/item_distance"-->
@@ -59,43 +59,58 @@
         <odoo.controls.BezelImageView
             android:id="@+id/image_small_action"
             android:layout_width="30dp"
-            app:maskDrawable="@drawable/circle_mask"
             android:layout_height="30dp"
             android:layout_marginLeft="0dp"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="62dp"
+            app:maskDrawable="@drawable/circle_mask"
             />
         <odoo.controls.BezelImageView
             android:id="@+id/image_small_loler"
             android:layout_width="30dp"
-            app:maskDrawable="@drawable/circle_mask"
             android:layout_height="30dp"
             android:layout_marginLeft="60dp"
-            android:layout_marginTop="60dp" />
+            android:layout_marginTop="62dp"
+            app:maskDrawable="@drawable/circle_mask" />
         <odoo.controls.BezelImageView
             android:id="@+id/image_small_install"
             android:layout_width="30dp"
-            app:maskDrawable="@drawable/circle_mask"
             android:layout_height="30dp"
             android:layout_marginLeft="120dp"
-            android:layout_marginTop="60dp" />
+            android:layout_marginTop="62dp"
+            app:maskDrawable="@drawable/circle_mask" />
         <odoo.controls.BezelImageView
             android:id="@+id/image_small_training"
             android:layout_width="30dp"
-            app:maskDrawable="@drawable/circle_mask"
             android:layout_height="30dp"
-
-
             android:layout_marginLeft="180dp"
-            android:layout_marginTop="60dp" />
+            android:layout_marginTop="62dp"
+            app:maskDrawable="@drawable/circle_mask" />
+
+        <odoo.controls.BezelImageView
+            android:id="@+id/image_small_pick_up"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="240dp"
+            android:layout_marginTop="62dp"
+            app:maskDrawable="@drawable/circle_mask" />
+
+        <odoo.controls.BezelImageView
+            android:id="@+id/image_small_replacement"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="300dp"
+            android:layout_marginTop="62dp"
+            app:maskDrawable="@drawable/circle_mask" />
+
 
         <ImageView
 
             android:id="@+id/imageState"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
             android:clickable="true" />
 
 

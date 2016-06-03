@@ -127,7 +127,7 @@
         <item name="90">3 months old</item>
         <item name="180">6 months old</item>
         <item name="360">12 months old</item>
-        <item name="720">12 months old</item>
+        <item name="720">24 months old</item>
     </string-array>
     <string-array name="syncDataLimitValues">
         <item name="30">30</item>
@@ -135,7 +135,7 @@
         <item name="90">90</item>
         <item name="180">180</item>
         <item name="360">360</item>
-        <item name="720">360</item>
+        <item name="720">720</item>
     </string-array>
     <string name="general_settings">General Settings</string>
     <string name="application_settings_summary">Sync settings, Interval settings, sync data limit, and more</string>

@@ -11,17 +11,17 @@
             <intent android:action="android.settings.SYNC_SETTINGS" />
         </PreferenceScreen>
         <RingtonePreference
-            android:key="notification_ringtone"
-            android:title="Notification ring tone"
-            android:ringtoneType="notification"
             android:defaultValue="@string/notification_default_ring_tone"
-            android:summary="Set notification ring tone" />
+            android:key="notification_ringtone"
+            android:ringtoneType="notification"
+            android:summary="Set notification ring tone"
+            android:title="Notification ring tone" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="sync_interval_settings"
         android:title="Sync interval">
         <ListPreference
-            android:defaultValue="1440"
+            android:defaultValue="40"
             android:entries="@array/syncInterval"
             android:entryValues="@array/syncIntervalValues"
             android:key="sync_interval"
@@ -32,7 +32,7 @@
         android:key="sync_data_limit_settings"
         android:title="Data Sync Limit">
         <ListPreference
-            android:defaultValue="60"
+            android:defaultValue="720"
             android:entries="@array/syncDataLimit"
             android:entryValues="@array/syncDataLimitValues"
             android:key="sync_data_limit"
