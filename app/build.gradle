@@ -6,9 +6,9 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
     defaultConfig {
-        //FIXME: Change application name as your requirement
+
         manifestPlaceholders = [applicationName: "Core PD Odoo"]
-        //FIXME: Please change the application id as your requirement
+
         applicationId "com.corepd"
         minSdkVersion 14
         targetSdkVersion 23
@@ -33,8 +33,13 @@ dependencies {
     compile project(':intro-slider-lib')
     compile project(':parallax-effect-lib')
     compile project(':odoo-rpc-v3')
+    compile 'com.github.AAkira:ExpandableLayout:v1.5.1'
 }
-
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
+}
 /**
  * Application Package checker.
  * Required to change application Id 'com.odoo' and application name 'Odoo'

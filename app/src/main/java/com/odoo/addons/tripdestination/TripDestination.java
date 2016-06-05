@@ -19,7 +19,6 @@ import com.odoo.R;
 import com.odoo.addons.Equipment.providers.CmmsEquipment;
 import com.odoo.addons.tripdestination.providers.CmmsTripDestination;
 import com.odoo.core.orm.ODataRow;
-import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -190,9 +189,9 @@ public class TripDestination extends BaseFragment implements ISyncStatusObserver
     public void onViewBind(View view, Cursor cursor, ODataRow row) {
 try{
 //        Log.i("oVB","on View Bind started inervention");
-    int id = getResources().getIdentifier("com.odoo:drawable/complete.png" , null, null);
+    //int id = getResources().getIdentifier("com.odoo:drawable/complete.png" , null, null);
     CmmsEquipment cmmsEquipment = new CmmsEquipment(getContext(),null);
-    ODataRow oDataRowEquipment = cmmsEquipment.browse(row.getInt(OColumn.ROW_ID));
+    ODataRow oDataRowEquipment = cmmsEquipment.browse(row.getInt("equipment_id"));
 
 
 //    String distanceraw= row.getString("distance");
@@ -229,13 +228,13 @@ catch (Exception e ){}
             }
         Bitmap img4;
         if (!row.getString("pick_up").equals("false")) {
-            img3 = BitmapUtils.getAlphabetImage(getActivity(), "P");
-            OControls.setImage(view, R.id.image_small_pick_up, img3);
+            img4 = BitmapUtils.getAlphabetImage(getActivity(), "P");
+            OControls.setImage(view, R.id.image_small_pick_up, img4);
         }
         Bitmap img5;
         if (!row.getString("replacement").equals("false")) {
-            img3 = BitmapUtils.getAlphabetImage(getActivity(), "R");
-            OControls.setImage(view, R.id.image_small_replacement, img3);
+            img5 = BitmapUtils.getAlphabetImage(getActivity(), "R");
+            OControls.setImage(view, R.id.image_small_replacement, img5);
         }
 
 

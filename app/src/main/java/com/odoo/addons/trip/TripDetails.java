@@ -25,6 +25,7 @@ import com.odoo.addons.Equipment.providers.CmmsEquipment;
 import com.odoo.addons.trip.providers.CmmsTrips;
 import com.odoo.addons.tripdestination.providers.CmmsTripDestination;
 import com.odoo.base.addons.ir.feature.OFileManager;
+import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -56,7 +57,7 @@ public class TripDetails extends OdooCompatActivity
     private CmmsTrips cmmsTrips;
     private ODataRow record = null;
     private ParallaxScrollView parallaxScrollView;
-    private ImageView userImage = null, captureImage = null;
+    private ImageView userImage = null, captureImage = null, user11 = null, user21 = null, user31 = null, user41 = null;
     private TextView mTitleView = null;
     private OForm mForm;
     private App app;
@@ -97,7 +98,10 @@ public class TripDetails extends OdooCompatActivity
         app = (App) getApplicationContext();
         parallaxScrollView = (ParallaxScrollView) findViewById(com.odoo.R.id.parallaxScrollView);
         parallaxScrollView.setActionBar(actionBar);
-        userImage = (ImageView) findViewById(android.R.id.icon);
+        user11 = (ImageView) findViewById(R.id.user11);
+        user21 = (ImageView) findViewById(R.id.user21);
+        user31 = (ImageView) findViewById(R.id.user31);
+        user41 = (ImageView) findViewById(R.id.user41);
         mTitleView = (TextView) findViewById(android.R.id.title);
         cmmsTrips = new CmmsTrips(this, null);
         extras = getIntent().getExtras();
@@ -150,19 +154,52 @@ public class TripDetails extends OdooCompatActivity
         }
     }
 
-    private void getInterventions()
-    {
-        cmmsTripDestination = new CmmsTripDestination(getBaseContext(),null);
+    private void getInterventions() {
+        cmmsTripDestination = new CmmsTripDestination(getBaseContext(), null);
         List<ODataRow> test;
-        OModel oModelDestination = new OModel(getApplicationContext(),cmmsTripDestination.getModelName(),null);
+        OModel oModelDestination = new OModel(getApplicationContext(), cmmsTripDestination.getModelName(), null);
         String stest = record.getString("_id");
         try {
             tripDestinations = oModelDestination.query("select * from " + cmmsTripDestination.getTableName() + " where trip = " + stest + " ORDER BY order1 ASC");
-           // tripDestinations = oModelDestination.
-        } catch (Exception e)
-        {
-            Log.e("error",e.getMessage());
+            // tripDestinations = oModelDestination.
+        } catch (Exception e) {
+            Log.e("error", e.getMessage());
         }
+        getUserImages();
+
+    }
+
+
+    public void getUserImages() {
+        ResUsers resUsers = new ResUsers(this, null);
+
+        ODataRow oDataRow = resUsers.browse(record.getInt("user1"));
+        setUserImage(oDataRow.getString("image"), user11);
+
+        oDataRow = resUsers.browse(record.getInt("user2"));
+        setUserImage(oDataRow.getString("image"), user21);
+        oDataRow = resUsers.browse(record.getInt("user3"));
+        setUserImage(oDataRow.getString("image"), user31);
+        oDataRow = resUsers.browse(record.getInt("user4"));
+        setUserImage(oDataRow.getString("image"), user41);
+
+    }
+
+    public void setUserImage(String image, ImageView imageView) {
+        if (!image.equals("false")) {
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setColorFilter(null);
+
+            imageView.setImageBitmap(BitmapUtils.getBitmapImage(this, image));
+        } else {
+            imageView.setColorFilter(Color.parseColor("#ffffff"));
+        }
+    }
+
+
+
+
+
 //        CmmsTrips cmmsTrips1 = new CmmsTrips(this, null);
 //       // OModel oModelTripDest = new OModel(getContext(), cmmsTripDestination.getModelName(), null);
 //        //  ODataRow oDataRow = oModelTripDest.query("select * from " + cmmsTripDestination.getTableName() + " where _id = " + row.getString("_id")).get(0);
@@ -209,7 +246,6 @@ public class TripDetails extends OdooCompatActivity
 //        cmmsEquipment = null;
 
 
-    }
     private void setMode(Boolean edit) {
         if (mMenu != null) {
             mMenu.findItem(com.odoo.R.id.menu_trip_detail_more).setVisible(!edit);
