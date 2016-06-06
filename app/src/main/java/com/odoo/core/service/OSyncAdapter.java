@@ -426,7 +426,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                     break;
                 case OneToMany:
-                    List<ODataRow> o2mRecs = row.getM2MRecord(column.getName()).browseEach();
+                    List<ODataRow> o2mRecs = row.getO2MRecord(column.getName()).browseEach();
                     if (!o2mRecs.isEmpty()) {
                         for (ODataRow o2mRec : o2mRecs) {
                             if (o2mRec.getInt("id") == 0) {
