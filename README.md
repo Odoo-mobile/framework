@@ -19,6 +19,11 @@ It has pre-developed services,providers, controls and more other features to mak
 
 **Odoo Mobile** is a part of The Odoo (India)
 
+SUPPORTED ODOO VERSIONS
+=======================
+
+Odoo 7.0, 8.0, 9.0
+
 HOW TO START
 ============
 
@@ -35,4 +40,4 @@ GIVE FEEDBACK
 =============
 
  - Please report bug or issues [https://github.com/Odoo-mobile/framework/issues](https://github.com/Odoo-mobile/framework/issues)
- - You can also write us on **android@mail.odoo.co.in**
+ - You can also write us on **android@odoo.co.in**
