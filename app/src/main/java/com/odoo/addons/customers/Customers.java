@@ -97,10 +97,18 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
         getLoaderManager().initLoader(0, null, this);
 
+
+//        OValues values = new OValues();
+//        values.put("category_id", new RelValues().unlink(2));
+//
+//        db().update(2, values);
+
 //        OValues values = new OValues();
 //        values.put("name", "Odoo Mobile");
 //        values.put("email", "contact@odoomobile.com");
 //        values.put("is_company", true);
+
+
 //
 //
 //        OValues dpr = new OValues();
@@ -112,9 +120,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
 //        pga.put("name", "Parth Gajjar");
 //        pga.put("email", "pga@odoomobile.com");
 //
-//        OValues ptr = new OValues();
-//        ptr.put("name", "Pariket Trivedi");
-//        ptr.put("email", "ptr@odoomobile.com");
 //
 //        Toast.makeText(getActivity(), "Working", Toast.LENGTH_SHORT).show();
 //        values.put("child_ids", new RelValues().replace(ptr));

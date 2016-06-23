@@ -112,7 +112,9 @@ public class OValues implements Serializable {
         for (String key : _values.keySet()) {
             Object val = _values.get(key);
             if (val instanceof ArrayList || val instanceof List) {
-                val = new RelValues().append(val);
+                // Contains all the ids list so replacing with all ids.
+                List<Integer> ids = (List<Integer>) val;
+                val = new RelValues().replace(ids.toArray(new Object[ids.size()]));
             }
             if (val instanceof OValues || val instanceof RelValues) {
                 // Converting values to byte so we can pass it to ContentValues

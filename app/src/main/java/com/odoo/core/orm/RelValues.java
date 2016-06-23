@@ -1,6 +1,7 @@
 package com.odoo.core.orm;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,9 @@ public class RelValues implements Serializable {
     }
 
     public RelValues delete(Integer... values) {
-        return manageRecord(RelCommands.Delete, values);
+        List<Object> ids = new ArrayList<>();
+        ids.addAll(Arrays.asList(values));
+        return manageRecord(RelCommands.Delete, ids.toArray(new Object[ids.size()]));
     }
 
     public RelValues unlink(List<Integer> values) {
@@ -38,7 +41,9 @@ public class RelValues implements Serializable {
     }
 
     public RelValues unlink(Integer... values) {
-        return manageRecord(RelCommands.Unlink, values);
+        List<Object> ids = new ArrayList<>();
+        ids.addAll(Arrays.asList(values));
+        return manageRecord(RelCommands.Unlink, ids.toArray(new Object[ids.size()]));
     }
 
     private RelValues manageRecord(RelCommands command, Object... values) {

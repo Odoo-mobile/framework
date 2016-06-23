@@ -1,31 +1,31 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- * <p/>
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- * <p/>
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- * <p/>
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- * <p/>
+ * <p>
  * Created on 30/12/14 3:31 PM
  */
 package com.odoo.core.orm;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.odoo.App;
@@ -53,7 +53,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -956,9 +955,11 @@ public class OModel implements ISyncServiceListener {
         for (RelCommands commands : columnValues.keySet()) {
             switch (column.getRelationType()) {
                 case OneToMany:
+                    Log.v(">>>", ">>>One to many..." + columnValues);
                     handleOneToManyRecords(column, commands, relModel, record_id, columnValues);
                 case ManyToMany:
-//                    handleManyToManyRecords(column, commands, relModel, record_id, columnValues);
+                    Log.v(">>>", "Many to many ..." + columnValues);
+                    handleManyToManyRecords(column, commands, relModel, record_id, columnValues);
                     break;
             }
         }
@@ -1014,7 +1015,7 @@ public class OModel implements ISyncServiceListener {
         }
     }
 
-    private void handleManyToManyRecords(OColumn column, RelCommands commands, OModel relModel,
+    private void handleManyToManyRecords(OColumn column, RelCommands command, OModel relModel,
                                          int record_id, HashMap<RelCommands, List<Object>> values) {
 
         String table = column.getRelTableName() != null ? column.getRelTableName() :
@@ -1024,74 +1025,49 @@ public class OModel implements ISyncServiceListener {
         String rel_column = column.getRelRelationColumn() != null ? column.getRelRelationColumn() :
                 relModel.getTableName() + "_id";
         SQLiteDatabase db = getWritableDatabase();
-        switch (commands) {
+        switch (command) {
             case Append:
-                ContentValues vals = new ContentValues();
-                vals.put(base_column, record_id);
-                vals.put(rel_column, 0);
-                vals.put("_write_date", ODateUtils.getDate());
-                db.insert(table, null, vals);
+                // Inserting each relation id with base record id to relation table
+                List<Object> append_ids = values.get(command);
+                StringBuilder sql = new StringBuilder("INSERT INTO ").append(table)
+                        .append(" (")
+                        .append(base_column).append(", ")
+                        .append(rel_column)
+                        .append(", _write_date )").append(" VALUES ");
+                for (Object id : append_ids) {
+                    sql.append(" (").append(record_id).append(",")
+                            .append(id).append(", ")
+                            .append("'").append(ODateUtils.getUTCDate()).append("'), ");
+                }
+                String statement = sql.substring(0, sql.length() - 2);
+                db.execSQL(statement);
                 break;
             case Replace:
+                List<Object> ids = values.get(command);
+                // Unlink records
+                values.put(RelCommands.Unlink, ids);
+                handleManyToManyRecords(column, RelCommands.Unlink, relModel, record_id, values);
+
+                // Appending record in relation with base record
+                values.put(RelCommands.Append, ids);
+                handleManyToManyRecords(column, RelCommands.Append, relModel, record_id, values);
                 break;
             case Delete:
+                // Unlink relation with base record and removing relation records
+                values.put(RelCommands.Unlink, values.get(command));
+                handleManyToManyRecords(column, RelCommands.Unlink, relModel, record_id, values);
+
+                String deleteSql = "DELETE FROM " + table + " WHERE " + base_column + " = " + record_id + " AND " + rel_column + " IN (" +
+                        TextUtils.join(",", values.get(command)) + ")";
+                db.execSQL(deleteSql);
                 break;
             case Unlink:
+                // Unlink relation with base record
+                db.execSQL("DELETE FROM " + table + " WHERE " + base_column + " = " + record_id);
                 break;
         }
+        values.remove(command);
         db.close();
-    }
-
-    public void storeManyToManyRecord(String column_name, int row_id, List<Integer> relationIds,
-                                      Command command)
-            throws InvalidObjectException {
-        OColumn column = getColumn(column_name);
-        if (column != null) {
-            OModel rel_model = createInstance(column.getType());
-            String table = getTableName() + "_" + rel_model.getTableName() + "_rel";
-            String base_column = getTableName() + "_id";
-            String rel_column = rel_model.getTableName() + "_id";
-
-            SQLiteDatabase db = getWritableDatabase();
-            try {
-                switch (command) {
-                    case Add:
-                        if (relationIds.size() > 0) {
-                            for (int id : relationIds) {
-                                ContentValues values = new ContentValues();
-                                values.put(base_column, row_id);
-                                values.put(rel_column, id);
-                                values.put("_write_date", ODateUtils.getDate());
-                                db.insert(table, null, values);
-                            }
-                        }
-                        break;
-                    case Update:
-                        break;
-                    case Delete:
-                        // Deleting records to relation model
-                        if (relationIds.size() > 0) {
-                            for (int id : relationIds) {
-                                db.delete(table, base_column + " = ? AND  " + rel_column
-                                        + " = ?", new String[]{row_id + "", id + ""});
-                            }
-                        }
-                        break;
-                    case Replace:
-                        // Removing old entries
-                        db.delete(table, base_column + " = ?", new String[]{row_id + ""});
-                        // Creating new entries
-                        storeManyToManyRecord(column_name, row_id, relationIds, Command.Add);
-                        break;
-                }
-            } finally {
-                db.close();
-                rel_model.close();
-            }
-        } else {
-            throw new InvalidObjectException("Column [" + column_name + "] not found in " + getModelName() + " model.");
-
-        }
     }
 
     public List<ODataRow> selectManyToManyRecords(String[] projection, String column_name, int row_id) {

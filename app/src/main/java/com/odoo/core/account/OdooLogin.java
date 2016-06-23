@@ -54,14 +54,12 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     private Boolean mConnectedToServer = false;
     private Boolean mAutoLogin = false;
     private Boolean mRequestedForAccount = false;
-    private AccountCreater accountCreator = null;
+    private AccountCreator accountCreator = null;
     private Spinner databaseSpinner = null;
     private List<String> databases = new ArrayList<>();
     private TextView mLoginProcessStatus = null;
-    private TextView mTermsCondition;
     private App mApp;
     private Odoo mOdoo;
-    private odoo.helper.OUser mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +88,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
     private void init() {
         mLoginProcessStatus = (TextView) findViewById(R.id.login_process_status);
-        mTermsCondition = (TextView) findViewById(R.id.termsCondition);
+        TextView mTermsCondition = (TextView) findViewById(R.id.termsCondition);
         mTermsCondition.setMovementMethod(LinkMovementMethod.getInstance());
         findViewById(R.id.btnLogin).setOnClickListener(this);
         findViewById(R.id.forgot_password).setOnClickListener(this);
@@ -214,6 +212,8 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
             }
             if (databaseSpinner != null && databases.size() > 1 && databaseSpinner.getSelectedItemPosition() == 0) {
                 Toast.makeText(this, OResource.string(this, R.string.label_select_database), Toast.LENGTH_LONG).show();
+                findViewById(R.id.controls).setVisibility(View.VISIBLE);
+                findViewById(R.id.login_progress).setVisibility(View.GONE);
                 return;
             }
 
@@ -243,7 +243,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
             loginProcess(null, serverURL, databaseName);
         } else {
             mAutoLogin = true;
-            Log.v("", "Testing URL: " + serverURL);
             try {
                 Odoo.createInstance(OdooLogin.this, serverURL).setOnConnect(OdooLogin.this);
             } catch (OdooVersionException e) {
@@ -347,7 +346,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                 @Override
                 public void onLoginSuccess(Odoo odoo, odoo.helper.OUser oUser) {
                     mOdoo = odoo;
-                    mUser = oUser;
                     mOdoo.getSaasInstances(new IOdooInstanceListener() {
                         @Override
                         public void onInstancesLoad(List<OdooInstance> odooInstances) {
@@ -409,7 +407,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
         if (accountCreator != null) {
             accountCreator.cancel(true);
         }
-        accountCreator = new AccountCreater();
+        accountCreator = new AccountCreator();
         OUser user = new OUser();
         user.setFromBundle(oUser.getAsBundle());
         accountCreator.execute(user);
@@ -426,7 +424,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
         edtUsername.setError(OResource.string(this, R.string.error_invalid_username_or_password));
     }
 
-    private class AccountCreater extends AsyncTask<OUser, Void, Boolean> {
+    private class AccountCreator extends AsyncTask<OUser, Void, Boolean> {
 
         private OUser mUser;
 
