@@ -29,7 +29,6 @@ dependencies {
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.android.support:design:23.3.0'
     compile project(':intro-slider-lib')
-    compile project(':parallax-effect-lib')
     compile project(':odoo-rpc-v3')
 }
 
