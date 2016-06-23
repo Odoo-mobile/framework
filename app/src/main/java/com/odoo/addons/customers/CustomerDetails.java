@@ -172,6 +172,7 @@ public class CustomerDetails extends OdooCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.full_address:
+                //FIXME if coords is empty("") value == 0.0,0.0
                 String coords = record.getString("coords");
                 if (coords.equals(""))
                     IntentUtils.redirectToMap(this, record.getString("full_address"));
