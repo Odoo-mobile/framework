@@ -1,17 +1,21 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
     defaultConfig {
         //FIXME: Change application name as your requirement
         manifestPlaceholders = [applicationName: "Odoo"]
         //FIXME: Please change the application id as your requirement
         applicationId "com.odoo"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 5
         versionName "2.1.0alpha"
+        multiDexEnabled true
+    }
+    dexOptions {
+        javaMaxHeapSize "2g"
     }
     buildTypes {
         release {
@@ -24,10 +28,10 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:cardview-v7:23.3.0'
-    compile 'com.google.android.gms:play-services:8.4.0'
-    compile 'com.android.support:design:23.3.0'
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:cardview-v7:24.0.0'
+    compile 'com.google.android.gms:play-services:9.0.2'
+    compile 'com.android.support:design:24.0.0'
     compile project(':intro-slider-lib')
     compile project(':odoo-rpc-v3')
 }

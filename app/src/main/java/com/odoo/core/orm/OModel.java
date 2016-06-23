@@ -447,7 +447,7 @@ public class OModel implements ISyncServiceListener {
     }
 
     public List<OColumn> getManyToManyColumns(OColumn column, OModel relation_model) {
-        List<OColumn> cols = new ArrayList<OColumn>();
+        List<OColumn> cols = new ArrayList<>();
         _write_date.setName("_write_date");
         cols.add(_write_date);
         _is_dirty.setName("_is_dirty");
@@ -712,7 +712,7 @@ public class OModel implements ISyncServiceListener {
                 } while (cr.moveToNext());
             }
         } finally {
-            cr.close();
+            if (cr != null) cr.close();
         }
         return rows;
     }
@@ -722,7 +722,7 @@ public class OModel implements ISyncServiceListener {
             Method method = column.getFunctionalMethod();
             OModel model = this;
             try {
-                return method.invoke(model, new Object[]{record});
+                return method.invoke(model, record);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -734,7 +734,7 @@ public class OModel implements ISyncServiceListener {
         Method method = column.getOnChangeMethod();
         OModel model = this;
         try {
-            return method.invoke(model, new Object[]{record});
+            return method.invoke(model, record);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -885,7 +885,7 @@ public class OModel implements ISyncServiceListener {
     public boolean delete(int row_id, boolean permanently) {
         int count = 0;
         if (permanently)
-            count = mContext.getContentResolver().delete(uri().withAppendedPath(uri(), row_id + ""), null, null);
+            count = mContext.getContentResolver().delete(Uri.withAppendedPath(uri(), row_id + ""), null, null);
         else {
             OValues values = new OValues();
             values.put("_is_active", "false");

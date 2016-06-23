@@ -36,7 +36,6 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OObjectUtils;
-import com.odoo.core.utils.logger.OLog;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -135,7 +134,7 @@ public class BaseModelProvider extends ContentProvider {
                     columns.add(key);
                 }
             }
-            columns.addAll(Arrays.asList(new String[]{OColumn.ROW_ID, "id", "_is_active", "_write_date"}));
+            columns.addAll(Arrays.asList(OColumn.ROW_ID, "id", "_is_active", "_write_date"));
             return columns.toArray(new String[columns.size()]);
         }
         return null;
@@ -161,7 +160,6 @@ public class BaseModelProvider extends ContentProvider {
         switch (match) {
             case COLLECTION:
                 SQLiteDatabase db = mModel.getWritableDatabase();
-                OLog.log(value_to_insert + "");
                 long new_id = db.insert(mModel.getTableName(), null, value_to_insert);
                 // Updating relation columns for record
                 if (values[1].size() > 0) {

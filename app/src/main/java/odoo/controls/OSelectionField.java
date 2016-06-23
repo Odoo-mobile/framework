@@ -202,8 +202,12 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                                 } catch (Exception e) {
 
                                 }
-                                mContext.registerReceiver(valueReceiver,
-                                        new IntentFilter("searchable_value_select"));
+                                try {
+                                    mContext.registerReceiver(valueReceiver,
+                                            new IntentFilter("searchable_value_select"));
+                                } catch (Exception e) {
+
+                                }
                                 mContext.startActivity(intent);
                             }
                         });

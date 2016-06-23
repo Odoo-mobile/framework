@@ -285,9 +285,13 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             OModel model = record.getBaseModel();
             OModel rel_model = model.createInstance(record.getRelationModel());
             model.close();
-            ODomain domain = new ODomain();
-            domain.add("id", "in", record.getUniqueIds());
-            syncData(rel_model, user, domain, result, false, false);
+
+            // Skipping blank sync request if there is no any ids to sync.
+            if (!record.getUniqueIds().isEmpty()) {
+                ODomain domain = new ODomain();
+                domain.add("id", "in", record.getUniqueIds());
+                syncData(rel_model, user, domain, result, true, false);
+            }
             // Updating manyToOne record with their relation record row_id
             switch (record.getRelationType()) {
                 case ManyToOne:
