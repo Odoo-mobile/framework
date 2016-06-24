@@ -1,4 +1,4 @@
-<img src="https://dharmangsoni.odoo.com/website/image?max_height=768&field=datas&model=ir.attachment&id=118&max_width=250" alt="Odoo Mobile"/>
+<img src="https://raw.githubusercontent.com/Odoo-mobile/framework/master-relation_data_mapping-dpr/app/src/main/res/drawable-nodpi/odoo_mobile_small.png" width="280" alt="Odoo Mobile"/>
 <br/>v2.1.0alpha (Build 5)
 
 
