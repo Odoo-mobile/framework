@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 16/2/15 12:52 PM
  */
 package com.odoo.core.account;
@@ -27,7 +27,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -43,7 +42,6 @@ import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OResource;
-import com.odoo.core.utils.notification.ONotificationBuilder;
 
 import odoo.Odoo;
 import odoo.helper.OUser;
@@ -66,8 +64,6 @@ public class OdooAccountQuickManage extends AppCompatActivity implements View.On
         getSupportActionBar().hide();
         action = getIntent().getAction();
         mApp = (App) getApplicationContext();
-        // Removing notification
-        ONotificationBuilder.cancelNotification(this, OSyncAdapter.REQUEST_SIGN_IN_ERROR);
         user = OdooAccountManager.getDetails(this, getIntent().getStringExtra("android_name"));
         if (action.equals("remove_account")) {
             findViewById(R.id.layoutSavePassword).setVisibility(View.GONE);
@@ -131,7 +127,6 @@ public class OdooAccountQuickManage extends AppCompatActivity implements View.On
 
     @Override
     public void onClick(View v) {
-        ONotificationBuilder.cancelNotification(this, OSyncAdapter.REQUEST_SIGN_IN_ERROR);
         switch (v.getId()) {
             case R.id.cancel:
                 finish();

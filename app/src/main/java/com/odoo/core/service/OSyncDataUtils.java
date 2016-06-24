@@ -52,20 +52,23 @@ public class OSyncDataUtils {
     private OUser mUser;
     private OdooResult response;
     private HashSet<String> recordsId = new HashSet<>();
+    private List<String> recentSyncIds = new ArrayList<>();
     private HashMap<String, SyncRelationRecords> relationRecordsHashMap = new HashMap<>();
     private Odoo mOdoo;
     private SyncResult mResult;
     private HashMap<String, List<Integer>> updateToServerRecords = new HashMap<>();
     private Boolean mCreateRelationRecords = true;
 
-    public OSyncDataUtils(Context context, Odoo odoo, OModel model, OUser user, OdooResult response,
-                          SyncResult result, Boolean createRelRecord) {
+    public OSyncDataUtils(Context context, Odoo odoo) {
         mContext = context;
         mOdoo = odoo;
+    }
+
+    public void handleResult(OModel model, OUser user, SyncResult result, OdooResult response, Boolean createRelRecord) {
         mModel = model;
         mUser = user;
-        this.response = response;
         mResult = result;
+        this.response = response;
         mCreateRelationRecords = createRelRecord;
         List<OdooRecord> updateInLocal = checkLocalUpdatedRecords();
         handleResult(updateInLocal);
@@ -92,11 +95,9 @@ public class OSyncDataUtils {
             }
 
             // getting local dirty records if server records length = 0
-            if (records.size() <= 0) {
-                for (ODataRow row : mModel.select(new String[]{}, "_is_dirty = ? and _is_active = ? and id != ?",
-                        new String[]{"true", "true", "0"})) {
-                    serverIds.add(row.getInt("id"));
-                }
+            for (ODataRow row : mModel.select(new String[]{}, "_is_dirty = ? and _is_active = ? and id != ?",
+                    new String[]{"true", "true", "0"})) {
+                serverIds.add(row.getInt("id"));
             }
             // Comparing dirty (updated) record
             List<Integer> updateToServerIds = new ArrayList<>();
@@ -167,120 +168,128 @@ public class OSyncDataUtils {
             List<OColumn> columns = mModel.getColumns(false);
             columns.addAll(mModel.getFunctionalColumns());
             for (OdooRecord record : records) {
-                OValues values = new OValues();
-                recordsId.add(mModel.getModelName() + "_" + record.getInt("id"));
-                for (OColumn column : columns) {
-                    String name = column.getSyncColumn();
-                    String lName = column.getName();
-                    if (column.getRelationType() == null) {
-                        // checks for functional store fields
-                        if (column.isFunctionalColumn() && column.canFunctionalStore()) {
-                            List<String> depends = column.getFunctionalStoreDepends();
-                            OValues dependValues = new OValues();
-                            if (!column.isLocal())
-                                dependValues.put(column.getName(), record.get(column.getName()));
-                            for (String depend : depends) {
-                                if (record.containsKey(depend)) {
-                                    dependValues.put(depend, record.get(depend));
+                if (!recentSyncIds.contains(mModel.getModelName() + ":" + record.getInt("id"))) {
+                    OValues values = new OValues();
+                    recordsId.add(mModel.getModelName() + "_" + record.getInt("id"));
+                    for (OColumn column : columns) {
+                        String name = column.getSyncColumn();
+                        String lName = column.getName();
+                        if (column.getRelationType() == null) {
+                            // checks for functional store fields
+                            if (column.isFunctionalColumn() && column.canFunctionalStore()) {
+                                List<String> depends = column.getFunctionalStoreDepends();
+                                OValues dependValues = new OValues();
+                                if (!column.isLocal())
+                                    dependValues.put(column.getName(), record.get(column.getName()));
+                                for (String depend : depends) {
+                                    if (record.containsKey(depend)) {
+                                        dependValues.put(depend, record.get(depend));
+                                    }
                                 }
+                                Object value = mModel.getFunctionalMethodValue(column, dependValues);
+                                values.put(lName, value);
+                            } else {
+                                // Normal Columns
+                                values.put(lName, record.get(name));
                             }
-                            Object value = mModel.getFunctionalMethodValue(column, dependValues);
-                            values.put(lName, value);
                         } else {
-                            // Normal Columns
-                            values.put(lName, record.get(name));
-                        }
-                    } else {
-                        // Relation Columns
-                        if (!record.getString(name).equals("false")) {
-                            switch (column.getRelationType()) {
-                                case ManyToOne:
-                                    OdooRecord m2oData = record.getM20(name);
-                                    OModel m2o_model = mModel.createInstance(column.getType());
-                                    String recKey = m2o_model.getModelName() + "_" + m2oData.getInt("id");
-                                    int m2oRowId;
-                                    if (!recordsId.contains(recKey)) {
-                                        OValues m2oValue = new OValues();
-                                        m2oValue.put("id", m2oData.getInt("id"));
-                                        m2oValue.put(m2o_model.getDefaultNameColumn(), m2oData.getString("name"));
-                                        m2oValue.put("_is_dirty", "false");
-                                        m2oRowId = m2o_model.insertOrUpdate(m2oData.getInt("id"),
-                                                m2oValue);
-                                    } else {
-                                        m2oRowId = m2o_model.selectRowId(m2oData.getInt("id"));
-                                    }
-
-                                    values.put(lName, m2oRowId);
-                                    if (mCreateRelationRecords) {
-                                        // Add id to sync if model contains more than (id,name) columns
-                                        if (m2o_model.getColumns(false).size() > 2
-                                                || (m2o_model.getColumns(false).size() > 4
-                                                && mModel.getOdooVersion().getVersionNumber() > 7)) {
-                                            List<Integer> m2oIds = new ArrayList<>();
-                                            m2oIds.add(m2oData.getInt("id"));
-                                            addUpdateRelationRecord(mModel, m2o_model.getTableName(),
-                                                    column.getType(), name, null,
-                                                    column.getRelationType(), m2oIds);
-                                        }
-                                    }
-                                    m2o_model.close();
-                                    break;
-                                case ManyToMany:
-                                    OModel m2mModel = mModel.createInstance(column.getType());
-                                    List<Integer> m2mIds = OListUtils.doubleToIntList(record.getM2M(name));
-                                    if (mCreateRelationRecords) {
-                                        addUpdateRelationRecord(mModel, m2mModel.getTableName(), column.getType(),
-                                                name, null, column.getRelationType(),
-                                                (column.getRecordSyncLimit() > 0) ?
-                                                        m2mIds.subList(0, column.getRecordSyncLimit()) : m2mIds);
-                                    }
-                                    List<Integer> m2mRowIds = new ArrayList<>();
-                                    for (Integer id : m2mIds) {
-                                        recKey = m2mModel.getModelName() + "_" + id;
-                                        int r_id;
+                            // Relation Columns
+                            if (!record.getString(name).equals("false")) {
+                                switch (column.getRelationType()) {
+                                    case ManyToOne:
+                                        OdooRecord m2oData = record.getM20(name);
+                                        OModel m2o_model = mModel.createInstance(column.getType());
+                                        String recKey = m2o_model.getModelName() + "_" + m2oData.getInt("id");
+                                        int m2oRowId;
                                         if (!recordsId.contains(recKey)) {
-                                            OValues m2mValues = new OValues();
-                                            m2mValues.put("id", id);
-                                            m2mValues.put("_is_dirty", "false");
-                                            r_id = m2mModel.insertOrUpdate(id, m2mValues);
+                                            OValues m2oValue = new OValues();
+                                            m2oValue.put("id", m2oData.getInt("id"));
+                                            m2oValue.put(m2o_model.getDefaultNameColumn(), m2oData.getString("name"));
+                                            m2oValue.put("_is_dirty", "false");
+                                            m2oRowId = m2o_model.insertOrUpdate(m2oData.getInt("id"),
+                                                    m2oValue);
                                         } else {
-                                            r_id = m2mModel.selectRowId(id);
+                                            m2oRowId = m2o_model.selectRowId(m2oData.getInt("id"));
                                         }
-                                        m2mRowIds.add(r_id);
-                                    }
-                                    if (m2mRowIds.size() > 0) {
-                                        // Putting many to many related ids
-                                        // (generated _id for each of server ids)
-                                        values.put(lName, m2mRowIds);
-                                    }
-                                    m2mModel.close();
-                                    break;
-                                case OneToMany:
-                                    if (mCreateRelationRecords) {
-                                        OModel o2mModel = mModel.createInstance(column.getType());
-                                        List<Integer> o2mIds = OListUtils.doubleToIntList(record.getO2M(name));
-                                        addUpdateRelationRecord(mModel, o2mModel.getTableName(),
-                                                column.getType(), name, column.getRelatedColumn(),
-                                                column.getRelationType(),
-                                                (column.getRecordSyncLimit() > 0) ?
-                                                        o2mIds.subList(0, column.getRecordSyncLimit()) : o2mIds);
-                                        o2mModel.close();
-                                    }
-                                    break;
+
+                                        values.put(lName, m2oRowId);
+                                        if (mCreateRelationRecords) {
+                                            // Add id to sync if model contains more than (id,name) columns
+                                            if (m2o_model.getColumns(false).size() > 2
+                                                    || (m2o_model.getColumns(false).size() > 4
+                                                    && mModel.getOdooVersion().getVersionNumber() > 7)) {
+                                                List<Integer> m2oIds = new ArrayList<>();
+                                                m2oIds.add(m2oData.getInt("id"));
+                                                addUpdateRelationRecord(mModel, m2o_model.getTableName(),
+                                                        column.getType(), name, null,
+                                                        column.getRelationType(), m2oIds);
+                                            }
+                                        }
+                                        m2o_model.close();
+                                        break;
+                                    case ManyToMany:
+                                        OModel m2mModel = mModel.createInstance(column.getType());
+                                        List<Integer> m2mIds = OListUtils.doubleToIntList(record.getM2M(name));
+                                        if (mCreateRelationRecords) {
+                                            addUpdateRelationRecord(mModel, m2mModel.getTableName(), column.getType(),
+                                                    name, null, column.getRelationType(),
+                                                    (column.getRecordSyncLimit() > 0) ?
+                                                            m2mIds.subList(0, column.getRecordSyncLimit()) : m2mIds);
+                                        }
+                                        List<Integer> m2mRowIds = new ArrayList<>();
+                                        for (Integer id : m2mIds) {
+                                            recKey = m2mModel.getModelName() + "_" + id;
+                                            int r_id;
+                                            if (!recordsId.contains(recKey)) {
+                                                OValues m2mValues = new OValues();
+                                                m2mValues.put("id", id);
+                                                m2mValues.put("_is_dirty", "false");
+                                                r_id = m2mModel.insertOrUpdate(id, m2mValues);
+                                            } else {
+                                                r_id = m2mModel.selectRowId(id);
+                                            }
+                                            m2mRowIds.add(r_id);
+                                        }
+                                        if (m2mRowIds.size() > 0) {
+                                            // Putting many to many related ids
+                                            // (generated _id for each of server ids)
+                                            values.put(lName, m2mRowIds);
+                                        }
+                                        m2mModel.close();
+                                        break;
+                                    case OneToMany:
+                                        if (mCreateRelationRecords) {
+                                            OModel o2mModel = mModel.createInstance(column.getType());
+                                            List<Integer> o2mIds = OListUtils.doubleToIntList(record.getO2M(name));
+                                            addUpdateRelationRecord(mModel, o2mModel.getTableName(),
+                                                    column.getType(), name, column.getRelatedColumn(),
+                                                    column.getRelationType(),
+                                                    (column.getRecordSyncLimit() > 0) ?
+                                                            o2mIds.subList(0, column.getRecordSyncLimit()) : o2mIds);
+                                            o2mModel.close();
+                                        }
+                                        break;
+                                }
                             }
                         }
                     }
+                    // Some default values
+                    values.put("id", record.getInt("id"));
+                    values.put("_write_date", ODateUtils.getUTCDate());
+                    values.put("_is_active", "true");
+                    values.put("_is_dirty", "false");
+                    mModel.insertOrUpdate(record.getInt("id"), values);
+
+                    // Fixed issue of multiple time sync same record. Performance improved
+                    // Adding to recent sync list for avoiding duplicate process for record
+                    recentSyncIds.add(mModel.getModelName() + ":" + record.getInt("id"));
+                    mResult.stats.numEntries++;
+                    counter++;
                 }
-                // Some default values
-                values.put("id", record.getInt("id"));
-                values.put("_write_date", ODateUtils.getUTCDate());
-                values.put("_is_active", "true");
-                values.put("_is_dirty", "false");
-                mModel.insertOrUpdate(record.getInt("id"), values);
-                counter++;
             }
             Log.i(TAG, counter + " records affected");
         } catch (Exception e) {
+            mResult.stats.numParseExceptions++;
             e.printStackTrace();
         }
     }

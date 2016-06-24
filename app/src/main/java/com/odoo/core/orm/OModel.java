@@ -19,13 +19,13 @@
  */
 package com.odoo.core.orm;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.odoo.App;
@@ -53,7 +53,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -77,8 +76,6 @@ public class OModel implements ISyncServiceListener {
 
     public static final String TAG = OModel.class.getSimpleName();
     public String BASE_AUTHORITY = App.APPLICATION_ID + ".core.provider.content";
-    public static final String KEY_UPDATE_IDS = "key_update_ids";
-    public static final String KEY_INSERT_IDS = "key_insert_ids";
     public static final int INVALID_ROW_ID = -1;
     public static OSQLite sqLite = null;
     private Context mContext;
@@ -92,21 +89,6 @@ public class OModel implements ISyncServiceListener {
     private String default_name_column = "name";
     public static OModelRegistry modelRegistry = new OModelRegistry();
     private boolean hasMailChatter = false;
-
-    // Relation record command
-    public enum Command {
-        Add(0), Update(1), Delete(2), Replace(6);
-
-        int type;
-
-        Command(int type) {
-            this.type = type;
-        }
-
-        public int getValue() {
-            return type;
-        }
-    }
 
     // Base Columns
     OColumn id = new OColumn("ID", OInteger.class).setDefaultValue(0);
@@ -447,7 +429,7 @@ public class OModel implements ISyncServiceListener {
     }
 
     public List<OColumn> getManyToManyColumns(OColumn column, OModel relation_model) {
-        List<OColumn> cols = new ArrayList<OColumn>();
+        List<OColumn> cols = new ArrayList<>();
         _write_date.setName("_write_date");
         cols.add(_write_date);
         _is_dirty.setName("_is_dirty");
@@ -712,7 +694,7 @@ public class OModel implements ISyncServiceListener {
                 } while (cr.moveToNext());
             }
         } finally {
-            cr.close();
+            if (cr != null) cr.close();
         }
         return rows;
     }
@@ -722,7 +704,7 @@ public class OModel implements ISyncServiceListener {
             Method method = column.getFunctionalMethod();
             OModel model = this;
             try {
-                return method.invoke(model, new Object[]{record});
+                return method.invoke(model, record);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -734,7 +716,7 @@ public class OModel implements ISyncServiceListener {
         Method method = column.getOnChangeMethod();
         OModel model = this;
         try {
-            return method.invoke(model, new Object[]{record});
+            return method.invoke(model, record);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -885,14 +867,14 @@ public class OModel implements ISyncServiceListener {
     public boolean delete(int row_id, boolean permanently) {
         int count = 0;
         if (permanently)
-            count = mContext.getContentResolver().delete(uri().withAppendedPath(uri(), row_id + ""), null, null);
+            count = mContext.getContentResolver().delete(Uri.withAppendedPath(uri(), row_id + ""), null, null);
         else {
             OValues values = new OValues();
             values.put("_is_active", "false");
             update(row_id, values);
             count++;
         }
-        return (count > 0) ? true : false;
+        return count > 0;
     }
 
     public int update(String selection, String[] args, OValues values) {
@@ -900,9 +882,9 @@ public class OModel implements ISyncServiceListener {
     }
 
     public boolean update(int row_id, OValues values) {
-        int count = mContext.getContentResolver().update(uri().withAppendedPath(uri(), row_id + ""),
+        int count = mContext.getContentResolver().update(Uri.withAppendedPath(uri(), row_id + ""),
                 values.toContentValues(), null, null);
-        return (count > 0) ? true : false;
+        return count > 0;
     }
 
 
@@ -941,56 +923,141 @@ public class OModel implements ISyncServiceListener {
     }
 
 
-    public void storeManyToManyRecord(String column_name, int row_id, List<Integer> relationIds,
-                                      Command command)
-            throws InvalidObjectException {
-        OColumn column = getColumn(column_name);
-        if (column != null) {
-            OModel rel_model = createInstance(column.getType());
-            String table = getTableName() + "_" + rel_model.getTableName() + "_rel";
-            String base_column = getTableName() + "_id";
-            String rel_column = rel_model.getTableName() + "_id";
-
-            SQLiteDatabase db = getWritableDatabase();
-            try {
-                switch (command) {
-                    case Add:
-                        if (relationIds.size() > 0) {
-                            for (int id : relationIds) {
-                                ContentValues values = new ContentValues();
-                                values.put(base_column, row_id);
-                                values.put(rel_column, id);
-                                values.put("_write_date", ODateUtils.getDate());
-                                db.insert(table, null, values);
-                            }
-                        }
-                        break;
-                    case Update:
-                        break;
-                    case Delete:
-                        // Deleting records to relation model
-                        if (relationIds.size() > 0) {
-                            for (int id : relationIds) {
-                                db.delete(table, base_column + " = ? AND  " + rel_column
-                                        + " = ?", new String[]{row_id + "", id + ""});
-                            }
-                        }
-                        break;
-                    case Replace:
-                        // Removing old entries
-                        db.delete(table, base_column + " = ?", new String[]{row_id + ""});
-                        // Creating new entries
-                        storeManyToManyRecord(column_name, row_id, relationIds, Command.Add);
-                        break;
-                }
-            } finally {
-                db.close();
-                rel_model.close();
+    /**
+     * Handle record values for insert, update, delete operation with relation columns
+     * Each record have different behaviour, appending, deleting, unlink reference and
+     * replacing with new list
+     *
+     * @param record_id Main record id on which relation values affected
+     * @param column    column object of the record (for relation column only)
+     * @param values    values list with commands (@see RelCommands)
+     */
+    public void handleRelationValues(int record_id, OColumn column, RelValues values) {
+        OModel relModel = createInstance(column.getType());
+        HashMap<RelCommands, List<Object>> columnValues = values.getColumnValues();
+        for (RelCommands commands : columnValues.keySet()) {
+            switch (column.getRelationType()) {
+                case OneToMany:
+                    handleOneToManyRecords(column, commands, relModel, record_id, columnValues);
+                    break;
+                case ManyToMany:
+                    handleManyToManyRecords(column, commands, relModel, record_id, columnValues);
+                    break;
             }
-        } else {
-            throw new InvalidObjectException("Column [" + column_name + "] not found in " + getModelName() + " model.");
-
         }
+    }
+
+    private void handleOneToManyRecords(OColumn column, RelCommands commands, OModel relModel,
+                                        int record_id, HashMap<RelCommands, List<Object>> values) {
+        if (commands == RelCommands.Replace) {
+            // Force to unlink record even no any other record values available.
+            OValues old_values = new OValues();
+            old_values.put(column.getRelatedColumn(), 0);
+            int count = relModel.update(column.getRelatedColumn() + " = ?", new String[]{record_id + ""},
+                    old_values);
+            Log.i(TAG, String.format("#%d references removed " + relModel.getModelName(), count));
+        }
+        for (Object rowObj : values.get(commands)) {
+            switch (commands) {
+                case Append:
+                    OValues value;
+                    if (rowObj instanceof OValues) {
+                        value = (OValues) rowObj;
+                        value.put(column.getRelatedColumn(), record_id);
+                        relModel.insert(value);
+                    } else {
+                        int rec_id = (int) rowObj;
+                        value = new OValues();
+                        value.put(column.getRelatedColumn(), record_id);
+                        relModel.update(rec_id, value);
+                    }
+                    break;
+                case Replace:
+                    if (rowObj instanceof OValues) {
+                        value = (OValues) rowObj;
+                        value.put(column.getRelatedColumn(), record_id);
+                        relModel.insert(value);
+                    } else {
+                        int rec_id = (int) rowObj;
+                        value = new OValues();
+                        value.put(column.getRelatedColumn(), record_id);
+                        relModel.update(rec_id, value);
+                    }
+                    break;
+                case Delete:
+                    relModel.delete((int) rowObj);
+                    break;
+                case Unlink:
+                    // Removing all older references
+                    OValues old_update = new OValues();
+                    old_update.put(column.getRelatedColumn(), 0);
+                    relModel.update((int) rowObj, old_update);
+                    break;
+            }
+        }
+    }
+
+    private void handleManyToManyRecords(OColumn column, RelCommands command, OModel relModel,
+                                         int record_id, HashMap<RelCommands, List<Object>> values) {
+
+        String table = column.getRelTableName() != null ? column.getRelTableName() :
+                getTableName() + "_" + relModel.getTableName() + "_rel";
+        String base_column = column.getRelBaseColumn() != null ? column.getRelBaseColumn() :
+                getTableName() + "_id";
+        String rel_column = column.getRelRelationColumn() != null ? column.getRelRelationColumn() :
+                relModel.getTableName() + "_id";
+        SQLiteDatabase db = getWritableDatabase();
+        switch (command) {
+            case Append:
+                // Inserting each relation id with base record id to relation table
+                List<Object> append_items = values.get(command);
+                StringBuilder sql = new StringBuilder("INSERT INTO ").append(table)
+                        .append(" (")
+                        .append(base_column).append(", ")
+                        .append(rel_column)
+                        .append(", _write_date )").append(" VALUES ");
+                for (Object obj : append_items) {
+                    int id;
+                    if (obj instanceof OValues) {
+                        Log.d(TAG, "creating quick record for many to many ");
+                        id = relModel.insert((OValues) obj);
+                    } else id = (int) obj;
+                    sql.append(" (").append(record_id).append(",")
+                            .append(id).append(", ")
+                            .append("'").append(ODateUtils.getUTCDate()).append("'), ");
+                }
+                String statement = sql.substring(0, sql.length() - 2);
+                db.execSQL(statement);
+                break;
+            case Replace:
+                List<Object> ids = values.get(command);
+                // Unlink records
+                values.put(RelCommands.Unlink, ids);
+                handleManyToManyRecords(column, RelCommands.Unlink, relModel, record_id, values);
+
+                // Appending record in relation with base record
+                values.put(RelCommands.Append, ids);
+                handleManyToManyRecords(column, RelCommands.Append, relModel, record_id, values);
+                break;
+            case Delete:
+                // Unlink relation with base record and removing relation records
+                values.put(RelCommands.Unlink, values.get(command));
+                handleManyToManyRecords(column, RelCommands.Unlink, relModel, record_id, values);
+
+                // Deleting master record from relation model with given ids
+                String deleteSql = "DELETE FROM " + relModel.getTableName() + " WHERE " + OColumn.ROW_ID + " IN (" +
+                        TextUtils.join(",", values.get(command)) + ")";
+                db.execSQL(deleteSql);
+                break;
+            case Unlink:
+                // Unlink relation with base record
+                String unlinkSQL = "DELETE FROM " + table + " WHERE " + base_column + " = " + record_id + " AND " + rel_column + " IN (" +
+                        TextUtils.join(",", values.get(command)) + ")";
+                db.execSQL(unlinkSQL);
+                break;
+        }
+        values.remove(command);
+        db.close();
     }
 
     public List<ODataRow> selectManyToManyRecords(String[] projection, String column_name, int row_id) {

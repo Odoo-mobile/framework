@@ -63,7 +63,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public static final String EXTRA_KEY_TYPE = "extra_key_type";
     private View mView;
     private String mCurFilter = null;
-    private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
     private boolean syncRequested = false;
 
@@ -87,7 +86,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         setHasSwipeRefreshView(view, R.id.swipe_container, this);
         mView = view;
         mType = Type.valueOf(getArguments().getString(EXTRA_KEY_TYPE));
-        mPartnersList = (ListView) view.findViewById(R.id.listview);
+        ListView mPartnersList = (ListView) view.findViewById(R.id.listview);
         mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.customer_row_item);
         mAdapter.setOnViewBindListener(this);
         mAdapter.setHasSectionIndexers(true, "name");
@@ -96,6 +95,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         mPartnersList.setOnItemClickListener(this);
         setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
         getLoaderManager().initLoader(0, null, this);
+
     }
 
     @Override
