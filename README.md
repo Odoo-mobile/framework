@@ -1,7 +1,6 @@
 <img src="https://github.com/Odoo-mobile/framework/blob/master/odoo_mobile.png" alt="Odoo Mobile"/>
 <br/>v2.2.0 (Build 6)
 
-
 Odoo Mobile v2.2.0 (Framework)
 ==============================
 
