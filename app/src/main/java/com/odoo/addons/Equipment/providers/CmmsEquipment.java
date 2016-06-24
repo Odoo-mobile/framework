@@ -3,6 +3,7 @@ package com.odoo.addons.Equipment.providers;
 import android.content.Context;
 import android.net.Uri;
 
+import com.odoo.addons.productionline.providers.CmmsProductionLine;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -63,7 +64,7 @@ public class CmmsEquipment extends OModel {
     OColumn trolleys = new OColumn("Trolleys", OSelection.class).addSelection("1","Unknown").addSelection("2", "Trolleys Version 2").addSelection("3","Trolleys Version 1").addSelection("4","None");
     OColumn wheelchair = new OColumn("Wheelchair", OSelection.class).addSelection("1", "Black").addSelection("2", "Gray");
     OColumn customer = new OColumn("Customer", ResPartner.class, OColumn.RelationType.ManyToOne);
-
+    OColumn line_id = new OColumn("Production Line", CmmsProductionLine.class, OColumn.RelationType.ManyToOne);
     //OColumn pod_bat_type = new OColumn("pod_bat_type", OSelection.class).addSelection("1","1P Plug").addSelection("2", "1P Stab in").addSelection("3","Pouch");
 
 

@@ -13,18 +13,103 @@
         app:ael_expanded="false"
         app:ael_interpolator="bounce"
         app:ael_orientation="vertical">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pod" >
 
+
+        <TextView
+            android:id="@+id/podConNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_below="@id/text"
+            android:text="Cont.N - 9999" />
+        <TextView
+            android:id="@+id/podRevision"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:padding="10dip"
+            android:layout_below="@id/pod"
+            android:text="Revision 1.5 " />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Details"
+            android:id="@+id/poddetails"
+            android:padding="10dip"
+            android:layout_below="@id/pod"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"/>
+
+    </LinearLayout>
         <TextView
             android:id="@+id/text"
             android:layout_width="match_parent"
+            android:layout_below="@id/pod"
             android:layout_height="wrap_content"
             android:text="sample" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/sample2"
             android:layout_below="@id/text"
             android:text="sample2" />
+
+
+            <TextView
+                android:id="@+id/intervention"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/sample2"
+                android:text="sampleInte222222222222r" />
+
+
+            <TextView
+                android:id="@+id/interventionmotif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/intervention"
+                android:text="interventionmotifinterventionmotifinterventionmotifinterventionmotifinterventionmotifinterventionmotif" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/satnav"  android:layout_below="@id/interventionmotif">
+
+
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start Navigation"
+                android:id="@+id/navigate"
+                android:padding="10dip"
+                android:layout_below="@id/satnav"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Address Details"
+                android:id="@+id/satnavdetails"
+                android:padding="10dip"
+                android:layout_below="@id/satnav"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"/>
+
+        </LinearLayout>
+
+
+
     </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
+
+
 
 </RelativeLayout>

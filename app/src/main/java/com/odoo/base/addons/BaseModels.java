@@ -22,6 +22,7 @@ package com.odoo.base.addons;
 import android.content.Context;
 
 
+import com.odoo.addons.productionline.providers.CmmsProductionLine;
 import com.odoo.addons.trip.providers.CmmsTrips;
 import com.odoo.addons.tripdestination.providers.CmmsTripDestination;
 import com.odoo.base.addons.ir.IrAttachment;
@@ -61,6 +62,7 @@ public class BaseModels {
         models.add(new CmmsPreventive(context, user));
         models.add(new CmmsTripDestination(context, user));
         models.add(new CmmsTrips(context, user));
+        models.add(new CmmsProductionLine(context, user));
        // models.add(new CmmsTimesheet(context,user));
         return models;
     }

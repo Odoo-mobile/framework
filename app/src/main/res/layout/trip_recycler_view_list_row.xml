@@ -19,35 +19,193 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:id="@+id/item_txtName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@id/button"
-        android:gravity="center"
-        android:padding="8dp"
-        android:textColor="@color/white"
-        android:textSize="12sp" />
+        android:layout_marginEnd="87dp"
+        android:layout_marginRight="87dp"
+        android:adjustViewBounds="true"
+        android:text="Poolpod Warehouse"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/item_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="30dp"
+        android:text="PP1-43-21"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <!--<TextView-->
+    <!--android:id="@+id/item_distance"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="300 Miles"-->
+    <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+    <!--android:layout_alignBottom="@+id/item_txtName"-->
+    <!--android:layout_toRightOf="@+id/item_txtName"-->
+    <!--android:layout_toEndOf="@+id/item_txtName" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/item_time"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="6h 9min"-->
+    <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+    <!--android:layout_alignBaseline="@+id/item_type"-->
+    <!--android:layout_alignBottom="@+id/item_type"-->
+    <!--android:layout_toRightOf="@+id/item_txtName"-->
+    <!--android:layout_toEndOf="@+id/item_txtName" />-->
+
+    <odoo.controls.BezelImageView
+        android:id="@+id/image_small_action"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="62dp"
+        app:maskDrawable="@drawable/circle_mask"
+        />
+    <odoo.controls.BezelImageView
+        android:id="@+id/image_small_loler"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="62dp"
+        app:maskDrawable="@drawable/circle_mask" />
+    <odoo.controls.BezelImageView
+        android:id="@+id/image_small_install"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="120dp"
+        android:layout_marginTop="62dp"
+        app:maskDrawable="@drawable/circle_mask" />
+    <odoo.controls.BezelImageView
+        android:id="@+id/image_small_training"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="180dp"
+        android:layout_marginTop="62dp"
+        app:maskDrawable="@drawable/circle_mask" />
+
+    <odoo.controls.BezelImageView
+        android:id="@+id/image_small_pick_up"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="240dp"
+        android:layout_marginTop="62dp"
+        app:maskDrawable="@drawable/circle_mask" />
+
+    <odoo.controls.BezelImageView
+        android:id="@+id/image_small_replacement"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="300dp"
+        android:layout_marginTop="62dp"
+        app:maskDrawable="@drawable/circle_mask" />
+
 
     <com.github.aakira.expandablelayout.ExpandableLinearLayout
         android:id="@+id/expandableLayout"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_below="@id/textView"
+        android:layout_height="200dp"
+        android:layout_below="@+id/image_small_replacement"
         android:orientation="vertical"
-        app:ael_duration="400"
+        app:ael_duration="800"
         app:ael_expanded="false">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pod" >
+
+
+            <TextView
+                android:id="@+id/podConNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dip"
+                android:layout_below="@id/text"
+                android:text="Cont.N - 9999" />
+            <TextView
+                android:id="@+id/podRevision"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="10dip"
+                android:layout_below="@id/pod"
+                android:text="Revision 1.5 " />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show Details"
+                android:id="@+id/poddetails"
+                android:padding="10dip"
+                android:layout_below="@id/pod"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"/>
+
+        </LinearLayout>
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_below="@id/pod"
+            android:layout_height="wrap_content"
+            android:text="sample" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:padding="@dimen/margin_normal"
-            android:text="
-    sample.sample.sample.sample.sample.sample.sample.sample.sample.sample.\n
-    "
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:id="@+id/sample2"
+            android:layout_below="@id/text"
+            android:text="sample2" />
+
+
+        <TextView
+            android:id="@+id/intervention"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sample2"
+            android:text="sampleInte222222222222r" />
+
+
+        <TextView
+            android:id="@+id/interventionmotif"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/intervention"
+            android:text="interventionmotifinterventionmotifinterventionmotifinterventionmotifinterventionmotifinterventionmotif" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/satnav"  android:layout_below="@id/interventionmotif">
+
+
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start Navigation"
+                android:id="@+id/navigate"
+                android:padding="10dip"
+                android:layout_below="@id/satnav"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Address Details"
+                android:id="@+id/satnavdetails"
+                android:padding="10dip"
+                android:layout_below="@id/satnav"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"/>
+
+        </LinearLayout>
+
     </com.github.aakira.expandablelayout.ExpandableLinearLayout>
 </RelativeLayout>
