@@ -1,9 +1,7 @@
 package com.odoo.addons.trip;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -15,10 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.odoo.R;
-
 import com.odoo.addons.trip.providers.CmmsTrips;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.addons.fragment.BaseFragment;
@@ -39,6 +35,8 @@ import java.util.List;
 public class Trip extends BaseFragment implements ISyncStatusObserverListener,
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener, View.OnClickListener,
         AdapterView.OnItemClickListener,OCursorListAdapter.OnViewBindListener {
+    ///////////////////////////////////////
+    public static final String TAG = CmmsTrips.class.getSimpleName();
     //private View mView;
     private String mCurFilter = null;
     private ListView mPartnersList = null;
@@ -46,13 +44,8 @@ public class Trip extends BaseFragment implements ISyncStatusObserverListener,
     private View mView;
     private ListView listView;
     private OCursorListAdapter listAdapter;
-
     private ODataRow record = null;
     private Bundle extra;
-
-
-    ///////////////////////////////////////
-    public static final String TAG = CmmsTrips.class.getSimpleName();
 
     @Override
     public List<ODrawerItem> drawerMenus(Context context) {
@@ -168,7 +161,10 @@ public class Trip extends BaseFragment implements ISyncStatusObserverListener,
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) listAdapter.getItem(position));
-        loadActivity(row);
+        //  loadActivity(row);
+
+        RecyclerViewActivity.startActivity(getContext());
+        //Intent myIntent = new Intent(Trip.class, RecyclerViewActivity.class);
     }
     private void loadActivity(ODataRow row) {
         Bundle data = null;

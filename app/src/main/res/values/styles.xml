@@ -6,11 +6,15 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    
+
     <style name="AppTheme" parent="AppTheme.Base">
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="AppTheme1" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">true</item>
+    </style>
     <style name="AppBar.Dark" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
     </style>
 

@@ -3,4 +3,9 @@
     <style name="AppTheme" parent="AppTheme.Base">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
+
+    <style name="AppTheme1" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">true</item>
+    </style>
 </resources>

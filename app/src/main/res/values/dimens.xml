@@ -8,4 +8,7 @@
     <dimen name="default_16dp">16dp</dimen>
     <dimen name="default_48dp">48dp</dimen>
     <dimen name="app_bar_top_padding">0dp</dimen>
+
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_normal">16dp</dimen>
 </resources>

@@ -35,6 +35,11 @@
     <color name="control_focused">#e5e5e5</color>
     <color name="control_pressed">#acacac</color>
 
+    <color name="transparent">#0fff</color>
+    <color name="white">#fff</color>
+    <color name="gray">#333</color>
+    <color name="gray_light">#dfdfdf</color>
+
 
     <array name="letter_tile_colors">
         <item>@color/android_blue</item>

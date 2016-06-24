@@ -30,8 +30,7 @@
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
-        android:largeHeap="true"
-        android:theme="@style/AppTheme">
+        android:largeHeap="true">
         <activity
             android:name="com.odoo.core.account.OdooLogin"
             android:label="${applicationName}"
@@ -212,6 +211,11 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/intervention_sync_adapter" />
         </service>
+
+        <activity
+            android:name="com.odoo.addons.trip.RecyclerViewActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme1" />
 
         <activity
             android:name="com.odoo.addons.customers.CustomerDetails"
