@@ -1,4 +1,4 @@
-<img src="https://dharmangsoni.odoo.com/website/image?max_height=768&field=datas&model=ir.attachment&id=118&max_width=250" alt="Odoo Mobile"/>
+<img src="https://github.com/Odoo-mobile/framework/blob/master/odoo_mobile.png" alt="Odoo Mobile"/>
 <br/>v2.2.0 (Build 6)
 
 
@@ -31,9 +31,9 @@ CHANGELOG
 SUPPORTED ODOO VERSIONS
 =======================
 
-- [ ] Odoo 7.0
-- [ ] Odoo 8.0
-- [ ] Odoo 9.0
+- [x] Odoo 7.0
+- [x] Odoo 8.0
+- [x] Odoo 9.0
 
 HOW TO START
 ============
