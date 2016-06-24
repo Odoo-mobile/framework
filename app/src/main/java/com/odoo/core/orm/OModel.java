@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- * <p>
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- * <p>
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- * <p>
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- * <p>
+ * <p/>
  * Created on 30/12/14 3:31 PM
  */
 package com.odoo.core.orm;
@@ -76,8 +76,6 @@ public class OModel implements ISyncServiceListener {
 
     public static final String TAG = OModel.class.getSimpleName();
     public String BASE_AUTHORITY = App.APPLICATION_ID + ".core.provider.content";
-    public static final String KEY_UPDATE_IDS = "key_update_ids";
-    public static final String KEY_INSERT_IDS = "key_insert_ids";
     public static final int INVALID_ROW_ID = -1;
     public static OSQLite sqLite = null;
     private Context mContext;
@@ -91,21 +89,6 @@ public class OModel implements ISyncServiceListener {
     private String default_name_column = "name";
     public static OModelRegistry modelRegistry = new OModelRegistry();
     private boolean hasMailChatter = false;
-
-    // Relation record command
-    public enum Command {
-        Add(0), Update(1), Delete(2), Replace(6);
-
-        int type;
-
-        Command(int type) {
-            this.type = type;
-        }
-
-        public int getValue() {
-            return type;
-        }
-    }
 
     // Base Columns
     OColumn id = new OColumn("ID", OInteger.class).setDefaultValue(0);
@@ -958,7 +941,6 @@ public class OModel implements ISyncServiceListener {
                     Log.v(">>>", ">>>One to many..." + columnValues);
                     handleOneToManyRecords(column, commands, relModel, record_id, columnValues);
                 case ManyToMany:
-                    Log.v(">>>", "Many to many ..." + columnValues);
                     handleManyToManyRecords(column, commands, relModel, record_id, columnValues);
                     break;
             }
@@ -1028,13 +1010,18 @@ public class OModel implements ISyncServiceListener {
         switch (command) {
             case Append:
                 // Inserting each relation id with base record id to relation table
-                List<Object> append_ids = values.get(command);
+                List<Object> append_items = values.get(command);
                 StringBuilder sql = new StringBuilder("INSERT INTO ").append(table)
                         .append(" (")
                         .append(base_column).append(", ")
                         .append(rel_column)
                         .append(", _write_date )").append(" VALUES ");
-                for (Object id : append_ids) {
+                for (Object obj : append_items) {
+                    int id;
+                    if (obj instanceof OValues) {
+                        Log.d(TAG, "creating quick record for many to many ");
+                        id = relModel.insert((OValues) obj);
+                    } else id = (int) obj;
                     sql.append(" (").append(record_id).append(",")
                             .append(id).append(", ")
                             .append("'").append(ODateUtils.getUTCDate()).append("'), ");
@@ -1057,13 +1044,16 @@ public class OModel implements ISyncServiceListener {
                 values.put(RelCommands.Unlink, values.get(command));
                 handleManyToManyRecords(column, RelCommands.Unlink, relModel, record_id, values);
 
-                String deleteSql = "DELETE FROM " + table + " WHERE " + base_column + " = " + record_id + " AND " + rel_column + " IN (" +
+                // Deleting master record from relation model with given ids
+                String deleteSql = "DELETE FROM " + relModel.getTableName() + " WHERE " + OColumn.ROW_ID + " IN (" +
                         TextUtils.join(",", values.get(command)) + ")";
                 db.execSQL(deleteSql);
                 break;
             case Unlink:
                 // Unlink relation with base record
-                db.execSQL("DELETE FROM " + table + " WHERE " + base_column + " = " + record_id);
+                String unlinkSQL = "DELETE FROM " + table + " WHERE " + base_column + " = " + record_id + " AND " + rel_column + " IN (" +
+                        TextUtils.join(",", values.get(command)) + ")";
+                db.execSQL(unlinkSQL);
                 break;
         }
         values.remove(command);
