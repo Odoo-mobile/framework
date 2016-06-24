@@ -32,7 +32,6 @@ import com.odoo.R;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.core.account.About;
-import com.odoo.core.account.OdooAccountQuickManage;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -44,7 +43,6 @@ import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.core.utils.logger.OLog;
-import com.odoo.core.utils.notification.ONotificationBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,20 +58,18 @@ import odoo.helper.utils.gson.OdooResult;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
-    public static final Integer REQUEST_SIGN_IN_ERROR = 11244;
-    public static final String KEY_AUTH_ERROR = "key_authentication_error";
     private Context mContext;
-    private Class<? extends OModel> mModelClass;
+    private App app = null;
+    private Odoo mOdoo;
     private OModel mModel;
     private OSyncService mService;
-    private OUser mUser;
-    private Boolean checkForWriteCreateDate = true;
-    private Integer mSyncDataLimit = 0;
-    private HashMap<String, ODomain> mDomain = new HashMap<>();
+    private OSyncDataUtils dataUtils;
     private OPreferenceManager preferenceManager;
-    private Odoo mOdoo;
+    private Class<? extends OModel> mModelClass;
+    private Integer mSyncDataLimit = 0;
+    private Boolean checkForWriteCreateDate = true;
+    private HashMap<String, ODomain> mDomain = new HashMap<>();
     private HashMap<String, ISyncFinishListener> mSyncFinishListeners = new HashMap<>();
-    private App app = null;
 
     public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service,
                         boolean autoInitialize) {
@@ -116,24 +112,29 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         // Creating model Object
         mModel = new OModel(mContext, null, OdooAccountManager.getDetails(mContext, account.name))
                 .createInstance(mModelClass);
-        mUser = mModel.getUser();
+        OUser mUser = mModel.getUser();
         if (OdooAccountManager.isValidUserObj(mContext, mUser)) {
             // Creating Odoo instance
             mOdoo = createOdooInstance(mContext, mUser);
-            Log.i(TAG, "User        : " + mModel.getUser().getAndroidName());
-            Log.i(TAG, "Model       : " + mModel.getModelName());
-            Log.i(TAG, "Database    : " + mModel.getDatabaseName());
-            Log.i(TAG, "Odoo Version: " + mUser.getOdooVersion().getServerSerie());
-            // Calling service callback
-            if (mService != null)
-                mService.performDataSync(this, extras, mUser);
+            if (mOdoo != null) {
+                dataUtils = new OSyncDataUtils(mContext, mOdoo);
+                Log.i(TAG, "User        : " + mModel.getUser().getAndroidName());
+                Log.i(TAG, "Model       : " + mModel.getModelName());
+                Log.i(TAG, "Database    : " + mModel.getDatabaseName());
+                Log.i(TAG, "Odoo Version: " + mUser.getOdooVersion().getServerSerie());
+                // Calling service callback
+                if (mService != null)
+                    mService.performDataSync(this, extras, mUser);
 
-            //Creating domain
-            ODomain domain = (mDomain.containsKey(mModel.getModelName())) ?
-                    mDomain.get(mModel.getModelName()) : null;
+                //Creating domain
+                ODomain domain = (mDomain.containsKey(mModel.getModelName())) ?
+                        mDomain.get(mModel.getModelName()) : null;
 
-            // Ready for sync data from server
-            syncData(mModel, mUser, domain, syncResult, true, true);
+                // Ready for sync data from server
+                syncData(mModel, mUser, domain, syncResult, true, true);
+            } else {
+                Log.e(TAG, "Unable to connect with Odoo Server.");
+            }
         }
     }
 
@@ -178,6 +179,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             // Getting data
             OdooResult response = mOdoo.searchRead(model.getModelName(), getFields(model)
                     , domain, 0, mSyncDataLimit, "create_date DESC");
+            if (response == null) {
+                // FIXME: Check in library. May be timeout issue with slow network.
+                Log.w(TAG, "Response null from server.");
+                return;
+            }
             if (response.containsKey("error")) {
                 app.setOdoo(null, user);
                 OPreferenceManager pref = new OPreferenceManager(mContext);
@@ -189,8 +195,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             Log.v(TAG, "Processing " + response.getRecords().size() + " records");
-            OSyncDataUtils dataUtils = new OSyncDataUtils(mContext, mOdoo, model, user, response,
-                    result, createRelationRecords);
+            dataUtils.handleResult(model, user, result, response, createRelationRecords);
             // Updating records on server if local are latest updated.
             // if model allowed update record to server
             if (model.allowUpdateRecordOnServer()) {
@@ -239,42 +244,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         }
         model.close();
-    }
-
-    private static void showSignInErrorNotification(Context context, OUser user) {
-        ONotificationBuilder builder = new ONotificationBuilder(context,
-                REQUEST_SIGN_IN_ERROR);
-        builder.setTitle("Odoo authentication problem");
-        builder.setBigText("May be you have changed your account " +
-                "password or your account does not exists");
-        builder.setIcon(R.drawable.ic_action_alert_warning);
-        builder.setText(user.getAndroidName());
-        builder.allowVibrate(true);
-        builder.withRingTone(false);
-        builder.setOngoing(true);
-        builder.withLargeIcon(false);
-        builder.setColor(R.color.android_orange_dark);
-        Bundle extra = user.getAsBundle();
-        // Actions
-        ONotificationBuilder.NotificationAction actionReset = new ONotificationBuilder.NotificationAction(
-                R.drawable.ic_action_refresh,
-                "Reset",
-                110,
-                "reset_password",
-                OdooAccountQuickManage.class,
-                extra
-        );
-        ONotificationBuilder.NotificationAction deleteAccount = new ONotificationBuilder.NotificationAction(
-                R.drawable.ic_action_navigation_close,
-                "Remove",
-                111,
-                "remove_account",
-                OdooAccountQuickManage.class,
-                extra
-        );
-        builder.addAction(actionReset);
-        builder.addAction(deleteAccount);
-        builder.build().show();
     }
 
     private void handleRelationRecords(OUser user,
@@ -335,10 +304,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         company.quickCreateRecord(company_details);
                     }
                 } else {
-                    // FIXME: Need to check again. Not working properly
-                    //showSignInErrorNotification(context, user);
-//                Toast.makeText(context, OResource.string(context, R.string.toast_something_gone_wrong),
-//                        Toast.LENGTH_LONG).show();
+                    // FIXME: Unable to get user object or may be due session destroyed with Odoo Saas (single connection support only)
                     Log.e(TAG, OResource.string(context, R.string.toast_something_gone_wrong));
                 }
             }
@@ -472,7 +438,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         }
         return id;
     }
-
 
     /**
      * Removes record on server if local record is not active

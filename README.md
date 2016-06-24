@@ -1,8 +1,8 @@
 <img src="https://dharmangsoni.odoo.com/website/image?max_height=768&field=datas&model=ir.attachment&id=118&max_width=250" alt="Odoo Mobile"/>
-<br/>v2.1.0alpha (Build 5)
+<br/>v2.2.0 (Build 6)
 
 
-Odoo Mobile v2.1.0 (Framework)
+Odoo Mobile v2.2.0 (Framework)
 ==============================
 
 Odoo Mobile is open-source framework allows you to integrate Odoo into your Android app.
@@ -19,10 +19,21 @@ It has pre-developed services,providers, controls and more other features to mak
 
 **Odoo Mobile** is a part of The Odoo (India)
 
+CHANGELOG
+=========
+
+- June 2016
+    - Sync performance improved
+    - Easy relation record creation (Fix for: https://github.com/Odoo-mobile/framework/issues/138) 
+        - ManyToOne, OneToMany and ManyToMany
+    - Minor bug fixes
+
 SUPPORTED ODOO VERSIONS
 =======================
 
-Odoo 7.0, 8.0, 9.0
+- [ ] Odoo 7.0
+- [ ] Odoo 8.0
+- [ ] Odoo 9.0
 
 HOW TO START
 ============
@@ -41,3 +52,5 @@ GIVE FEEDBACK
 
  - Please report bug or issues [https://github.com/Odoo-mobile/framework/issues](https://github.com/Odoo-mobile/framework/issues)
  - You can also write us on **android@odoo.co.in**
+
+Follow us on Twitter: <a href="https://twitter.com/odoomobile">@odoomobile</a>

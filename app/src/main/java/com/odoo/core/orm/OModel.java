@@ -938,8 +938,8 @@ public class OModel implements ISyncServiceListener {
         for (RelCommands commands : columnValues.keySet()) {
             switch (column.getRelationType()) {
                 case OneToMany:
-                    Log.v(">>>", ">>>One to many..." + columnValues);
                     handleOneToManyRecords(column, commands, relModel, record_id, columnValues);
+                    break;
                 case ManyToMany:
                     handleManyToManyRecords(column, commands, relModel, record_id, columnValues);
                     break;

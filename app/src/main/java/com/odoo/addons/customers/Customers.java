@@ -63,7 +63,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public static final String EXTRA_KEY_TYPE = "extra_key_type";
     private View mView;
     private String mCurFilter = null;
-    private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
     private boolean syncRequested = false;
 
@@ -87,7 +86,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         setHasSwipeRefreshView(view, R.id.swipe_container, this);
         mView = view;
         mType = Type.valueOf(getArguments().getString(EXTRA_KEY_TYPE));
-        mPartnersList = (ListView) view.findViewById(R.id.listview);
+        ListView mPartnersList = (ListView) view.findViewById(R.id.listview);
         mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.customer_row_item);
         mAdapter.setOnViewBindListener(this);
         mAdapter.setHasSectionIndexers(true, "name");
@@ -96,44 +95,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         mPartnersList.setOnItemClickListener(this);
         setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
         getLoaderManager().initLoader(0, null, this);
-
-
-//        OValues values = new OValues();
-//        values.put("category_id", new RelValues().unlink(2));
-//
-//        db().update(2, values);
-
-//        OValues values = new OValues();
-//        values.put("name", "Odoo Mobile");
-//        values.put("email", "contact@odoomobile.com");
-//        values.put("is_company", true);
-
-
-//
-//
-//        OValues dpr = new OValues();
-//        dpr.put("name", "Dharmang Soni");
-//        dpr.put("email", "dpr@odoomobile.com");
-//
-//
-//        OValues pga = new OValues();
-//        pga.put("name", "Parth Gajjar");
-//        pga.put("email", "pga@odoomobile.com");
-//
-//
-//        Toast.makeText(getActivity(), "Working", Toast.LENGTH_SHORT).show();
-//        values.put("child_ids", new RelValues().replace(ptr));
-////        OValues tag_1 = new OValues();
-////        tag_1.put("name", "Odoo IN");
-////
-////        values.put("category_id", new RelValues().append(tag_1));
-//
-//        ODataRow row = db().browse(null, "email = ?", new String[]{"contact@odoomobile.com"});
-//        if (row != null) {
-//            db().update(row.getInt(OColumn.ROW_ID), values);
-//        } else {
-//            db().insert(values);
-//        }
 
     }
 

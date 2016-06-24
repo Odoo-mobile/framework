@@ -48,7 +48,8 @@ public class RelValues implements Serializable {
 
     private RelValues manageRecord(RelCommands command, Object... values) {
         if (columnValues.containsKey(command)) {
-            List<Object> items = columnValues.get(command);
+            List<Object> items = new ArrayList<>();
+            items.addAll(columnValues.get(command));
             items.addAll(Arrays.asList(values));
             columnValues.put(command, items);
         } else {
