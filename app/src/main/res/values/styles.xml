@@ -36,4 +36,11 @@
         <item name="android:layout_height">1dp</item>
         <item name="android:background">#cccccc</item>
     </style>
+
+    <style name="myImageView">
+        <!-- 3dp so the background border to be visible -->
+        <item name="android:padding">3dp</item>
+        <item name="android:background">@drawable/image_border</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
 </resources>

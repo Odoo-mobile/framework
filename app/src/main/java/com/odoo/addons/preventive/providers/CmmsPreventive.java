@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.odoo.addons.Equipment.providers.CmmsEquipment;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBoolean;
@@ -38,8 +39,9 @@ public class CmmsPreventive extends OModel {
         return buildURI(AUTHORITY);
     }
 
-    public int days_left()
+    public int days_left(ODataRow oDataRow)
     {
+        //TODO - calculate days from last till today
       //  days_last_done.
         return 0;
     }

@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.aakira.expandablelayout.ExpandableLayout;
 import com.github.aakira.expandablelayout.ExpandableLayoutListenerAdapter;
@@ -28,11 +26,8 @@ import com.github.aakira.expandablelayout.Utils;
 import com.odoo.R;
 import com.odoo.addons.Equipment.EquipmentDetails;
 import com.odoo.addons.Equipment.providers.CmmsEquipment;
-import com.odoo.addons.tripdestination.providers.CmmsTripDestination;
-import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
-import com.odoo.core.orm.OModel;
 import com.odoo.core.utils.IntentUtils;
 
 import java.util.List;
@@ -75,7 +70,17 @@ public class RecyclerViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
         holder.r.setImageBitmap(item.getR());
         holder.a.setImageBitmap(item.getA());
         holder.podConNumber.setText("Controller- "+item.getController_number());
-        //TODO - add revision number
+        holder.podRevision.setText(item.getEquipment_rev());
+        holder.notstarted.setImageResource(R.drawable.notstarted);
+
+        holder.driving.setImageResource(R.drawable.driving);
+        holder.working.setImageResource(R.drawable.working);
+        holder.complete.setImageResource(R.drawable.complete);
+        holder.incomplete.setImageResource(R.drawable.incomplete);
+
+
+
+
        holder.itemView.setBackgroundColor(ContextCompat.getColor(context, item.getColorId1()));
        holder.expandableLayout.setBackgroundColor(ContextCompat.getColor(context, item.getColorId2()));
         holder.expandableLayout.setInterpolator(Utils.createInterpolator(Utils.DECELERATE_INTERPOLATOR));
@@ -111,6 +116,7 @@ public class RecyclerViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
             @Override
             public void onClick(final View v) {
                 Log.i("onClick","start Sat Nav");
+                //TODO - change state to driving - check if previous(trip) finished (if not ask to change state)
                 startSatNav(item.getCustomerID());
             }
         });
@@ -122,8 +128,91 @@ public class RecyclerViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
                 navigationDetails();
             }
         });
+        holder.notstarted.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Log.i("onClick", "no Started");
+                // holder.notstarted.setBackgroundResource(R.drawable.image_border);
+                //TODO - Add logic
+                int[] col = getColors("1");
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, col[0]));
+                holder.expandableLayout.setBackgroundColor(ContextCompat.getColor(context, col[1]));
+            }
+        });
+        holder.notstarted.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //TODO - Add logic - pop up window showing date which can be updated
+                return false;
+            }
+        });
+        holder.driving.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Log.i("onClick", "driving");
+                int[] col = getColors("2");
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, col[0]));
+                holder.expandableLayout.setBackgroundColor(ContextCompat.getColor(context, col[1]));
+            }
+        });
+        holder.working.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Log.i("onClick", "working");
+                int[] col = getColors("3");
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, col[0]));
+                holder.expandableLayout.setBackgroundColor(ContextCompat.getColor(context, col[1]));
+            }
+        });
+        holder.complete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Log.i("onClick", "complete");
+                int[] col = getColors("4");
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, col[0]));
+                holder.expandableLayout.setBackgroundColor(ContextCompat.getColor(context, col[1]));
+            }
+        });
+        holder.incomplete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Log.i("onClick", "incomplete");
+                int[] col = getColors("5");
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, col[0]));
+                holder.expandableLayout.setBackgroundColor(ContextCompat.getColor(context, col[1]));
+            }
+        });
 
     }
+
+    private int[] getColors(String state) {
+        int[] colors = new int[2];
+        switch (state) {
+            case "1": //Not started
+                colors[0] = R.color.material_amber_A400;
+                colors[1] = (R.color.material_amber_200);
+                break;
+            case "2": // driving
+                colors[0] = R.color.material_indigo_700;
+                colors[1] = R.color.material_indigo_200;
+                break;
+            case "3": // working
+                colors[0] = R.color.material_teal_700;
+                colors[1] = R.color.material_teal_200;
+                break;
+            case "4": // complete
+                colors[0] = R.color.material_light_green_700;
+                colors[1] = R.color.material_light_green_400;
+                break;
+            case "5": //incomplete
+                colors[0] = R.color.material_red_500;
+                colors[1] = R.color.material_red_300;
+                break;
+        }
+
+        return colors;
+    }
+
     private void navigationDetails()
     {
 
@@ -165,6 +254,7 @@ public class RecyclerViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
         ODataRow record = resPartner.browse(customerID);
         String coords =  resPartner.getCoords(record);
         if (coords.equals("0.0, 0.0"))
+            //FIXME- nothing happens when address is empty!
             IntentUtils.redirectToMap(context, record.getString("full_address"));
         else
             IntentUtils.redirectToMap(context, coords);
@@ -207,6 +297,7 @@ public class RecyclerViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
         public  ImageView l ;
         public  ImageView p ;
         public ImageView r ;
+
         public RelativeLayout buttonLayout;
         //pod details
         public Button podDetails;
@@ -215,6 +306,13 @@ public class RecyclerViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
         //satnav
         public Button startSatNav;
         public Button satNavDetails;
+        // state
+        public ImageView notstarted;
+        public ImageView driving;
+        public ImageView working;
+        public ImageView complete;
+        public ImageView incomplete;
+
 
         /**
          * You must use the ExpandableLinearLayout in the recycler view.
@@ -239,6 +337,12 @@ public class RecyclerViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
             //
             startSatNav = (Button)v.findViewById(R.id.navigate);
             satNavDetails = (Button)v.findViewById(R.id.satnavdetails);
+            //
+            notstarted = (ImageView) v.findViewById(R.id.not_started);
+            driving = (ImageView) v.findViewById(R.id.driving);
+            working = (ImageView) v.findViewById(R.id.working);
+            complete = (ImageView) v.findViewById(R.id.complete);
+            incomplete = (ImageView) v.findViewById(R.id.incomplete);
 
             expandableLayout = (ExpandableLinearLayout) v.findViewById(R.id.expandableLayout);
         }

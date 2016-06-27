@@ -14,50 +14,104 @@
         app:ael_interpolator="bounce"
         app:ael_orientation="vertical">
     <LinearLayout
+        android:id="@+id/pod"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/pod" >
+        android:padding="5dip">
 
 
         <TextView
             android:id="@+id/podConNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dip"
             android:layout_below="@id/text"
+            android:padding="10dip"
             android:text="Cont.N - 9999" />
         <TextView
             android:id="@+id/podRevision"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/pod"
             android:gravity="center_horizontal"
             android:padding="10dip"
-            android:layout_below="@id/pod"
             android:text="Revision 1.5 " />
 
         <Button
+            android:id="@+id/poddetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Show Details"
-            android:id="@+id/poddetails"
-            android:padding="10dip"
-            android:layout_below="@id/pod"
+            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"/>
+            android:layout_below="@id/pod"
+            android:padding="10dip"
+            android:text="Show Details" />
 
     </LinearLayout>
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="match_parent"
-            android:layout_below="@id/pod"
+
+        <LinearLayout
+            android:id="@+id/state"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="sample" />
+            android:layout_below="@id/poddetails"
+            android:padding="5dip">
+
+
+            <ImageView
+                android:id="@+id/not_started"
+                style="@style/myImageView"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_below="@id/state"
+                android:clickable="true"
+                android:paddingLeft="5dp" />
+
+            <ImageView
+                android:id="@+id/driving"
+                style="@style/myImageView"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_below="@id/state"
+                android:layout_marginLeft="5dp" />
+
+            <ImageView
+                android:id="@+id/working"
+                style="@style/myImageView"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_below="@id/state"
+                android:layout_marginLeft="5dp" />
+
+            <ImageView
+                android:id="@+id/complete"
+                style="@style/myImageView"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_below="@id/state"
+                android:layout_marginLeft="5dp" />
+
+            <ImageView
+                android:id="@+id/incomplete"
+                style="@style/myImageView"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_below="@id/state"
+                android:layout_marginLeft="5dp" />
+
+        </LinearLayout>
+
 
         <TextView
+            android:id="@+id/preventive_days"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/state"
+            android:text="Next Service: +183" />
+
+        <TextView
             android:id="@+id/sample2"
-            android:layout_below="@id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/preventive_days"
             android:text="sample2" />
 
 
@@ -77,32 +131,33 @@
                 android:text="interventionmotifinterventionmotifinterventionmotifinterventionmotifinterventionmotifinterventionmotif" />
 
         <LinearLayout
+            android:id="@+id/satnav"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/satnav"  android:layout_below="@id/interventionmotif">
+            android:layout_below="@id/interventionmotif">
 
 
 
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Start Navigation"
                 android:id="@+id/navigate"
-                android:padding="10dip"
-                android:layout_below="@id/satnav"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"/>
-
-            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Address Details"
-                android:id="@+id/satnavdetails"
-                android:padding="10dip"
-                android:layout_below="@id/satnav"
+                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"/>
+                android:layout_below="@id/satnav"
+                android:padding="10dip"
+                android:text="Start Navigation" />
+
+            <Button
+                android:id="@+id/satnavdetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_below="@id/satnav"
+                android:padding="10dip"
+                android:text="Address Details" />
 
         </LinearLayout>
 

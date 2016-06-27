@@ -1,6 +1,7 @@
 package com.odoo.addons.trip;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -163,8 +164,10 @@ public class Trip extends BaseFragment implements ISyncStatusObserverListener,
         ODataRow row = OCursorUtils.toDatarow((Cursor) listAdapter.getItem(position));
         //  loadActivity(row);
 
-        RecyclerViewActivity.startActivity(getContext());
-        //Intent myIntent = new Intent(Trip.class, RecyclerViewActivity.class);
+        //RecyclerViewActivity.startActivity(getContext());
+        Intent trip = new Intent(getContext(), RecyclerViewActivity.class);
+        trip.putExtra("trip_id", row.getString("_id"));
+        startActivity(trip);
     }
     private void loadActivity(ODataRow row) {
         Bundle data = null;

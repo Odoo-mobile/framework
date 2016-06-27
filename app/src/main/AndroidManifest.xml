@@ -211,7 +211,25 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/intervention_sync_adapter" />
         </service>
+        <!-- Production Line Sync-->
+        <provider
+            android:name="com.odoo.addons.productionline.providers.ProductionLineSyncProvider"
+            android:authorities="com.corepd.addons.productionline.ProductionLine"
+            android:label="Production Line"
+            android:multiprocess="true" />
 
+        <service
+            android:name="com.odoo.addons.productionline.services.ProductionLineSyncService"
+            android:exported="true"
+            android:process=":sync_productionline">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/productionline_sync_adapter" />
+        </service>
         <activity
             android:name="com.odoo.addons.trip.RecyclerViewActivity"
             android:label="@string/app_name"

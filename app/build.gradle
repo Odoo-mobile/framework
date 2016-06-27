@@ -1,3 +1,4 @@
+
 apply plugin: 'com.android.application'
 
 android {
@@ -29,12 +30,13 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.google.android.gms:play-services:8.3.0'
-    compile 'com.android.support:recyclerview-v7:23.2.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile project(':intro-slider-lib')
     compile project(':parallax-effect-lib')
     compile project(':odoo-rpc-v3')
     compile 'com.github.AAkira:ExpandableLayout:v1.5.1'
+
 }
 repositories {
     maven {

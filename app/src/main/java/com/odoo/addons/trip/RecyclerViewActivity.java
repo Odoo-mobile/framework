@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 
-import com.github.aakira.expandablelayout.Utils;
 import com.odoo.R;
 import com.odoo.addons.Equipment.providers.CmmsEquipment;
 import com.odoo.addons.productionline.providers.CmmsProductionLine;
@@ -35,25 +34,28 @@ public class RecyclerViewActivity extends AppCompatActivity {
     private ODataRow oDataRow1;
     private List<ODataRow> tripDestinations;
     private CmmsTripDestination cmmsTripDestination;
+    private Bundle extras = null;
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, RecyclerViewActivity.class));
 
     }
 
+    //TODO - add Menu click handles
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(com.odoo.R.menu.menu_trip_detail, menu);
         mMenu = menu;
         return true;
     }
-    private void getTripDestinationList() {
+
+    private void getTripDestinationList(String trip_id) {
         cmmsTripDestination = new CmmsTripDestination(getApplicationContext(), null);
         List<ODataRow> test;
         OModel oModelDestination = new OModel(getApplicationContext(), cmmsTripDestination.getModelName(), null);
         //String stest = record.getString("_id");
         try {
-            tripDestinations = oModelDestination.query("select * from " + cmmsTripDestination.getTableName() + " where trip = " + "1" + " ORDER BY order1 ASC");
+            tripDestinations = oModelDestination.query("select * from " + cmmsTripDestination.getTableName() + " where trip = " + trip_id + " ORDER BY order1 ASC");
             // tripDestinations = oModelDestination.
         } catch (Exception e) {
             Log.e("error", e.getMessage());
@@ -104,10 +106,12 @@ public class RecyclerViewActivity extends AppCompatActivity {
         else
             itemModel.setController_number(oDataRowEquipment.getString("pp_controller_number"));
 
-       // CmmsProductionLine cmmsProductionLine = new CmmsProductionLine(getApplicationContext(),null);
-        //TODO - Add production line to itemmodel
-      //  ODataRow oDataRowLine = cmmsProductionLine.browse(oDataRowEquipment.getInt("line_id"));
-      //  itemModel.setEquipment_rev(oDataRowLine.getString("name"));
+        CmmsProductionLine cmmsProductionLine = new CmmsProductionLine(getApplicationContext(), null);
+        ODataRow oDataRowLine = cmmsProductionLine.browse(oDataRowEquipment.getInt("line_id"));
+        itemModel.setEquipment_rev(oDataRowLine.getString("code"));
+        itemModel.setState(oDataRow.getString("state"));
+
+
 
         return itemModel;
     }
@@ -141,9 +145,15 @@ public class RecyclerViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        extras = getIntent().getExtras();
+        String trip_id = "";
+        if (extras != null) {
+            trip_id = extras.getString("trip_id");
+            //The key argument here must match that used in the other activity
+        }
         setContentView(R.layout.activity_recycler_view);
         getSupportActionBar().setTitle("Trip Details");
-        getTripDestinationList();
+        getTripDestinationList(trip_id);
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
