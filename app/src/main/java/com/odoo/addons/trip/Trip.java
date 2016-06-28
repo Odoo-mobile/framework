@@ -180,6 +180,7 @@ public class Trip extends BaseFragment implements ISyncStatusObserverListener,
     public void onRefresh() {
         if (inNetwork()) {
             parent().sync().requestSync(CmmsTrips.AUTHORITY);
+            //FIXME - inNetwork
         }
     }
 

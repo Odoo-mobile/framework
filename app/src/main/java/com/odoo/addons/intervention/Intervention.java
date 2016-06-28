@@ -169,6 +169,7 @@ public class Intervention extends BaseFragment implements ISyncStatusObserverLis
     public void onRefresh() {
         if (inNetwork()) {
             parent().sync().requestSync(CmmsIntervention.AUTHORITY);
+            //FIXME - inNetwork
         }
     }
 

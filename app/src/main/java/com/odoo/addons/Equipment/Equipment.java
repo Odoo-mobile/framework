@@ -183,6 +183,7 @@ public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
     public void onRefresh() {
         if (inNetwork()) {
             parent().sync().requestSync(CmmsEquipment.AUTHORITY);
+            //FIXME - inNetwork
         }
     }
 

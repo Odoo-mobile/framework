@@ -182,6 +182,7 @@ public class TripDestination extends BaseFragment implements ISyncStatusObserver
     public void onRefresh() {
         if (inNetwork()) {
             parent().sync().requestSync(CmmsTripDestination.AUTHORITY);
+            //FIXME - inNetwork
         }
     }
 

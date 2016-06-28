@@ -167,6 +167,7 @@ public class Failure extends BaseFragment implements ISyncStatusObserverListener
     public void onRefresh() {
         if (inNetwork()) {
             parent().sync().requestSync(CmmsFailure.AUTHORITY);
+            //FIXME - inNetwork
         }
     }
 

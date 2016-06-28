@@ -169,6 +169,7 @@ public class Preventive extends BaseFragment implements ISyncStatusObserverListe
     public void onRefresh() {
         if (inNetwork()) {
             parent().sync().requestSync(CmmsPreventive.AUTHORITY);
+            //FIXME - inNetwork
         }
     }
 
