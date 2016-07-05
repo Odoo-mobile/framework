@@ -67,11 +67,12 @@ import static android.widget.Toast.makeText;
 public class OFileManager implements DialogInterface.OnClickListener {
     public static final String TAG = OFileManager.class.getSimpleName();
     public static final int REQUEST_CAMERA = 111;
-    public static final int REQUEST_IMAGE = 112;
-    public static final int REQUEST_AUDIO = 113;
-    public static final int REQUEST_FILE = 114;
-    public static final int REQUEST_ALL_FILE = 115;
-    private static final int SINGLE_ATTACHMENT_STREAM = 115;
+    public static final int REQUEST_HIGH_CAMERA = 112;
+    public static final int REQUEST_IMAGE = 113;
+    public static final int REQUEST_AUDIO = 114;
+    public static final int REQUEST_FILE = 115;
+    public static final int REQUEST_ALL_FILE = 116;
+    private static final int SINGLE_ATTACHMENT_STREAM = 117;
     private static final long IMAGE_MAX_SIZE = 1000000; // 1 MB
     private OdooCompatActivity mActivity = null;
     private String[] mOptions = null;
@@ -82,7 +83,14 @@ public class OFileManager implements DialogInterface.OnClickListener {
     private DevicePermissionHelper devicePermissionHelper;
 
     public enum RequestType {
-        CAPTURE_IMAGE, IMAGE, IMAGE_OR_CAPTURE_IMAGE, AUDIO, FILE, ALL_FILE_TYPE
+        CAPTURE_HIGH_IMAGE,
+        CAPTURE_IMAGE,
+        IMAGE,
+        IMAGE_OR_CAPTURE_IMAGE,
+        IMAGE_OR_CAPTURE_HIGH_IMAGE,
+        AUDIO,
+        FILE,
+        ALL_FILE_TYPE
     }
 
     public OFileManager(OdooCompatActivity activity) {
@@ -349,6 +357,7 @@ public class OFileManager implements DialogInterface.OnClickListener {
                 requestIntent(intent, REQUEST_IMAGE);
                 break;
             case CAPTURE_IMAGE:
+            case CAPTURE_HIGH_IMAGE:
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, "Odoo Mobile Attachment");
                 values.put(MediaStore.Images.Media.DESCRIPTION,
@@ -357,9 +366,11 @@ public class OFileManager implements DialogInterface.OnClickListener {
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, newImageUri);
-                requestIntent(intent, REQUEST_CAMERA);
+                requestIntent(intent, type == RequestType.CAPTURE_IMAGE ?
+                        REQUEST_CAMERA : REQUEST_HIGH_CAMERA);
                 break;
             case IMAGE_OR_CAPTURE_IMAGE:
+            case IMAGE_OR_CAPTURE_HIGH_IMAGE:
                 requestDialog(type);
                 break;
             case FILE:
@@ -423,9 +434,10 @@ public class OFileManager implements DialogInterface.OnClickListener {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_CAMERA:
+                case REQUEST_HIGH_CAMERA:
                     OValues values = getURIDetails(newImageUri);
                     values.put("datas", BitmapUtils.uriToBase64(newImageUri,
-                            mActivity.getContentResolver(), true));
+                            mActivity.getContentResolver(), requestCode == REQUEST_CAMERA));
                     return values;
                 case REQUEST_IMAGE:
                     values = getURIDetails(data.getData());
@@ -453,6 +465,7 @@ public class OFileManager implements DialogInterface.OnClickListener {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         switch (type) {
             case IMAGE_OR_CAPTURE_IMAGE:
+            case IMAGE_OR_CAPTURE_HIGH_IMAGE:
                 requestType = type;
                 mOptions = new String[]{"Select Image", "Capture Image"};
                 break;
@@ -465,7 +478,10 @@ public class OFileManager implements DialogInterface.OnClickListener {
     public void onClick(DialogInterface dialog, int which) {
         switch (requestType) {
             case IMAGE_OR_CAPTURE_IMAGE:
-                requestForFile((which == 0) ? RequestType.IMAGE : RequestType.CAPTURE_IMAGE);
+            case IMAGE_OR_CAPTURE_HIGH_IMAGE:
+                RequestType captureType = requestType == RequestType.IMAGE_OR_CAPTURE_IMAGE
+                        ? RequestType.CAPTURE_IMAGE : RequestType.CAPTURE_HIGH_IMAGE;
+                requestForFile((which == 0) ? RequestType.IMAGE : captureType);
                 break;
         }
         dialog.dismiss();

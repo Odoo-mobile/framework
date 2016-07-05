@@ -180,7 +180,7 @@ public class CustomerDetails extends OdooCompatActivity
                 IntentUtils.requestCall(this, record.getString("mobile"));
                 break;
             case R.id.captureImage:
-                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
+                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_HIGH_IMAGE);
                 break;
         }
     }
