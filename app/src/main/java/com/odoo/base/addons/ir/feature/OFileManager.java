@@ -37,6 +37,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Base64;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
@@ -312,10 +313,12 @@ public class OFileManager implements DialogInterface.OnClickListener {
     }
 
     public void requestForFile(final RequestType type) {
-        if (devicePermissionHelper.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (devicePermissionHelper.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                && devicePermissionHelper.hasPermission(Manifest.permission.CAMERA)) {
             _requestForFile(type);
         } else {
-            devicePermissionHelper.requestToGrantPermission(new DevicePermissionHelper
+            Log.w(TAG, "No permission for CAMERA or WRITE_EXTERNAL_STORAGE");
+            devicePermissionHelper.requestPermissions(new DevicePermissionHelper
                     .PermissionGrantListener() {
                 @Override
                 public void onPermissionGranted() {
@@ -333,7 +336,7 @@ public class OFileManager implements DialogInterface.OnClickListener {
                     Toast.makeText(mActivity, R.string.toast_permission_download_storage_help,
                             Toast.LENGTH_LONG).show();
                 }
-            }, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA});
         }
     }
 
