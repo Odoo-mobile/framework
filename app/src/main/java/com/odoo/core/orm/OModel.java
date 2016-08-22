@@ -1192,6 +1192,11 @@ public class OModel implements ISyncServiceListener {
         // Will be over ride by extending model
     }
 
+    @Override
+    public void onSyncFailed() {
+        // Will be over ride by extending model
+    }
+
     public SyncUtils sync() {
         return SyncUtils.get(mContext);
     }

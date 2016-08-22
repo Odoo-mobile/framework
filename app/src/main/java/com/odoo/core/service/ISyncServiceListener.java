@@ -23,4 +23,6 @@ public interface ISyncServiceListener {
     public void onSyncStarted();
 
     public void onSyncFinished();
+
+    public void onSyncFailed();
 }

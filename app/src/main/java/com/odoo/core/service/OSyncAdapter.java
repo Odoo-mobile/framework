@@ -228,6 +228,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             model.onSyncFinished();
         } catch (Exception e) {
             e.printStackTrace();
+            model.onSyncFailed();
         }
         // Performing next sync if any in service
         if (mSyncFinishListeners.containsKey(model.getModelName())) {
