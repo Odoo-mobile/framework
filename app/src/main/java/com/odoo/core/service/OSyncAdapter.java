@@ -182,6 +182,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (response == null) {
                 // FIXME: Check in library. May be timeout issue with slow network.
                 Log.w(TAG, "Response null from server.");
+                model.onSyncTimedOut();
                 return;
             }
             if (response.containsKey("error")) {
