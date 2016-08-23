@@ -182,6 +182,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (response == null) {
                 // FIXME: Check in library. May be timeout issue with slow network.
                 Log.w(TAG, "Response null from server.");
+                model.onSyncTimedOut();
                 return;
             }
             if (response.containsKey("error")) {
@@ -228,6 +229,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             model.onSyncFinished();
         } catch (Exception e) {
             e.printStackTrace();
+            model.onSyncFailed();
         }
         // Performing next sync if any in service
         if (mSyncFinishListeners.containsKey(model.getModelName())) {
