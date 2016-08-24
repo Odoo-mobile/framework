@@ -115,7 +115,7 @@ public class OModel implements ISyncServiceListener {
         this.model_name = model_name;
         if (mUser != null) {
             mOdooVersion = mUser.getOdooVersion();
-            if (sqLite == null) {
+            if (sqLite == null || !sqLite.getUserAndroidName().equals(mUser.getAndroidName())) {
                 sqLite = new OSQLite(mContext, mUser);
             }
         }

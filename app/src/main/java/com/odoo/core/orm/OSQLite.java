@@ -160,4 +160,7 @@ public class OSQLite extends SQLiteOpenHelper {
                 "/data/" + app.getPackageName() + "/databases/" + getDatabaseName();
     }
 
+    public String getUserAndroidName() {
+        return (this.mUser != null) ? this.mUser.getAndroidName() : "";
+    }
 }
