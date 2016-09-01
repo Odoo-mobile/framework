@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/customer_no_items"
+            android:id="@+id/data_list_no_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone">
