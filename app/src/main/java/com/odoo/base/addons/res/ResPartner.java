@@ -22,7 +22,7 @@ package com.odoo.base.addons.res;
 import android.content.Context;
 import android.net.Uri;
 
-import com.odoo.App;
+import com.odoo.BuildConfig;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResPartner extends OModel {
-    public static final String AUTHORITY = App.APPLICATION_ID +
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
             ".core.provider.content.sync.res_partner";
 
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();

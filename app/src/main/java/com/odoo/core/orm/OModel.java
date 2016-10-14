@@ -29,6 +29,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.odoo.App;
+import com.odoo.BuildConfig;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.annotation.Odoo;
@@ -75,7 +76,7 @@ import odoo.listeners.IModuleInstallListener;
 public class OModel implements ISyncServiceListener {
 
     public static final String TAG = OModel.class.getSimpleName();
-    public String BASE_AUTHORITY = App.APPLICATION_ID + ".core.provider.content";
+    public String BASE_AUTHORITY = BuildConfig.APPLICATION_ID + ".core.provider.content";
     public static final int INVALID_ROW_ID = -1;
     public static OSQLite sqLite = null;
     private Context mContext;
