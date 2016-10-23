@@ -50,28 +50,28 @@
             android:name="com.odoo.core.account.AppIntro"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".base.addons.mail.widget.MailDetailDialog"
+            android:name="com.odoo.base.addons.mail.widget.MailDetailDialog"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity
-            android:name=".base.addons.mail.widget.MailChatterCompose"
+            android:name="com.odoo.base.addons.mail.widget.MailChatterCompose"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity
-            android:windowSoftInputMode="adjustPan"
             android:name="com.odoo.core.account.OdooAccountQuickManage"
-            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name="com.odoo.core.account.About" />
         <activity android:name="com.odoo.core.account.Profile" />
 
         <!-- Reminder Receivers// -->
         <receiver android:name="com.odoo.core.utils.reminder.ReminderReceiver" />
         <receiver android:name="com.odoo.core.utils.reminder.ReminderActionReceiver" />
-        <receiver android:name=".news.OdooNewsReceiver">
+        <receiver android:name="com.odoo.news.OdooNewsReceiver">
             <intent-filter>
                 <action android:name="odoo.Odoo.ACTION_ODOO_UPDATES" />
             </intent-filter>
         </receiver>
-        
-        <receiver android:name=".server.notifications.OdooServerNotificationReceiver">
+
+        <receiver android:name="com.odoo.server.notifications.OdooServerNotificationReceiver">
             <intent-filter>
                 <action android:name="${applicationId}.odoo.mobile.SERVER_NOTIFICATION" />
             </intent-filter>
