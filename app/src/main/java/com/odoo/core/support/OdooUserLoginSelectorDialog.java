@@ -80,7 +80,7 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
     private void generateView(int position, View view, OUser user) {
         BezelImageView imgView = (BezelImageView) view.findViewById(R.id.imgInstance);
         if (user.getAvatar().equals("false")) {
-            imgView.setImageResource(R.drawable.avatar);
+            imgView.setImageResource(R.drawable.base_avatar);
         } else {
             imgView.setImageBitmap(BitmapUtils.getBitmapImage(mContext, user.getAvatar()));
         }

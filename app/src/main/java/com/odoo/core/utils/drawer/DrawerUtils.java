@@ -127,16 +127,16 @@ public class DrawerUtils {
             TextView title = (TextView) view.findViewById(R.id.title);
             TextView counter = (TextView) view.findViewById(R.id.counter);
             if (focused) {
-                icon.setColorFilter(context.getResources().getColor(R.color.drawer_icon_tint_selected));
-                title.setTextColor(context.getResources().getColor(R.color.drawer_text_color_selected));
+                icon.setColorFilter(context.getResources().getColor(R.color.base_drawer_icon_tint_selected));
+                title.setTextColor(context.getResources().getColor(R.color.base_drawer_text_color_selected));
                 title.setTypeface(title.getTypeface(), Typeface.BOLD);
-                counter.setTextColor(context.getResources().getColor(R.color.drawer_text_color_selected));
+                counter.setTextColor(context.getResources().getColor(R.color.base_drawer_text_color_selected));
                 counter.setTypeface(title.getTypeface(), Typeface.BOLD);
             } else {
-                icon.setColorFilter(context.getResources().getColor(R.color.drawer_icon_tint));
-                title.setTextColor(context.getResources().getColor(R.color.drawer_text_color));
+                icon.setColorFilter(context.getResources().getColor(R.color.base_drawer_icon_tint));
+                title.setTextColor(context.getResources().getColor(R.color.base_drawer_text_color));
                 title.setTypeface(null, Typeface.NORMAL);
-                counter.setTextColor(context.getResources().getColor(R.color.drawer_text_color));
+                counter.setTextColor(context.getResources().getColor(R.color.base_drawer_text_color));
                 counter.setTypeface(null, Typeface.NORMAL);
             }
         }

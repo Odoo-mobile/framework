@@ -29,27 +29,27 @@
             android:layout_height="100dp"
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="60dp"
-            android:src="@drawable/avatar"
-            app:maskDrawable="@drawable/circle_mask" />
+            android:src="@drawable/base_avatar"
+            app:maskDrawable="@drawable/base_circle_mask" />
 
         <TextView
             android:id="@+id/userName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="@dimen/default_16dp"
-            android:fontFamily="@string/font_normal"
+            android:layout_marginBottom="@dimen/base_default_16dp"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center"
             android:singleLine="true"
             android:textColor="#ffffff"
-            android:textSize="@dimen/text_size_xxlarge" />
+            android:textSize="@dimen/base_text_size_xxlarge" />
     </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/default_16dp">
+        android:padding="@dimen/base_default_16dp">
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -59,11 +59,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_8dp"
-            android:fontFamily="@string/font_normal"
+            android:layout_marginTop="@dimen/base_default_8dp"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center"
             android:text="@string/label_be_patient_we_are_configuring_account_update"
-            android:textColor="@color/body_text_2"
-            android:textSize="@dimen/text_size_large" />
+            android:textColor="@color/base_body_text_2"
+            android:textSize="@dimen/base_text_size_large" />
     </LinearLayout>
 </LinearLayout>

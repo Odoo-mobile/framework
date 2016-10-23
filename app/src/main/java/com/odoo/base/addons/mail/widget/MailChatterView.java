@@ -74,6 +74,18 @@ public class MailChatterView extends LinearLayout implements
     private App app;
     private Boolean loadAllMessages = false;
     private boolean isExecuting = false;
+    private BroadcastReceiver dataChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!isExecuting) {
+                if (messagesLoader != null)
+                    messagesLoader.cancel(true);
+                messagesLoader = new ChatterMessagesLoader();
+                messagesLoader.execute();
+                isExecuting = true;
+            }
+        }
+    };
 
     public MailChatterView(Context context) {
         super(context);
@@ -209,7 +221,7 @@ public class MailChatterView extends LinearLayout implements
             Bitmap author = BitmapUtils.getBitmapImage(mContext, author_image);
             OControls.setImage(view, R.id.authorImage, author);
         } else {
-            OControls.setImage(view, R.id.authorImage, R.drawable.avatar);
+            OControls.setImage(view, R.id.authorImage, R.drawable.base_avatar);
         }
 
         view.setTag(row);
@@ -298,17 +310,4 @@ public class MailChatterView extends LinearLayout implements
             isExecuting = false;
         }
     }
-
-    private BroadcastReceiver dataChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (!isExecuting) {
-                if (messagesLoader != null)
-                    messagesLoader.cancel(true);
-                messagesLoader = new ChatterMessagesLoader();
-                messagesLoader.execute();
-                isExecuting = true;
-            }
-        }
-    };
 }

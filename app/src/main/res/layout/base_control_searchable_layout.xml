@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/statusBarHeight"
+    android:layout_marginTop="@dimen/baseStatusBarHeight"
     android:background="#ebebeb"
     android:orientation="vertical">
 
@@ -32,7 +32,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:ellipsize="end"
-            android:fontFamily="@string/font_normal"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center_vertical"
             android:hint="Search"
             android:singleLine="true"
@@ -42,7 +42,7 @@
         </EditText>
     </LinearLayout>
 
-    <View style="@style/ViewSeparator" />
+    <View style="@style/OdooViewSeparator" />
 
     <include
         android:id="@+id/loading_progress"

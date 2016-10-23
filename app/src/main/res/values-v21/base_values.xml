@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <color name="base_actionbar_spinner_text_color">#fff</color>
+    <dimen name="base_app_bar_top_padding">24dp</dimen>
+
+    <!-- Drawer Properties -->
+    <dimen name="baseDrawerDefaultWidth">295dp</dimen>
+    <dimen name="baseDrawerAccountBottomPadding">8dp</dimen>
+    <dimen name="baseStatusBarHeight">24dp</dimen>
+
+    <!-- Booleans -->
+    <bool name="baseFitToScreenWindow">true</bool>
+
+    <!-- Base application theme. -->
+    <style name="OdooTheme" parent="OdooTheme.Base">
+        <item name="android:colorPrimary">@color/base_colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/base_colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/base_colorAccent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+</resources>

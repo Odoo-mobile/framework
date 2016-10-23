@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.odoo.base.addons.mail.widget.MailChatterView xmlns:android="http://schemas.android.com/apk/res/android"
+<me.kasimrangwala.odoo.base.addons.mail.widget.MailChatterView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_marginTop="@dimen/default_16dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/base_default_16dp">
 
     <LinearLayout
-        android:background="@color/base_chatter_view_background"
         android:layout_width="match_parent"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:background="@color/base_chatter_view_background"
         android:gravity="center"
-        android:layout_height="wrap_content">
+        android:orientation="vertical">
 
-        <View style="@style/ViewSeparator" />
+        <View style="@style/OdooViewSeparator" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:paddingTop="@dimen/default_8dp"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_height="wrap_content">
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/base_default_8dp">
 
             <TextView
                 android:id="@+id/chatterSendMessage"
-                android:text="@string/label_send_message"
-                android:background="?android:attr/selectableItemBackground"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:padding="@dimen/default_8dp"
                 android:layout_width="wrap_content"
-                android:textColor="@color/android_blue_dark"
-                android:fontFamily="@string/font_condensed"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="@string/base_font_condensed"
+                android:padding="@dimen/base_default_8dp"
+                android:text="@string/label_send_message"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/base_android_blue_dark" />
 
             <ProgressBar
+                android:id="@+id/chatterProgress"
                 style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
-                android:visibility="gone"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/default_8dp"
-                android:layout_marginRight="@dimen/default_8dp"
-                android:id="@+id/chatterProgress" />
+                android:layout_marginLeft="@dimen/base_default_8dp"
+                android:layout_marginRight="@dimen/base_default_8dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/chatterOr"
-                android:text="or"
-                android:textColor="@color/body_text_3"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:padding="@dimen/default_8dp"
                 android:layout_width="wrap_content"
-                android:layout_marginLeft="@dimen/default_8dp"
-                android:layout_marginRight="@dimen/default_8dp"
-                android:fontFamily="@string/font_normal"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/base_default_8dp"
+                android:layout_marginRight="@dimen/base_default_8dp"
+                android:fontFamily="@string/base_font_normal"
+                android:padding="@dimen/base_default_8dp"
+                android:text="or"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/base_body_text_3" />
 
             <TextView
                 android:id="@+id/chatterLogInternalNote"
-                android:background="?android:attr/selectableItemBackground"
-                android:textColor="@color/android_blue_dark"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:padding="@dimen/default_8dp"
-                android:text="@string/label_log_an_internal_note"
-                android:fontFamily="@string/font_condensed"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="@string/base_font_condensed"
+                android:padding="@dimen/base_default_8dp"
+                android:text="@string/label_log_an_internal_note"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/base_android_blue_dark" />
 
         </LinearLayout>
 
         <odoo.controls.ExpandableListControl
             android:id="@+id/chatterMessages"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/default_8dp"
-            android:layout_height="wrap_content">
+            android:padding="@dimen/base_default_8dp">
 
         </odoo.controls.ExpandableListControl>
 
         <TextView
             android:id="@+id/chatterLoadMoreMessages"
-            android:text="Load more..."
-            android:background="?android:attr/selectableItemBackground"
-            android:textAppearance="?android:textAppearanceSmall"
-            android:padding="@dimen/default_8dp"
-            android:layout_marginBottom="@dimen/default_8dp"
-            android:visibility="gone"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/base_default_8dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:fontFamily="@string/base_font_condensed"
             android:gravity="center"
-            android:textColor="@color/body_text_2"
-            android:fontFamily="@string/font_condensed"
-            android:layout_height="wrap_content" />
+            android:padding="@dimen/base_default_8dp"
+            android:text="Load more..."
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="@color/base_body_text_2"
+            android:visibility="gone" />
     </LinearLayout>
-</com.odoo.base.addons.mail.widget.MailChatterView>
+</me.kasimrangwala.odoo.base.addons.mail.widget.MailChatterView>

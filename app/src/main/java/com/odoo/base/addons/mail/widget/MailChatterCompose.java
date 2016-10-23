@@ -68,11 +68,6 @@ public class MailChatterCompose extends OdooCompatActivity implements View.OnCli
     private OFileManager fileManager;
     private LinearLayout horizontalScrollView;
     private List<Integer> attachmentIds = new ArrayList<>();
-
-    public enum MessageType {
-        Message, InternalNote
-    }
-
     private MessageType mType = MessageType.Message;
     private View parent;
     private MailMessage mailMessage;
@@ -172,11 +167,11 @@ public class MailChatterCompose extends OdooCompatActivity implements View.OnCli
             OLog.log(values.getString("file_uri"));
             imgPreview.setImageURI(Uri.parse(values.getString("file_uri")));
         } else if (type.contains("audio")) {
-            imgPreview.setImageResource(R.drawable.audio);
+            imgPreview.setImageResource(R.drawable.base_audio);
         } else if (type.contains("video")) {
-            imgPreview.setImageResource(R.drawable.video);
+            imgPreview.setImageResource(R.drawable.base_video);
         } else {
-            imgPreview.setImageResource(R.drawable.file);
+            imgPreview.setImageResource(R.drawable.base_file);
         }
         OControls.setText(attachmentView, R.id.attachmentFileName, fileName);
         attachmentView.setTag(values);
@@ -227,6 +222,10 @@ public class MailChatterCompose extends OdooCompatActivity implements View.OnCli
                 edtSubject.getText().toString() : "false";
         MessagePost messagePost = new MessagePost();
         messagePost.execute(subject, edtBody.getText().toString());
+    }
+
+    public enum MessageType {
+        Message, InternalNote
     }
 
     private class CreateAttachments extends AsyncTask<List<OValues>, Void, List<Integer>> {

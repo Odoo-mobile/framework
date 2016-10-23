@@ -90,7 +90,7 @@ public class About extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_about, menu);
+        getMenuInflater().inflate(R.menu.menu_base_about, menu);
         OPreferenceManager pref = new OPreferenceManager(this);
         if (pref.getBoolean(DEVELOPER_MODE, false)) {
             menu.findItem(R.id.menu_developer_mode).setVisible(true);

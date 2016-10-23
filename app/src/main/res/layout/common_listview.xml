@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/default_16dp"
+        android:layout_margin="@dimen/base_default_16dp"
         android:src="@drawable/ic_action_content_add"
         app:borderWidth="0dp"
         app:layout_behavior="odoo.controls.fab.FABScrollBehaviour" />

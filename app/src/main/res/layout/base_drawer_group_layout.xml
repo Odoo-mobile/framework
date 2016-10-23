@@ -6,21 +6,21 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/default_8dp"
-        android:background="@color/drawer_separator_background"
+        android:layout_marginTop="@dimen/base_default_8dp"
+        android:background="@color/base_drawer_separator_background"
         android:gravity="start|center_vertical" />
 
     <TextView
         android:id="@+id/group_title"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:fontFamily="@string/font_normal"
+        android:fontFamily="@string/base_font_normal"
         android:gravity="center_vertical"
-        android:paddingLeft="@dimen/default_16dp"
+        android:paddingLeft="@dimen/base_default_16dp"
         android:singleLine="true"
         android:textAllCaps="true"
-        android:textColor="@color/drawer_separator_text_color"
-        android:textSize="@dimen/text_size_small"
+        android:textColor="@color/base_drawer_separator_text_color"
+        android:textSize="@dimen/base_text_size_small"
         android:textStyle="bold" />
 
 </LinearLayout>

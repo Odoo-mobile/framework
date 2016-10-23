@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="label_accounts_settings">Odoo</string>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <string name="label_accounts_settings">@string/app_name</string>
     <string name="label_login">Login</string>
     <string name="label_accept_login">Accept &amp; Login</string>
     <string name="label_your_self_hosted_url">Your self-hosted URL</string>
@@ -47,6 +48,23 @@
     <string name="label_reply">Reply</string>
     <string name="label_close">Close</string>
     <string name="label_send">Send</string>
+
+    <string name="sync_label_customers">Customers</string>
+    <string name="toast_information_saved">Information Saved</string>
+    <string name="toast_image_size_too_large">Image size too large !</string>
+    <string name="label_no_customer_found">No Customer Found !</string>
+    <string name="message_to">Message to %s</string>
+    <string name="add_internal_note">Add and internal note</string>
+    <string name="internal_note_hint">Add an internal note that will not be sent to the followers</string>
+    <string name="label_log_note">Log note</string>
+    <string name="label_send_message"><u>Send a message</u></string>
+    <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
+    <string name="label_version_build">Build</string>
+    <string name="toast_permission_download_storage">Storage permission required to create downloaded file on your sdcard.</string>
+    <string name="toast_permission_download_storage_help">Storage permission required to store downloaded files on sdcard of your phone. Please grant permission for use this feature</string>
+    <string name="alert_permission_help">Some of permission required to start application. Please grant permission from application settings.</string>
+    <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
+    <string name="toast_record_deleted">Record deleted</string>
 
     <!-- package warning -->
     <string name="changes_required">Changes required in \n<b>app/build.gradle</b> for</string>
@@ -153,4 +171,157 @@
     <string name="app_version_name">Version</string>
     <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
     <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.com/">Terms of Service</a> and <a href="http://www.odoo.com/">Privacy Policy</a></string>
+
+    <bool name="baseAtLeastKitKat">false</bool>
+
+    <color name="base_list_divider">#ddd</color>
+
+    <!-- Odoo Theme Colors -->
+
+    <color name="base_primary">#a24689</color>
+    <color name="base_secondary">#8f8f8f</color>
+    <color name="base_optional">#21b799</color>
+
+    <!-- Drawer Colors -->
+    <color name="base_drawer_text_color">#282828</color>
+    <color name="base_drawer_text_color_selected">#414141</color>
+    <color name="base_drawer_icon_tint">#808080</color>
+    <color name="base_drawer_icon_tint_selected">#414141</color>
+    <color name="base_drawer_focused">#f3f3f3</color>
+    <color name="base_drawer_pressed">#EBEBEB</color>
+    <color name="base_drawer_background">#ffffffff</color>
+    <color name="base_drawer_separator_text_color">#acacac</color>
+    <color name="base_drawer_separator_background">#e5e5e5</color>
+
+    <!-- Android Style Colors -->
+    <color name="base_android_blue">#33B5E5</color>
+    <color name="base_android_blue_dark">#0099CC</color>
+    <color name="base_android_violet">#AA66CC</color>
+    <color name="base_android_violet_dark">#9933CC</color>
+    <color name="base_android_green">#99CC00</color>
+    <color name="base_android_green_dark">#669900</color>
+    <color name="base_android_orange">#FFBB33</color>
+    <color name="base_android_orange_dark">#FF8800</color>
+    <color name="base_android_red">#FF4444</color>
+    <color name="base_android_red_dark">#CC0000</color>
+
+    <color name="base_control_focused">#e5e5e5</color>
+    <color name="base_control_pressed">#acacac</color>
+
+
+    <array name="base_letter_tile_colors">
+        <item>@color/base_android_blue</item>
+        <item>@color/base_android_violet_dark</item>
+        <item>@color/base_android_red</item>
+        <item>@color/base_android_green_dark</item>
+        <item>@color/base_android_blue_dark</item>
+        <item>@color/base_android_orange</item>
+        <item>@color/base_android_red_dark</item>
+        <item>@color/base_android_violet</item>
+        <item>@color/base_android_green</item>
+        <item>@color/base_android_orange_dark</item>
+    </array>
+
+    <color name="base_icon_tint">#5e5e5e</color>
+    <color name="base_actionbar_spinner_text_color">#414141</color>
+
+    <color name="base_chatter_view_background">#f3f3f3</color>
+    <color name="base_chatter_view_note_background">#dadada</color>
+
+    <color name="base_translucent_scrim_top">#26000000</color>
+    <color name="base_translucent_scrim_top_center">#0C000000</color>
+    <color name="base_translucent_scrim_bottom">#2A000000</color>
+    <color name="base_translucent_scrim_bottom_center">#0D000000</color>
+
+    <dimen name="base_default_4dp">4dp</dimen>
+    <dimen name="base_default_8dp">8dp</dimen>
+    <dimen name="base_default_16dp">16dp</dimen>
+    <dimen name="base_default_48dp">48dp</dimen>
+    <dimen name="base_app_bar_top_padding">0dp</dimen>
+
+    <!-- Fonts -->
+    <string name="base_font_normal">sans-serif</string>
+    <string name="base_font_light">sans-serif-light</string>
+    <string name="base_font_condensed">sans-serif-condensed</string>
+
+    <!-- Text colors -->
+    <color name="base_body_text_1">#de000000</color>
+    <color name="base_body_text_2">#8a000000</color>
+    <color name="base_body_text_3">#60000000</color>
+    <color name="base_body_text_disabled">#44000000</color>
+    <color name="base_body_text_1_inverse">#deffffff</color>
+    <color name="base_body_text_2_inverse">#8affffff</color>
+
+    <!-- Text Sizes -->
+    <dimen name="base_text_size_xsmall">11sp</dimen>
+    <dimen name="base_text_size_xxsmall">10sp</dimen>
+    <dimen name="base_text_size_small">12sp</dimen>
+    <dimen name="base_text_size_medium">14sp</dimen>
+    <dimen name="base_text_size_xmedium">16sp</dimen>
+    <dimen name="base_text_size_large">18sp</dimen>
+    <dimen name="base_text_size_xlarge">20sp</dimen>
+    <dimen name="base_text_size_xxlarge">25sp</dimen>
+
+    <color name="base_theme_primary">#3F51B5</color>
+    <color name="base_theme_primary_dark">#303F9F</color>
+    <color name="base_theme_primary_medium">#7986CB</color>
+    <color name="base_theme_primary_light">#C5CAE9</color>
+    <color name="base_theme_accent">#FFC107</color>
+    <color name="base_theme_secondary">#795548</color>
+    <color name="base_theme_secondary_dark">#5D4037</color>
+    <color name="base_theme_secondary_light">#D7CCC8</color>
+
+    <color name="base_colorPrimary">@color/base_theme_primary</color>
+    <color name="base_colorPrimaryDark">@color/base_theme_primary_dark</color>
+    <color name="base_colorAccent">@color/base_theme_accent</color>
+
+    <color name="base_theme_text_white">#ffffff</color>
+    <color name="base_theme_primary_text">#212121</color>
+    <color name="base_theme_secondary_text">#727272</color>
+    <color name="base_theme_divider">#B6B6B6</color>
+
+    <!-- Drawer Properties -->
+    <color name="baseDrawerDefaultBackgroundColor">#ffffff</color>
+    <dimen name="baseDrawerDefaultWidth">280dp</dimen>
+    <dimen name="baseDrawerAccountBottomPadding">16dp</dimen>
+    <dimen name="baseDrawerAvatarWidthHeight">80dp</dimen>
+
+    <!-- Dimensions -->
+    <dimen name="baseStatusBarHeight">0dp</dimen>
+
+    <!-- Booleans -->
+    <bool name="baseFitToScreenWindow">true</bool>
+
+    <!-- Base application theme. -->
+    <style name="OdooTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/base_colorPrimary</item>
+        <item name="colorPrimaryDark">@color/base_colorPrimaryDark</item>
+        <item name="colorAccent">@color/base_colorAccent</item>
+    </style>
+
+    <style name="OdooTheme" parent="OdooTheme.Base">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="OdooAppBar.Dark" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+
+    <!-- FIXME: Replace toolbar with appbar.. -->
+    <style name="OdooToolBarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="homeAsUpIndicator">@drawable/ic_action_navigation_menu</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_action_navigation_menu</item>
+    </style>
+
+    <style name="OdooStatusBarView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/baseStatusBarHeight</item>
+        <item name="android:background">@color/base_colorPrimaryDark</item>
+    </style>
+
+    <style name="OdooViewSeparator">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">#cccccc</item>
+    </style>
+
 </resources>

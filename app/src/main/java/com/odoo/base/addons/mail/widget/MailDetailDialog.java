@@ -113,22 +113,6 @@ public class MailDetailDialog extends OdooCompatActivity implements View.OnClick
         OControls.setText(parent, R.id.messageDate, date);
     }
 
-    private class LoadAttachments extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    for (ODataRow row : attachments) {
-                        addAttachment(row);
-                    }
-                }
-            });
-            return null;
-        }
-    }
-
     private void addAttachment(ODataRow values) {
         View attachmentView = LayoutInflater.from(this)
                 .inflate(R.layout.base_attachment_item, horizontalScrollView, false);
@@ -140,13 +124,13 @@ public class MailDetailDialog extends OdooCompatActivity implements View.OnClick
                 Uri uri = Uri.parse(new File(values.getString("file_uri")).toString());
                 imgPreview.setImageBitmap(fileManager.getBitmapFromURI(uri));
             } else
-                imgPreview.setImageResource(R.drawable.image);
+                imgPreview.setImageResource(R.drawable.base_image);
         } else if (type.contains("audio")) {
-            imgPreview.setImageResource(R.drawable.audio);
+            imgPreview.setImageResource(R.drawable.base_audio);
         } else if (type.contains("video")) {
-            imgPreview.setImageResource(R.drawable.video);
+            imgPreview.setImageResource(R.drawable.base_video);
         } else {
-            imgPreview.setImageResource(R.drawable.file);
+            imgPreview.setImageResource(R.drawable.base_file);
         }
         OControls.setText(attachmentView, R.id.attachmentFileName, fileName);
         attachmentView.setTag(values);
@@ -179,6 +163,22 @@ public class MailDetailDialog extends OdooCompatActivity implements View.OnClick
         super.onPause();
         if (loadAttachments != null) {
             loadAttachments.cancel(true);
+        }
+    }
+
+    private class LoadAttachments extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (ODataRow row : attachments) {
+                        addAttachment(row);
+                    }
+                }
+            });
+            return null;
         }
     }
 }

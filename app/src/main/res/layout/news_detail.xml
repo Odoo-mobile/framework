@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    android:layout_height="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
 
         <TextView
+            android:id="@+id/detailSubject"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@string/base_font_normal"
+            android:padding="@dimen/base_default_16dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/body_text_1"
-            android:fontFamily="@string/font_normal"
-            android:padding="@dimen/default_16dp"
-            android:id="@+id/detailSubject" />
+            android:textColor="@color/base_body_text_1" />
 
         <WebView
+            android:id="@+id/detailMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/base_default_8dp"
+            android:fontFamily="@string/base_font_light"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/body_text_2"
-            android:fontFamily="@string/font_light"
-            android:layout_margin="@dimen/default_8dp"
-            android:id="@+id/detailMessage" />
+            android:textColor="@color/base_body_text_2" />
     </LinearLayout>
 </ScrollView>

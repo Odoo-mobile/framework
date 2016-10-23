@@ -33,7 +33,7 @@ public class OStringColorUtil {
 
     public static int getStringColor(Context context, String content) {
         Resources res = context.getResources();
-        TypedArray mColors = res.obtainTypedArray(R.array.letter_tile_colors);
+        TypedArray mColors = res.obtainTypedArray(R.array.base_letter_tile_colors);
         int MAX_COLORS = mColors.length();
         int firstCharAsc = content.toUpperCase(Locale.getDefault()).charAt(0);
         int index = (firstCharAsc % MAX_COLORS);

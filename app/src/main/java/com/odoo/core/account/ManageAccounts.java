@@ -68,7 +68,7 @@ public class ManageAccounts extends AppCompatActivity implements View.OnClickLis
     private void generateView(View view, OUser user) {
         OControls.setText(view, R.id.accountName, user.getName());
         OControls.setText(view, R.id.accountURL, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
-        OControls.setImage(view, R.id.profile_image, R.drawable.avatar);
+        OControls.setImage(view, R.id.profile_image, R.drawable.base_avatar);
         if (!user.getAvatar().equals("false")) {
             Bitmap bmp = BitmapUtils.getBitmapImage(this, user.getAvatar());
             if (bmp != null)

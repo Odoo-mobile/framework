@@ -98,6 +98,22 @@ public class OdooActivity extends OdooCompatActivity {
     private Integer mDrawerSelectedIndex = -1;
     private Boolean mHasActionBarSpinner = false;
     private App app;
+    private View.OnClickListener drawerItemClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int index = mDrawerItemContainer.indexOfChild(v);
+            if (mDrawerSelectedIndex != index) {
+                ODrawerItem item = (ODrawerItem) v.getTag();
+                if (item.getInstance() instanceof Fragment) {
+                    focusOnDrawerItem(index);
+                    setTitle(item.getTitle());
+                }
+                loadDrawerItemInstance(item.getInstance(), item.getExtra());
+            } else {
+                closeDrawer();
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -180,7 +196,7 @@ public class OdooActivity extends OdooCompatActivity {
                 invalidateOptionsMenu();
             }
         };
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerLayout.setDrawerShadow(R.drawable.base_drawer_shadow, GravityCompat.START);
         mDrawerToggle.syncState();
 
         setupAccountBox();
@@ -202,23 +218,6 @@ public class OdooActivity extends OdooCompatActivity {
             mDrawerItemContainer.addView(DrawerUtils.fillDrawerItemValue(view, item));
         }
     }
-
-    private View.OnClickListener drawerItemClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int index = mDrawerItemContainer.indexOfChild(v);
-            if (mDrawerSelectedIndex != index) {
-                ODrawerItem item = (ODrawerItem) v.getTag();
-                if (item.getInstance() instanceof Fragment) {
-                    focusOnDrawerItem(index);
-                    setTitle(item.getTitle());
-                }
-                loadDrawerItemInstance(item.getInstance(), item.getExtra());
-            } else {
-                closeDrawer();
-            }
-        }
-    };
 
     public void closeDrawer() {
         new Handler().postDelayed(new Runnable() {
@@ -478,7 +477,7 @@ public class OdooActivity extends OdooCompatActivity {
         OControls.setGone(view, R.id.profile_url_text);
         ImageView icon = (ImageView) view.findViewById(R.id.profile_image);
         icon.setImageResource(res_id);
-        icon.setColorFilter(OResource.color(this, R.color.body_text_2));
+        icon.setColorFilter(OResource.color(this, R.color.base_body_text_2));
         TextView name = (TextView) view.findViewById(R.id.profile_name_text);
         name.setTypeface(name.getTypeface(), Typeface.BOLD);
         name.setText(title);

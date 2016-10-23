@@ -56,7 +56,7 @@ public class ONotificationBuilder {
     private Boolean withVibrate = true;
     private Boolean withLargeIcon = true;
     private Boolean withRingTone = true;
-    private int notification_color = R.color.theme_secondary;
+    private int notification_color = R.color.base_theme_secondary;
     private int maxProgress = -1;
     private int currentProgress = -1;
     private boolean indeterminate = false;
@@ -65,6 +65,21 @@ public class ONotificationBuilder {
     public ONotificationBuilder(Context context, int notification_id) {
         mContext = context;
         this.notification_id = notification_id;
+    }
+
+    public static void cancelNotification(Context context) {
+        NotificationManager nMgr = (NotificationManager) context.getSystemService(
+                Context.NOTIFICATION_SERVICE
+        );
+        nMgr.cancelAll();
+        ;
+    }
+
+    public static void cancelNotification(Context context, int id) {
+        NotificationManager nMgr = (NotificationManager) context.getSystemService(
+                Context.NOTIFICATION_SERVICE
+        );
+        nMgr.cancel(id);
     }
 
     public ONotificationBuilder setTitle(String title) {
@@ -237,20 +252,6 @@ public class ONotificationBuilder {
         }
         mNotificationManager.notify(notification_id, mNotificationBuilder.build());
     }
-
-    public static  void cancelNotification(Context context){
-        NotificationManager nMgr = (NotificationManager) context.getSystemService(
-                Context.NOTIFICATION_SERVICE
-        );
-        nMgr.cancelAll();;
-    }
-    public static void cancelNotification(Context context, int id) {
-        NotificationManager nMgr = (NotificationManager) context.getSystemService(
-                Context.NOTIFICATION_SERVICE
-        );
-        nMgr.cancel(id);
-    }
-
 
     public static class NotificationAction {
         private int icon;

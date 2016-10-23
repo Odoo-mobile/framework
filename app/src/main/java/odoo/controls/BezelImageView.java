@@ -95,7 +95,7 @@ public class BezelImageView extends ImageView {
 
     public void autoSetMaskDrawable() {
         mMaskDrawable = mContext.getResources().getDrawable(
-                R.drawable.circle_mask);
+                R.drawable.base_circle_mask);
         otherInit();
     }
 

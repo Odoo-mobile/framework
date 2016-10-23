@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="100dp"
-    android:layout_margin="2dp"
-    android:layout_height="100dp">
+    android:layout_height="100dp"
+    android:layout_margin="2dp">
 
     <ImageView
         android:id="@+id/attachmentPreview"
-        android:scaleType="centerCrop"
         android:layout_width="match_parent"
-        android:src="@drawable/file"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/base_file" />
 
     <ImageView
-        android:layout_gravity="top|right"
-        android:background="#99CC0000"
-        android:src="@drawable/ic_action_navigation_close"
         android:id="@+id/btnRemoveAttachment"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:background="#99CC0000"
         android:padding="3dp"
-        android:layout_height="wrap_content" />
+        android:src="@drawable/ic_action_navigation_close" />
 
     <TextView
         android:id="@+id/attachmentFileName"
-        android:layout_gravity="bottom"
-        android:textColor="#ffffff"
-        android:padding="4dp"
-        android:background="#99000000"
-        android:singleLine="true"
-        android:ellipsize="middle"
-        android:fontFamily="@string/font_condensed"
-        android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#99000000"
+        android:ellipsize="middle"
+        android:fontFamily="@string/base_font_condensed"
+        android:padding="4dp"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#ffffff" />
 </FrameLayout>

@@ -1,100 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
     android:id="@+id/layoutSavePassword"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#fff"
-    android:layout_height="match_parent">
+    android:orientation="vertical">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/userAvatar"
-                android:scaleType="centerCrop"
                 android:layout_width="match_parent"
-                android:layout_height="250dp" />
+                android:layout_height="250dp"
+                android:scaleType="centerCrop" />
 
             <LinearLayout
-                android:padding="@dimen/default_16dp"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/base_default_16dp">
 
                 <TextView
-                    android:textColor="@color/body_text_2"
                     android:id="@+id/userName"
-                    android:layout_marginBottom="@dimen/default_8dp"
-                    android:textSize="@dimen/text_size_xlarge"
-                    android:fontFamily="@string/font_condensed"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/base_default_8dp"
+                    android:fontFamily="@string/base_font_condensed"
+                    android:textColor="@color/base_body_text_2"
+                    android:textSize="@dimen/base_text_size_xlarge" />
 
                 <TextView
-                    android:textColor="@color/body_text_3"
-                    android:layout_marginBottom="@dimen/default_8dp"
-                    android:textSize="@dimen/text_size_small"
-                    android:textAllCaps="true"
-                    android:text="New Password"
-                    android:fontFamily="@string/font_normal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/base_default_8dp"
+                    android:fontFamily="@string/base_font_normal"
+                    android:text="New Password"
+                    android:textAllCaps="true"
+                    android:textColor="@color/base_body_text_3"
+                    android:textSize="@dimen/base_text_size_small" />
 
                 <EditText
                     android:id="@+id/newPassword"
-                    android:hint="New Password"
-                    android:inputType="textPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="New Password"
+                    android:inputType="textPassword" />
 
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-    <View style="@style/ViewSeparator" />
+    <View style="@style/OdooViewSeparator" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:showDividers="middle"
         android:divider="?android:attr/dividerVertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:showDividers="middle">
 
         <Button
             android:id="@+id/save_password"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="?android:selectableItemBackground"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center"
-            android:fontFamily="@string/font_normal"
-            android:padding="@dimen/default_16dp"
+            android:padding="@dimen/base_default_16dp"
             android:text="Save Password"
             android:textAllCaps="true"
-            android:textColor="@color/body_text_1"
-            android:textSize="@dimen/text_size_medium" />
+            android:textColor="@color/base_body_text_1"
+            android:textSize="@dimen/base_text_size_medium" />
 
         <Button
             android:id="@+id/cancel"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:fontFamily="@string/font_normal"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="?android:selectableItemBackground"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center"
-            android:padding="@dimen/default_16dp"
+            android:padding="@dimen/base_default_16dp"
             android:text="@string/label_cancel"
             android:textAllCaps="true"
-            android:textColor="@color/body_text_2"
-            android:textSize="@dimen/text_size_medium" />
+            android:textColor="@color/base_body_text_2"
+            android:textSize="@dimen/base_text_size_medium" />
     </LinearLayout>
 </LinearLayout>

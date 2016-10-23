@@ -35,20 +35,31 @@
         <activity
             android:name="com.odoo.core.account.OdooLogin"
             android:label="${applicationName}"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/OdooTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.odoo.core.account.ManageAccounts" />
-        <activity android:name="com.odoo.OdooActivity" android:label="${applicationName}" />
-        <activity android:name="odoo.controls.SearchableItemActivity" />
-        <activity android:name="com.odoo.SettingsActivity" />
+        <activity
+            android:name="com.odoo.core.account.ManageAccounts"
+            android:theme="@style/OdooTheme" />
+        <activity
+            android:name="com.odoo.OdooActivity"
+            android:label="${applicationName}"
+            android:theme="@style/OdooTheme" />
+        <activity
+            android:name="odoo.controls.SearchableItemActivity"
+            android:theme="@style/OdooTheme" />
+        <activity
+            android:name="com.odoo.SettingsActivity"
+            android:theme="@style/OdooTheme" />
         <activity
             android:name="com.odoo.core.account.AppIntro"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/OdooTheme" />
         <activity
             android:name="com.odoo.base.addons.mail.widget.MailDetailDialog"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
@@ -59,8 +70,12 @@
             android:name="com.odoo.core.account.OdooAccountQuickManage"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name="com.odoo.core.account.About" />
-        <activity android:name="com.odoo.core.account.Profile" />
+        <activity
+            android:name="com.odoo.core.account.About"
+            android:theme="@style/OdooTheme" />
+        <activity
+            android:name="com.odoo.core.account.Profile"
+            android:theme="@style/OdooTheme" />
 
         <!-- Reminder Receivers// -->
         <receiver android:name="com.odoo.core.utils.reminder.ReminderReceiver" />
@@ -118,6 +133,7 @@
 
         <activity
             android:name="com.odoo.addons.customers.CustomerDetails"
+            android:theme="@style/OdooTheme"
             android:windowSoftInputMode="adjustPan" />
     </application>
 

@@ -125,7 +125,7 @@ public class BitmapUtils {
         mPaint.setColor(Color.WHITE);
         mPaint.setTextAlign(Paint.Align.CENTER);
         mPaint.setAntiAlias(true);
-        int textSize = res.getDimensionPixelSize(R.dimen.text_size_xxlarge);
+        int textSize = res.getDimensionPixelSize(R.dimen.base_text_size_xxlarge);
 
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas();

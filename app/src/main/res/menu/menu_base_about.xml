@@ -16,8 +16,8 @@
         android:id="@+id/menu_developer_mode"
         android:icon="@drawable/ic_action_more"
         android:title="@string/label_odoo_developer_mode"
-        app:showAsAction="always"
-        android:visible="false">
+        android:visible="false"
+        app:showAsAction="always">
         <menu>
             <item
                 android:id="@+id/menu_export_db"
