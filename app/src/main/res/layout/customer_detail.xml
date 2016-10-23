@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#fff"
     android:fitsSystemWindows="true"
-    tools:context="me.kasimrangwala.odoo.addons.customers.CustomerDetails">
+    tools:context="com.odoo.addons.customers.CustomerDetails">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/customer_detail_appbar"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<me.kasimrangwala.odoo.base.addons.mail.widget.MailChatterView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.odoo.base.addons.mail.widget.MailChatterView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/base_default_16dp">
@@ -88,4 +88,4 @@
             android:textColor="@color/base_body_text_2"
             android:visibility="gone" />
     </LinearLayout>
-</me.kasimrangwala.odoo.base.addons.mail.widget.MailChatterView>
+</com.odoo.base.addons.mail.widget.MailChatterView>
