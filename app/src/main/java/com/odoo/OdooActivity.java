@@ -69,6 +69,7 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.drawer.DrawerUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
+import com.odoo.utils.AppPrefs;
 
 import java.util.List;
 
@@ -114,6 +115,12 @@ public class OdooActivity extends OdooCompatActivity {
             }
         }
     };
+
+    /// Edited by Kasim Rangwala
+    /// BEGIN
+
+    private AppPrefs mPrefs;
+    /// END
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

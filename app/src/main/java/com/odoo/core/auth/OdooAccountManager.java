@@ -19,9 +19,12 @@
  */
 package com.odoo.core.auth;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.odoo.App;
@@ -29,6 +32,7 @@ import com.odoo.core.orm.OModelRegistry;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.sys.OCacheUtils;
+import com.odoo.utils.AppPrefs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,15 +50,25 @@ public class OdooAccountManager {
      * @return List of OUser instances if any
      */
     public static List<OUser> getAllAccounts(Context context) {
-        List<OUser> users = new ArrayList<>();
-        AccountManager aManager = AccountManager.get(context);
-        for (Account account : aManager.getAccountsByType(KEY_ACCOUNT_TYPE)) {
-            OUser user = new OUser();
-            user.fillFromAccount(aManager, account);
-            user.setAccount(account);
-            users.add(user);
+        /// Edit by Kasim Rangwala
+        /// BEGIN
+
+        // Added runtime permission checker
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
+            List<OUser> users = new ArrayList<>();
+            AccountManager aManager = AccountManager.get(context);
+            for (Account account : aManager.getAccountsByType(KEY_ACCOUNT_TYPE)) {
+                OUser user = new OUser();
+                user.fillFromAccount(aManager, account);
+                user.setAccount(account);
+                users.add(user);
+            }
+            return users;
+        } else {
+            Log.e(TAG, "getAllAccounts: Manifest.permission.GET_ACCOUNTS is not granted.");
         }
-        return users;
+        return null;
+        /// END
     }
 
     /**
@@ -177,6 +191,37 @@ public class OdooAccountManager {
         }
         return null;
     }
+
+    /**
+     * Gets active first user object
+     *
+     * @param context
+     * @return user object (Instance of OUser class)
+     */
+    /// Added by Kasim Rangwala
+    /// BEGIN
+    public static OUser getUser(Context context) {
+        // getting username from SharedPreference
+        String userName = new AppPrefs(context)
+                .getUserName();
+        List<OUser> users = getAllAccounts(context);
+        if (null != users) {
+            if (null != userName) {
+                for (OUser user : users) {
+                    if (user.getUsername().equals(userName)) {
+                        Log.d(TAG, "getUser() called with: user = [" + userName + "]");
+                        return user;
+                    }
+                }
+            } else {
+                if (users.size() > 0) {
+                    return users.get(0);
+                }
+            }
+        }
+        return null;
+    }
+    /// END
 
     /**
      * Returns OUser object with username

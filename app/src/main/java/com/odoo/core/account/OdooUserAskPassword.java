@@ -29,10 +29,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.odoo.App;
 import com.odoo.R;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OControls;
+import com.odoo.utils.AppPrefs;
 
 public class OdooUserAskPassword {
 
@@ -65,6 +67,16 @@ public class OdooUserAskPassword {
                     show();
                 } else {
                     if (password.equals(mUser.getPassword())) {
+                        /// Added by Kasim Rangwala
+                        /// BEGIN
+
+                        AppPrefs appPrefs = new AppPrefs(mContext);
+                        appPrefs.setUserName(mUser.getUsername());
+                        appPrefs.setSelfHosted(!mUser.isOAuthLogin());
+                        App app = (App) mContext.getApplicationContext();
+                        app.setOdoo(null, mUser);
+                        app.checkOdoo();
+                        /// END
                         mOnUserPasswordValidateListener.onSuccess();
                     } else {
                         mOnUserPasswordValidateListener.onFail();
