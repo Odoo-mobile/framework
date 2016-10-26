@@ -324,4 +324,76 @@
         <item name="android:background">#cccccc</item>
     </style>
 
+    <declare-styleable name="BezelImageView">
+        <attr name="biv_maskDrawable" format="reference" />
+        <attr name="biv_borderDrawable" format="reference" />
+        <attr name="biv_desaturateOnPress" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="ODrawerScrollView">
+        <attr name="dsv_insetForeground" format="reference|color" />
+    </declare-styleable>
+
+    <!-- Custom Controls -->
+    <declare-styleable name="OField">
+        <attr name="fieldName" format="string" />
+        <attr name="fieldIconResource" format="reference" />
+        <attr name="fieldShowIcon" format="boolean" />
+        <attr name="fieldShowLabel" format="boolean" />
+        <attr name="fieldIconTint" format="reference|color" />
+        <attr name="fieldParsePattern" format="string" />
+        <attr name="fieldWithOutSidePadding" format="boolean" />
+        <attr name="fieldType">
+            <enum name="Text" value="0" />
+            <enum name="Boolean" value="1" />
+            <enum name="ManyToOne" value="2" />
+            <enum name="Chips" value="3" />
+            <enum name="Selection" value="4" />
+            <enum name="Date" value="5" />
+            <enum name="DateTime" value="6" />
+            <enum name="Blob" value="7" />
+            <enum name="Time" value="8" />
+        </attr>
+        <attr name="fieldWidgetType">
+            <enum name="Switch" value="0" />
+            <enum name="RadioGroup" value="1" />
+            <enum name="SelectionDialog" value="2" />
+            <enum name="Searchable" value="3" />
+            <enum name="SearchableLive" value="4" />
+            <enum name="Image" value="5" />
+            <enum name="ImageCircle" value="6" />
+            <enum name="Duration" value="7" />
+        </attr>
+        <attr name="fieldWidgetImageSize" format="dimension" />
+        <attr name="fieldWithBottomPadding" format="boolean" />
+        <attr name="fieldWithTopPadding" format="boolean" />
+        <attr name="fieldControlLabel" format="string|reference" />
+        <attr name="fieldDefaultValue" format="reference|string" />
+        <attr name="fieldDefaultImage" format="reference" />
+        <attr name="fieldValueArray" format="reference" />
+        <attr name="fieldTextAppearance" format="reference" />
+        <attr name="fieldTextSize" format="dimension" />
+        <attr name="fieldTextColor" format="color" />
+        <attr name="fieldLabelColor" format="color" />
+        <attr name="fieldLabelTextAppearance" format="reference" />
+        <attr name="fieldLabelSize" format="dimension" />
+    </declare-styleable>
+    <declare-styleable name="OForm">
+        <attr name="formEditableMode" format="boolean" />
+        <attr name="formModelName" format="string" />
+        <attr name="formAutoUIGenerate" format="boolean" />
+        <attr name="formControlIconTint" format="color" />
+    </declare-styleable>
+    <declare-styleable name="FloatingActionButton">
+        <attr name="fab_drawable" format="integer" />
+        <attr name="fab_fabColor" format="color" />
+        <attr name="fab_shadowRadius" format="float" />
+        <attr name="fab_shadowDx" format="float" />
+        <attr name="fab_shadowDy" format="float" />
+        <attr name="fab_shadowColor" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="MailChatterView">
+        <attr name="mcv_resModelName" format="string" />
+    </declare-styleable>
+
 </resources>
