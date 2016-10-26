@@ -82,6 +82,29 @@ public class OForm extends LinearLayout {
         init(context, attrs, 0, 0);
     }
 
+    private void init(Context context, AttributeSet attrs, int defStyleAttr,
+                      int defStyleRes) {
+        mFirstModeChange = true;
+        mContext = context;
+        if (attrs != null) {
+            TypedArray types = mContext.obtainStyledAttributes(attrs,
+                    R.styleable.OForm);
+            mModel = types.getString(R.styleable.OForm_formModelName);
+            mEditable = types.getBoolean(R.styleable.OForm_formEditableMode,
+                    false);
+            autoUIGenerate = types.getBoolean(R.styleable.OForm_formAutoUIGenerate, true);
+            icon_tint_color = types.getColor(R.styleable.OForm_formControlIconTint, -1);
+            types.recycle();
+        }
+        initForm();
+        LayoutTransition transition = new LayoutTransition();
+        setLayoutTransition(transition);
+    }
+
+    public boolean getEditable() {
+        return mEditable;
+    }
+
     public void setEditable(Boolean editable) {
         mEditable = editable;
         if (mEditable) {
@@ -94,43 +117,20 @@ public class OForm extends LinearLayout {
         mFirstModeChange = false;
     }
 
-    private void init(Context context, AttributeSet attrs, int defStyleAttr,
-                      int defStyleRes) {
-        mFirstModeChange = true;
-        mContext = context;
-        if (attrs != null) {
-            TypedArray types = mContext.obtainStyledAttributes(attrs,
-                    R.styleable.OForm);
-            mModel = types.getString(R.styleable.OForm_modelName);
-            mEditable = types.getBoolean(R.styleable.OForm_editableMode,
-                    false);
-            autoUIGenerate = types.getBoolean(R.styleable.OForm_autoUIGenerate, true);
-            icon_tint_color = types.getColor(R.styleable.OForm_controlIconTint, -1);
-            types.recycle();
-        }
-        initForm();
-        LayoutTransition transition = new LayoutTransition();
-        setLayoutTransition(transition);
-    }
-
-    public boolean getEditable() {
-        return mEditable;
+    public String getModel() {
+        return mModel;
     }
 
     public void setModel(String model) {
         mModel = model;
     }
 
-    public String getModel() {
-        return mModel;
+    public ODataRow getData() {
+        return mRecord;
     }
 
     public void setData(ODataRow record) {
         initForm(record);
-    }
-
-    public ODataRow getData() {
-        return mRecord;
     }
 
     public void initForm(ODataRow record) {

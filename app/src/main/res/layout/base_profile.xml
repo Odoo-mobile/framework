@@ -74,63 +74,63 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/base_default_8dp"
                 android:orientation="vertical"
-                app:modelName="res.users">
+                app:formModelName="res.users">
 
                 <odoo.controls.OField
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:controlLabel="Name"
+                    app:fieldControlLabel="Name"
                     app:fieldLabelColor="@color/base_theme_primary"
                     app:fieldName="name"
-                    app:fieldTextSize="@dimen/base_text_size_xmedium"
-                    app:showIcon="false"></odoo.controls.OField>
+                    app:fieldShowIcon="false"
+                    app:fieldTextSize="@dimen/base_text_size_xmedium"></odoo.controls.OField>
 
                 <odoo.controls.OField
                     android:id="@+id/user_login"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:controlLabel="USER LOGIN"
+                    app:fieldControlLabel="USER LOGIN"
                     app:fieldLabelColor="@color/base_theme_primary"
                     app:fieldName="user_login"
-                    app:fieldTextSize="@dimen/base_text_size_xmedium"
-                    app:showIcon="false"></odoo.controls.OField>
+                    app:fieldShowIcon="false"
+                    app:fieldTextSize="@dimen/base_text_size_xmedium"></odoo.controls.OField>
 
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:controlLabel="SERVER URL"
+                    app:fieldControlLabel="SERVER URL"
                     app:fieldLabelColor="@color/base_theme_primary"
                     app:fieldName="server_url"
-                    app:fieldTextSize="@dimen/base_text_size_xmedium"
-                    app:showIcon="false"></odoo.controls.OField>
+                    app:fieldShowIcon="false"
+                    app:fieldTextSize="@dimen/base_text_size_xmedium"></odoo.controls.OField>
 
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:controlLabel="DATABASE"
+                    app:fieldControlLabel="DATABASE"
                     app:fieldLabelColor="@color/base_theme_primary"
                     app:fieldName="database"
-                    app:fieldTextSize="@dimen/base_text_size_xmedium"
-                    app:showIcon="false"></odoo.controls.OField>
+                    app:fieldShowIcon="false"
+                    app:fieldTextSize="@dimen/base_text_size_xmedium"></odoo.controls.OField>
 
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:controlLabel="ODOO VERSION"
+                    app:fieldControlLabel="ODOO VERSION"
                     app:fieldLabelColor="@color/base_theme_primary"
                     app:fieldName="version"
-                    app:fieldTextSize="@dimen/base_text_size_xmedium"
-                    app:showIcon="false"></odoo.controls.OField>
+                    app:fieldShowIcon="false"
+                    app:fieldTextSize="@dimen/base_text_size_xmedium"></odoo.controls.OField>
 
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:controlLabel="TIMEZONE"
+                    app:fieldControlLabel="TIMEZONE"
                     app:fieldLabelColor="@color/base_theme_primary"
                     app:fieldName="timezone"
-                    app:fieldTextSize="@dimen/base_text_size_xmedium"
-                    app:showIcon="false"></odoo.controls.OField>
+                    app:fieldShowIcon="false"
+                    app:fieldTextSize="@dimen/base_text_size_xmedium"></odoo.controls.OField>
             </odoo.controls.OForm>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

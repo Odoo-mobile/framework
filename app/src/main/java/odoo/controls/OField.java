@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.odoo.R;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
@@ -48,7 +49,6 @@ import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OTimestamp;
 import com.odoo.core.orm.fields.types.OVarchar;
-import com.odoo.R;
 
 public class OField extends LinearLayout implements IOControlData.ValueUpdateListener {
     public static final String TAG = OField.class.getSimpleName();
@@ -84,60 +84,6 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
     private float labelSize = -1;
     private IOnFieldValueChangeListener mValueUpdateListener = null;
 
-    public enum WidgetType {
-        Switch, RadioGroup, SelectionDialog, Searchable, SearchableLive, Image, ImageCircle, Duration;
-
-        public static WidgetType getWidgetType(int widget) {
-            switch (widget) {
-                case 0:
-                    return WidgetType.Switch;
-                case 1:
-                    return WidgetType.RadioGroup;
-                case 2:
-                    return WidgetType.SelectionDialog;
-                case 3:
-                    return WidgetType.Searchable;
-                case 4:
-                    return WidgetType.SearchableLive;
-                case 5:
-                    return WidgetType.Image;
-                case 6:
-                    return WidgetType.ImageCircle;
-                case 7:
-                    return WidgetType.Duration;
-            }
-            return null;
-        }
-    }
-
-    public enum FieldType {
-        Text, Boolean, ManyToOne, Chips, Selection, Date, Time, DateTime, Blob, RelationType;
-
-        public static FieldType getTypeValue(int type_val) {
-            switch (type_val) {
-                case 0:
-                    return FieldType.Text;
-                case 1:
-                    return FieldType.Boolean;
-                case 2:
-                    return FieldType.ManyToOne;
-                case 3:
-                    return FieldType.Chips;
-                case 4:
-                    return FieldType.Selection;
-                case 5:
-                    return FieldType.Date;
-                case 6:
-                    return FieldType.DateTime;
-                case 7:
-                    return FieldType.Blob;
-                case 8:
-                    return FieldType.Time;
-            }
-            return FieldType.Text;
-        }
-    }
-
     public OField(Context context) {
         super(context);
         init(context, null, 0, 0);
@@ -167,26 +113,26 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             TypedArray types = mContext.obtainStyledAttributes(attrs,
                     R.styleable.OField);
             mField_name = types.getString(R.styleable.OField_fieldName);
-            resId = types.getResourceId(R.styleable.OField_iconResource, 0);
-            showIcon = types.getBoolean(R.styleable.OField_showIcon, true);
-            tint_color = types.getColor(R.styleable.OField_iconTint, 0);
-            show_label = types.getBoolean(R.styleable.OField_showLabel, true);
+            resId = types.getResourceId(R.styleable.OField_fieldIconResource, 0);
+            showIcon = types.getBoolean(R.styleable.OField_fieldShowIcon, true);
+            tint_color = types.getColor(R.styleable.OField_fieldIconTint, 0);
+            show_label = types.getBoolean(R.styleable.OField_fieldShowLabel, true);
             int type_value = types.getInt(R.styleable.OField_fieldType, 0);
             mType = FieldType.getTypeValue(type_value);
 
             with_bottom_padding = types.getBoolean(
-                    R.styleable.OField_withBottomPadding, true);
+                    R.styleable.OField_fieldWithBottomPadding, true);
             with_top_padding = types.getBoolean(
-                    R.styleable.OField_withTopPadding, true);
-            mLabel = types.getString(R.styleable.OField_controlLabel);
-            mValue = types.getString(R.styleable.OField_defaultValue);
-            mParsePattern = types.getString(R.styleable.OField_parsePattern);
+                    R.styleable.OField_fieldWithTopPadding, true);
+            mLabel = types.getString(R.styleable.OField_fieldControlLabel);
+            mValue = types.getString(R.styleable.OField_fieldDefaultValue);
+            mParsePattern = types.getString(R.styleable.OField_fieldParsePattern);
             mValueArrayId = types.getResourceId(
-                    R.styleable.OField_valueArray, -1);
+                    R.styleable.OField_fieldValueArray, -1);
             mWidgetType = WidgetType.getWidgetType(types.getInt(
-                    R.styleable.OField_widgetType, -1));
-            mWidgetImageSize = types.getDimension(R.styleable.OField_widgetImageSize, -1);
-            withPadding = types.getBoolean(R.styleable.OField_withOutSidePadding, true);
+                    R.styleable.OField_fieldWidgetType, -1));
+            mWidgetImageSize = types.getDimension(R.styleable.OField_fieldWidgetImageSize, -1);
+            withPadding = types.getBoolean(R.styleable.OField_fieldWithOutSidePadding, true);
 
             textColor = types.getColor(R.styleable.OField_fieldTextColor, Color.BLACK);
             labelColor = types.getColor(R.styleable.OField_fieldLabelColor, Color.DKGRAY);
@@ -194,7 +140,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             labelAppearance = types.getResourceId(R.styleable.OField_fieldLabelTextAppearance, -1);
             textSize = types.getDimension(R.styleable.OField_fieldTextSize, -1);
             labelSize = types.getDimension(R.styleable.OField_fieldLabelSize, -1);
-            defaultImage = types.getResourceId(R.styleable.OField_defaultImage, -1);
+            defaultImage = types.getResourceId(R.styleable.OField_fieldDefaultImage, -1);
             types.recycle();
         }
         if (mContext.getClass().getSimpleName().contains("BridgeContext"))
@@ -294,17 +240,6 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             img_icon.setVisibility(View.GONE);
     }
 
-    public <T> void setColumn(OColumn column) {
-        mColumn = column;
-        mType = getType(column.getType());
-        if (label_view != null) {
-            label_view.setText(getLabelText());
-        }
-        if (mControlData != null) {
-            mControlData.setColumn(mColumn);
-        }
-    }
-
     private <T> FieldType getType(Class<T> type_class) {
         try {
             // Varchar
@@ -363,6 +298,12 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         return getFieldName();
     }
 
+    public Object getValue() {
+        if (mControlData != null)
+            return mControlData.getValue();
+        return null;
+    }
+
     public void setValue(Object value) {
         mValue = value;
         if (mValue != null && mControlData != null) {
@@ -370,10 +311,8 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         }
     }
 
-    public Object getValue() {
-        if (mControlData != null)
-            return mControlData.getValue();
-        return null;
+    public boolean getEditable() {
+        return mEditable;
     }
 
     public void setEditable(Boolean editable) {
@@ -385,10 +324,6 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             if (value != null)
                 mControlData.setValue(value);
         }
-    }
-
-    public boolean getEditable() {
-        return mEditable;
     }
 
     public String getFieldName() {
@@ -474,10 +409,6 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         return label;
     }
 
-    public void setIcon(int resourceId) {
-        img_icon.setImageResource(resourceId);
-    }
-
     public void setError(String error) {
         mControlData.setError(error);
     }
@@ -486,16 +417,31 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         return resId;
     }
 
-    public void setModel(OModel model) {
-        mModel = model;
+    public void setIcon(int resourceId) {
+        img_icon.setImageResource(resourceId);
     }
 
     public OModel getModel() {
         return mModel;
     }
 
+    public void setModel(OModel model) {
+        mModel = model;
+    }
+
     public OColumn getColumn() {
         return mColumn;
+    }
+
+    public <T> void setColumn(OColumn column) {
+        mColumn = column;
+        mType = getType(column.getType());
+        if (label_view != null) {
+            label_view.setText(getLabelText());
+        }
+        if (mControlData != null) {
+            mControlData.setColumn(mColumn);
+        }
     }
 
     public void resetData() {
@@ -565,6 +511,60 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
                                           IOnDomainFilterCallbacks callback) {
         mColumnDomain = domain;
         mOnDomainFilterCallbacks = callback;
+    }
+
+    public enum WidgetType {
+        Switch, RadioGroup, SelectionDialog, Searchable, SearchableLive, Image, ImageCircle, Duration;
+
+        public static WidgetType getWidgetType(int widget) {
+            switch (widget) {
+                case 0:
+                    return WidgetType.Switch;
+                case 1:
+                    return WidgetType.RadioGroup;
+                case 2:
+                    return WidgetType.SelectionDialog;
+                case 3:
+                    return WidgetType.Searchable;
+                case 4:
+                    return WidgetType.SearchableLive;
+                case 5:
+                    return WidgetType.Image;
+                case 6:
+                    return WidgetType.ImageCircle;
+                case 7:
+                    return WidgetType.Duration;
+            }
+            return null;
+        }
+    }
+
+    public enum FieldType {
+        Text, Boolean, ManyToOne, Chips, Selection, Date, Time, DateTime, Blob, RelationType;
+
+        public static FieldType getTypeValue(int type_val) {
+            switch (type_val) {
+                case 0:
+                    return FieldType.Text;
+                case 1:
+                    return FieldType.Boolean;
+                case 2:
+                    return FieldType.ManyToOne;
+                case 3:
+                    return FieldType.Chips;
+                case 4:
+                    return FieldType.Selection;
+                case 5:
+                    return FieldType.Date;
+                case 6:
+                    return FieldType.DateTime;
+                case 7:
+                    return FieldType.Blob;
+                case 8:
+                    return FieldType.Time;
+            }
+            return FieldType.Text;
+        }
     }
 
     public interface IOnFieldValueChangeListener {

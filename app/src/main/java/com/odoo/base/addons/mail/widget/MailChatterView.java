@@ -108,7 +108,7 @@ public class MailChatterView extends LinearLayout implements
         if (attrs != null) {
             TypedArray types = mContext.obtainStyledAttributes(attrs,
                     R.styleable.MailChatterView);
-            modelName = types.getString(R.styleable.MailChatterView_resModelName);
+            modelName = types.getString(R.styleable.MailChatterView_mcv_resModelName);
             types.recycle();
         }
         setOrientation(VERTICAL);

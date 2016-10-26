@@ -17,7 +17,7 @@
         android:layout_marginRight="@dimen/base_default_8dp"
         android:scaleType="centerCrop"
         android:src="@drawable/base_avatar"
-        app:maskDrawable="@drawable/base_circle_mask" />
+        app:biv_maskDrawable="@drawable/base_circle_mask" />
 
     <LinearLayout
         android:layout_width="match_parent"
