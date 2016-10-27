@@ -73,6 +73,8 @@ import com.odoo.utils.AppPrefs;
 
 import java.util.List;
 
+import odoo.Odoo;
+
 public class OdooActivity extends OdooCompatActivity {
 
     public static final String TAG = OdooActivity.class.getSimpleName();
@@ -125,9 +127,25 @@ public class OdooActivity extends OdooCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /// Edited by Kasim Rangwala
+        /// BEGIN
+
+        mPrefs = new AppPrefs(this);
+        mPrefs.setOdooActivity(TAG);
+        /// END
         Log.i(TAG, "OdooActivity->onCreate");
         mSavedInstanceState = savedInstanceState;
         app = (App) getApplicationContext();
+        /// Edited by Kasim Rangwala
+        /// BEGIN
+
+        app.requestOdoo(new OdooInstanceListener() {
+            @Override
+            public void onOdooInstance(Odoo odoo, odoo.helper.OUser user) {
+                Log.d(TAG, "onOdooInstance() called with: odoo = [" + odoo + "], user = [" + user + "]");
+            }
+        });
+        /// END
         startApp(savedInstanceState);
     }
 

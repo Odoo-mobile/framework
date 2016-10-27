@@ -38,4 +38,12 @@ public class AppPrefs extends BasePrefs {
     public void setSelfHosted(boolean selfHosted) {
         putBoolean(SelfHosted, selfHosted);
     }
+
+    public String whichOdooActivity() {
+        return getString(OdooActivity);
+    }
+
+    public void setOdooActivity(String odooActivity) {
+        putString(OdooActivity, odooActivity);
+    }
 }

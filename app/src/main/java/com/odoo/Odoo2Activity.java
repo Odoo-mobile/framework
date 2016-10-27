@@ -19,6 +19,7 @@ public class Odoo2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPrefs = new AppPrefs(this);
+        mPrefs.setOdooActivity(TAG);
         setContentView(R.layout.activity_odoo2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

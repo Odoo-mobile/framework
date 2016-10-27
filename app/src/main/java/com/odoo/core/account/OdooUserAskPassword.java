@@ -67,6 +67,8 @@ public class OdooUserAskPassword {
                     show();
                 } else {
                     if (password.equals(mUser.getPassword())) {
+                        mOnUserPasswordValidateListener.onSuccess();
+                        dialog.dismiss();
                         /// Added by Kasim Rangwala
                         /// BEGIN
 
@@ -76,13 +78,21 @@ public class OdooUserAskPassword {
                         App app = (App) mContext.getApplicationContext();
                         app.setOdoo(null, mUser);
                         app.checkOdoo();
+                        // Intent intent;
+                        // if (appPrefs.whichOdooActivity().equals(OdooActivity.TAG)) {
+                        //     intent = new Intent(mContext, OdooActivity.class);
+                        // } else {
+                        //     intent = new Intent(mContext, Odoo2Activity.class);
+                        // }
+                        // TaskStackBuilder.create(mContext)
+                        //         .addNextIntent(intent)
+                        //         .startActivities();
                         /// END
-                        mOnUserPasswordValidateListener.onSuccess();
                     } else {
                         mOnUserPasswordValidateListener.onFail();
+                        dialog.dismiss();
                     }
                 }
-                dialog.dismiss();
             }
         });
         builder.setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {

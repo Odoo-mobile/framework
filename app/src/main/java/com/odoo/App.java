@@ -34,7 +34,9 @@ import com.odoo.utils.AppPrefs;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import odoo.Odoo;
 import odoo.handler.OdooVersionException;
@@ -49,33 +51,107 @@ public class App extends Application {
     public static String APPLICATION_NAME;
     private static HashMap<String, Odoo> mOdooInstances = new HashMap<>();
 
+    private AppPrefs mAppPrefs;
+    private List<OdooInstanceListener> mOdooInstanceListeners;
+
     @Override
     public void onCreate() {
         super.onCreate();
         App.APPLICATION_NAME = getPackageManager().getApplicationLabel(getApplicationInfo()).toString();
         Odoo.REQUEST_TIMEOUT_MS = OConstants.RPC_REQUEST_TIME_OUT;
         Odoo.DEFAULT_MAX_RETRIES = OConstants.RPC_REQUEST_RETRIES;
+
+        mAppPrefs = new AppPrefs(this);
+        mOdooInstanceListeners = new ArrayList<>();
+        checkOdoo();
     }
 
+    /**
+     * Switch to requestOdoo() for Asynchronous callback.
+     */
+    @Deprecated
     public Odoo getOdoo(@NonNull OUser user) {
         Log.d(TAG, "getOdoo() called with: user = [" + user + "]");
         if (mOdooInstances.containsKey(user.getAndroidName())) {
             return mOdooInstances.get(user.getAndroidName());
         }
+        Log.e(TAG, "getOdoo: Odoo Instance not found");
         return null;
+    }
+
+
+    public Odoo getOdoo() {
+        return getOdoo(user());
     }
 
     public void setOdoo(Odoo odoo, @NonNull OUser user) {
         Log.d(TAG, "setOdoo() called with: odoo = [" + odoo + "], user = [" + user + "]");
-        if (user != null)
+        if (user != null) {
             mOdooInstances.put(user.getAndroidName(), odoo);
+            if (mOdooInstanceListeners != null) {
+                Log.d(TAG, "setOdoo: mOdooInstanceListeners has length of "
+                        + mOdooInstanceListeners.size());
+                for (OdooInstanceListener mOdooInstanceListener : mOdooInstanceListeners) {
+                    if (mOdooInstanceListener != null) {
+                        try {
+                            mOdooInstanceListener.onOdooInstance(
+                                    odoo, user
+                            );
+                        } catch (Exception e) {
+                            Log.e(TAG, "setOdoo: Callback Exception", e);
+                        }
+                    } else {
+                        Log.e(TAG, "setOdoo: ");
+                    }
+                } // else { Java Language not support else for Ranged For loop
+                //   Log.e(TAG, "setOdoo: mOdooInstanceListeners is 0 length.");
+                // }
+            } else {
+                Log.e(TAG, "setOdoo: list mOdooInstanceListeners is null, initialise it");
+            }
+        } else {
+            Log.e(TAG, "setOdoo: user is null");
+        }
     }
 
     /**
-     * checkOdoo()
+     * instead of calling getOdoo() which returns null.
+     * prefer to call request requestOdoo()
+     * which returns Odoo Instance with Asynchronous interface callback
      */
-    public void requestOdoo() {
-
+    public void requestOdoo(@NonNull OdooInstanceListener odooInstanceListener) {
+        // This method has written only for login with SelfHostedURL
+        // Anyone can edit this for Odoo.com login or OAuth login
+        Log.d(TAG, "requestOdoo() called");
+        if (mOdooInstanceListeners != null
+                && !mOdooInstanceListeners.contains(odooInstanceListener)) {
+            mOdooInstanceListeners.add(odooInstanceListener);
+            if (mAppPrefs.isSelfHosted()) {
+                final OUser user = user();
+                if (user != null) {
+                    final Odoo odoo = getOdoo(user);
+                    if (odoo != null) {
+                        if (odooInstanceListener != null) {
+                            try {
+                                odooInstanceListener.onOdooInstance(
+                                        odoo, user
+                                );
+                            } catch (Exception e) {
+                                Log.e(TAG, "requestOdoo: Callback Exception", e);
+                            }
+                        } else {
+                            Log.e(TAG, "requestOdoo() called with " +
+                                    "odooInstanceListener parameter as null");
+                        }
+                    }
+                } else {
+                    Log.e(TAG, "requestOdoo: current user is null");
+                }
+            } else {
+                Log.e(TAG, "requestOdoo: currently not supported with " +
+                        "Odoo.com login or OAuth login ");
+            }
+        }
     }
 
     /**
@@ -87,8 +163,7 @@ public class App extends Application {
         // This method has written only for login with SelfHostedURL
         // Anyone can edit this for Odoo.com login or OAuth login
         Log.d(TAG, "checkOdoo() called");
-        AppPrefs appPrefs = new AppPrefs(this);
-        if (appPrefs.isSelfHosted()) {
+        if (mAppPrefs.isSelfHosted()) {
             final OUser user = user();
             if (user != null) {
                 if (getOdoo(user) == null) {
