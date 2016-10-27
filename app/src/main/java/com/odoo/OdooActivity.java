@@ -123,16 +123,12 @@ public class OdooActivity extends OdooCompatActivity {
         Log.i(TAG, "OdooActivity->onCreate");
         mSavedInstanceState = savedInstanceState;
         app = (App) getApplicationContext();
-        /// Edited by Kasim Rangwala
-        /// BEGIN
-
         app.requestOdoo(TAG, new OdooInstanceListener() {
             @Override
             public void onOdooInstance(Odoo odoo, odoo.helper.OUser user) {
                 Log.d(TAG, "onOdooInstance() called with: odoo = [" + odoo + "], user = [" + user + "]");
             }
         });
-        /// END
         startApp(savedInstanceState);
     }
 

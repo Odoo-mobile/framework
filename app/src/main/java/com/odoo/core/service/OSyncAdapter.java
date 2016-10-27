@@ -191,12 +191,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                                 && createRelationRecords && model.getLastSyncDateTime() != null)
                             domain.add("&");
                     }
-                    /// Edited by Kasim Rangwala
-                    /// BEGIN
-
                     // int data_limit = preferenceManager.getInt("sync_data_limit", 60);
                     int data_limit = 720;
-                    /// END
                     domain.add("create_date", ">=", ODateUtils.getDateBefore(data_limit));
                     if (serverIds.size() > 0) {
                         domain.add("id", "not in", serverIds);

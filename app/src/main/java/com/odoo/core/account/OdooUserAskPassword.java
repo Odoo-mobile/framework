@@ -69,9 +69,6 @@ public class OdooUserAskPassword {
                     if (password.equals(mUser.getPassword())) {
                         mOnUserPasswordValidateListener.onSuccess();
                         dialog.dismiss();
-                        /// Added by Kasim Rangwala
-                        /// BEGIN
-
                         AppPrefs appPrefs = new AppPrefs(mContext);
                         appPrefs.setUserName(mUser.getUsername());
                         appPrefs.setSelfHosted(!mUser.isOAuthLogin());

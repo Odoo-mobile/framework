@@ -62,10 +62,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     private App mApp;
     private Odoo mOdoo;
 
-    /// Added by Kasim Rangwala
-    /// BEGIN
     private AppPrefs mAppPrefs;
-    /// END
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +86,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                 onRequestAccountSelect();
             }
         }
-        /// Added by Kasim Rangwala
-        /// BEGIN
         mAppPrefs = new AppPrefs(this);
-        /// END
         init();
     }
 
@@ -241,13 +235,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
             return;
         }
         findViewById(R.id.controls).setVisibility(View.GONE);
-        /// Added by Kasim Rangwala
-        /// BEGIN
-
         // Storing username & selHosted into SharedPreference
         mAppPrefs.setUserName(edtUsername.getText().toString());
         mAppPrefs.setSelfHosted(mSelfHostedURL);
-        /// END
         findViewById(R.id.login_progress).setVisibility(View.VISIBLE);
         mLoginProcessStatus.setText(OResource.string(OdooLogin.this,
                 R.string.status_connecting_to_server));

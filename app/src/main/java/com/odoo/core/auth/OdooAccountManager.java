@@ -50,9 +50,6 @@ public class OdooAccountManager {
      * @return List of OUser instances if any
      */
     public static List<OUser> getAllAccounts(Context context) {
-        /// Edit by Kasim Rangwala
-        /// BEGIN
-
         // Added runtime permission checker
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
             List<OUser> users = new ArrayList<>();
@@ -68,7 +65,6 @@ public class OdooAccountManager {
             Log.e(TAG, "getAllAccounts: Manifest.permission.GET_ACCOUNTS is not granted.");
         }
         return null;
-        /// END
     }
 
     /**
@@ -198,8 +194,6 @@ public class OdooAccountManager {
      * @param context
      * @return user object (Instance of OUser class)
      */
-    /// Added by Kasim Rangwala
-    /// BEGIN
     public static OUser getUser(Context context) {
         // getting username from SharedPreference
         String userName = new AppPrefs(context)
@@ -221,7 +215,6 @@ public class OdooAccountManager {
         }
         return null;
     }
-    /// END
 
     /**
      * Returns OUser object with username
