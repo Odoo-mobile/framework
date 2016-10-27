@@ -25,6 +25,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.util.Log;
 
 import com.odoo.core.auth.OdooAccountManager;
@@ -34,9 +35,8 @@ import com.odoo.utils.AppPrefs;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import odoo.Odoo;
 import odoo.handler.OdooVersionException;
@@ -52,7 +52,7 @@ public class App extends Application {
     private static HashMap<String, Odoo> mOdooInstances = new HashMap<>();
 
     private AppPrefs mAppPrefs;
-    private List<OdooInstanceListener> mOdooInstanceListeners;
+    private ArrayMap<String, OdooInstanceListener> mOdooInstanceListeners;
 
     @Override
     public void onCreate() {
@@ -62,7 +62,7 @@ public class App extends Application {
         Odoo.DEFAULT_MAX_RETRIES = OConstants.RPC_REQUEST_RETRIES;
 
         mAppPrefs = new AppPrefs(this);
-        mOdooInstanceListeners = new ArrayList<>();
+        mOdooInstanceListeners = new ArrayMap<>();
         checkOdoo();
     }
 
@@ -79,22 +79,27 @@ public class App extends Application {
         return null;
     }
 
-
+    @Deprecated
     public Odoo getOdoo() {
         return getOdoo(user());
     }
 
     public void setOdoo(Odoo odoo, @NonNull OUser user) {
         Log.d(TAG, "setOdoo() called with: odoo = [" + odoo + "], user = [" + user + "]");
+        //noinspection ConstantConditions
         if (user != null) {
             mOdooInstances.put(user.getAndroidName(), odoo);
             if (mOdooInstanceListeners != null) {
                 Log.d(TAG, "setOdoo: mOdooInstanceListeners has length of "
                         + mOdooInstanceListeners.size());
-                for (OdooInstanceListener mOdooInstanceListener : mOdooInstanceListeners) {
-                    if (mOdooInstanceListener != null) {
+                for (Map.Entry<String, OdooInstanceListener> odooInstanceListenerEntry
+                        : mOdooInstanceListeners.entrySet()) {
+                    Log.d(TAG, "setOdoo: TAG is: " + odooInstanceListenerEntry.getKey());
+                    Log.d(TAG, "setOdoo: OdooInstanceListener is: " + odooInstanceListenerEntry.getValue());
+                    OdooInstanceListener odooInstanceListener = odooInstanceListenerEntry.getValue();
+                    if (odooInstanceListener != null) {
                         try {
-                            mOdooInstanceListener.onOdooInstance(
+                            odooInstanceListener.onOdooInstance(
                                     odoo, user
                             );
                         } catch (Exception e) {
@@ -103,9 +108,7 @@ public class App extends Application {
                     } else {
                         Log.e(TAG, "setOdoo: ");
                     }
-                } // else { Java Language not support else for Ranged For loop
-                //   Log.e(TAG, "setOdoo: mOdooInstanceListeners is 0 length.");
-                // }
+                }
             } else {
                 Log.e(TAG, "setOdoo: list mOdooInstanceListeners is null, initialise it");
             }
@@ -119,18 +122,19 @@ public class App extends Application {
      * prefer to call request requestOdoo()
      * which returns Odoo Instance with Asynchronous interface callback
      */
-    public void requestOdoo(@NonNull OdooInstanceListener odooInstanceListener) {
+    public void requestOdoo(@NonNull String TAG, @NonNull OdooInstanceListener odooInstanceListener) {
         // This method has written only for login with SelfHostedURL
         // Anyone can edit this for Odoo.com login or OAuth login
         Log.d(TAG, "requestOdoo() called");
         if (mOdooInstanceListeners != null
-                && !mOdooInstanceListeners.contains(odooInstanceListener)) {
-            mOdooInstanceListeners.add(odooInstanceListener);
+                && !mOdooInstanceListeners.containsKey(TAG)) {
+            mOdooInstanceListeners.put(TAG, odooInstanceListener);
             if (mAppPrefs.isSelfHosted()) {
                 final OUser user = user();
                 if (user != null) {
                     final Odoo odoo = getOdoo(user);
                     if (odoo != null) {
+                        //noinspection ConstantConditions
                         if (odooInstanceListener != null) {
                             try {
                                 odooInstanceListener.onOdooInstance(
@@ -157,8 +161,6 @@ public class App extends Application {
     /**
      * check for Odoo instance. if Odoo instance is null this will authenticate Odoo instance
      */
-    /// Added by Kasim Rangwala
-    /// BEGIN
     public void checkOdoo() {
         // This method has written only for login with SelfHostedURL
         // Anyone can edit this for Odoo.com login or OAuth login
@@ -173,10 +175,7 @@ public class App extends Application {
             }
         }
     }
-    /// END
 
-    /// Added by Kasim Rangwala
-    /// BEGIN
     private void quickLogin(final OUser user, boolean asynchronous) {
         Log.d(TAG, "quickLogin() called with: user = [" + user + "], asynchronous = [" + asynchronous + "]");
         if (asynchronous) {
@@ -216,10 +215,7 @@ public class App extends Application {
             }
         }
     }
-    /// END
 
-    /// Added by Kasim Rangwala
-    /// BEGIN
     private void webLogin(final OUser user) {
         Log.d(TAG, "webLogin() called with: user = [" + user + "]");
         try {
@@ -251,17 +247,12 @@ public class App extends Application {
             Log.e(TAG, "webLogin() OdooVersionException:", e);
         }
     }
-    /// END
 
-    /// Added by Kasim Rangwala
-    /// BEGIN
+
     public SyncUtils sync() {
         return SyncUtils.get(this);
     }
-    /// END
 
-    /// Added by Kasim Rangwala
-    /// BEGIN
     public OUser user() {
         try {
             return OdooAccountManager.getUser(this);
@@ -270,13 +261,10 @@ public class App extends Application {
         }
         return null;
     }
-    /// END
 
     /**
      * @param o Object returned by callMethod()
      */
-    /// Added by Kasim Rangwala
-    /// BEGIN
     public boolean isResponseSuccessful(Object o) {
         try {
             if (new JSONObject(o.toString()).optJSONArray("result") != null) {
@@ -287,7 +275,6 @@ public class App extends Application {
         }
         return false;
     }
-    /// END
 
     /**
      * Checks for network availability
@@ -307,7 +294,7 @@ public class App extends Application {
     /**
      * Checks for installed application
      *
-     * @param appPackage
+     * @param appPackage PackageName
      * @return true, if application installed on device
      */
     public boolean appInstalled(String appPackage) {

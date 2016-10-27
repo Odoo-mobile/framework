@@ -13,9 +13,6 @@ public class AppPrefs extends BasePrefs {
     private static final String UserName = "UserName";
     private static final String SelfHosted = "SelfHosted";
 
-    // decides one activity b/w OdooActivity & Odoo2Activity
-    private static final String OdooActivity = "OdooActivity";
-
     /**
      * @param context context
      */
@@ -37,13 +34,5 @@ public class AppPrefs extends BasePrefs {
 
     public void setSelfHosted(boolean selfHosted) {
         putBoolean(SelfHosted, selfHosted);
-    }
-
-    public String whichOdooActivity() {
-        return getString(OdooActivity);
-    }
-
-    public void setOdooActivity(String odooActivity) {
-        putString(OdooActivity, odooActivity);
     }
 }

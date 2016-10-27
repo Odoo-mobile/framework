@@ -78,16 +78,6 @@ public class OdooUserAskPassword {
                         App app = (App) mContext.getApplicationContext();
                         app.setOdoo(null, mUser);
                         app.checkOdoo();
-                        // Intent intent;
-                        // if (appPrefs.whichOdooActivity().equals(OdooActivity.TAG)) {
-                        //     intent = new Intent(mContext, OdooActivity.class);
-                        // } else {
-                        //     intent = new Intent(mContext, Odoo2Activity.class);
-                        // }
-                        // TaskStackBuilder.create(mContext)
-                        //         .addNextIntent(intent)
-                        //         .startActivities();
-                        /// END
                     } else {
                         mOnUserPasswordValidateListener.onFail();
                         dialog.dismiss();

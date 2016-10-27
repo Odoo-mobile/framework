@@ -69,7 +69,6 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.drawer.DrawerUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.utils.AppPrefs;
 
 import java.util.List;
 
@@ -118,28 +117,16 @@ public class OdooActivity extends OdooCompatActivity {
         }
     };
 
-    /// Edited by Kasim Rangwala
-    /// BEGIN
-
-    private AppPrefs mPrefs;
-    /// END
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /// Edited by Kasim Rangwala
-        /// BEGIN
-
-        mPrefs = new AppPrefs(this);
-        mPrefs.setOdooActivity(TAG);
-        /// END
         Log.i(TAG, "OdooActivity->onCreate");
         mSavedInstanceState = savedInstanceState;
         app = (App) getApplicationContext();
         /// Edited by Kasim Rangwala
         /// BEGIN
 
-        app.requestOdoo(new OdooInstanceListener() {
+        app.requestOdoo(TAG, new OdooInstanceListener() {
             @Override
             public void onOdooInstance(Odoo odoo, odoo.helper.OUser user) {
                 Log.d(TAG, "onOdooInstance() called with: odoo = [" + odoo + "], user = [" + user + "]");
