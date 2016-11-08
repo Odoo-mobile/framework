@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/dialogHeader"
         android:layout_width="match_parent"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:background="@color/base_theme_secondary_dark"
         android:gravity="center_vertical"
-        android:background="@color/theme_secondary_dark"
-        android:layout_height="wrap_content">
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/recordName"
-            android:textColor="#fff"
-            android:padding="@dimen/default_16dp"
-            android:fontFamily="@string/font_normal"
-            android:textStyle="bold"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:ellipsize="end"
+            android:fontFamily="@string/base_font_normal"
+            android:padding="@dimen/base_default_16dp"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#fff"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -34,48 +34,48 @@
         android:fillViewport="true">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/messageSubject"
-                android:padding="@dimen/default_16dp"
-                android:hint="Subject"
-                android:background="@android:color/transparent"
-                android:textAppearance="?android:textAppearanceMedium"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="Subject"
+                android:padding="@dimen/base_default_16dp"
+                android:textAppearance="?android:textAppearanceMedium" />
 
-            <View style="@style/ViewSeparator" />
+            <View style="@style/OdooViewSeparator" />
 
             <EditText
-                android:padding="@dimen/default_16dp"
-                android:gravity="top"
-                android:textAppearance="?android:textAppearanceMedium"
                 android:id="@+id/messageBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:gravity="top"
                 android:hint="Message"
                 android:minLines="10"
-                android:background="@android:color/transparent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:padding="@dimen/base_default_16dp"
+                android:textAppearance="?android:textAppearanceMedium" />
 
 
         </LinearLayout>
     </ScrollView>
 
-    <View style="@style/ViewSeparator" />
+    <View style="@style/OdooViewSeparator" />
 
     <TextView
         android:id="@+id/btnAttachment"
-        android:padding="@dimen/default_16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:textColor="@color/android_blue_dark"
-        android:fontFamily="@string/font_condensed"
+        android:fontFamily="@string/base_font_condensed"
+        android:padding="@dimen/base_default_16dp"
         android:text="@string/label_attach_a_file"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:textColor="@color/base_android_blue_dark" />
 
     <HorizontalScrollView
         android:layout_width="wrap_content"
@@ -83,55 +83,55 @@
 
         <LinearLayout
             android:id="@+id/attachmentsList"
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
 
         </LinearLayout>
 
     </HorizontalScrollView>
 
-    <View style="@style/ViewSeparator" />
+    <View style="@style/OdooViewSeparator" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:showDividers="middle"
         android:divider="?android:attr/dividerVertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:showDividers="middle">
 
 
         <Button
             android:id="@+id/btnSend"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:fontFamily="@string/font_normal"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="?android:selectableItemBackground"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center"
-            android:padding="@dimen/default_16dp"
+            android:padding="@dimen/base_default_16dp"
             android:text="@string/label_send"
             android:textAllCaps="true"
-            android:textStyle="bold"
-            android:textColor="@color/body_text_1"
-            android:textSize="@dimen/text_size_medium" />
+            android:textColor="@color/base_body_text_1"
+            android:textSize="@dimen/base_text_size_medium"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnCancel"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="?android:selectableItemBackground"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center"
-            android:fontFamily="@string/font_normal"
-            android:padding="@dimen/default_16dp"
+            android:padding="@dimen/base_default_16dp"
             android:text="@string/label_cancel"
             android:textAllCaps="true"
-            android:textColor="@color/body_text_1"
-            android:textSize="@dimen/text_size_medium" />
+            android:textColor="@color/base_body_text_1"
+            android:textSize="@dimen/base_text_size_medium" />
 
     </LinearLayout>
 </LinearLayout>

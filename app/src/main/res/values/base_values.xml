@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <string name="label_accounts_settings">@string/app_name</string>
+    <string name="label_login">Login</string>
+    <string name="label_accept_login">Accept &amp; Login</string>
+    <string name="label_your_self_hosted_url">Your self-hosted URL</string>
+    <string name="label_username">Username</string>
+    <string name="label_username_or_email">Username or email</string>
+    <string name="label_password">Password</string>
+    <string name="label_forgot_password">Forgot password?</string>
+    <string name="label_add_self_hosted_url">Add self-hosted URL</string>
+    <string name="label_login_with_odoo">Login with Odoo.com</string>
+    <string name="label_create_account">Create account</string>
+    <string name="label_select_database">Select Database</string>
+    <string name="title_ssl_warning">SSL Warning</string>
+    <string name="untrusted_ssl_warning">The site\'s security certificate is not trusted !</string>
+    <string name="error_invalid_odoo_url">Invalid Odoo URL !</string>
+    <string name="error_invalid_username_or_password">Invalid Username or Password</string>
+    <string name="error_invalid_password">Invalid password</string>
+    <string name="error_provide_username">Provide username</string>
+    <string name="error_provide_password">Provide password</string>
+    <string name="error_provide_server_url">Provide server URL</string>
+    <string name="status_connecting_to_server">Connecting&#8230;</string>
+    <string name="status_connected_to_server">Connected</string>
+    <string name="status_logging_in">Logging in&#8230;</string>
+    <string name="status_logging_in_with_instance">Logging in to instance&#8230;</string>
+    <string name="status_login_success">Login Success</string>
+    <string name="status_logout_success">Logout Success</string>
+    <string name="status_creating_account">Creating account</string>
+    <string name="status_getting_instances">Getting instances&#8230;</string>
+    <string name="status_redirecting">Redirecting&#8230;</string>
+    <string name="title_instance_expired">Instance Expired</string>
+    <string name="label_select_instance">Select Instance</string>
+    <string name="label_select_user">Login to User</string>
+    <string name="label_accounts">Accounts</string>
+    <string name="label_settings">Settings</string>
+    <string name="label_save">Save</string>
+    <string name="label_edit">Edit</string>
+    <string name="label_required">required</string>
+    <string name="label_more">More</string>
+    <string name="label_alert">Alert</string>
+    <string name="label_warning">Warning</string>
+    <string name="label_error">Error</string>
+    <string name="label_share">Share</string>
+    <string name="label_import_contact">Import</string>
+    <string name="label_address">Address</string>
+    <string name="label_reply">Reply</string>
+    <string name="label_close">Close</string>
+    <string name="label_send">Send</string>
+
+    <string name="sync_label_customers">Customers</string>
+    <string name="toast_information_saved">Information Saved</string>
+    <string name="toast_image_size_too_large">Image size too large !</string>
+    <string name="label_no_customer_found">No Customer Found !</string>
+    <string name="message_to">Message to %s</string>
+    <string name="add_internal_note">Add and internal note</string>
+    <string name="internal_note_hint">Add an internal note that will not be sent to the followers</string>
+    <string name="label_log_note">Log note</string>
+    <string name="label_send_message"><u>Send a message</u></string>
+    <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
+    <string name="label_version_build">Build</string>
+    <string name="toast_permission_download_storage">Storage permission required to create downloaded file on your sdcard.</string>
+    <string name="toast_permission_download_storage_help">Storage permission required to store downloaded files on sdcard of your phone. Please grant permission for use this feature</string>
+    <string name="alert_permission_help">Some of permission required to start application. Please grant permission from application settings.</string>
+    <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
+    <string name="toast_record_deleted">Record deleted</string>
+
+    <!-- package warning -->
+    <string name="changes_required">Changes required in \n<b>app/build.gradle</b> for</string>
+    <string name="label_app_name">Application Name</string>
+    <string name="label_package_name">Application Id</string>
+    <string name="label_dialog_disappear">Panel will disappear when configuration changed.</string>
+    <!-- Drawer -->
+    <string name="label_drawer_account_add_account">Add Account</string>
+    <string name="label_drawer_account_manage_accounts">Manage Accounts</string>
+    <!-- Common Labels -->
+    <string name="title_application_settings">"Application Settings"</string>
+    <string name="title_select_account">"Select Account"</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_general_settings">General Settings</string>
+    <string name="title_accounts">Accounts</string>
+    <string name="title_about">About</string>
+    <string name="title_confirm">Confirm</string>
+    <string name="title_user_profile">Odoo User Profile</string>
+    <string name="title_configuration">Configuration</string>
+    <string name="title_refresh_details">Refresh Details</string>
+    <string name="title_add_account">Add Account</string>
+    <string name="title_working">Working&#8230;</string>
+    <string name="title_please_wait">Please wait&#8230;</string>
+    <string name="label_new">New</string>
+    <string name="label_ok">OK</string>
+    <string name="label_yes">Yes</string>
+    <string name="label_no">No</string>
+    <string name="label_search">Search</string>
+    <string name="label_delete">Delete</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="label_logout">Logout</string>
+    <string name="label_version">Version</string>
+    <string name="label_update_info">Update Info</string>
+    <string name="label_process_anyway">Process Anyway</string>
+    <string name="label_read_more">Read More</string>
+    <string name="label_read_less">Read Less</string>
+    <string name="label_no_records_found">No Records Found</string>
+    <string name="label_odoo_mobile_on_github">Odoo Mobile on GitHub</string>
+    <string name="label_odoo_developer_mode">Developer Mode</string>
+    <string name="label_export_db">Export Database</string>
+    <string name="label_our_apps">Our apps</string>
+    <string name="label_attach_a_file"> + Attach a file</string>
+    <string name="label_be_patient_we_are_configuring_account_update">Be patient, We are configuring your account updates</string>
+    <!-- Toasts -->
+    <string name="developer_2_tap">Need 2 tap for developer mode</string>
+    <string name="developer_5_tap">Developer mode activated</string>
+    <string name="toast_setting_saved">Setting saved.</string>
+    <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
+    <string name="toast_are_you_sure_delete_account">Are you sure want to delete account ?</string>
+    <string name="toast_user_already_exists">User already exists</string>
+    <string name="toast_network_required">Network required</string>
+    <string name="toast_account_removed">Account Removed Successfully</string>
+    <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
+    <string name="toast_updating_password">Updating password</string>
+    <string name="toast_something_gone_wrong">Something gone wrong</string>
+    <!-- Setting pref strings -->
+    <string-array name="syncInterval">
+        <item name="5">Every 5 minutes</item>
+        <item name="10">Every 10 minutes</item>
+        <item name="20">Every 20 minutes</item>
+        <item name="40">Every 40 minutes</item>
+        <item name="60">Every 60 minutes</item>
+        <item name="1440">Once in a day</item>
+    </string-array>
+    <string-array name="syncIntervalValues">
+        <item name="5">5</item>
+        <item name="10">10</item>
+        <item name="20">20</item>
+        <item name="40">40</item>
+        <item name="60">60</item>
+        <item name="1440">1440</item>
+    </string-array>
+    <string-array name="syncDataLimit">
+        <item name="30">1 month old</item>
+        <item name="60">2 months old</item>
+        <item name="90">3 months old</item>
+        <item name="180">6 months old</item>
+        <item name="360">12 months old</item>
+    </string-array>
+    <string-array name="syncDataLimitValues">
+        <item name="30">30</item>
+        <item name="60">60</item>
+        <item name="90">90</item>
+        <item name="180">180</item>
+        <item name="360">360</item>
+    </string-array>
+    <string name="general_settings">General Settings</string>
+    <string name="application_settings_summary">Sync settings, Interval settings, sync data limit, and more</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="add_account">Add Account</string>
+    <string name="summary_about_odoo_mobile">Odoo Mobile</string>
+    <string name="build_version">Build Version</string>
+    <string name="label_powered_by">Powered by</string>
+    <string name="odoo_mobile_framework">Odoo Mobile framework</string>
+    <string name="supported_versions">Supported versions</string>
+    <string name="supported_versions_names">Odoo 7.0+</string>
+    <string name="label_access_odoo_mobile">Connect Odoo Mobile</string>
+    <!-- About Company Fragment Strings -->
+    <string name="about_Company_line1">Copyright © 2004-TODAY Odoo SA. All Rights Reserved.</string>
+    <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>
+    <string name="about_Company_line3">Licenced under the terms of <a href="http://www.gnu.org/licenses/agpl.html/">GNU Affero General Public License</a></string>
+    <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
+    <string name="app_version_name">Version</string>
+    <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
+    <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.com/">Terms of Service</a> and <a href="http://www.odoo.com/">Privacy Policy</a></string>
+
+    <bool name="baseAtLeastKitKat">false</bool>
+
+    <color name="base_list_divider">#ddd</color>
+
+    <!-- Odoo Theme Colors -->
+
+    <color name="base_primary">#a24689</color>
+    <color name="base_secondary">#8f8f8f</color>
+    <color name="base_optional">#21b799</color>
+
+    <!-- Drawer Colors -->
+    <color name="base_drawer_text_color">#282828</color>
+    <color name="base_drawer_text_color_selected">#414141</color>
+    <color name="base_drawer_icon_tint">#808080</color>
+    <color name="base_drawer_icon_tint_selected">#414141</color>
+    <color name="base_drawer_focused">#f3f3f3</color>
+    <color name="base_drawer_pressed">#EBEBEB</color>
+    <color name="base_drawer_background">#ffffffff</color>
+    <color name="base_drawer_separator_text_color">#acacac</color>
+    <color name="base_drawer_separator_background">#e5e5e5</color>
+
+    <!-- Android Style Colors -->
+    <color name="base_android_blue">#33B5E5</color>
+    <color name="base_android_blue_dark">#0099CC</color>
+    <color name="base_android_violet">#AA66CC</color>
+    <color name="base_android_violet_dark">#9933CC</color>
+    <color name="base_android_green">#99CC00</color>
+    <color name="base_android_green_dark">#669900</color>
+    <color name="base_android_orange">#FFBB33</color>
+    <color name="base_android_orange_dark">#FF8800</color>
+    <color name="base_android_red">#FF4444</color>
+    <color name="base_android_red_dark">#CC0000</color>
+
+    <color name="base_control_focused">#e5e5e5</color>
+    <color name="base_control_pressed">#acacac</color>
+
+
+    <array name="base_letter_tile_colors">
+        <item>@color/base_android_blue</item>
+        <item>@color/base_android_violet_dark</item>
+        <item>@color/base_android_red</item>
+        <item>@color/base_android_green_dark</item>
+        <item>@color/base_android_blue_dark</item>
+        <item>@color/base_android_orange</item>
+        <item>@color/base_android_red_dark</item>
+        <item>@color/base_android_violet</item>
+        <item>@color/base_android_green</item>
+        <item>@color/base_android_orange_dark</item>
+    </array>
+
+    <color name="base_icon_tint">#5e5e5e</color>
+    <color name="base_actionbar_spinner_text_color">#414141</color>
+
+    <color name="base_chatter_view_background">#f3f3f3</color>
+    <color name="base_chatter_view_note_background">#dadada</color>
+
+    <color name="base_translucent_scrim_top">#26000000</color>
+    <color name="base_translucent_scrim_top_center">#0C000000</color>
+    <color name="base_translucent_scrim_bottom">#2A000000</color>
+    <color name="base_translucent_scrim_bottom_center">#0D000000</color>
+
+    <dimen name="base_default_4dp">4dp</dimen>
+    <dimen name="base_default_8dp">8dp</dimen>
+    <dimen name="base_default_16dp">16dp</dimen>
+    <dimen name="base_default_48dp">48dp</dimen>
+    <dimen name="base_app_bar_top_padding">0dp</dimen>
+
+    <!-- Fonts -->
+    <string name="base_font_normal">sans-serif</string>
+    <string name="base_font_light">sans-serif-light</string>
+    <string name="base_font_condensed">sans-serif-condensed</string>
+
+    <!-- Text colors -->
+    <color name="base_body_text_1">#de000000</color>
+    <color name="base_body_text_2">#8a000000</color>
+    <color name="base_body_text_3">#60000000</color>
+    <color name="base_body_text_disabled">#44000000</color>
+    <color name="base_body_text_1_inverse">#deffffff</color>
+    <color name="base_body_text_2_inverse">#8affffff</color>
+
+    <!-- Text Sizes -->
+    <dimen name="base_text_size_xsmall">11sp</dimen>
+    <dimen name="base_text_size_xxsmall">10sp</dimen>
+    <dimen name="base_text_size_small">12sp</dimen>
+    <dimen name="base_text_size_medium">14sp</dimen>
+    <dimen name="base_text_size_xmedium">16sp</dimen>
+    <dimen name="base_text_size_large">18sp</dimen>
+    <dimen name="base_text_size_xlarge">20sp</dimen>
+    <dimen name="base_text_size_xxlarge">25sp</dimen>
+
+    <color name="base_theme_primary">#3F51B5</color>
+    <color name="base_theme_primary_dark">#303F9F</color>
+    <color name="base_theme_primary_medium">#7986CB</color>
+    <color name="base_theme_primary_light">#C5CAE9</color>
+    <color name="base_theme_accent">#FFC107</color>
+    <color name="base_theme_secondary">#795548</color>
+    <color name="base_theme_secondary_dark">#5D4037</color>
+    <color name="base_theme_secondary_light">#D7CCC8</color>
+
+    <color name="base_colorPrimary">@color/base_theme_primary</color>
+    <color name="base_colorPrimaryDark">@color/base_theme_primary_dark</color>
+    <color name="base_colorAccent">@color/base_theme_accent</color>
+
+    <color name="base_theme_text_white">#ffffff</color>
+    <color name="base_theme_primary_text">#212121</color>
+    <color name="base_theme_secondary_text">#727272</color>
+    <color name="base_theme_divider">#B6B6B6</color>
+
+    <!-- Drawer Properties -->
+    <color name="baseDrawerDefaultBackgroundColor">#ffffff</color>
+    <dimen name="baseDrawerDefaultWidth">280dp</dimen>
+    <dimen name="baseDrawerAccountBottomPadding">16dp</dimen>
+    <dimen name="baseDrawerAvatarWidthHeight">80dp</dimen>
+
+    <!-- Dimensions -->
+    <dimen name="baseStatusBarHeight">0dp</dimen>
+
+    <!-- Booleans -->
+    <bool name="baseFitToScreenWindow">true</bool>
+
+    <!-- Base application theme. -->
+    <style name="OdooTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/base_colorPrimary</item>
+        <item name="colorPrimaryDark">@color/base_colorPrimaryDark</item>
+        <item name="colorAccent">@color/base_colorAccent</item>
+    </style>
+
+    <style name="OdooTheme" parent="OdooTheme.Base">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="OdooAppBar.Dark" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+
+    <!-- FIXME: Replace toolbar with appbar.. -->
+    <style name="OdooToolBarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="homeAsUpIndicator">@drawable/ic_action_navigation_menu</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_action_navigation_menu</item>
+    </style>
+
+    <style name="OdooStatusBarView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/baseStatusBarHeight</item>
+        <item name="android:background">@color/base_colorPrimaryDark</item>
+    </style>
+
+    <style name="OdooViewSeparator">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">#cccccc</item>
+    </style>
+
+    <declare-styleable name="BezelImageView">
+        <attr name="biv_maskDrawable" format="reference" />
+        <attr name="biv_borderDrawable" format="reference" />
+        <attr name="biv_desaturateOnPress" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="ODrawerScrollView">
+        <attr name="dsv_insetForeground" format="reference|color" />
+    </declare-styleable>
+
+    <!-- Custom Controls -->
+    <declare-styleable name="OField">
+        <attr name="fieldName" format="string" />
+        <attr name="fieldIconResource" format="reference" />
+        <attr name="fieldShowIcon" format="boolean" />
+        <attr name="fieldShowLabel" format="boolean" />
+        <attr name="fieldIconTint" format="reference|color" />
+        <attr name="fieldParsePattern" format="string" />
+        <attr name="fieldWithOutSidePadding" format="boolean" />
+        <attr name="fieldType">
+            <enum name="Text" value="0" />
+            <enum name="Boolean" value="1" />
+            <enum name="ManyToOne" value="2" />
+            <enum name="Chips" value="3" />
+            <enum name="Selection" value="4" />
+            <enum name="Date" value="5" />
+            <enum name="DateTime" value="6" />
+            <enum name="Blob" value="7" />
+            <enum name="Time" value="8" />
+        </attr>
+        <attr name="fieldWidgetType">
+            <enum name="Switch" value="0" />
+            <enum name="RadioGroup" value="1" />
+            <enum name="SelectionDialog" value="2" />
+            <enum name="Searchable" value="3" />
+            <enum name="SearchableLive" value="4" />
+            <enum name="Image" value="5" />
+            <enum name="ImageCircle" value="6" />
+            <enum name="Duration" value="7" />
+        </attr>
+        <attr name="fieldWidgetImageSize" format="dimension" />
+        <attr name="fieldWithBottomPadding" format="boolean" />
+        <attr name="fieldWithTopPadding" format="boolean" />
+        <attr name="fieldControlLabel" format="string|reference" />
+        <attr name="fieldDefaultValue" format="reference|string" />
+        <attr name="fieldDefaultImage" format="reference" />
+        <attr name="fieldValueArray" format="reference" />
+        <attr name="fieldTextAppearance" format="reference" />
+        <attr name="fieldTextSize" format="dimension" />
+        <attr name="fieldTextColor" format="color" />
+        <attr name="fieldLabelColor" format="color" />
+        <attr name="fieldLabelTextAppearance" format="reference" />
+        <attr name="fieldLabelSize" format="dimension" />
+    </declare-styleable>
+    <declare-styleable name="OForm">
+        <attr name="formEditableMode" format="boolean" />
+        <attr name="formModelName" format="string" />
+        <attr name="formAutoUIGenerate" format="boolean" />
+        <attr name="formControlIconTint" format="color" />
+    </declare-styleable>
+    <declare-styleable name="FloatingActionButton">
+        <attr name="fab_drawable" format="integer" />
+        <attr name="fab_fabColor" format="color" />
+        <attr name="fab_shadowRadius" format="float" />
+        <attr name="fab_shadowDx" format="float" />
+        <attr name="fab_shadowDy" format="float" />
+        <attr name="fab_shadowColor" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="MailChatterView">
+        <attr name="mcv_resModelName" format="string" />
+    </declare-styleable>
+
+</resources>

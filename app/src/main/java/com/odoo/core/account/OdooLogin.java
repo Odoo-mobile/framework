@@ -31,6 +31,7 @@ import com.odoo.core.support.OdooUserLoginSelectorDialog;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.datas.OConstants;
+import com.odoo.utils.AppPrefs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,8 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     private App mApp;
     private Odoo mOdoo;
 
+    private AppPrefs mAppPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +86,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                 onRequestAccountSelect();
             }
         }
+        mAppPrefs = new AppPrefs(this);
         init();
     }
 
@@ -231,6 +235,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
             return;
         }
         findViewById(R.id.controls).setVisibility(View.GONE);
+        // Storing username & selHosted into SharedPreference
+        mAppPrefs.setUserName(edtUsername.getText().toString());
+        mAppPrefs.setSelfHosted(mSelfHostedURL);
         findViewById(R.id.login_progress).setVisibility(View.VISIBLE);
         mLoginProcessStatus.setText(OResource.string(OdooLogin.this,
                 R.string.status_connecting_to_server));

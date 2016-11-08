@@ -2,13 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.odoo.core.account.AppIntro"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    tools:context="com.odoo.core.account.AppIntro">
 
     <com.odoo.widgets.slider.SliderView
+        android:id="@+id/sliderView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/sliderView">
+        android:layout_height="match_parent">
 
     </com.odoo.widgets.slider.SliderView>
 

@@ -56,6 +56,59 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
     private IOnSearchViewChangeListener mOnSearchViewChangeListener;
     private SearchView mSearchView;
     private FloatingActionButton mFab = null;
+    private SyncStatusObserver mSyncStatusObserver = new SyncStatusObserver() {
+        /** Callback invoked with the sync adapter status changes. */
+        @Override
+        public void onStatusChanged(int which) {
+            boolean refreshing = false;
+            switch (which) {
+                case ContentResolver.SYNC_OBSERVER_TYPE_PENDING:
+                case ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE:
+                    refreshing = true;
+            }
+            final boolean finalRefreshing = refreshing;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSyncStatusObserverListener.onStatusChange(finalRefreshing);
+                }
+            });
+        }
+    };
+    private SearchView.OnCloseListener closeListener = new SearchView.OnCloseListener() {
+
+        @Override
+        public boolean onClose() {
+            // Restore the SearchView if a query was entered
+            if (!TextUtils.isEmpty(mSearchView.getQuery())) {
+                mSearchView.setQuery(null, true);
+            }
+            mOnSearchViewChangeListener.onSearchViewClose();
+            return true;
+        }
+    };
+    private SearchView.OnQueryTextListener searchViewQueryListener = new SearchView.OnQueryTextListener() {
+
+        public boolean onQueryTextChange(String newText) {
+            String newFilter = !TextUtils.isEmpty(newText) ? newText : null;
+            return mOnSearchViewChangeListener
+                    .onSearchViewTextChange(newFilter);
+        }
+
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            // Don't care about this.
+            return true;
+        }
+    };
+    private ISyncFinishReceiver syncFinishReceiver = new ISyncFinishReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            hideRefreshingProgress();
+            if (mSyncStatusObserverListener != null)
+                mSyncStatusObserverListener.onStatusChange(false);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,36 +159,15 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
         syncStatusObserverModel = model;
     }
 
-    private SyncStatusObserver mSyncStatusObserver = new SyncStatusObserver() {
-        /** Callback invoked with the sync adapter status changes. */
-        @Override
-        public void onStatusChanged(int which) {
-            boolean refreshing = false;
-            switch (which) {
-                case ContentResolver.SYNC_OBSERVER_TYPE_PENDING:
-                case ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE:
-                    refreshing = true;
-            }
-            final boolean finalRefreshing = refreshing;
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSyncStatusObserverListener.onStatusChange(finalRefreshing);
-                }
-            });
-        }
-    };
-
-
     // Swipe refresh view
     public void setHasSwipeRefreshView(View parent, int resource_id,
                                        SwipeRefreshLayout.OnRefreshListener listener) {
         mSwipeRefresh = (SwipeRefreshLayout) parent.findViewById(resource_id);
         mSwipeRefresh.setOnRefreshListener(listener);
-        mSwipeRefresh.setColorSchemeResources(R.color.android_blue,
-                R.color.android_green,
-                R.color.android_orange_dark,
-                R.color.android_red);
+        mSwipeRefresh.setColorSchemeResources(R.color.base_android_blue,
+                R.color.base_android_green,
+                R.color.base_android_orange_dark,
+                R.color.base_android_red);
     }
 
     public void setSwipeRefreshing(boolean refreshing) {
@@ -214,34 +246,6 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
         }
     }
 
-    private SearchView.OnCloseListener closeListener = new SearchView.OnCloseListener() {
-
-        @Override
-        public boolean onClose() {
-            // Restore the SearchView if a query was entered
-            if (!TextUtils.isEmpty(mSearchView.getQuery())) {
-                mSearchView.setQuery(null, true);
-            }
-            mOnSearchViewChangeListener.onSearchViewClose();
-            return true;
-        }
-    };
-
-    private SearchView.OnQueryTextListener searchViewQueryListener = new SearchView.OnQueryTextListener() {
-
-        public boolean onQueryTextChange(String newText) {
-            String newFilter = !TextUtils.isEmpty(newText) ? newText : null;
-            return mOnSearchViewChangeListener
-                    .onSearchViewTextChange(newFilter);
-        }
-
-        @Override
-        public boolean onQueryTextSubmit(String query) {
-            // Don't care about this.
-            return true;
-        }
-    };
-
     public void setHasFloatingButton(View view, int res_id, ListView list,
                                      View.OnClickListener clickListener) {
         mFab = (FloatingActionButton) view.findViewById(res_id);
@@ -263,15 +267,6 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
             mFab.setVisibility(View.VISIBLE);
         }
     }
-
-    private ISyncFinishReceiver syncFinishReceiver = new ISyncFinishReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            hideRefreshingProgress();
-            if (mSyncStatusObserverListener != null)
-                mSyncStatusObserverListener.onStatusChange(false);
-        }
-    };
 
     public void startFragment(Fragment fragment, Boolean addToBackState, Bundle extra) {
         parent().loadFragment(fragment, addToBackState, extra);

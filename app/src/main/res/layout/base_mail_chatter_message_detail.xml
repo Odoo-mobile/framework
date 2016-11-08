@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/recordName"
-        android:textColor="#fff"
-        android:padding="@dimen/default_16dp"
-        android:background="@color/android_blue_dark"
-        android:fontFamily="@string/font_normal"
-        android:textStyle="bold"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/base_android_blue_dark"
+        android:fontFamily="@string/base_font_normal"
+        android:padding="@dimen/base_default_16dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#fff"
+        android:textStyle="bold" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -23,72 +23,72 @@
         android:fillViewport="true">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:paddingTop="@dimen/default_8dp"
-                android:paddingBottom="@dimen/default_8dp"
-                android:paddingLeft="@dimen/default_16dp"
-                android:paddingRight="@dimen/default_16dp"
+                android:layout_height="wrap_content"
                 android:background="#fff"
                 android:orientation="horizontal"
-                android:layout_height="wrap_content">
+                android:paddingBottom="@dimen/base_default_8dp"
+                android:paddingLeft="@dimen/base_default_16dp"
+                android:paddingRight="@dimen/base_default_16dp"
+                android:paddingTop="@dimen/base_default_8dp">
 
                 <odoo.controls.BezelImageView
                     android:id="@+id/author_image"
                     android:layout_width="40dp"
-                    app:maskDrawable="@drawable/circle_mask"
-                    android:layout_height="40dp" />
+                    android:layout_height="40dp"
+                    app:biv_maskDrawable="@drawable/base_circle_mask" />
 
                 <LinearLayout
                     android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:paddingLeft="@dimen/default_8dp"
                     android:orientation="vertical"
-                    android:layout_height="wrap_content">
+                    android:paddingLeft="@dimen/base_default_8dp">
 
                     <TextView
                         android:id="@+id/authorName"
-                        android:textColor="@color/body_text_2"
-                        android:fontFamily="@string/font_condensed"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@string/base_font_condensed"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/base_body_text_2" />
 
                     <TextView
                         android:id="@+id/messageDate"
-                        android:textColor="@color/body_text_3"
-                        android:fontFamily="@string/font_condensed"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@string/base_font_condensed"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/base_body_text_3" />
                 </LinearLayout>
             </LinearLayout>
 
 
             <TextView
                 android:id="@+id/messageSubject"
-                android:textColor="@color/body_text_1"
-                android:textStyle="bold"
-                android:padding="@dimen/default_16dp"
-                android:background="#fff"
-                android:fontFamily="@string/font_normal"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:fontFamily="@string/base_font_normal"
+                android:padding="@dimen/base_default_16dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/base_body_text_1"
+                android:textStyle="bold" />
 
-            <View style="@style/ViewSeparator" />
+            <View style="@style/OdooViewSeparator" />
 
             <WebView
                 android:id="@+id/messageBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
-                android:background="@android:color/transparent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:background="@android:color/transparent">
 
             </WebView>
 
@@ -97,60 +97,60 @@
     </ScrollView>
 
     <HorizontalScrollView
-        android:padding="@dimen/default_8dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="@dimen/base_default_8dp">
 
         <LinearLayout
             android:id="@+id/attachmentsList"
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
         </LinearLayout>
 
     </HorizontalScrollView>
 
-    <View style="@style/ViewSeparator" />
+    <View style="@style/OdooViewSeparator" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:showDividers="middle"
         android:divider="?android:attr/dividerVertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:showDividers="middle">
 
 
         <Button
             android:id="@+id/btnReply"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:fontFamily="@string/font_normal"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="?android:selectableItemBackground"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center"
-            android:padding="@dimen/default_16dp"
+            android:padding="@dimen/base_default_16dp"
             android:text="@string/label_reply"
             android:textAllCaps="true"
-            android:textStyle="bold"
-            android:textColor="@color/body_text_1"
-            android:textSize="@dimen/text_size_medium" />
+            android:textColor="@color/base_body_text_1"
+            android:textSize="@dimen/base_text_size_medium"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnClose"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="?android:selectableItemBackground"
+            android:fontFamily="@string/base_font_normal"
             android:gravity="center"
-            android:fontFamily="@string/font_normal"
-            android:padding="@dimen/default_16dp"
+            android:padding="@dimen/base_default_16dp"
             android:text="@string/label_close"
             android:textAllCaps="true"
-            android:textColor="@color/body_text_1"
-            android:textSize="@dimen/text_size_medium" />
+            android:textColor="@color/base_body_text_1"
+            android:textSize="@dimen/base_text_size_medium" />
 
     </LinearLayout>
 </LinearLayout>

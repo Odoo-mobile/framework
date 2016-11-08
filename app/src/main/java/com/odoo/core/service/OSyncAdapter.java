@@ -84,6 +84,35 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         init(context, model, service);
     }
 
+    public static Odoo createOdooInstance(final Context context, final OUser user) {
+        final App app = (App) context.getApplicationContext();
+        Odoo odoo = app.getOdoo(user);
+        try {
+            if (odoo == null) {
+                odoo = Odoo.createQuickInstance(context, (user.isOAuthLogin())
+                        ? user.getInstanceURL() : user.getHost());
+                odoo.helper.OUser mUser =
+                        odoo.authenticate(user.getUsername(), user.getPassword(), (user.isOAuthLogin()) ?
+                                user.getInstanceDatabase() : user.getDatabase());
+                app.setOdoo(odoo, user);
+                if (mUser != null) {
+                    ResCompany company = new ResCompany(context, user);
+                    if (company.count("id = ? ", new String[]{user.getCompanyId() + ""}) <= 0) {
+                        ODataRow company_details = new ODataRow();
+                        company_details.put("id", user.getCompanyId());
+                        company.quickCreateRecord(company_details);
+                    }
+                } else {
+                    // FIXME: Unable to get user object or may be due session destroyed with Odoo Saas (single connection support only)
+                    Log.e(TAG, OResource.string(context, R.string.toast_something_gone_wrong));
+                }
+            }
+        } catch (OdooVersionException e) {
+            e.printStackTrace();
+        }
+        return odoo;
+    }
+
     private void init(Context context, Class<? extends OModel> model, OSyncService service) {
         mContext = context;
         mModelClass = model;
@@ -163,7 +192,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                                 && createRelationRecords && model.getLastSyncDateTime() != null)
                             domain.add("&");
                     }
-                    int data_limit = preferenceManager.getInt("sync_data_limit", 60);
+                    // int data_limit = preferenceManager.getInt("sync_data_limit", 60);
+                    int data_limit = 720;
                     domain.add("create_date", ">=", ODateUtils.getDateBefore(data_limit));
                     if (serverIds.size() > 0) {
                         domain.add("id", "not in", serverIds);
@@ -288,35 +318,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             rel_model.close();
         }
-    }
-
-    public static Odoo createOdooInstance(final Context context, final OUser user) {
-        final App app = (App) context.getApplicationContext();
-        Odoo odoo = app.getOdoo(user);
-        try {
-            if (odoo == null) {
-                odoo = Odoo.createQuickInstance(context, (user.isOAuthLogin())
-                        ? user.getInstanceURL() : user.getHost());
-                odoo.helper.OUser mUser =
-                        odoo.authenticate(user.getUsername(), user.getPassword(), (user.isOAuthLogin()) ?
-                                user.getInstanceDatabase() : user.getDatabase());
-                app.setOdoo(odoo, user);
-                if (mUser != null) {
-                    ResCompany company = new ResCompany(context, user);
-                    if (company.count("id = ? ", new String[]{user.getCompanyId() + ""}) <= 0) {
-                        ODataRow company_details = new ODataRow();
-                        company_details.put("id", user.getCompanyId());
-                        company.quickCreateRecord(company_details);
-                    }
-                } else {
-                    // FIXME: Unable to get user object or may be due session destroyed with Odoo Saas (single connection support only)
-                    Log.e(TAG, OResource.string(context, R.string.toast_something_gone_wrong));
-                }
-            }
-        } catch (OdooVersionException e) {
-            e.printStackTrace();
-        }
-        return odoo;
     }
 
     private OdooFields getFields(OModel model) {
@@ -509,12 +510,12 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         return mModelClass;
     }
 
-    public void setModel(OModel model) {
-        mModel = model;
-    }
-
     public OModel getModel() {
         return mModel;
+    }
+
+    public void setModel(OModel model) {
+        mModel = model;
     }
 
     public OSyncAdapter onSyncFinish(ISyncFinishListener syncFinish) {

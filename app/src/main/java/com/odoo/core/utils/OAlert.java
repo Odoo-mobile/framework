@@ -32,14 +32,6 @@ import com.odoo.R;
 public class OAlert {
     public static final String TAG = OAlert.class.getSimpleName();
 
-    private enum Type {
-        Alert, Warning, Error
-    }
-
-    public static enum ConfirmType {
-        POSITIVE, NEGATIVE
-    }
-
     public static void showAlert(Context context, String message) {
         showAlert(context, message, null);
     }
@@ -127,7 +119,7 @@ public class OAlert {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        int margin = OResource.dimen(context, R.dimen.default_8dp);
+        int margin = OResource.dimen(context, R.dimen.base_default_8dp);
         params.setMargins(margin, margin, margin, margin);
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setLayoutParams(params);
@@ -157,6 +149,14 @@ public class OAlert {
         });
         builder.setNegativeButton("Cancel", null);
         builder.create().show();
+    }
+
+    private enum Type {
+        Alert, Warning, Error
+    }
+
+    public static enum ConfirmType {
+        POSITIVE, NEGATIVE
     }
 
     public static interface OnAlertConfirmListener {

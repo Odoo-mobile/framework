@@ -2,97 +2,97 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="4dp"
     android:background="#ffffff"
-    android:orientation="vertical"
-    android:layout_height="wrap_content">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
         android:gravity="top"
 
-        android:layout_height="wrap_content">
+        android:orientation="horizontal">
 
         <odoo.controls.BezelImageView
             android:id="@+id/authorImage"
             android:layout_width="32dp"
-            android:src="@drawable/avatar"
-            android:layout_marginTop="@dimen/default_16dp"
-            android:layout_marginLeft="@dimen/default_8dp"
-            app:maskDrawable="@drawable/circle_mask"
-            android:layout_height="32dp" />
+            android:layout_height="32dp"
+            android:layout_marginLeft="@dimen/base_default_8dp"
+            android:layout_marginTop="@dimen/base_default_16dp"
+            android:src="@drawable/base_avatar"
+            app:biv_maskDrawable="@drawable/base_circle_mask" />
 
         <LinearLayout
-            android:orientation="vertical"
-            android:paddingTop="@dimen/default_16dp"
-            android:paddingBottom="@dimen/default_16dp"
-            android:paddingRight="@dimen/default_16dp"
-            android:paddingLeft="@dimen/default_8dp"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content">
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/base_default_16dp"
+            android:paddingLeft="@dimen/base_default_8dp"
+            android:paddingRight="@dimen/base_default_16dp"
+            android:paddingTop="@dimen/base_default_16dp">
 
 
             <TextView
                 android:id="@+id/chatterSubject"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:fontFamily="@string/font_normal"
-                android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"
-                android:singleLine="true"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:ellipsize="middle"
-                android:textStyle="bold"
-                android:textColor="@color/body_text_1"
-                android:layout_height="wrap_content" />
+                android:fontFamily="@string/base_font_normal"
+                android:singleLine="true"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/base_body_text_1"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/chatterBody"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:fontFamily="@string/font_normal"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@string/base_font_normal"
                 android:maxLines="3"
-                android:textColor="#414141"
-                android:layout_height="wrap_content" />
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="#414141" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:layout_height="wrap_content">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/chatterAuthor"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:fontFamily="@string/font_condensed"
                     android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:singleLine="true"
                     android:ellipsize="middle"
-                    android:textColor="@color/body_text_3"
-                    android:layout_height="wrap_content" />
+                    android:fontFamily="@string/base_font_condensed"
+                    android:singleLine="true"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="@color/base_body_text_3" />
 
                 <ImageView
                     android:id="@+id/imgAttachments"
-                    android:visibility="gone"
-                    android:layout_gravity="right"
-                    android:tint="@color/theme_secondary"
-                    android:src="@drawable/ic_action_file_attachment"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:src="@drawable/ic_action_file_attachment"
+                    android:tint="@color/base_theme_secondary"
+                    android:visibility="gone" />
 
                 <TextView
-                    android:singleLine="true"
                     android:id="@+id/chatterDate"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:fontFamily="@string/font_condensed"
-                    android:textColor="@color/body_text_3"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@string/base_font_condensed"
+                    android:singleLine="true"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="@color/base_body_text_3" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-    <View style="@style/ViewSeparator" />
+    <View style="@style/OdooViewSeparator" />
 </LinearLayout>

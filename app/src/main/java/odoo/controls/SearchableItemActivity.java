@@ -133,7 +133,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
                     if (row.contains(OColumn.ROW_ID)
                             && selected_position == row.getInt(OColumn.ROW_ID)) {
                         v.setBackgroundColor(getResources().getColor(
-                                R.color.control_pressed));
+                                R.color.base_control_pressed));
                     } else {
                         v.setBackgroundColor(Color.TRANSPARENT);
                     }
@@ -269,8 +269,8 @@ public class SearchableItemActivity extends ActionBarActivity implements
 
     private class QuickCreateRecordProcess extends AsyncTask<ODataRow, Void, ODataRow> {
 
-        private ProgressDialog progressDialog;
         IOnQuickRecordCreateListener mOnQuickRecordCreateListener = null;
+        private ProgressDialog progressDialog;
 
         public QuickCreateRecordProcess(IOnQuickRecordCreateListener listener) {
             mOnQuickRecordCreateListener = listener;

@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/userAvatar"
-        android:scaleType="centerCrop"
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
+        android:layout_height="180dp"
+        android:scaleType="centerCrop" />
 
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="@dimen/default_16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/base_default_16dp">
 
         <TextView
             android:id="@+id/txvUsername"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/theme_secondary_dark"
             android:layout_width="match_parent"
-            android:layout_marginBottom="@dimen/default_8dp"
-            android:fontFamily="@string/font_condensed"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/base_default_8dp"
+            android:fontFamily="@string/base_font_condensed"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/base_theme_secondary_dark" />
 
         <EditText
             android:id="@+id/edtPassword"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:fontFamily="@string/font_light"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@string/base_font_light"
+            android:hint="@string/error_provide_password"
             android:inputType="textPassword"
             android:singleLine="true"
-            android:hint="@string/error_provide_password"
-            android:layout_height="wrap_content" />
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 </LinearLayout>

@@ -10,8 +10,8 @@
     <odoo.controls.BezelImageView
         android:id="@+id/imgInstance"
         android:layout_width="48dp"
-        android:layout_gravity="center_horizontal"
         android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
         android:scaleType="fitCenter" />
 
     <TextView
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:fontFamily="@string/font_condensed"
+        android:fontFamily="@string/base_font_condensed"
         android:gravity="center"
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:fontFamily="@string/font_light"
+        android:fontFamily="@string/base_font_light"
         android:gravity="center"
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceSmall"

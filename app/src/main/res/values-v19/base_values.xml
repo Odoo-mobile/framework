@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <bool name="baseAtLeastKitKat">true</bool>
+
+    <dimen name="base_app_bar_top_padding">24dp</dimen>
+
+    <dimen name="baseStatusBarHeight">24dp</dimen>
+
+    <style name="OdooTheme" parent="OdooTheme.Base">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+</resources>

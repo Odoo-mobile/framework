@@ -74,19 +74,19 @@ public class BezelImageView extends ImageView {
         final TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.BezelImageView, defStyle, 0);
 
-        mMaskDrawable = a.getDrawable(R.styleable.BezelImageView_maskDrawable);
+        mMaskDrawable = a.getDrawable(R.styleable.BezelImageView_biv_maskDrawable);
         if (mMaskDrawable != null) {
             mMaskDrawable.setCallback(this);
         }
 
         mBorderDrawable = a
-                .getDrawable(R.styleable.BezelImageView_borderDrawable);
+                .getDrawable(R.styleable.BezelImageView_biv_borderDrawable);
         if (mBorderDrawable != null) {
             mBorderDrawable.setCallback(this);
         }
 
         mDesaturateOnPress = a.getBoolean(
-                R.styleable.BezelImageView_desaturateOnPress,
+                R.styleable.BezelImageView_biv_desaturateOnPress,
                 mDesaturateOnPress);
 
         a.recycle();
@@ -95,7 +95,7 @@ public class BezelImageView extends ImageView {
 
     public void autoSetMaskDrawable() {
         mMaskDrawable = mContext.getResources().getDrawable(
-                R.drawable.circle_mask);
+                R.drawable.base_circle_mask);
         otherInit();
     }
 
