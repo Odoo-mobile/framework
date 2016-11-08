@@ -21,6 +21,7 @@ package com.odoo.core.orm;
 
 import android.content.Context;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.odoo.App;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
@@ -76,9 +77,19 @@ public class ServerDataHelper {
 
     public OdooResult read(odoo.helper.OdooFields fields, int id) {
         if (mApp.inNetwork()) {
-            return mOdoo
+            OdooResult result = mOdoo
                     .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
                     .read(mModel.getModelName(), id, fields);
+            if (mOdoo.getVersion().getVersionNumber() >= 10) {
+                if (result.containsKey("result") && result.get("result") instanceof ArrayList) {
+                    LinkedTreeMap record = (LinkedTreeMap) result.getArray("result").get(0);
+                    OdooResult odooResult = new OdooResult();
+                    odooResult.putAll(record);
+                    return odooResult;
+                }
+            } else {
+                return result;
+            }
         }
         return null;
     }
