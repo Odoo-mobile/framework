@@ -128,7 +128,7 @@ public class OValues implements Serializable {
                 }
             } else if (val instanceof byte[]) {
                 values.put(key, (byte[]) val);
-            } else {
+            } else if (val != null) {
                 values.put(key, val.toString());
             }
         }

@@ -43,6 +43,7 @@ import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.core.utils.logger.OLog;
+import com.odoo.datas.OConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -207,8 +208,10 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
             // Getting data
-            OdooResult response = mOdoo.searchRead(model.getModelName(), getFields(model)
-                    , domain, 0, mSyncDataLimit, "create_date DESC");
+            OdooResult response = mOdoo
+                    .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+                    .searchRead(model.getModelName(), getFields(model)
+                            , domain, 0, mSyncDataLimit, "create_date DESC");
             if (response == null) {
                 // FIXME: Check in library. May be timeout issue with slow network.
                 Log.w(TAG, "Response null from server.");
