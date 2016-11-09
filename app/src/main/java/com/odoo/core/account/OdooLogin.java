@@ -312,6 +312,8 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
         // Some error occurred
         if (error.getResponseCode() == Odoo.ErrorCode.InvalidURL.get() ||
                 error.getResponseCode() == -1) {
+            findViewById(R.id.controls).setVisibility(View.VISIBLE);
+            findViewById(R.id.login_progress).setVisibility(View.GONE);
             edtSelfHosted.setError(OResource.string(OdooLogin.this, R.string.error_invalid_odoo_url));
             edtSelfHosted.requestFocus();
         }
