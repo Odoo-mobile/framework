@@ -200,10 +200,11 @@ public class OdooWrapper<T> implements Response.Listener<JSONObject> {
             requestQueue.add(request);
         } else {
             JsonObjectRequest request = new JsonObjectRequest(url, postData, requestFuture, requestFuture);
+            request.setRetryPolicy(new DefaultRetryPolicy(new_request_timeout, new_request_max_retry,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(request);
             try {
-                OdooResponse response = parseToResponse(requestFuture.get(new_request_timeout,
-                        TimeUnit.MILLISECONDS));
+                OdooResponse response = parseToResponse(requestFuture.get());
                 backResponse.setResponse(response);
             } catch (Exception e) {
                 OdooLog.e(e);

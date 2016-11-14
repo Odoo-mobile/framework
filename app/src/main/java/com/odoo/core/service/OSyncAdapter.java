@@ -296,6 +296,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (odoo == null) {
                 odoo = Odoo.createQuickInstance(context, user.getHost());
                 OUser mUser = odoo
+                        .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
                         .authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
                 app.setOdoo(odoo, user);
                 if (mUser != null) {
