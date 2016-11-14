@@ -1,1 +1,1 @@
-include ':app', ':intro-slider-lib', ':odoo-rpc-v3'
+include ':app', ':intro-slider-lib'

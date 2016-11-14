@@ -4,7 +4,6 @@
     <string name="label_login">Login</string>
     <string name="label_accept_login">Accept &amp; Login</string>
     <string name="label_your_self_hosted_url">Your self-hosted URL</string>
-    <string name="label_username">Username</string>
     <string name="label_username_or_email">Username or email</string>
     <string name="label_password">Password</string>
     <string name="label_forgot_password">Forgot password?</string>
@@ -12,8 +11,6 @@
     <string name="label_login_with_odoo">Login with Odoo.com</string>
     <string name="label_create_account">Create account</string>
     <string name="label_select_database">Select Database</string>
-    <string name="title_ssl_warning">SSL Warning</string>
-    <string name="untrusted_ssl_warning">The site\'s security certificate is not trusted !</string>
     <string name="error_invalid_odoo_url">Invalid Odoo URL !</string>
     <string name="error_invalid_username_or_password">Invalid Username or Password</string>
     <string name="error_invalid_password">Invalid password</string>
@@ -23,14 +20,10 @@
     <string name="status_connecting_to_server">Connecting&#8230;</string>
     <string name="status_connected_to_server">Connected</string>
     <string name="status_logging_in">Logging in&#8230;</string>
-    <string name="status_logging_in_with_instance">Logging in to instance&#8230;</string>
     <string name="status_login_success">Login Success</string>
     <string name="status_logout_success">Logout Success</string>
     <string name="status_creating_account">Creating account</string>
-    <string name="status_getting_instances">Getting instances&#8230;</string>
     <string name="status_redirecting">Redirecting&#8230;</string>
-    <string name="title_instance_expired">Instance Expired</string>
-    <string name="label_select_instance">Select Instance</string>
     <string name="label_select_user">Login to User</string>
     <string name="label_accounts">Accounts</string>
     <string name="label_settings">Settings</string>
@@ -49,42 +42,22 @@
     <string name="label_send">Send</string>
 
     <!-- package warning -->
-    <string name="changes_required">Changes required in \n<b>app/build.gradle</b> for</string>
-    <string name="label_app_name">Application Name</string>
-    <string name="label_package_name">Application Id</string>
-    <string name="label_dialog_disappear">Panel will disappear when configuration changed.</string>
     <!-- Drawer -->
     <string name="label_drawer_account_add_account">Add Account</string>
     <string name="label_drawer_account_manage_accounts">Manage Accounts</string>
     <!-- Common Labels -->
     <string name="title_application_settings">"Application Settings"</string>
-    <string name="title_select_account">"Select Account"</string>
-    <string name="title_settings">Settings</string>
     <string name="title_profile">Profile</string>
-    <string name="title_general_settings">General Settings</string>
-    <string name="title_accounts">Accounts</string>
     <string name="title_about">About</string>
     <string name="title_confirm">Confirm</string>
-    <string name="title_user_profile">Odoo User Profile</string>
-    <string name="title_configuration">Configuration</string>
-    <string name="title_refresh_details">Refresh Details</string>
-    <string name="title_add_account">Add Account</string>
     <string name="title_working">Working&#8230;</string>
     <string name="title_please_wait">Please wait&#8230;</string>
-    <string name="label_new">New</string>
     <string name="label_ok">OK</string>
-    <string name="label_yes">Yes</string>
-    <string name="label_no">No</string>
     <string name="label_search">Search</string>
     <string name="label_delete">Delete</string>
     <string name="label_cancel">Cancel</string>
     <string name="label_logout">Logout</string>
     <string name="label_version">Version</string>
-    <string name="label_update_info">Update Info</string>
-    <string name="label_process_anyway">Process Anyway</string>
-    <string name="label_read_more">Read More</string>
-    <string name="label_read_less">Read Less</string>
-    <string name="label_no_records_found">No Records Found</string>
     <string name="label_odoo_mobile_on_github">Odoo Mobile on GitHub</string>
     <string name="label_odoo_developer_mode">Developer Mode</string>
     <string name="label_export_db">Export Database</string>
@@ -97,7 +70,6 @@
     <string name="toast_setting_saved">Setting saved.</string>
     <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
     <string name="toast_are_you_sure_delete_account">Are you sure want to delete account ?</string>
-    <string name="toast_user_already_exists">User already exists</string>
     <string name="toast_network_required">Network required</string>
     <string name="toast_account_removed">Account Removed Successfully</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
@@ -134,17 +106,7 @@
         <item name="180">180</item>
         <item name="360">360</item>
     </string-array>
-    <string name="general_settings">General Settings</string>
-    <string name="application_settings_summary">Sync settings, Interval settings, sync data limit, and more</string>
-    <string name="account_settings">Account Settings</string>
-    <string name="add_account">Add Account</string>
     <string name="summary_about_odoo_mobile">Odoo Mobile</string>
-    <string name="build_version">Build Version</string>
-    <string name="label_powered_by">Powered by</string>
-    <string name="odoo_mobile_framework">Odoo Mobile framework</string>
-    <string name="supported_versions">Supported versions</string>
-    <string name="supported_versions_names">Odoo 7.0+</string>
-    <string name="label_access_odoo_mobile">Connect Odoo Mobile</string>
     <!-- About Company Fragment Strings -->
     <string name="about_Company_line1">Copyright © 2004-TODAY Odoo SA. All Rights Reserved.</string>
     <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>

@@ -21,7 +21,6 @@
             app:modelName="res.partner">
 
             <odoo.controls.OField
-                android:id="@+id/is_company"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:fieldName="is_company"

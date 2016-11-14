@@ -23,22 +23,21 @@ import android.content.Context;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.odoo.App;
+import com.odoo.core.rpc.Odoo;
+import com.odoo.core.rpc.helper.OArguments;
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.ORecordValues;
+import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
+import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
-import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.datas.OConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import odoo.Odoo;
-import odoo.helper.OArguments;
-import odoo.helper.ODomain;
-import odoo.helper.ORecordValues;
-import odoo.helper.utils.gson.OdooRecord;
-import odoo.helper.utils.gson.OdooResult;
 
 public class ServerDataHelper {
     public static final String TAG = ServerDataHelper.class.getSimpleName();
@@ -75,7 +74,7 @@ public class ServerDataHelper {
         return items;
     }
 
-    public OdooResult read(odoo.helper.OdooFields fields, int id) {
+    public OdooResult read(com.odoo.core.rpc.helper.OdooFields fields, int id) {
         if (mApp.inNetwork()) {
             OdooResult result = mOdoo
                     .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
@@ -111,10 +110,6 @@ public class ServerDataHelper {
 
     public Odoo getOdoo() {
         return mOdoo;
-    }
-
-    public OdooResult executeWorkFlow(int server_id, String signal) {
-        return mOdoo.executeWorkFlow(mModel.getModelName(), server_id, signal);
     }
 
     public Object callMethod(String method, OArguments args) {

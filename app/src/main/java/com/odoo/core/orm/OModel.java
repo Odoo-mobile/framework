@@ -68,9 +68,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
-import odoo.helper.ODomain;
-import odoo.helper.OdooVersion;
-import odoo.listeners.IModuleInstallListener;
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooVersion;
+import com.odoo.core.rpc.listeners.IModuleInstallListener;
 
 
 public class OModel implements ISyncServiceListener {

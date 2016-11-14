@@ -28,15 +28,14 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.ORecordValues;
+import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
+import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.support.OUser;
 
 import java.util.ArrayList;
-
-import odoo.helper.ODomain;
-import odoo.helper.ORecordValues;
-import odoo.helper.OdooFields;
-import odoo.helper.utils.gson.OdooRecord;
-import odoo.helper.utils.gson.OdooResult;
 
 
 public class IrAttachment extends OModel {

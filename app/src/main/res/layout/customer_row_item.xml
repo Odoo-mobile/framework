@@ -6,7 +6,6 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/customerView"
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/default_8dp"

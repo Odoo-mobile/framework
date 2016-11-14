@@ -287,7 +287,7 @@ public class OdooActivity extends OdooCompatActivity {
         TextView url = (TextView) chosenAccountView.findViewById(R.id.profile_url_text);
 
         name.setText(currentUser.getName());
-        url.setText((currentUser.isOAuthLogin()) ? currentUser.getInstanceURL() : currentUser.getHost());
+        url.setText(currentUser.getHost());
 
         if (!currentUser.getAvatar().equals("false")) {
             Bitmap bitmap = BitmapUtils.getBitmapImage(this, currentUser.getAvatar());
@@ -390,7 +390,7 @@ public class OdooActivity extends OdooCompatActivity {
                         avatar.setImageBitmap(img);
                 }
                 OControls.setText(view, R.id.profile_name_text, user.getName());
-                OControls.setText(view, R.id.profile_url_text, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
+                OControls.setText(view, R.id.profile_url_text, user.getHost());
                 // Setting login event for other account
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override

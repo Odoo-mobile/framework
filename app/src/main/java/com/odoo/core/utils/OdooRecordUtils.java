@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import odoo.helper.ORecordValues;
-import odoo.helper.utils.gson.OdooRecord;
+import com.odoo.core.rpc.helper.ORecordValues;
+import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
 
 
 public class OdooRecordUtils {

@@ -39,12 +39,11 @@ import com.odoo.App;
 import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
+import com.odoo.core.rpc.Odoo;
 import com.odoo.core.service.OSyncAdapter;
+import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OResource;
-
-import odoo.Odoo;
-import odoo.helper.OUser;
 
 public class OdooAccountQuickManage extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = OdooAccountQuickManage.class.getSimpleName();

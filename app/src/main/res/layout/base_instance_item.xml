@@ -26,7 +26,7 @@
         android:textColor="#414141" />
 
     <TextView
-        android:id="@+id/txvInstanceUrl"
+        android:id="@+id/txvServerURL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"

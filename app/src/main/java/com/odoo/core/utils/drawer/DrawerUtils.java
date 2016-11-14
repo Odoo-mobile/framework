@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p>
  * Created on 30/12/14 4:27 PM
  */
 package com.odoo.core.utils.drawer;
@@ -36,8 +36,6 @@ import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
-import com.odoo.news.News;
-import com.odoo.news.models.OdooNews;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,16 +69,6 @@ public class DrawerUtils {
         settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_settings))
                 .setIcon(R.drawable.ic_action_settings)
                 .setInstance(SettingsActivity.class));
-//        if (pref.getBoolean(Profile.CONNECT_WITH_ODOO, false))
-//            settings.add(new ODrawerItem(key).setTitle(OResource.string(context, R.string.label_access_odoo_mobile))
-//                    .setInstance(OdooMobileQRReader.class).setIcon(R.drawable.ic_action_qrcode)
-//                    .setExtra(OUser.current(context).getAsBundle()));
-        OdooNews news = new OdooNews(context, null);
-        if (!news.isEmptyTable()) {
-            settings.add(new ODrawerItem(key).setTitle("Odoo News")
-                            .setInstance(new News()).setIcon(R.drawable.ic_odoo_o)
-            );
-        }
         return settings;
     }
 

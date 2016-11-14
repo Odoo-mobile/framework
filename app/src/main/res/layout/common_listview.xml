@@ -6,7 +6,6 @@
     android:background="#fff">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/data_list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">

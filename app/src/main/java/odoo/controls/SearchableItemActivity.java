@@ -40,15 +40,14 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.support.OdooFields;
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import odoo.helper.ODomain;
 
 
 public class SearchableItemActivity extends ActionBarActivity implements

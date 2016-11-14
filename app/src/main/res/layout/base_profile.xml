@@ -7,7 +7,6 @@
     android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
@@ -54,7 +53,6 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
-        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#ffffff"
@@ -87,7 +85,6 @@
                     app:showIcon="false"></odoo.controls.OField>
 
                 <odoo.controls.OField
-                    android:id="@+id/user_login"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:controlLabel="USER LOGIN"

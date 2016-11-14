@@ -25,8 +25,13 @@ import com.odoo.config.FirstLaunchConfig;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.rpc.Odoo;
+import com.odoo.core.rpc.handler.OdooVersionException;
+import com.odoo.core.rpc.listeners.IDatabaseListListener;
+import com.odoo.core.rpc.listeners.IOdooConnectionListener;
+import com.odoo.core.rpc.listeners.IOdooLoginCallback;
+import com.odoo.core.rpc.listeners.OdooError;
 import com.odoo.core.support.OUser;
-import com.odoo.core.support.OdooInstancesSelectorDialog;
 import com.odoo.core.support.OdooUserLoginSelectorDialog;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OResource;
@@ -35,18 +40,9 @@ import com.odoo.datas.OConstants;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.Odoo;
-import odoo.handler.OdooVersionException;
-import odoo.helper.OdooInstance;
-import odoo.listeners.IDatabaseListListener;
-import odoo.listeners.IOdooConnectionListener;
-import odoo.listeners.IOdooInstanceListener;
-import odoo.listeners.IOdooLoginCallback;
-import odoo.listeners.OdooError;
-
 public class OdooLogin extends AppCompatActivity implements View.OnClickListener,
-        View.OnFocusChangeListener, OdooInstancesSelectorDialog.OnInstanceSelectListener,
-        OdooUserLoginSelectorDialog.IUserLoginSelectListener, IOdooConnectionListener, IOdooLoginCallback {
+        View.OnFocusChangeListener, OdooUserLoginSelectorDialog.IUserLoginSelectListener,
+        IOdooConnectionListener, IOdooLoginCallback {
 
     private EditText edtUsername, edtPassword, edtSelfHosted;
     private Boolean mCreateAccountRequest = false;
@@ -240,7 +236,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                 databaseName = databases.get(databaseSpinner.getSelectedItemPosition());
             }
             mAutoLogin = false;
-            loginProcess(null, serverURL, databaseName);
+            loginProcess(databaseName);
         } else {
             mAutoLogin = true;
             try {
@@ -317,101 +313,33 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
             edtSelfHosted.setError(OResource.string(OdooLogin.this, R.string.error_invalid_odoo_url));
             edtSelfHosted.requestFocus();
         }
-        canceledInstanceSelect();
-    }
-
-    @Override
-    public void onCancelSelect() {
-    }
-
-    @Override
-    public void canceledInstanceSelect() {
         findViewById(R.id.controls).setVisibility(View.VISIBLE);
         findViewById(R.id.login_progress).setVisibility(View.GONE);
         findViewById(R.id.serverURLCheckProgress).setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void instanceSelected(OdooInstance instance) {
-        // Logging in to instance
-        loginProcess(instance, null, null);
+    public void onCancelSelect() {
     }
 
-    private void loginProcess(final OdooInstance instance, String url, final String database) {
+    private void loginProcess(String database) {
         Log.v("", "LoginProcess");
         final String username = edtUsername.getText().toString();
         final String password = edtPassword.getText().toString();
-        if (instance == null && url.equals(OConstants.URL_ODOO)) {
-            // OAuth Login or Odoo.com Login
-            mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_getting_instances));
-            mOdoo.authenticate(username, password, database, new IOdooLoginCallback() {
-                @Override
-                public void onLoginSuccess(Odoo odoo, odoo.helper.OUser oUser) {
-                    mOdoo = odoo;
-                    mOdoo.getSaasInstances(new IOdooInstanceListener() {
-                        @Override
-                        public void onInstancesLoad(List<OdooInstance> odooInstances) {
-                            OdooInstance oInstance = new OdooInstance();
-                            oInstance.setCompanyName(OConstants.ODOO_COMPANY_NAME);
-                            oInstance.setUrl(OConstants.URL_ODOO);
-                            oInstance.setDbName(database);
-                            odooInstances.add(0, oInstance);
-                            if (odooInstances.size() > 1) {
-                                OdooInstancesSelectorDialog instancesSelectorDialog =
-                                        new OdooInstancesSelectorDialog(OdooLogin.this);
-                                instancesSelectorDialog.setInstances(odooInstances);
-                                instancesSelectorDialog.setOnInstanceSelectListener(OdooLogin.this);
-                                instancesSelectorDialog.showDialog();
-                            } else {
-                                //Loggin in to odoo.com (default instance)
-                                loginProcess(oInstance, oInstance.getUrl(), database);
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void onLoginFail(OdooError error) {
-                    loginFail(error);
-                }
-            });
-        } else if (instance == null) {
-            Log.v("", "Processing Self Hosted Server Login");
-            mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_logging_in));
-            mOdoo.authenticate(username, password, database, this);
-        } else {
-            // Instance login
-            Log.v("", "Processing Odoo Instance Login");
-            mLoginProcessStatus.setText(OResource.string(OdooLogin.this,
-                    R.string.status_logging_in_with_instance));
-            new AsyncTask<Void, Void, odoo.helper.OUser>() {
-
-                @Override
-                protected odoo.helper.OUser doInBackground(Void... params) {
-                    // Need to execute in background task.
-                    return mOdoo.oAuthLogin(instance, username, password);
-                }
-
-                @Override
-                protected void onPostExecute(odoo.helper.OUser oUser) {
-                    super.onPostExecute(oUser);
-                    onLoginSuccess(mOdoo, oUser);
-                }
-            }.execute();
-        }
+        Log.v("", "Processing Self Hosted Server Login");
+        mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_logging_in));
+        mOdoo.authenticate(username, password, database, this);
     }
 
     @Override
-    public void onLoginSuccess(Odoo odoo, odoo.helper.OUser oUser) {
-        mApp.setOdoo(odoo, oUser);
+    public void onLoginSuccess(Odoo odoo, OUser user) {
+        mApp.setOdoo(odoo, user);
         mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_login_success));
         mOdoo = odoo;
         if (accountCreator != null) {
             accountCreator.cancel(true);
         }
         accountCreator = new AccountCreator();
-        OUser user = new OUser();
-        user.setFromBundle(oUser.getAsBundle());
         accountCreator.execute(user);
     }
 
@@ -421,6 +349,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     }
 
     private void loginFail(OdooError error) {
+        Log.e("Login Failed", error.getMessage());
         findViewById(R.id.controls).setVisibility(View.VISIBLE);
         findViewById(R.id.login_progress).setVisibility(View.GONE);
         edtUsername.setError(OResource.string(this, R.string.error_invalid_username_or_password));

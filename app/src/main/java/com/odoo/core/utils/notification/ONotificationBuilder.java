@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p>
  * Created on 9/1/15 6:51 PM
  */
 package com.odoo.core.utils.notification;
@@ -51,7 +51,7 @@ public class ONotificationBuilder {
     private Intent resultIntent = null;
     private int icon = R.drawable.ic_odoo_o_white;
     private int small_icon = R.drawable.ic_odoo_o_white;
-    private List<NotificationAction> mActions = new ArrayList<ONotificationBuilder.NotificationAction>();
+    private List<NotificationAction> mActions = new ArrayList<>();
     private int notification_id = 0;
     private Boolean withVibrate = true;
     private Boolean withLargeIcon = true;
@@ -238,12 +238,14 @@ public class ONotificationBuilder {
         mNotificationManager.notify(notification_id, mNotificationBuilder.build());
     }
 
-    public static  void cancelNotification(Context context){
+    public static void cancelNotification(Context context) {
         NotificationManager nMgr = (NotificationManager) context.getSystemService(
                 Context.NOTIFICATION_SERVICE
         );
-        nMgr.cancelAll();;
+        nMgr.cancelAll();
+        ;
     }
+
     public static void cancelNotification(Context context, int id) {
         NotificationManager nMgr = (NotificationManager) context.getSystemService(
                 Context.NOTIFICATION_SERVICE

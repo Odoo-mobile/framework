@@ -279,9 +279,9 @@ receiver#com.odoo.news.OdooNewsReceiver
 ADDED from AndroidManifest.xml:69:9
 	android:name
 		ADDED from AndroidManifest.xml:69:19
-intent-filter#odoo.Odoo.ACTION_ODOO_UPDATES
+intent-filter#com.odoo.core.rpc.Odoo.ACTION_ODOO_UPDATES
 ADDED from AndroidManifest.xml:70:13
-action#odoo.Odoo.ACTION_ODOO_UPDATES
+action#com.odoo.core.rpc.Odoo.ACTION_ODOO_UPDATES
 ADDED from AndroidManifest.xml:71:17
 	android:name
 		ADDED from AndroidManifest.xml:71:25

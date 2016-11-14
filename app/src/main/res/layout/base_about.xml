@@ -39,7 +39,6 @@
                 android:padding="20dp">
 
                 <ImageView
-                    android:id="@+id/abtus_imgLogo"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
@@ -71,7 +70,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layoutServerConfig"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#ffffff"

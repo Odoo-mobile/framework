@@ -21,6 +21,11 @@ It has pre-developed services,providers, controls and more other features to mak
 CHANGELOG
 =========
 
+- November 2016
+    - odoo-rpc-v3 source merged with Framework
+    - Added Odoo 10.0 support
+    - Minor bug fixes
+    
 - June 2016
     - Sync performance improved
     - Easy relation record creation (Fix for: https://github.com/Odoo-mobile/framework/issues/138) 
@@ -33,6 +38,7 @@ SUPPORTED ODOO VERSIONS
 - [x] Odoo 7.0
 - [x] Odoo 8.0
 - [x] Odoo 9.0
+- [x] Odoo 10.0
 
 HOW TO START
 ============

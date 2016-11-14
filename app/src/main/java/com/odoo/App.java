@@ -25,10 +25,10 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import java.util.HashMap;
+import com.odoo.core.rpc.Odoo;
+import com.odoo.core.support.OUser;
 
-import odoo.Odoo;
-import odoo.helper.OUser;
+import java.util.HashMap;
 
 public class App extends Application {
 

@@ -6,7 +6,6 @@
     android:gravity="center">
 
     <LinearLayout
-        android:id="@+id/dashboard_no_item_view"
         android:layout_width="match_parent"
         android:gravity="center"
         android:layout_height="wrap_content"

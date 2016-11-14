@@ -37,6 +37,13 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.rpc.Odoo;
+import com.odoo.core.rpc.handler.OdooVersionException;
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.ORecordValues;
+import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
+import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
@@ -48,14 +55,6 @@ import com.odoo.datas.OConstants;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import odoo.Odoo;
-import odoo.handler.OdooVersionException;
-import odoo.helper.ODomain;
-import odoo.helper.ORecordValues;
-import odoo.helper.OdooFields;
-import odoo.helper.utils.gson.OdooRecord;
-import odoo.helper.utils.gson.OdooResult;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
@@ -295,11 +294,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         Odoo odoo = app.getOdoo(user);
         try {
             if (odoo == null) {
-                odoo = Odoo.createQuickInstance(context, (user.isOAuthLogin())
-                        ? user.getInstanceURL() : user.getHost());
-                odoo.helper.OUser mUser =
-                        odoo.authenticate(user.getUsername(), user.getPassword(), (user.isOAuthLogin()) ?
-                                user.getInstanceDatabase() : user.getDatabase());
+                odoo = Odoo.createQuickInstance(context, user.getHost());
+                OUser mUser = odoo
+                        .authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
                 app.setOdoo(odoo, user);
                 if (mUser != null) {
                     ResCompany company = new ResCompany(context, user);

@@ -27,8 +27,12 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.rpc.Odoo;
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
+import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.support.OUser;
-import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
 import com.odoo.core.utils.OdooRecordUtils;
@@ -39,11 +43,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
-import odoo.Odoo;
-import odoo.helper.ODomain;
-import odoo.helper.utils.gson.OdooRecord;
-import odoo.helper.utils.gson.OdooResult;
 
 public class OSyncDataUtils {
     public static final String TAG = OSyncDataUtils.class.getSimpleName();
@@ -138,7 +137,7 @@ public class OSyncDataUtils {
         try {
             List<OdooRecord> result;
             if (model.getColumn("write_date") != null) {
-                OdooFields fields = new OdooFields(new String[]{"write_date"});
+                OdooFields fields = new OdooFields("write_date");
                 ODomain domain = new ODomain();
                 domain.add("id", "in", ids);
                 OdooResult response =
