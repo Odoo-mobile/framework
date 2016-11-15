@@ -66,7 +66,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -200,11 +199,11 @@ public class OdooWrapper<T> implements Response.Listener<JSONObject> {
             requestQueue.add(request);
         } else {
             JsonObjectRequest request = new JsonObjectRequest(url, postData, requestFuture, requestFuture);
+            request.setRetryPolicy(new DefaultRetryPolicy(new_request_timeout, new_request_max_retry,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(request);
             try {
-                OdooResponse response = parseToResponse(requestFuture.get(new_request_timeout,
-                        TimeUnit.MILLISECONDS));
-                backResponse.setResponse(response);
+                backResponse.setResponse(parseToResponse(requestFuture.get()));
             } catch (Exception e) {
                 OdooLog.e(e);
             }
