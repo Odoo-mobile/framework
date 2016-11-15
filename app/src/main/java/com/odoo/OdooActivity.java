@@ -24,7 +24,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -54,6 +56,8 @@ import com.odoo.core.account.OdooUserObjectUpdater;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.service.OnSyncFinishListener;
+import com.odoo.core.service.receivers.ISyncFinishReceiver;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
@@ -90,6 +94,8 @@ public class OdooActivity extends OdooCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle = null;
     private IOnBackPressListener backPressListener = null;
     private IOnActivityResultListener mIOnActivityResultListener = null;
+    private OnSyncFinishListener mOnSyncFinishListener = null;
+    private ISyncFinishReceiver mISyncFinishReceiver = null;
     //Drawer Containers
     private LinearLayout mDrawerAccountContainer = null;
     private LinearLayout mDrawerItemContainer = null;
@@ -124,6 +130,24 @@ public class OdooActivity extends OdooCompatActivity {
         setupDrawer();
         // Validating user object
         validateUserObject();
+        setupSyncListener();
+    }
+
+    private void setupSyncListener() {
+        mISyncFinishReceiver = new ISyncFinishReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // Sync Finished
+                try {
+                    if (mOnSyncFinishListener != null) {
+                        mOnSyncFinishListener.onSyncFinish();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "syncFinishReceiver: Exception: " + e.getMessage());
+                }
+            }
+        };
     }
 
     private void validateUserObject() {
@@ -577,6 +601,23 @@ public class OdooActivity extends OdooCompatActivity {
         }
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        registerReceiver(mISyncFinishReceiver,
+                new IntentFilter(ISyncFinishReceiver.SYNC_FINISH));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            unregisterReceiver(mISyncFinishReceiver);
+        } catch (Exception e) {
+            // Skipping issue related to unregister receiver
+            e.printStackTrace();
+        }
+    }
 
     private void focusOnDrawerItem(int index) {
         mDrawerSelectedIndex = index;
@@ -595,6 +636,11 @@ public class OdooActivity extends OdooCompatActivity {
 
 
     public SyncUtils sync() {
+        return SyncUtils.get(this);
+    }
+
+    public SyncUtils sync(OnSyncFinishListener onSyncFinishListener) {
+        mOnSyncFinishListener = onSyncFinishListener;
         return SyncUtils.get(this);
     }
 

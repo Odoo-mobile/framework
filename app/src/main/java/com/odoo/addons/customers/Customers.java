@@ -28,6 +28,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,7 @@ import android.widget.Toast;
 import com.odoo.R;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.service.OnSyncFinishListener;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -218,7 +220,14 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            parent().sync().requestSync(ResPartner.AUTHORITY);
+            parent().sync(new OnSyncFinishListener() {
+                @Override
+                public void onSyncFinish() {
+                    Log.d(KEY, "onSyncFinish() called");
+                    Toast.makeText(getActivity(), _s(R.string.toast_sync_complete), Toast.LENGTH_LONG)
+                            .show();
+                }
+            }).requestSync(ResPartner.AUTHORITY);
             setSwipeRefreshing(true);
         } else {
             hideRefreshingProgress();
