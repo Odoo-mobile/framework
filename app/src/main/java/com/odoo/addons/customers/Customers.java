@@ -152,6 +152,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setVisible(mView, R.id.swipe_container);
                     OControls.setGone(mView, R.id.data_list_no_item);
+                    OControls.setGone(mView, R.id.noItemsView);
                     setHasSwipeRefreshView(mView, R.id.swipe_container, Customers.this);
                 }
             }, 500);
@@ -161,6 +162,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setGone(mView, R.id.swipe_container);
+                    OControls.setVisible(mView, R.id.noItemsView);
                     OControls.setVisible(mView, R.id.data_list_no_item);
                     setHasSwipeRefreshView(mView, R.id.data_list_no_item, Customers.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
@@ -224,6 +226,26 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 @Override
                 public void onSyncFinish() {
                     Log.d(KEY, "onSyncFinish() called");
+                    final SwipeRefreshLayout dataListNoItem = (SwipeRefreshLayout)
+                            getActivity().findViewById(R.id.data_list_no_item);
+                    if (dataListNoItem.isRefreshing()) {
+                        dataListNoItem.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                dataListNoItem.setRefreshing(false);
+                            }
+                        });
+                    }
+                    final SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout)
+                            getActivity().findViewById(R.id.swipe_container);
+                    if (swipeContainer.isRefreshing()) {
+                        swipeContainer.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipeContainer.setRefreshing(false);
+                            }
+                        });
+                    }
                     Toast.makeText(getActivity(), _s(R.string.toast_sync_complete), Toast.LENGTH_LONG)
                             .show();
                 }
