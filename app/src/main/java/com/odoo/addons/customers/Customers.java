@@ -220,7 +220,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            parent().sync(new OnSyncFinishListener() {
+            parent().sync(KEY, new OnSyncFinishListener() {
                 @Override
                 public void onSyncFinish() {
                     Log.d(KEY, "onSyncFinish() called");

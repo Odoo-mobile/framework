@@ -74,7 +74,9 @@ import com.odoo.core.utils.drawer.DrawerUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OdooActivity extends OdooCompatActivity {
 
@@ -94,7 +96,7 @@ public class OdooActivity extends OdooCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle = null;
     private IOnBackPressListener backPressListener = null;
     private IOnActivityResultListener mIOnActivityResultListener = null;
-    private OnSyncFinishListener mOnSyncFinishListener = null;
+    private Map<String, OnSyncFinishListener> mOnSyncFinishListeners = null;
     private ISyncFinishReceiver mISyncFinishReceiver = null;
     //Drawer Containers
     private LinearLayout mDrawerAccountContainer = null;
@@ -134,17 +136,21 @@ public class OdooActivity extends OdooCompatActivity {
     }
 
     private void setupSyncListener() {
+        mOnSyncFinishListeners = new HashMap<>();
         mISyncFinishReceiver = new ISyncFinishReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 // Sync Finished
-                try {
-                    if (mOnSyncFinishListener != null) {
-                        mOnSyncFinishListener.onSyncFinish();
+                for (Map.Entry<String, OnSyncFinishListener> entry : mOnSyncFinishListeners.entrySet()) {
+                    try {
+                        OnSyncFinishListener listener = entry.getValue();
+                        if (listener != null) {
+                            listener.onSyncFinish();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "syncFinishReceiver: Exception: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "syncFinishReceiver: Exception: " + e.getMessage());
                 }
             }
         };
@@ -639,9 +645,9 @@ public class OdooActivity extends OdooCompatActivity {
         return SyncUtils.get(this);
     }
 
-    public SyncUtils sync(OnSyncFinishListener onSyncFinishListener) {
-        mOnSyncFinishListener = onSyncFinishListener;
-        return SyncUtils.get(this);
+    public SyncUtils sync(final String TAG, OnSyncFinishListener onSyncFinishListener) {
+        mOnSyncFinishListeners.put(TAG, onSyncFinishListener);
+        return sync();
     }
 
     /**
