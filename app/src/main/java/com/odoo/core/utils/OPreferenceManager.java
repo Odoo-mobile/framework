@@ -68,13 +68,15 @@ public class OPreferenceManager {
     }
 
     public int getInt(String key, int default_value) {
-        try {
-            String value = mPref.getString(key, String.valueOf(default_value));
-            return Integer.parseInt(value);
-        } catch (Exception e) {
-            Log.e(TAG, "getInt: ", e);
+        if (mPref.getAll().get(key) instanceof String) {
+            try {
+                return Integer.parseInt(mPref.getString(key, default_value + ""));
+            } catch (NumberFormatException e) {
+                Log.d(TAG, e.getMessage());
+                return -1;
+            }
         }
-        return default_value;
+        return mPref.getInt(key, default_value);
     }
 
     public void setBoolean(String key, Boolean value) {
