@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.OModel;
@@ -47,7 +48,6 @@ public class BaseModelProvider extends ContentProvider {
     public final static String KEY_USERNAME = "key_username";
     private final int COLLECTION = 1;
     private final int SINGLE_ROW = 2;
-    protected OModel mModel = null;
     public UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     public static Uri buildURI(String authority, String model, String username) {
@@ -74,29 +74,28 @@ public class BaseModelProvider extends ContentProvider {
         return OdooAccountManager.getDetails(getContext(), username);
     }
 
-    public void setModel(Uri uri) {
+    public OModel getModel(Uri uri) {
         String path = uri.getQueryParameter(KEY_MODEL);
         String username = uri.getQueryParameter(KEY_USERNAME);
-        mModel = OModel.get(getContext(), path, username);
-        assert mModel != null;
+        return OModel.get(getContext(), path, username);
     }
 
-    private void setMatcher(Uri uri) {
+    private void setMatcher(OModel model, Uri uri) {
         String authority = (authority() != null) ? authority() : uri.getAuthority();
-        matcher.addURI(authority, mModel.getModelName(), COLLECTION);
-        matcher.addURI(authority, mModel.getModelName() + "/#", SINGLE_ROW);
+        matcher.addURI(authority, model.getModelName(), COLLECTION);
+        matcher.addURI(authority, model.getModelName() + "/#", SINGLE_ROW);
     }
 
     @Override
     public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs, String sortOrder) {
-        setModel(uri);
-        setMatcher(uri);
-        if (mModel == null)
+        OModel model = getModel(uri);
+        setMatcher(model, uri);
+        if (model == null)
             return null;
-        String[] projection = removeRelationColumns(base_projection);
+        String[] projection = removeRelationColumns(model, base_projection);
         int match = matcher.match(uri);
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-        builder.setTables(mModel.getTableName());
+        builder.setTables(model.getTableName());
 
         // If selection not null and does not contain _is_active
         if ((selection != null && !selection.contains("_is_active")) || selection == null) {
@@ -105,12 +104,12 @@ public class BaseModelProvider extends ContentProvider {
         Cursor cr = null;
         switch (match) {
             case COLLECTION:
-                cr = builder.query(mModel.getReadableDatabase(), projection,
+                cr = builder.query(model.getReadableDatabase(), projection,
                         selection, selectionArgs, null, null, sortOrder);
                 break;
             case SINGLE_ROW:
                 int row_id = Integer.parseInt(uri.getLastPathSegment());
-                cr = builder.query(mModel.getReadableDatabase(), projection,
+                cr = builder.query(model.getReadableDatabase(), projection,
                         OColumn.ROW_ID + " = ? ", new String[]{row_id + ""}, null, null, null);
             case UriMatcher.NO_MATCH:
                 break;
@@ -123,11 +122,11 @@ public class BaseModelProvider extends ContentProvider {
         return cr;
     }
 
-    private String[] removeRelationColumns(String[] projection) {
+    private String[] removeRelationColumns(OModel model, String[] projection) {
         HashSet<String> columns = new HashSet<>();
-        if (projection != null && projection.length > 0 && mModel != null) {
+        if (projection != null && projection.length > 0 && model != null) {
             for (String key : projection) {
-                OColumn column = mModel.getColumn(key);
+                OColumn column = model.getColumn(key);
                 if (column != null && column.getRelationType() == null) {
                     columns.add(key);
                 } else if (column != null && column.getRelationType() == OColumn.RelationType.ManyToOne) {
@@ -141,15 +140,15 @@ public class BaseModelProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return uri.toString();
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues all_values) {
-        setModel(uri);
-        setMatcher(uri);
-        ContentValues[] values = generateValues(all_values);
+    public Uri insert(@NonNull Uri uri, ContentValues all_values) {
+        OModel model = getModel(uri);
+        setMatcher(model, uri);
+        ContentValues[] values = generateValues(model, all_values);
         ContentValues value_to_insert = values[0];
         value_to_insert.put("_write_date", ODateUtils.getUTCDate());
         if (!value_to_insert.containsKey("_is_active"))
@@ -159,11 +158,12 @@ public class BaseModelProvider extends ContentProvider {
         int match = matcher.match(uri);
         switch (match) {
             case COLLECTION:
-                SQLiteDatabase db = mModel.getWritableDatabase();
-                long new_id = db.insert(mModel.getTableName(), null, value_to_insert);
+                SQLiteDatabase db = model.getWritableDatabase();
+                long new_id = db.insert(model.getTableName(), null, value_to_insert);
                 // Updating relation columns for record
                 if (values[1].size() > 0) {
-                    storeUpdateRelationRecords(values[1], OColumn.ROW_ID + "  = ?", new String[]{new_id + ""});
+                    storeUpdateRelationRecords(model, values[1], OColumn.ROW_ID + "  = ?",
+                            new String[]{new_id + ""});
                 }
                 return Uri.withAppendedPath(uri, new_id + "");
             case SINGLE_ROW:
@@ -179,20 +179,20 @@ public class BaseModelProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         int count = 0;
-        setModel(uri);
-        setMatcher(uri);
+        OModel model = getModel(uri);
+        setMatcher(model, uri);
         int match = matcher.match(uri);
         switch (match) {
             case COLLECTION:
-                SQLiteDatabase db = mModel.getWritableDatabase();
-                count = db.delete(mModel.getTableName(), selection, selectionArgs);
+                SQLiteDatabase db = model.getWritableDatabase();
+                count = db.delete(model.getTableName(), selection, selectionArgs);
                 break;
             case SINGLE_ROW:
-                db = mModel.getWritableDatabase();
+                db = model.getWritableDatabase();
                 String row_id = uri.getLastPathSegment();
-                count = db.delete(mModel.getTableName(), OColumn.ROW_ID + "  = ?", new String[]{row_id});
+                count = db.delete(model.getTableName(), OColumn.ROW_ID + "  = ?", new String[]{row_id});
                 break;
             case UriMatcher.NO_MATCH:
                 break;
@@ -204,10 +204,10 @@ public class BaseModelProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues all_values, String selection, String[] selectionArgs) {
-        setModel(uri);
-        setMatcher(uri);
-        ContentValues[] values = generateValues(all_values);
+    public int update(@NonNull Uri uri, ContentValues all_values, String selection, String[] selectionArgs) {
+        OModel model = getModel(uri);
+        setMatcher(model, uri);
+        ContentValues[] values = generateValues(model, all_values);
         ContentValues value_to_update = values[0];
         if (!value_to_update.containsKey("_write_date")) {
             value_to_update.put("_write_date", ODateUtils.getUTCDate());
@@ -219,21 +219,21 @@ public class BaseModelProvider extends ContentProvider {
         int match = matcher.match(uri);
         switch (match) {
             case COLLECTION:
-                SQLiteDatabase db = mModel.getWritableDatabase();
-                count = db.update(mModel.getTableName(), value_to_update, selection, selectionArgs);
+                SQLiteDatabase db = model.getWritableDatabase();
+                count = db.update(model.getTableName(), value_to_update, selection, selectionArgs);
                 // Updating relation columns
                 if (values[1].size() > 0) {
-                    storeUpdateRelationRecords(values[1], selection, selectionArgs);
+                    storeUpdateRelationRecords(model, values[1], selection, selectionArgs);
                 }
 
                 break;
             case SINGLE_ROW:
                 String row_id = uri.getLastPathSegment();
-                db = mModel.getWritableDatabase();
-                count = db.update(mModel.getTableName(), value_to_update, OColumn.ROW_ID + "  = ?", new String[]{row_id});
+                db = model.getWritableDatabase();
+                count = db.update(model.getTableName(), value_to_update, OColumn.ROW_ID + "  = ?", new String[]{row_id});
                 // Updating relation columns for record
                 if (values[1].size() > 0) {
-                    storeUpdateRelationRecords(values[1], OColumn.ROW_ID + "  = ?", new String[]{row_id});
+                    storeUpdateRelationRecords(model, values[1], OColumn.ROW_ID + "  = ?", new String[]{row_id});
                 }
                 break;
             case UriMatcher.NO_MATCH:
@@ -245,25 +245,26 @@ public class BaseModelProvider extends ContentProvider {
         return count;
     }
 
-    private void storeUpdateRelationRecords(ContentValues values, String selection, String[] args) {
-        int row_id = mModel.selectRowId(selection, args);
+    private void storeUpdateRelationRecords(OModel model, ContentValues values,
+                                            String selection, String[] args) {
+        int row_id = model.selectRowId(selection, args);
         for (String key : values.keySet()) {
             try {
-                OColumn column = mModel.getColumn(key);
+                OColumn column = model.getColumn(key);
                 RelValues relValues = (RelValues) OObjectUtils.byteToObject(
                         (byte[]) values.get(key));
-                mModel.handleRelationValues(row_id, column, relValues);
+                model.handleRelationValues(row_id, column, relValues);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private ContentValues[] generateValues(ContentValues values) {
+    private ContentValues[] generateValues(OModel model, ContentValues values) {
         OValues data_value = new OValues();
         OValues rel_value = new OValues();
         for (String key : values.keySet()) {
-            OColumn column = mModel.getColumn(key);
+            OColumn column = model.getColumn(key);
             if (column != null) {
                 if (column.getRelationType() == null) {
                     data_value.put(key, values.get(key));
@@ -273,7 +274,7 @@ public class BaseModelProvider extends ContentProvider {
                             data_value.put(key, values.get(key));
                         else {
                             // Creating many to one record and assigning id to record
-                            OModel m2oModel = mModel.createInstance(column.getType());
+                            OModel m2oModel = model.createInstance(column.getType());
                             try {
                                 OValues m2oVal = (OValues) OObjectUtils.byteToObject(
                                         (byte[]) values.get(key));
