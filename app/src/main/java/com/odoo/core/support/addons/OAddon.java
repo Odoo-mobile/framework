@@ -19,14 +19,16 @@
  */
 package com.odoo.core.support.addons;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.odoo.core.support.addons.fragment.BaseFragment;
 
-public class OAddon {
+public class OAddon implements Comparable<OAddon> {
     public static final String TAG = OAddon.class.getSimpleName();
     private Class<?> addon = null;
     private Boolean isDefault = false;
+    private Integer sequence = 0;
 
     public OAddon(Class<? extends BaseFragment> addon_class) {
         addon = addon_class;
@@ -48,5 +50,18 @@ public class OAddon {
 
     public Boolean isDefault() {
         return isDefault;
+    }
+
+    public OAddon withSequence(int sequence) {
+        if (!isDefault())
+            this.sequence = sequence;
+        else
+            this.sequence = 0;
+        return this;
+    }
+
+    @Override
+    public int compareTo(@NonNull OAddon addon) {
+        return sequence.compareTo(addon.sequence);
     }
 }
