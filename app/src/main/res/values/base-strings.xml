@@ -71,6 +71,7 @@
     <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
     <string name="toast_are_you_sure_delete_account">Are you sure want to delete account ?</string>
     <string name="toast_network_required">Network required</string>
+    <string name="toast_sync_complete">Sync complete</string>
     <string name="toast_account_removed">Account Removed Successfully</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <string name="toast_updating_password">Updating password</string>

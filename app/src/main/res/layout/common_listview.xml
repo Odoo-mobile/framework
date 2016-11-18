@@ -16,7 +16,9 @@
             android:layout_height="wrap_content"
             android:visibility="gone">
 
-            <include layout="@layout/base_no_items_view" />
+            <include
+                android:id="@+id/noItemsView"
+                layout="@layout/base_no_items_view" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
