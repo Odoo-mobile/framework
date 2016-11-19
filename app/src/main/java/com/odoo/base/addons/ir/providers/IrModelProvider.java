@@ -15,18 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 2/1/15 2:25 PM
+ * Created on 6/2/15 10:05 AM
  */
-package com.odoo.addons.customers.providers;
+package com.odoo.base.addons.ir.providers;
 
-import com.odoo.base.addons.res.ResPartner;
+import android.net.Uri;
+
+import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.orm.provider.BaseModelProvider;
 
-public class CustomersSyncProvider extends BaseModelProvider {
-    public static final String TAG = CustomersSyncProvider.class.getSimpleName();
+public class IrModelProvider extends BaseModelProvider {
+    public static final String TAG = IrModelProvider.class.getSimpleName();
 
     @Override
-    public String authority() {
-        return ResPartner.AUTHORITY;
+    public void setModel(Uri uri) {
+        mModel = new IrModel(getContext(), getUser(uri));
     }
 }

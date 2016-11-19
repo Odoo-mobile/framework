@@ -53,6 +53,7 @@ import com.odoo.core.account.OdooUserAskPassword;
 import com.odoo.core.account.OdooUserObjectUpdater;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
+import com.odoo.core.orm.OModel;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
@@ -403,6 +404,8 @@ public class OdooActivity extends OdooCompatActivity {
                                                 // Logging in to other account
                                                 OdooAccountManager.login(OdooActivity.this,
                                                         user.getAndroidName());
+                                                OModel.sqLite = null;
+
                                                 mAccountBoxExpanded = false;
                                                 accountBoxToggle();
                                                 mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -522,6 +525,7 @@ public class OdooActivity extends OdooCompatActivity {
                     accountBoxToggle();
                 }
                 OdooAccountManager.login(this, data.getStringExtra(KEY_NEW_USER_NAME));
+                OModel.sqLite = null;
                 restartActivity();
             }
             if (requestCode == REQUEST_ACCOUNTS_MANAGE) {

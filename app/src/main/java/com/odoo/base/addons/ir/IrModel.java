@@ -20,8 +20,10 @@
 package com.odoo.base.addons.ir;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
+import com.odoo.BuildConfig;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -35,6 +37,7 @@ import java.util.Date;
 
 public class IrModel extends OModel {
     public static final String TAG = IrModel.class.getSimpleName();
+    public static String AUTHORITY = BuildConfig.APPLICATION_ID + ".core.provider.content.sync.ir_model";
     OColumn name = new OColumn("Model Description", OVarchar.class).setSize(100);
     OColumn model = new OColumn("Model", OVarchar.class).setSize(100);
     OColumn state = new OColumn("State", OVarchar.class).setSize(64);
@@ -44,6 +47,11 @@ public class IrModel extends OModel {
 
     public IrModel(Context context, OUser user) {
         super(context, "ir.model", user);
+    }
+
+    @Override
+    public Uri uri() {
+        return buildURI(AUTHORITY);
     }
 
     @Override

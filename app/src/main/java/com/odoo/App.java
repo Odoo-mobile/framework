@@ -25,12 +25,9 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.odoo.core.orm.ModelRegistryUtils;
-import com.odoo.core.orm.OModel;
 import com.odoo.core.rpc.Odoo;
 import com.odoo.core.support.OUser;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
 public class App extends Application {
@@ -38,13 +35,11 @@ public class App extends Application {
     public static final String TAG = App.class.getSimpleName();
     public static String APPLICATION_NAME;
     private static HashMap<String, Odoo> mOdooInstances = new HashMap<>();
-    private static ModelRegistryUtils modelRegistryUtils = new ModelRegistryUtils();
 
     @Override
     public void onCreate() {
         super.onCreate();
         App.APPLICATION_NAME = getPackageManager().getApplicationLabel(getApplicationInfo()).toString();
-        App.modelRegistryUtils.makeReady(getApplicationContext());
     }
 
     public Odoo getOdoo(OUser user) {
@@ -90,22 +85,5 @@ public class App extends Application {
             e.printStackTrace();
         }
         return mInstalled;
-    }
-
-    public static <T> T getModel(Context context, String modelName, OUser user) {
-        Class<? extends OModel> modelCls = App.modelRegistryUtils.getModel(modelName);
-        if (modelCls != null) {
-            try {
-                Constructor constructor = modelCls.getConstructor(Context.class, OUser.class);
-                return (T) constructor.newInstance(context, user);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-    public ModelRegistryUtils getModelRegistry() {
-        return modelRegistryUtils;
     }
 }

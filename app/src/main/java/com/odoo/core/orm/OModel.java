@@ -39,9 +39,6 @@ import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.provider.BaseModelProvider;
-import com.odoo.core.rpc.helper.ODomain;
-import com.odoo.core.rpc.helper.OdooVersion;
-import com.odoo.core.rpc.listeners.IModuleInstallListener;
 import com.odoo.core.service.ISyncServiceListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
@@ -49,6 +46,7 @@ import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OStorageUtils;
 import com.odoo.core.utils.StringUtils;
 
@@ -70,11 +68,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooVersion;
+import com.odoo.core.rpc.listeners.IModuleInstallListener;
+
 
 public class OModel implements ISyncServiceListener {
 
     public static final String TAG = OModel.class.getSimpleName();
-    private String BASE_AUTHORITY = BuildConfig.APPLICATION_ID + ".core.provider.content";
+    public String BASE_AUTHORITY = BuildConfig.APPLICATION_ID + ".core.provider.content";
     public static final int INVALID_ROW_ID = -1;
     public static OSQLite sqLite = null;
     private Context mContext;
@@ -86,20 +88,19 @@ public class OModel implements ISyncServiceListener {
     private HashMap<String, Field> mDeclaredFields = new HashMap<>();
     private OdooVersion mOdooVersion = null;
     private String default_name_column = "name";
+    public static OModelRegistry modelRegistry = new OModelRegistry();
     private boolean hasMailChatter = false;
 
     // Base Columns
     OColumn id = new OColumn("ID", OInteger.class).setDefaultValue(0);
     @Odoo.api.v8
     @Odoo.api.v9
-    @Odoo.api.v10
-    @Odoo.api.v11alpha
+    @Odoo.api.v10alpha
     public OColumn create_date = new OColumn("Created On", ODateTime.class);
 
     @Odoo.api.v8
     @Odoo.api.v9
-    @Odoo.api.v10
-    @Odoo.api.v11alpha
+    @Odoo.api.v10alpha
     public OColumn write_date = new OColumn("Last Updated On", ODateTime.class);
 
     // Local Base columns
@@ -347,13 +348,8 @@ public class OModel implements ISyncServiceListener {
                     Class<? extends Annotation> type = annotation.annotationType();
                     if (type.getDeclaringClass().isAssignableFrom(Odoo.api.class)) {
                         switch (mOdooVersion.getVersionNumber()) {
-                            case 11:
-                                if (type.isAssignableFrom(Odoo.api.v11alpha.class)) {
-                                    version++;
-                                }
-                                break;
                             case 10:
-                                if (type.isAssignableFrom(Odoo.api.v10.class)) {
+                                if (type.isAssignableFrom(Odoo.api.v10alpha.class)) {
                                     version++;
                                 }
                                 break;
@@ -472,8 +468,23 @@ public class OModel implements ISyncServiceListener {
     }
 
     public static OModel get(Context context, String model_name, String username) {
+        OModel model = modelRegistry.getModel(model_name, username);
         OUser user = OdooAccountManager.getDetails(context, username);
-        return App.getModel(context, model_name, user);
+        if (model == null) {
+            try {
+                OPreferenceManager pfManager = new OPreferenceManager(context);
+                Class<?> model_class = Class.forName(pfManager.getString(model_name, null));
+                if (model_class != null) {
+                    model = new OModel(context, model_name, user).createInstance(model_class);
+                    if (model != null) {
+                        modelRegistry.register(model);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return model;
     }
 
     public String authority() {
