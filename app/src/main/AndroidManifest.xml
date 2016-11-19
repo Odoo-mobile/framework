@@ -79,7 +79,7 @@
             android:authorities="${applicationId}.core.provider.content"
             android:multiprocess="true" />
 
-        <!-- Sync Provider & Service Ricardo  // -->
+        <!-- Sync Provider & Service Ricardo 1234  // -->
         <provider
             android:name="com.odoo.addons.customers.providers.CustomersSyncProvider"
             android:authorities="${applicationId}.core.provider.content.sync.res_partner"
