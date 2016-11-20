@@ -73,7 +73,7 @@ public class OPreferenceManager {
                 return Integer.parseInt(mPref.getString(key, default_value + ""));
             } catch (NumberFormatException e) {
                 Log.d(TAG, e.getMessage());
-                return -1;
+                return default_value;
             }
         }
         return mPref.getInt(key, default_value);
