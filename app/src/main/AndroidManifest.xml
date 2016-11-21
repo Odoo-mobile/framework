@@ -78,8 +78,12 @@
             android:name="com.odoo.core.orm.provider.BaseModelProvider"
             android:authorities="${applicationId}.core.provider.content"
             android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.addons.ir.providers.IrModelProvider"
+            android:authorities="${applicationId}.core.provider.content.sync.ir_model"
+            android:multiprocess="true" />
 
-        <!-- Sync Provider & Service  // -->
+        <!-- Sync Provider & Service Ricardo 1234  // -->
         <provider
             android:name="com.odoo.addons.customers.providers.CustomersSyncProvider"
             android:authorities="${applicationId}.core.provider.content.sync.res_partner"

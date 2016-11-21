@@ -25,6 +25,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.odoo.App;
+import com.odoo.core.orm.OModelRegistry;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.sys.OCacheUtils;
@@ -205,6 +206,9 @@ public class OdooAccountManager {
         // Setting odoo instance to null
         App app = (App) context.getApplicationContext();
         app.setOdoo(null, null);
+        // Clearing models registry
+        OModelRegistry registry = new OModelRegistry();
+        registry.clearAll();
         OUser activeUser = getActiveUser(context);
         // Logging out user if any
         if (activeUser != null) {
