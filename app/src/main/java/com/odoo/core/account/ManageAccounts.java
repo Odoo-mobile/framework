@@ -22,6 +22,7 @@ package com.odoo.core.account;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -153,17 +154,9 @@ public class ManageAccounts extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         OUser user = (OUser) v.getTag();
-                        OdooAccountManager.removeAccount(ManageAccounts.this, user.getAndroidName());
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(ManageAccounts.this, OResource.string(ManageAccounts.this,
-                                        R.string.toast_account_removed), Toast.LENGTH_LONG).show();
-                                setResult(RESULT_OK);
-                                finish();
-                            }
-                        }, OdooActivity.DRAWER_ITEM_LAUNCH_DELAY);
-
+                        new AccountDeleteTask().execute(user);
+                        setResult(RESULT_OK);
+                        finish();
                     }
                 });
                 builder.setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
@@ -174,6 +167,30 @@ public class ManageAccounts extends AppCompatActivity implements View.OnClickLis
                 });
                 builder.show();
                 break;
+        }
+    }
+
+    private class AccountDeleteTask extends AsyncTask<OUser, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(OUser... odooUsers) {
+            return OdooAccountManager.removeAccount(ManageAccounts.this, odooUsers[0].getAndroidName());
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (result) {
+                Toast.makeText(ManageAccounts.this, R.string.toast_account_removed,
+                        Toast.LENGTH_LONG).show();
+                accounts.clear();
+                accounts.addAll(OdooAccountManager.getAllAccounts(ManageAccounts.this));
+                mAdapter.notifyDataSetChanged(accounts);
+            }
         }
     }
 

@@ -27,6 +27,7 @@ import android.net.NetworkInfo;
 
 import com.odoo.core.orm.ModelRegistryUtils;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OSQLite;
 import com.odoo.core.rpc.Odoo;
 import com.odoo.core.support.OUser;
 
@@ -38,6 +39,7 @@ public class App extends Application {
     public static final String TAG = App.class.getSimpleName();
     public static String APPLICATION_NAME;
     private static HashMap<String, Odoo> mOdooInstances = new HashMap<>();
+    private static HashMap<String, OSQLite> mSQLiteObjecs = new HashMap<>();
     private static ModelRegistryUtils modelRegistryUtils = new ModelRegistryUtils();
 
     @Override
@@ -45,6 +47,14 @@ public class App extends Application {
         super.onCreate();
         App.APPLICATION_NAME = getPackageManager().getApplicationLabel(getApplicationInfo()).toString();
         App.modelRegistryUtils.makeReady(getApplicationContext());
+    }
+
+    public static OSQLite getSQLite(String userName) {
+        return mSQLiteObjecs.containsKey(userName) ? mSQLiteObjecs.get(userName) : null;
+    }
+
+    public static void setSQLite(String userName, OSQLite sqLite) {
+        mSQLiteObjecs.put(userName, sqLite);
     }
 
     public Odoo getOdoo(OUser user) {

@@ -76,7 +76,7 @@ public class OModel implements ISyncServiceListener {
     public static final String TAG = OModel.class.getSimpleName();
     private String BASE_AUTHORITY = BuildConfig.APPLICATION_ID + ".core.provider.content";
     public static final int INVALID_ROW_ID = -1;
-    public static OSQLite sqLite = null;
+    private OSQLite sqLite = null;
     private Context mContext;
     private OUser mUser;
     private String model_name = null;
@@ -114,8 +114,11 @@ public class OModel implements ISyncServiceListener {
         this.model_name = model_name;
         if (mUser != null) {
             mOdooVersion = mUser.getOdooVersion();
-            if (sqLite == null || !sqLite.getUserAndroidName().equals(mUser.getAndroidName())) {
+
+            sqLite = App.getSQLite(mUser.getAndroidName());
+            if (sqLite == null) {
                 sqLite = new OSQLite(mContext, mUser);
+                App.setSQLite(mUser.getAndroidName(), sqLite);
             }
         }
     }

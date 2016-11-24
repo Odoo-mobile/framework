@@ -27,11 +27,8 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 
-import com.odoo.App;
 import com.odoo.core.account.OdooLogin;
-import com.odoo.core.orm.OSQLite;
 import com.odoo.core.support.OUser;
 
 public class OdooAuthenticator extends AbstractAccountAuthenticator {
@@ -58,7 +55,6 @@ public class OdooAuthenticator extends AbstractAccountAuthenticator {
         return result;
     }
 
-    @NonNull
     @Override
     public Bundle getAccountRemovalAllowed(AccountAuthenticatorResponse response, Account account) throws NetworkErrorException {
         Bundle result = super.getAccountRemovalAllowed(response, account);
@@ -69,10 +65,7 @@ public class OdooAuthenticator extends AbstractAccountAuthenticator {
                     .getBoolean(AccountManager.KEY_BOOLEAN_RESULT);
             if (removalAllowed) {
                 OUser user = OdooAccountManager.getDetails(mContext, account.name);
-                OSQLite sqLite = new OSQLite(mContext, user);
-                sqLite.dropDatabase();
-                App app = (App) mContext.getApplicationContext();
-                app.setOdoo(null, user);
+                OdooAccountManager.dropDatabase(user);
             }
         }
         return result;
