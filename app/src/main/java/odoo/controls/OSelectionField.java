@@ -367,6 +367,10 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                 } else if (mCol.getType().isAssignableFrom(OSelection.class)) {
                     int pos = getPos();
                     mSpinner.setSelection(pos);
+                    if (pos != -1) {
+                        row = mAdapter.getItem(pos);
+                        mValue = pos;
+                    }
                 } else {
                     Integer row_id = null;
                     if (mValue instanceof OM2ORecord) {
