@@ -369,7 +369,6 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                     mSpinner.setSelection(pos);
                     if (pos != -1) {
                         row = mAdapter.getItem(pos);
-                        mValue = pos;
                     }
                 } else {
                     Integer row_id = null;
@@ -393,8 +392,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             if (mResourceArray != -1 || mCol.getType().isAssignableFrom(OSelection.class)) {
                 int position = getPos();
                 // Ignoring if default value not set for field.
-                if (position != -1)
-                    row = items.get(position);
+                if (position != -1) row = items.get(position);
             } else {
                 if (mValue instanceof OM2ORecord) {
                     row = ((OM2ORecord) mValue).browse();
@@ -414,8 +412,8 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             if (!row.getString(mModel.getDefaultNameColumn()).equals("false"))
                 txvView.setText(row.getString(mModel.getDefaultNameColumn()));
         }
-        if (isEditable() && mValueUpdateListener != null && (mValue instanceof Integer &&
-                (int) mValue != -1)) {
+        if (isEditable() && mValueUpdateListener != null) {
+            if (mValue instanceof Integer && (int) mValue == -1) return;
             mValueUpdateListener.onValueUpdate(row);
         }
     }
