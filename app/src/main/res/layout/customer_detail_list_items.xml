@@ -86,6 +86,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:fieldLabelColor="@color/theme_secondary"
+                app:fieldName="state_id"
+                app:fieldTextAppearance="?android:textAppearanceMedium"></odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:fieldLabelColor="@color/theme_secondary"
                 app:fieldName="country_id"
                 app:fieldTextAppearance="?android:textAppearanceMedium"></odoo.controls.OField>
 
@@ -181,6 +188,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:fieldName="zip"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"></odoo.controls.OField>
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:fieldName="state_id"
                     app:fieldTextAppearance="?android:textAppearanceMedium"></odoo.controls.OField>
 
                 <odoo.controls.OField

@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p>
  * Created on 7/1/15 5:10 PM
  */
 package odoo.controls;
@@ -41,10 +41,10 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.utils.DomainFilterParser;
 import com.odoo.core.utils.OResource;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 public class OForm extends LinearLayout {
     public static final String TAG = OForm.class.getSimpleName();
@@ -60,6 +60,7 @@ public class OForm extends LinearLayout {
     private OValues extraValues = new OValues();
     private MailChatterView chatterView = null;
     private Boolean loadChatter = true;
+
     public OForm(Context context) {
         super(context);
         init(context, null, 0, 0);
@@ -151,6 +152,7 @@ public class OForm extends LinearLayout {
             View v = mFormFieldControls.get(key);
             if (v instanceof OField) {
                 OField c = (OField) v;
+                c.setFormView(this);
                 c.setEditable(mEditable);
                 c.useTemplate(autoUIGenerate);
                 c.setModel(model);
@@ -182,7 +184,7 @@ public class OForm extends LinearLayout {
         }
 
         // Adding chatter view if model requested
-        if(loadChatter) {
+        if (loadChatter) {
             if (!mEditable) {
                 if (model != null && model.hasMailChatter()
                         && mRecord != null && mRecord.getInt("id") != 0) {
@@ -198,8 +200,8 @@ public class OForm extends LinearLayout {
             }
         }
     }
-    
-    public void loadChatter(boolean loadChatter){
+
+    public void loadChatter(boolean loadChatter) {
         this.loadChatter = loadChatter;
     }
 
@@ -217,6 +219,17 @@ public class OForm extends LinearLayout {
                     mFormFieldControls.put(field.getFieldName(), field);
             }
         }
+    }
+
+    public OValues getControlValues() {
+        OValues values = getValues();
+        for (String key : values.keys()) {
+            if (values.get(key).toString().equals("false") &&
+                    !mRecord.get(key).toString().equals("false")) {
+                values.put(key, mRecord.get(key));
+            }
+        }
+        return values;
     }
 
     public OValues getValues() {
@@ -245,35 +258,21 @@ public class OForm extends LinearLayout {
         return values;
     }
 
-    // OnDomainFilterCallBack callbacks
-    private void setOnDomainFilterCallBack(final OColumn column, OField field) {
-        LinkedHashMap<String, OColumn.ColumnDomain> filterDomain = column
-                .getFilterDomains();
-        for (String key : filterDomain.keySet()) {
-            OColumn.ColumnDomain domain = filterDomain.get(key);
-            if (domain.getColumn() != null) {
-                OField fld = mFormFieldControls.get(domain.getColumn());
-                if (fld != null) {
-                    setFilterDomainCallback(domain, fld, field, column);
-                }
+    private void setOnDomainFilterCallBack(final OColumn column, final OField baseField) {
+        DomainFilterParser domainFilter = column.getDomainFilterParser();
+        for (String key : domainFilter.getFilterColumns()) {
+            DomainFilterParser.FilterDomain filterDomain = domainFilter.getFilter(key);
+            if (filterDomain.operator_value == null &&
+                    mFormFieldControls.containsKey(filterDomain.valueColumn)) {
+                final OField columnField = mFormFieldControls.get(filterDomain.valueColumn);
+                columnField.setOnFilterDomainCallBack(new IOnDomainFilterCallbacks() {
+                    @Override
+                    public void onFieldValueChanged(Object value) {
+                        baseField.resetData();
+                    }
+                });
             }
         }
-
-    }
-
-    private void setFilterDomainCallback(OColumn.ColumnDomain domain,
-                                         final OField field, final OField oField, final OColumn column) {
-        field.setOnFilterDomainCallBack(domain, new IOnDomainFilterCallbacks() {
-
-            @Override
-            public void onFieldValueChanged(OColumn.ColumnDomain dm) {
-                column.addDomain(dm.getColumn(), dm.getOperator(),
-                        dm.getValue());
-                column.setHasDomainFilterColumn(false);
-                oField.setColumn(column);
-                oField.resetData();
-            }
-        });
     }
 
     // OnChange event for control column

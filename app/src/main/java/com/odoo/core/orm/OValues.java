@@ -20,7 +20,10 @@
 package com.odoo.core.orm;
 
 import android.content.ContentValues;
+import android.os.Bundle;
 
+import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.utils.DomainFilterParser;
 import com.odoo.core.utils.OObjectUtils;
 
 import java.io.IOException;
@@ -147,4 +150,28 @@ public class OValues implements Serializable {
         return values;
     }
 
+    public Bundle toFilterColumnsBundle(OColumn column) {
+        Bundle data = new Bundle();
+        if (column.hasDomainFilterColumn()) {
+            DomainFilterParser parser = column.getDomainFilterParser();
+            for (String key : parser.getFilterColumns()) {
+                if (!key.startsWith("operator#")) {
+                    String[] keyParts = key.split("#");
+                    Object val = get(keyParts[1]);
+                    if (val instanceof Integer) {
+                        data.putInt(key, (Integer) val);
+                    } else if (val instanceof String) {
+                        data.putString(key, val + "");
+                    } else if (val instanceof Boolean) {
+                        data.putBoolean(key, (Boolean) val);
+                    } else if (val instanceof Float) {
+                        data.putDouble(key, (Float) val);
+                    } else if (val instanceof OM2ORecord) {
+                        data.putInt(key, ((OM2ORecord) val).getId());
+                    }
+                }
+            }
+        }
+        return data;
+    }
 }

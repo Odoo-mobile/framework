@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p>
  * Created on 7/1/15 5:10 PM
  */
 package odoo.controls;
@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.odoo.R;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
@@ -48,7 +49,6 @@ import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OTimestamp;
 import com.odoo.core.orm.fields.types.OVarchar;
-import com.odoo.R;
 
 public class OField extends LinearLayout implements IOControlData.ValueUpdateListener {
     public static final String TAG = OField.class.getSimpleName();
@@ -68,10 +68,10 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
     private String mParsePattern = null;
     private IOnChangeCallback mOnChangeCallback = null;
     private IOnDomainFilterCallbacks mOnDomainFilterCallbacks = null;
-    private OColumn.ColumnDomain mColumnDomain = null;
     private float mWidgetImageSize = -1;
     private Boolean withPadding = true;
     // Controls
+    private OForm parentForm;
     private IOControlData mControlData = null;
     private Boolean useTemplate = true;
     private Integer defaultImage = -1;
@@ -199,6 +199,10 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         }
         if (mContext.getClass().getSimpleName().contains("BridgeContext"))
             initControl();
+    }
+
+    public void setFormView(OForm formView) {
+        parentForm = formView;
     }
 
     public void useTemplate(Boolean withTemplate) {
@@ -422,6 +426,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
     // Selection, Searchable, SearchableLive
     private View initSelectionWidget() {
         OSelectionField selection = new OSelectionField(mContext);
+        selection.setFormView(parentForm);
         mControlData = selection;
         selection.setResource(textSize, textAppearance, textColor);
         selection.setLabelText(getLabelText());
@@ -526,8 +531,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
                     mOnChangeCallback.onValueChange(row);
                 }
                 if (mOnDomainFilterCallbacks != null) {
-                    mColumnDomain.setValue(row.getInt(OColumn.ROW_ID));
-                    mOnDomainFilterCallbacks.onFieldValueChanged(mColumnDomain);
+                    mOnDomainFilterCallbacks.onFieldValueChanged(row.getInt(OColumn.ROW_ID));
                 }
             }
         }
@@ -558,16 +562,13 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
     /**
      * Domain Filters
      *
-     * @param domain
      * @param callback
      */
-    public void setOnFilterDomainCallBack(OColumn.ColumnDomain domain,
-                                          IOnDomainFilterCallbacks callback) {
-        mColumnDomain = domain;
+    public void setOnFilterDomainCallBack(IOnDomainFilterCallbacks callback) {
         mOnDomainFilterCallbacks = callback;
     }
 
     public interface IOnFieldValueChangeListener {
-        public void onFieldValueChange(OField field, Object value);
+        void onFieldValueChange(OField field, Object value);
     }
 }

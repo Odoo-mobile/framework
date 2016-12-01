@@ -19,7 +19,6 @@
  */
 package odoo.controls;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -49,7 +48,6 @@ import com.odoo.core.utils.OResource;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class SearchableItemActivity extends ActionBarActivity implements
         AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener,
         OListAdapter.OnSearchChange, IOnQuickRecordCreateListener {
@@ -67,7 +65,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
     private Integer mRowId = null;
     private LiveSearch mLiveDataLoader = null;
     private OColumn mCol = null;
-    private AlertDialog.Builder builder;
+    private Bundle formData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,8 +108,11 @@ public class SearchableItemActivity extends ActionBarActivity implements
                 if (extra.containsKey("column_name")) {
                     mCol = mModel.getColumn(extra.getString("column_name"));
                     mRelModel = mModel.createInstance(mCol.getType());
-                    objects.addAll(OSelectionField.getRecordItems(mRelModel,
-                            mCol));
+
+                    if (mCol.hasDomainFilterColumn()) {
+                        formData = extra.getBundle("form_data");
+                    }
+                    objects.addAll(OSelectionField.getRecordItems(mRelModel, mCol, formData));
                 }
             }
 
@@ -233,6 +234,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
                 ODomain domain = new ODomain();
                 domain.add(mRelModel.getDefaultNameColumn(), "ilike", params[0]);
                 if (mCol != null) {
+                    //FIXME:  Check for domain filter and domains
                     for (String key : mCol.getDomains().keySet()) {
                         OColumn.ColumnDomain dom = mCol.getDomains().get(key);
                         domain.add(dom.getColumn(), dom.getOperator(),

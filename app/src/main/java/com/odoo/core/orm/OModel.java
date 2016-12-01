@@ -239,7 +239,10 @@ public class OModel implements ISyncServiceListener {
                     column.setSyncColumnName(syncColumnName);
 
                     // domain filter on column
-                    column.setHasDomainFilterColumn(isDomainFilterColumn(field));
+                    column.setHasDomainFilterColumn(field.getAnnotation(Odoo.Domain.class) != null);
+                    if (column.hasDomainFilterColumn()) {
+                        column.setDomainFilter(field.getAnnotation(Odoo.Domain.class));
+                    }
                     return column;
                 }
             } catch (Exception e) {
@@ -248,15 +251,6 @@ public class OModel implements ISyncServiceListener {
             }
         }
         return null;
-    }
-
-    private boolean isDomainFilterColumn(Field field) {
-        Annotation annotation = field.getAnnotation(Odoo.hasDomainFilter.class);
-        if (annotation != null) {
-            Odoo.hasDomainFilter domainFilter = (Odoo.hasDomainFilter) annotation;
-            return domainFilter.checkDomainRuntime();
-        }
-        return false;
     }
 
     private Boolean checkForOnChangeBGProcess(Field field) {
@@ -381,7 +375,7 @@ public class OModel implements ISyncServiceListener {
                     // Check for functional annotation
                     if (type.isAssignableFrom(Odoo.Functional.class)
                             || type.isAssignableFrom(Odoo.onChange.class)
-                            || type.isAssignableFrom(Odoo.hasDomainFilter.class)
+                            || type.isAssignableFrom(Odoo.Domain.class)
                             || type.isAssignableFrom(Odoo.SyncColumnName.class)) {
                         version++;
                     }
