@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -64,7 +65,6 @@ public class SearchableItemActivity extends ActionBarActivity implements
     private OModel mRelModel = null;
     private Integer mRowId = null;
     private LiveSearch mLiveDataLoader = null;
-    private OColumn mCol = null;
     private Bundle formData;
     private ODomain liveDomain = new ODomain();
 
@@ -107,7 +107,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
                 }
             } else {
                 if (extra.containsKey("column_name")) {
-                    mCol = mModel.getColumn(extra.getString("column_name"));
+                    OColumn mCol = mModel.getColumn(extra.getString("column_name"));
                     mRelModel = mModel.createInstance(mCol.getType());
 
                     if (mCol.hasDomainFilterColumn()) {
@@ -170,7 +170,8 @@ public class SearchableItemActivity extends ActionBarActivity implements
         if (mRowId != null) {
             intent.putExtra("record_id", true);
         }
-        sendBroadcast(intent);
+        // FIXME: use local broadcast
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         finish();
     }
 

@@ -28,6 +28,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -185,38 +186,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
 
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(mContext, SearchableItemActivity.class);
-                                intent.putExtra("resource_id", mResourceArray);
-                                intent.putExtra("selected_position", getPos());
-                                intent.putExtra(OColumn.ROW_ID, getPos());
-                                intent.putExtra("search_hint", getLabel());
-                                if (mCol != null) {
-                                    intent.putExtra("column_name", mCol.getName());
-                                    if (mCol.hasDomainFilterColumn()) {
-                                        Bundle formData = formView.getValues()
-                                                .toFilterColumnsBundle(mModel, mCol);
-                                        intent.putExtra("form_data", formData);
-                                    }
-                                }
-                            /*
-                             * FIXME: What about filter domain. Pass detail for
-							 * filter domain
-							 */
-                                intent.putExtra("model", mModel.getModelName());
-                                intent.putExtra("live_search",
-                                        (mWidget == OField.WidgetType.SearchableLive));
-                                try {
-                                    mContext.unregisterReceiver(valueReceiver);
-                                } catch (Exception e) {
-
-                                }
-                                try {
-                                    mContext.registerReceiver(valueReceiver,
-                                            new IntentFilter("searchable_value_select"));
-                                } catch (Exception e) {
-
-                                }
-                                mContext.startActivity(intent);
+                                startSearchableActivity();
                             }
                         });
                         if (textSize > -1) {
@@ -253,6 +223,26 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             txvView.setTextColor(textColor);
             addView(txvView);
         }
+    }
+
+    private void startSearchableActivity() {
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(mContext);
+        Intent intent = new Intent(mContext, SearchableItemActivity.class);
+        intent.putExtra("resource_id", mResourceArray);
+        intent.putExtra("selected_position", getPos());
+        intent.putExtra(OColumn.ROW_ID, getPos());
+        intent.putExtra("search_hint", getLabel());
+        if (mCol != null) {
+            intent.putExtra("column_name", mCol.getName());
+            if (mCol.hasDomainFilterColumn()) {
+                Bundle formData = formView.getValues().toFilterColumnsBundle(mModel, mCol);
+                intent.putExtra("form_data", formData);
+            }
+        }
+        intent.putExtra("model", mModel.getModelName());
+        intent.putExtra("live_search", (mWidget == OField.WidgetType.SearchableLive));
+        broadcastManager.registerReceiver(valueReceiver, new IntentFilter("searchable_value_select"));
+        mContext.startActivity(intent);
     }
 
     private void createItems() {
@@ -331,7 +321,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                                     .setChecked(true);
                             row = items.get(getPos());
                         } else {
-                            Integer row_id = null;
+                            Integer row_id;
                             if (mValue instanceof OM2ORecord) {
                                 row = ((OM2ORecord) mValue).browse();
                                 row_id = row.getInt(OColumn.ROW_ID);
@@ -360,7 +350,8 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                             else if (mValue instanceof Integer)
                                 row = getRecordData((Integer) mValue);
                         }
-                        txvView.setText(row.getString(mModel.getDefaultNameColumn()));
+                        if (row != null)
+                            txvView.setText(row.getString(mModel.getDefaultNameColumn()));
                         if (txvView.getTag() != null) {
                             AlertDialog dialog = (AlertDialog) txvView.getTag();
                             dialog.dismiss();
@@ -583,7 +574,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         @Override
         public void onReceive(Context context, Intent intent) {
             setValue(intent.getIntExtra("selected_position", -1));
-            mContext.unregisterReceiver(valueReceiver);
+            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(valueReceiver);
         }
     };
 
