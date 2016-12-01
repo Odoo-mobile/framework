@@ -66,6 +66,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
     private LiveSearch mLiveDataLoader = null;
     private OColumn mCol = null;
     private Bundle formData;
+    private ODomain liveDomain = new ODomain();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +112,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
 
                     if (mCol.hasDomainFilterColumn()) {
                         formData = extra.getBundle("form_data");
+                        liveDomain = mCol.getDomainFilterParser(mModel).getRPCDomain(formData);
                     }
                     objects.addAll(OSelectionField.getRecordItems(mRelModel, mCol, formData));
                 }
@@ -233,19 +235,12 @@ public class SearchableItemActivity extends ActionBarActivity implements
                 ServerDataHelper helper = mRelModel.getServerDataHelper();
                 ODomain domain = new ODomain();
                 domain.add(mRelModel.getDefaultNameColumn(), "ilike", params[0]);
-                if (mCol != null) {
-                    //FIXME:  Check for domain filter and domains
-                    for (String key : mCol.getDomains().keySet()) {
-                        OColumn.ColumnDomain dom = mCol.getDomains().get(key);
-                        domain.add(dom.getColumn(), dom.getOperator(),
-                                dom.getValue());
-                    }
-                }
-                OdooFields fields = new OdooFields(mRelModel.getColumns());
-                return helper.searchRecords(fields, domain, 10);
+                domain.append(liveDomain);
+                return helper.searchRecords(new OdooFields(mRelModel.getColumns()), domain, 10);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
             return null;
         }
 

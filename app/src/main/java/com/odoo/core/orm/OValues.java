@@ -150,12 +150,13 @@ public class OValues implements Serializable {
         return values;
     }
 
-    public Bundle toFilterColumnsBundle(OColumn column) {
+    public Bundle toFilterColumnsBundle(OModel model, OColumn column) {
         Bundle data = new Bundle();
         if (column.hasDomainFilterColumn()) {
-            DomainFilterParser parser = column.getDomainFilterParser();
+            DomainFilterParser parser = column.getDomainFilterParser(model);
             for (String key : parser.getFilterColumns()) {
-                if (!key.startsWith("operator#")) {
+                if (!key.startsWith("operator#") &&
+                        !key.startsWith("value#")) {
                     String[] keyParts = key.split("#");
                     Object val = get(keyParts[1]);
                     if (val instanceof Integer) {

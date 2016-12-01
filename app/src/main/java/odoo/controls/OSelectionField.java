@@ -194,7 +194,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                                     intent.putExtra("column_name", mCol.getName());
                                     if (mCol.hasDomainFilterColumn()) {
                                         Bundle formData = formView.getValues()
-                                                .toFilterColumnsBundle(mCol);
+                                                .toFilterColumnsBundle(mModel, mCol);
                                         intent.putExtra("form_data", formData);
                                     }
                                 }
@@ -288,7 +288,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                 items.addAll(rows);
             } else {
                 items.addAll(getRecordItems(mModel, mCol, formView.getControlValues()
-                        .toFilterColumnsBundle(mCol)));
+                        .toFilterColumnsBundle(mModel, mCol)));
             }
         }
     }
@@ -601,7 +601,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         LinkedHashMap<String, OColumn.ColumnDomain> domains = new LinkedHashMap<>();
         domains.putAll(column.getDomains());
         if (column.hasDomainFilterColumn()) {
-            domains.putAll(column.getDomainFilterParser().getDomain(formData));
+            domains.putAll(column.getDomainFilterParser(model).getDomain(formData));
         }
         for (String key : domains.keySet()) {
             OColumn.ColumnDomain domain = domains.get(key);

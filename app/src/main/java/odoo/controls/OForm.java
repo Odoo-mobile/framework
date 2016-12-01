@@ -259,7 +259,7 @@ public class OForm extends LinearLayout {
     }
 
     private void setOnDomainFilterCallBack(final OColumn column, final OField baseField) {
-        DomainFilterParser domainFilter = column.getDomainFilterParser();
+        DomainFilterParser domainFilter = column.getDomainFilterParser(model);
         for (String key : domainFilter.getFilterColumns()) {
             DomainFilterParser.FilterDomain filterDomain = domainFilter.getFilter(key);
             if (filterDomain.operator_value == null &&

@@ -194,6 +194,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:fieldName="state_id"
+                    app:widgetType="SearchableLive"
                     app:fieldTextAppearance="?android:textAppearanceMedium"></odoo.controls.OField>
 
                 <odoo.controls.OField

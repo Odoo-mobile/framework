@@ -19,6 +19,7 @@
  */
 package com.odoo.core.orm.fields;
 
+import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.utils.DomainFilterParser;
 
@@ -225,9 +226,9 @@ public class OColumn {
         columnDomains.clear();
     }
 
-    public DomainFilterParser getDomainFilterParser() {
+    public DomainFilterParser getDomainFilterParser(OModel model) {
         if (domainFilter != null) {
-            return new DomainFilterParser(this, domainFilter.value());
+            return new DomainFilterParser(model, this, domainFilter.value());
         }
         return null;
     }
