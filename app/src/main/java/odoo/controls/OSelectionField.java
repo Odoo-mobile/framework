@@ -47,6 +47,7 @@ import android.widget.Toast;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OM2ORecord;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.utils.OControls;
@@ -235,7 +236,9 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         if (mCol != null) {
             intent.putExtra("column_name", mCol.getName());
             if (mCol.hasDomainFilterColumn()) {
-                Bundle formData = formView.getValues().toFilterColumnsBundle(mModel, mCol);
+                OValues formValues = formView.getControlValues();
+                Bundle formData = formValues != null ?
+                        formValues.toFilterColumnsBundle(mModel, mCol) : new Bundle();
                 intent.putExtra("form_data", formData);
             }
         }
@@ -277,8 +280,10 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                 }
                 items.addAll(rows);
             } else {
-                items.addAll(getRecordItems(mModel, mCol, formView.getControlValues()
-                        .toFilterColumnsBundle(mModel, mCol)));
+                OValues formValues = formView.getControlValues();
+                Bundle data = formValues != null ? formValues
+                        .toFilterColumnsBundle(mModel, mCol) : new Bundle();
+                items.addAll(getRecordItems(mModel, mCol, data));
             }
         }
     }

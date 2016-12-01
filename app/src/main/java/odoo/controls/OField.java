@@ -179,7 +179,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             with_top_padding = types.getBoolean(
                     R.styleable.OField_withTopPadding, true);
             mLabel = types.getString(R.styleable.OField_controlLabel);
-            mValue = types.getString(R.styleable.OField_defaultValue);
+            mValue = types.getString(R.styleable.OField_defaultFieldValue);
             mParsePattern = types.getString(R.styleable.OField_parsePattern);
             mValueArrayId = types.getResourceId(
                     R.styleable.OField_valueArray, -1);

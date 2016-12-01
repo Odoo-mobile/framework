@@ -222,17 +222,23 @@ public class OForm extends LinearLayout {
     }
 
     public OValues getControlValues() {
-        OValues values = getValues();
-        for (String key : values.keys()) {
-            if (values.get(key).toString().equals("false") &&
-                    !mRecord.get(key).toString().equals("false")) {
-                values.put(key, mRecord.get(key));
+        OValues values = getValues(false);
+        if (mRecord != null) {
+            for (String key : values.keys()) {
+                if (values.get(key).toString().equals("false") &&
+                        !mRecord.get(key).toString().equals("false")) {
+                    values.put(key, mRecord.get(key));
+                }
             }
         }
         return values;
     }
 
     public OValues getValues() {
+        return getValues(true);
+    }
+
+    private OValues getValues(boolean validateData) {
         OValues values = new OValues();
         for (String key : mFormFieldControls.keySet()) {
             OField control = mFormFieldControls.get(key);
@@ -243,7 +249,7 @@ public class OForm extends LinearLayout {
                 val = false;
             }
 
-            if (column != null && column.isRequired()) {
+            if (column != null && validateData && column.isRequired()) {
                 if (val.toString().equals("false")) {
                     control.setError(column.getLabel() +
                             " " + OResource.string(mContext, R.string.label_required));

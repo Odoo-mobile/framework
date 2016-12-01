@@ -43,7 +43,7 @@
         <attr name="withBottomPadding" format="boolean" />
         <attr name="withTopPadding" format="boolean" />
         <attr name="controlLabel" format="string|reference" />
-        <attr name="defaultValue" format="reference|string" />
+        <attr name="defaultFieldValue" format="reference|string" />
         <attr name="defaultImage" format="reference" />
         <attr name="valueArray" format="reference" />
         <attr name="fieldTextAppearance" format="reference" />

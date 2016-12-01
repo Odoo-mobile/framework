@@ -157,7 +157,8 @@ public class DomainFilterParser {
                     switch (domainColumn.getRelationType()) {
                         case ManyToOne:
                             OModel relModel = baseModel.createInstance(domainColumn.getType());
-                            value = relModel.selectServerId((Integer) filterDomain.value);
+                            if (filterDomain.value instanceof Integer)
+                                value = relModel.selectServerId((Integer) filterDomain.value);
                             break;
                     }
                 }
