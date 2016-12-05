@@ -149,4 +149,8 @@ public class ServerDataHelper {
         mOdoo.updateRecord(mModel.getModelName(), data, id);
         return mModel.selectRowId(id);
     }
+
+    public OdooResult executeWorkFlow(int server_id, String signal) {
+        return mOdoo.executeWorkFlow(mModel.getModelName(), server_id, signal);
+    }
 }

@@ -603,6 +603,30 @@ public class OdooWrapper<T> implements Response.Listener<JSONObject> {
         }
     }
 
+    public OdooResult executeWorkFlow(String model, int id, String signal) {
+        OdooSyncResponse response = new OdooSyncResponse();
+        executeWorkFlow(model, id, signal, null, response);
+        return validateResult(response);
+    }
+
+    public void executeWorkFlow(String model, int id, String signal, IOdooResponse callback) {
+        executeWorkFlow(model, id, signal, callback, null);
+    }
+
+    private void executeWorkFlow(String model, int id, String signal, IOdooResponse callback,
+                                 OdooSyncResponse backResponse) {
+        String url = serverURL + "/web/dataset/exec_workflow";
+        try {
+            JSONObject params = new JSONObject();
+            params.put("model", model);
+            params.put("id", id);
+            params.put("signal", signal);
+            newJSONPOSTRequest(url, params, callback, backResponse);
+        } catch (Exception e) {
+            OdooLog.e(e, e.getMessage());
+        }
+    }
+
     private JSONObject updateCTX(JSONObject context) {
         try {
             if (tempContext != null) {
