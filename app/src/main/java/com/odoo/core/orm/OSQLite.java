@@ -68,17 +68,10 @@ public class OSQLite extends SQLiteOpenHelper {
         Log.i(TAG, "upgrading database.");
         ModelRegistryUtils registryUtils = odooApp.getModelRegistry();
         HashMap<String, Class<? extends OModel>> models = registryUtils.getModels();
-        OSQLHelper sqlHelper = new OSQLHelper(mContext);
-
         for (String key : models.keySet()) {
             OModel model = App.getModel(mContext, key, mUser);
-            sqlHelper.createDropStatements(model);
+            if (model != null) model.onModelUpgrade(db, oldVersion, newVersion);
         }
-        for (String key : sqlHelper.getStatements().keySet()) {
-            String query = sqlHelper.getStatements().get(key);
-            db.execSQL(query);
-        }
-        onCreate(db);
     }
 
     public void dropDatabase() {

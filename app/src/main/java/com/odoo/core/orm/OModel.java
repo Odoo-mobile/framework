@@ -132,6 +132,10 @@ public class OModel implements ISyncServiceListener {
         return sqLite.getDatabaseName();
     }
 
+    public void onModelUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Override in model
+    }
+
     public Context getContext() {
         return mContext;
     }

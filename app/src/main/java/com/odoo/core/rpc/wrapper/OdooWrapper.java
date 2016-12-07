@@ -496,9 +496,12 @@ public class OdooWrapper<T> implements Response.Listener<JSONObject> {
             }
             odooSession.setCurrencies(currencyList);
             if (mVersion.isEnterprise()) {
-                odooSession.setExpiration_date(response.getString("expiration_date"));
-                odooSession.setExpiration_reason(response.getString("expiration_reason"));
-                odooSession.setWarning_level(response.getString("warning"));
+                if (response.containsKey("expiration_date"))
+                    odooSession.setExpiration_date(response.getString("expiration_date"));
+                if (response.containsKey("expiration_reason"))
+                    odooSession.setExpiration_reason(response.getString("expiration_reason"));
+                if (response.containsKey("warning"))
+                    odooSession.setWarning_level(response.getString("warning"));
             }
             odooSession.setIs_admin(response.getBoolean("is_admin"));
             odooSession.setIs_superuser(response.getBoolean("is_superuser"));

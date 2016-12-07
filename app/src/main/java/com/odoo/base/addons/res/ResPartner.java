@@ -20,6 +20,7 @@
 package com.odoo.base.addons.res;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 import com.odoo.BuildConfig;
@@ -114,5 +115,10 @@ public class ResPartner extends OModel {
         if (!row.getString("zip").equals("false"))
             add += " - " + row.getString("zip") + " ";
         return add;
+    }
+
+    @Override
+    public void onModelUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Execute upgrade script
     }
 }

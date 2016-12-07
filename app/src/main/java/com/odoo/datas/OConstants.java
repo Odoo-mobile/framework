@@ -34,6 +34,9 @@ public class OConstants {
     /**
      * Database version. Required to change in increment order
      * when you change your database model in case of released apk.
+     *
+     * When dealing with DATABASE_VERSION, you need to override onModelUpgrade() method
+     * in each of the model class for applying upgrade script for that model.
      */
     public static final int DATABASE_VERSION = 1;
 }
