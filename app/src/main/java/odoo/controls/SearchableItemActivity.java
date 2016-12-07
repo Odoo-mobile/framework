@@ -165,12 +165,14 @@ public class SearchableItemActivity extends ActionBarActivity implements
 
     @Override
     public void onRecordCreated(ODataRow row) {
+        Bundle extra = getIntent().getExtras();
         Intent intent = new Intent("searchable_value_select");
+        if (extra.containsKey("column_name"))
+            intent.putExtra("column_name", extra.getString("column_name"));
         intent.putExtra("selected_position", row.getInt(OColumn.ROW_ID));
         if (mRowId != null) {
             intent.putExtra("record_id", true);
         }
-        // FIXME: use local broadcast
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         finish();
     }
