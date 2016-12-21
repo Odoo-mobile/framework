@@ -5,15 +5,14 @@ import android.text.TextUtils;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.rpc.helper.ORecordValues;
+import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import com.odoo.core.rpc.helper.ORecordValues;
-import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
 
 
 public class OdooRecordUtils {
@@ -100,6 +99,8 @@ public class OdooRecordUtils {
                             if (m2o != null) {
                                 values.put(col.getSyncColumn(), m2o.getInt("id"));
                             }
+                        } else {
+                            values.put(col.getSyncColumn(), false);
                         }
                         break;
                     case OneToMany:
