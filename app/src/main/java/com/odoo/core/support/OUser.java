@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.core.auth.OdooAccountManager;
-
 import com.odoo.core.rpc.helper.OdooVersion;
 import com.odoo.core.rpc.helper.utils.OBundleUtils;
 
@@ -186,32 +185,68 @@ public class OUser {
     }
 
     public void fillFromBundle(Bundle data) {
-        if (OBundleUtils.hasKey(data, "username"))
-            setUsername(data.getString("username"));
-        if (OBundleUtils.hasKey(data, "name"))
-            setName(data.getString("name"));
-        if (OBundleUtils.hasKey(data, "timezone"))
-            setTimezone(data.getString("timezone"));
-        if (OBundleUtils.hasKey(data, "avatar"))
-            setAvatar(data.getString("avatar"));
-        if (OBundleUtils.hasKey(data, "database"))
-            setDatabase(data.getString("database"));
-        if (OBundleUtils.hasKey(data, "host"))
-            setHost(data.getString("host"));
-        if (OBundleUtils.hasKey(data, "password"))
-            setPassword(data.getString("password"));
-        if (OBundleUtils.hasKey(data, "user_id"))
-            setUserId(data.getInt("user_id"));
-        if (OBundleUtils.hasKey(data, "partner_id"))
-            setPartnerId(data.getInt("partner_id"));
-        if (OBundleUtils.hasKey(data, "company_id"))
-            setCompanyId(data.getInt("company_id"));
-        if (OBundleUtils.hasKey(data, "is_active"))
-            setIsActive(data.getBoolean("is_active"));
-        if (OBundleUtils.hasKey(data, "allow_force_connect"))
-            setAllowForceConnect(data.getBoolean("allow_force_connect"));
-        odooVersion = new OdooVersion();
-        odooVersion.fillFromBundle(data);
+        try {
+            if (OBundleUtils.hasKey(data, "username"))
+                setUsername(data.getString("username"));
+            if (OBundleUtils.hasKey(data, "name"))
+                setName(data.getString("name"));
+            if (OBundleUtils.hasKey(data, "timezone"))
+                setTimezone(data.getString("timezone"));
+            if (OBundleUtils.hasKey(data, "avatar"))
+                setAvatar(data.getString("avatar"));
+            if (OBundleUtils.hasKey(data, "database"))
+                setDatabase(data.getString("database"));
+            if (OBundleUtils.hasKey(data, "host"))
+                setHost(data.getString("host"));
+            if (OBundleUtils.hasKey(data, "password"))
+                setPassword(data.getString("password"));
+            if (OBundleUtils.hasKey(data, "user_id")) {
+                Object element = data.get("user_id");
+                if (element instanceof String) {
+                    setUserId(Integer.parseInt((String)element));
+                } else if (element instanceof Integer) {
+                    setUserId((Integer) element);
+                }
+            }
+            if (OBundleUtils.hasKey(data, "partner_id")) {
+                Object element = data.get("partner_id");
+                if (element instanceof String) {
+                    setPartnerId(Integer.parseInt((String)element));
+                } else if (element instanceof Integer) {
+                    setPartnerId((Integer) element);
+                }
+            }
+            if (OBundleUtils.hasKey(data, "company_id")) {
+                Object element = data.get("company_id");
+                if (element instanceof String) {
+                    setCompanyId(Integer.parseInt((String)element));
+                } else if (element instanceof Integer) {
+                    setCompanyId((Integer) element);
+                }
+            }
+            if (OBundleUtils.hasKey(data, "is_active")) {
+                Object element = data.get("is_active");
+                if (element instanceof String) {
+                    setIsActive(Boolean.parseBoolean((String)element));
+                } else if (element instanceof Boolean) {
+                    setIsActive((Boolean) element);
+                }
+            }
+            if (OBundleUtils.hasKey(data, "allow_force_connect")) {
+                Object element = data.get("allow_force_connect");
+                if (element instanceof String) {
+                    setAllowForceConnect(Boolean.parseBoolean((String)element));
+                } else if (element instanceof Boolean) {
+                    setAllowForceConnect((Boolean) element);
+                }
+            }
+            odooVersion = new OdooVersion();
+            odooVersion.fillFromBundle(data);
+        }
+        catch (NumberFormatException exc) {
+            exc.printStackTrace();
+            Log.w(TAG, exc.getMessage(), exc);
+        }
     }
 
     public void setFromBundle(Bundle data) {

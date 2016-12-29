@@ -20,6 +20,7 @@
 package com.odoo.core.rpc.helper;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.odoo.core.rpc.handler.OdooVersionException;
 import com.odoo.core.rpc.helper.utils.OBundleUtils;
@@ -52,18 +53,36 @@ public class OdooVersion {
     }
 
     public void fillFromBundle(Bundle data) {
-        if (OBundleUtils.hasKey(data, "server_serie"))
-            setServerSerie(data.getString("server_serie"));
-        if (OBundleUtils.hasKey(data, "server_version"))
-            setServerVersion(data.getString("server_version"));
-        if (OBundleUtils.hasKey(data, "version_type"))
-            setVersionType(data.getString("version_type"));
-        if (OBundleUtils.hasKey(data, "version_release"))
-            setVersionRelease(data.getString("version_release"));
-        if (OBundleUtils.hasKey(data, "version_number"))
-            setVersionNumber(data.getInt("version_number"));
-        if (OBundleUtils.hasKey(data, "version_type_number"))
-            setVersionTypeNumber(data.getInt("version_type_number"));
+        try {
+            if (OBundleUtils.hasKey(data, "server_serie"))
+                setServerSerie(data.getString("server_serie"));
+            if (OBundleUtils.hasKey(data, "server_version"))
+                setServerVersion(data.getString("server_version"));
+            if (OBundleUtils.hasKey(data, "version_type"))
+                setVersionType(data.getString("version_type"));
+            if (OBundleUtils.hasKey(data, "version_release"))
+                setVersionRelease(data.getString("version_release"));
+            if (OBundleUtils.hasKey(data, "version_number")) {
+                Object element = data.get("version_number");
+                if (element instanceof String) {
+                    setVersionNumber(Integer.parseInt((String)element));
+                } else if (element instanceof Integer) {
+                    setVersionNumber((Integer) element);
+                }
+            }
+            if (OBundleUtils.hasKey(data, "version_type_number")) {
+                Object element = data.get("version_type_number");
+                if (element instanceof String) {
+                    setVersionTypeNumber(Integer.parseInt((String)element));
+                } else if (element instanceof Integer) {
+                    setVersionTypeNumber((Integer) element);
+                }
+            }
+        }
+        catch (NumberFormatException exc) {
+            exc.printStackTrace();
+            Log.w(TAG, exc.getMessage(), exc);
+        }
     }
 
     public static OdooVersion parseVersion(OdooResult result) throws OdooVersionException {
