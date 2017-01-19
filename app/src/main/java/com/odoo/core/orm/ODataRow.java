@@ -22,6 +22,7 @@ package com.odoo.core.orm;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.odoo.core.orm.fields.OColumn;
 
@@ -32,7 +33,22 @@ import java.util.List;
 public class ODataRow implements Parcelable {
     public static final String TAG = ODataRow.class.getSimpleName();
 
-    HashMap<String, Object> _data = new HashMap<>();
+    private HashMap<String, Object> _data = new HashMap<>();
+
+    public ODataRow() {
+        super();
+    }
+
+    public ODataRow(@Nullable final ODataRow dataRow) {
+        super();
+        if (dataRow != null) {
+            _data = new HashMap<>(dataRow.getAll());
+        }
+    }
+
+    public Object remove(String key) {
+        return _data.remove(key);
+    }
 
     public void put(String key, Object value) {
         _data.put(key, value);
