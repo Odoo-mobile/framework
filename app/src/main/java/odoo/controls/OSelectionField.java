@@ -70,6 +70,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
     private OColumn mCol;
     private String mLabel;
     private OModel mModel;
+    private OModel mRelModel;
     private List<ODataRow> items = new ArrayList<>();
     private ValueUpdateListener mValueUpdateListener = null;
     // Controls
@@ -129,7 +130,11 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         for (ODataRow label : items) {
             RadioButton rdoBtn = new RadioButton(mContext);
             rdoBtn.setLayoutParams(params);
-            rdoBtn.setText(label.getString(mModel.getDefaultNameColumn()));
+            if (mRelModel != null) {
+                rdoBtn.setText(label.getString(mRelModel.getDefaultNameColumn()));
+            } else {
+                rdoBtn.setText(label.getString(mModel.getDefaultNameColumn()));
+            }
             if (textSize > -1) {
                 rdoBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
@@ -357,7 +362,11 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                                 row = getRecordData((Integer) mValue);
                         }
                         if (row != null)
-                            txvView.setText(row.getString(mModel.getDefaultNameColumn()));
+                            if (mRelModel != null) {
+                                txvView.setText(row.getString(mRelModel.getDefaultNameColumn()));
+                            } else {
+                                txvView.setText(row.getString(mModel.getDefaultNameColumn()));
+                            }
                         if (txvView.getTag() != null) {
                             AlertDialog dialog = (AlertDialog) txvView.getTag();
                             dialog.dismiss();
@@ -479,13 +488,16 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         if (mCol != null && mLabel == null) {
             mLabel = mCol.getLabel();
         }
+
+        if (mCol != null && mModel != null) {
+            mRelModel = mModel.createInstance(mCol.getType());
+        }
     }
 
     private ODataRow getRecordData(int row_id) {
         ODataRow row;
         if (row_id > 0) {
-            OModel rel_model = mModel.createInstance(mCol.getType());
-            row = rel_model.browse(row_id);
+            row = mRelModel.browse(row_id);
         } else {
             row = items.get(0);
         }
@@ -588,6 +600,10 @@ public class OSelectionField extends LinearLayout implements IOControlData,
 
     public void setModel(OModel model) {
         mModel = model;
+
+        if (mCol != null && mModel != null) {
+            mRelModel = mModel.createInstance(mCol.getType());
+        }
     }
 
     public static List<ODataRow> getRecordItems(OModel model, OColumn column, Bundle formData) {
