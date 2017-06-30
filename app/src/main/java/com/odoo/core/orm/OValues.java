@@ -23,6 +23,7 @@ import android.content.ContentValues;
 import android.os.Bundle;
 
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.OColumn.RelationType;
 import com.odoo.core.orm.fields.utils.DomainFilterParser;
 import com.odoo.core.utils.OObjectUtils;
 
@@ -107,6 +108,41 @@ public class OValues implements Serializable {
     public ODataRow toDataRow() {
         ODataRow row = new ODataRow();
         row.addAll(_values);
+        return row;
+    }
+
+    public ODataRow toDataRow(OModel base) {
+        if (base == null) {
+            return toDataRow();
+        }
+
+        ODataRow row = new ODataRow();
+
+        for (OColumn column : base.getColumns()) {
+            String columnName = column.getName();
+            RelationType relationType = column.getRelationType();
+            Object value = _values.get(columnName);
+
+            if (value == null) {
+                row.put(columnName, column.getDefaultValue());
+            } else if (relationType == null) {
+                row.put(columnName, value);
+            } else if (value instanceof Integer) {
+                Integer recordId = (Integer) value;
+                switch (relationType) {
+                    case ManyToOne:
+                        row.put(columnName, new OM2ORecord(base, column, recordId));
+                        break;
+                    case OneToMany:
+                        row.put(columnName, new OO2MRecord(base, column, recordId));
+                        break;
+                    case ManyToMany:
+                        row.put(columnName, new OM2MRecord(base, column, recordId));
+                        break;
+                }
+            }
+        }
+
         return row;
     }
 
