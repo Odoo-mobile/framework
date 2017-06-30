@@ -26,6 +26,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -48,6 +49,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
     private float textSize = -1;
     private int appearance = -1;
     private int textColor = Color.BLACK;
+    private int inputtype = -1;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public OEditTextField(Context context, AttributeSet attrs,
@@ -101,6 +103,9 @@ public class OEditTextField extends LinearLayout implements IOControlData,
             }
             if (appearance > -1) {
                 edtText.setTextAppearance(mContext, appearance);
+            }
+            if (inputtype > -1) {
+                edtText.setInputType(inputtype);
             }
             edtText.setTextColor(textColor);
             addView(edtText);
@@ -183,6 +188,14 @@ public class OEditTextField extends LinearLayout implements IOControlData,
     @Override
     public Boolean isEditable() {
         return mEditable;
+    }
+
+    public void setInputType(int type) {
+        inputtype = type;
+    }
+
+    public int getInputType() {
+        return inputtype;
     }
 
     public void setHint(String hint) {
