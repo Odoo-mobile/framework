@@ -28,6 +28,8 @@
             <enum name="DateTime" value="6" />
             <enum name="Blob" value="7" />
             <enum name="Time" value="8" />
+            <enum name="Integer" value="9" />
+            <enum name="Float" value="10" />
         </attr>
         <attr name="widgetType">
             <enum name="Switch" value="0" />

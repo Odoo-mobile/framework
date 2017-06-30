@@ -30,6 +30,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -111,7 +112,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
     }
 
     public enum FieldType {
-        Text, Boolean, ManyToOne, Chips, Selection, Date, Time, DateTime, Blob, RelationType;
+        Text, Boolean, ManyToOne, Chips, Selection, Date, Time, DateTime, Blob, RelationType, Integer, Float;
 
         public static FieldType getTypeValue(int type_val) {
             switch (type_val) {
@@ -133,6 +134,10 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
                     return FieldType.Blob;
                 case 8:
                     return FieldType.Time;
+                case 9:
+                    return FieldType.Integer;
+                case 10:
+                    return FieldType.Float;
             }
             return FieldType.Text;
         }
@@ -267,6 +272,12 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             case Blob:
                 controlView = initBlobControl();
                 break;
+            case Integer:
+                controlView = initIntegerControl();
+                break;
+            case Float:
+                controlView = initFloatControl();
+                break;
             default:
                 return;
         }
@@ -313,13 +324,20 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         try {
             // Varchar
             if (type_class.isAssignableFrom(OVarchar.class)
-                    || type_class.isAssignableFrom(OInteger.class)
-                    || type_class.isAssignableFrom(OFloat.class)) {
+                    || type_class.isAssignableFrom(OText.class)) {
                 return FieldType.Text;
             }
             // boolean
             if (type_class.isAssignableFrom(OBoolean.class)) {
                 return FieldType.Boolean;
+            }
+            // Integer
+            if (type_class.isAssignableFrom(OInteger.class)) {
+                return FieldType.Integer;
+            }
+            // Float
+            if (type_class.isAssignableFrom(OFloat.class)) {
+                return FieldType.Float;
             }
 
             // Blob
@@ -334,10 +352,6 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             // Date
             if (type_class.isAssignableFrom(ODate.class)) {
                 return FieldType.Date;
-            }
-            // Text
-            if (type_class.isAssignableFrom(OText.class)) {
-                return FieldType.Text;
             }
             // FIXME: WebView type
             if (type_class.isAssignableFrom(OHtml.class)) {
@@ -459,6 +473,21 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         blob.setColumn(mColumn);
         blob.setWidgetType(mWidgetType);
         return blob;
+    }
+
+    // EditText control (TextView, EditText)
+    private View initIntegerControl() {
+        OEditTextField edt = (OEditTextField) initTextControl();
+        edt.setInputType(EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
+                | EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        return edt;
+    }
+
+    // EditText control (TextView, EditText)
+    private View initFloatControl() {
+        OEditTextField edt = (OEditTextField) initTextControl();
+        edt.setInputType(EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_FLAG_DECIMAL);
+        return edt;
     }
 
     private TextView getLabelView() {
