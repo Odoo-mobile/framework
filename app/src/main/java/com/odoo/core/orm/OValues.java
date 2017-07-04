@@ -58,26 +58,39 @@ public class OValues implements Serializable {
         return _values.get(key);
     }
 
-    public long getLong(String key) {
-        if (_values.get(key).toString().equals("false")) {
-            return -1;
+    public Long getLong(String key) {
+        if (!contains(key) || get(key).toString().equals("false")) {
+            return -1L;
         }
-        return Long.parseLong(_values.get(key).toString());
+        return Long.parseLong(get(key).toString());
     }
 
     public Integer getInt(String key) {
-        if (_values.get(key).toString().equals("false")) {
+        if (!contains(key) || get(key).toString().equals("false")) {
             return -1;
         }
-        return Integer.parseInt(_values.get(key).toString());
+        return Integer.parseInt(get(key).toString());
+    }
+
+    public Float getFloat(String key) {
+        if (!contains(key) || get(key).toString().equals("false")) {
+            return -1f;
+        }
+        return Float.parseFloat(get(key).toString());
     }
 
     public String getString(String key) {
-        return _values.get(key).toString();
+        if (!contains(key)) {
+            return "";
+        }
+        return get(key).toString();
     }
 
     public Boolean getBoolean(String key) {
-        return Boolean.parseBoolean(_values.get(key).toString());
+        if (!contains(key)) {
+            return false;
+        }
+        return Boolean.parseBoolean(get(key).toString());
     }
 
     public boolean contains(String key) {
