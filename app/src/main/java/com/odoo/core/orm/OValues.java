@@ -21,6 +21,7 @@ package com.odoo.core.orm;
 
 import android.content.ContentValues;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.OColumn.RelationType;
@@ -127,8 +128,23 @@ public class OValues implements Serializable {
                 row.put(columnName, column.getDefaultValue());
             } else if (relationType == null) {
                 row.put(columnName, value);
-            } else if (value instanceof Integer) {
-                Integer recordId = (Integer) value;
+            } else {
+                Integer recordId = null;
+
+                if (value instanceof Integer) {
+                    recordId = (Integer) value;
+                } else if (value instanceof String) {
+                    try {
+                        recordId = Integer.parseInt(value.toString());
+                    } catch (NumberFormatException e) {
+                        Log.d(TAG, "Could not parse integer from value " + value.toString());
+                    }
+                }
+
+                if (recordId == null) {
+                    continue;
+                }
+
                 switch (relationType) {
                     case ManyToOne:
                         row.put(columnName, new OM2ORecord(base, column, recordId));
