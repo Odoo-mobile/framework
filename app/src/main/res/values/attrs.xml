@@ -15,7 +15,7 @@
         <attr name="iconResource" format="reference" />
         <attr name="showIcon" format="boolean" />
         <attr name="showLabel" format="boolean" />
-        <attr name="iconTint" format="reference|color" />
+        <!--<attr name="iconTint" format="reference|color" />-->
         <attr name="parsePattern" format="string" />
         <attr name="withOutSidePadding" format="boolean" />
         <attr name="fieldType">

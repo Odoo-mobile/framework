@@ -39,8 +39,18 @@
 
 ##---------------End: proguard configuration for Gson  ----------
 
-
--dontobfuscate
+# Application Model Classes
 -keep class * extends com.odoo.core.orm.OModel{*;}
-# Searchview v4
+
+# Volley
+-keep class com.android.volley.** { *; }
+-keep interface com.android.volley.** { *; }
+
+# Searchview v7
 -keep class android.support.v7.widget.SearchView { *; }
+
+# Odoo Framework
+-keep class com.odoo.core.** { *; }
+-keep interface com.odoo.core.** { *; }
+
+-printmapping mapping.txt
