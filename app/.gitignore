@@ -1,1 +1,15 @@
+# Gradle files
+.gradle/
+build/
+app/debug/
+
+/local.properties
+.idea/
+*.iml
+
+# mac filesystem metadata
+.DS_Store
+
 /build
+/captures
+.externalNativeBuild

@@ -169,7 +169,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             mField_name = types.getString(R.styleable.OField_fieldName);
             resId = types.getResourceId(R.styleable.OField_iconResource, 0);
             showIcon = types.getBoolean(R.styleable.OField_showIcon, true);
-            tint_color = types.getColor(R.styleable.OField_iconTint, 0);
+            tint_color = types.getColor(R.styleable.OField_oiconTint, 0);
             show_label = types.getBoolean(R.styleable.OField_showLabel, true);
             int type_value = types.getInt(R.styleable.OField_fieldType, 0);
             mType = FieldType.getTypeValue(type_value);
