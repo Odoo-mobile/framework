@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.odoo.ActivityCommons;
 import com.odoo.App;
 import com.odoo.R;
 import com.odoo.addons.customers.utils.ShareUtil;
@@ -105,7 +106,7 @@ public class CustomerDetails extends OdooCompatActivity
     }
 
     private boolean hasRecordInExtra() {
-        return extras != null && extras.containsKey(OColumn.ROW_ID);
+        return ActivityCommons.hasRecordInExtra(extras);
     }
 
     private void setMode(Boolean edit) {

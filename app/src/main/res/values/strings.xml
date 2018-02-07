@@ -2,9 +2,11 @@
 <resources>
     <string name="app_name">Odoo</string>
     <string name="sync_label_customers">Customers</string>
+    <string name="sync_label_patients">Patients</string>
     <string name="toast_information_saved">Information Saved</string>
     <string name="toast_image_size_too_large">Image size too large !</string>
     <string name="label_no_customer_found">No Customer Found !</string>
+    <string name="label_no_patients">No Patients Found !</string>
     <string name="message_to">Message to %s</string>
     <string name="add_internal_note">Add and internal note</string>
     <string name="internal_note_hint">Add an internal note that will not be sent to the followers</string>
@@ -16,4 +18,38 @@
     <string name="toast_permission_download_storage_help">Storage permission required to store downloaded files on sdcard of your phone. Please grant permission for use this feature</string>
     <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
     <string name="toast_record_deleted">Record deleted</string>
+
+    <!-- Patients -->
+    <string name="patients">Patients</string>
+    <string name="patient_group">Patients</string>
+    <string name="create_patient">Create Patients</string>
+    <string name="patient_info">Patient Info</string>
+    <string name="ic_menu_info_details">Item Details</string>
+
+    <string name="title_activity_main">SCAPRMS</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_logout">Logout</string>
+
+
+    <string name="retry">Retry</string>
+    <string name="search_hint">Search by surname</string>
+    <string name="surname">Surname</string>
+    <string name="first_name">First name</string>
+    <string name="middle_name">Middle Name</string>
+    <string name="parent_name">Parent Name</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="select_your_gender">Select your gender</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="address">Address</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="barcode">Barcode</string>
+    <string name="submit">Submit</string>
+    <string name="update_patient_button">Update Patient</string>
+    <string name="add_new_patient">Add new Patient</string>
+    <string name="patient_updated">Patient Info Updated</string>
+    <string name="patient_created">Patient Created</string>
 </resources>

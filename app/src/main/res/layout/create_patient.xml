@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:background="@drawable/editext_container"
+            android:minHeight="70dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/surname"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:background="@android:drawable/screen_background_light_transparent"
+                android:hint="@string/surname"
+                android:inputType="text"
+                tools:text="Oyedele" />
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:background="@drawable/editext_container"
+            android:minHeight="70dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/first_name"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:background="@android:drawable/screen_background_light_transparent"
+                android:hint="@string/first_name"
+                android:inputType="text"
+                tools:text="Bunmi" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:background="@drawable/editext_container"
+            android:minHeight="70dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/middle_name"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:background="@android:drawable/screen_background_light_transparent"
+                android:hint="@string/middle_name"
+                android:inputType="text"
+                tools:text="Tony" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:background="@drawable/editext_container"
+            android:minHeight="70dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/parent_name"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:background="@android:drawable/screen_background_light_transparent"
+                android:hint="@string/parent_name"
+                android:inputType="text"
+                tools:text="Adeola &amp; Funke Oyedele" />
+        </android.support.design.widget.TextInputLayout>
+
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:text="@string/select_your_gender" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/male_gender"
+                style="@style/TextAppearance.AppCompat.Caption"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/male" />
+
+            <RadioButton
+                android:id="@+id/female_gender"
+                style="@style/TextAppearance.AppCompat.Caption"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/female" />
+        </RadioGroup>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:background="@drawable/editext_container"
+            android:minHeight="70dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp">
+
+            <EditText
+                tools:text="12/08/2000"
+                android:id="@+id/date_of_birth"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:background="@android:drawable/screen_background_light_transparent"
+                android:hint="@string/date_of_birth"
+                android:inputType="date" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:background="@drawable/editext_container"
+            android:minHeight="70dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@android:drawable/screen_background_light_transparent"
+                android:hint="@string/address"
+                android:inputType="textImeMultiLine"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/locationsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </LinearLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:background="@drawable/editext_container"
+            android:minHeight="70dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/barcode"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:background="@android:drawable/screen_background_light_transparent"
+                android:hint="@string/barcode"
+                android:inputType="text"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/submit_button"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="@dimen/margin_btw_view"
+            android:background="@drawable/default_button_selector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/submit"
+            />
+
+    </LinearLayout>
+
+
+</ScrollView>
