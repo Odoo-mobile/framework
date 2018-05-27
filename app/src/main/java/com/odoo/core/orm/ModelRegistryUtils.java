@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.odoo.App;
 import com.odoo.core.support.OUser;
+import com.odoo.datas.OConstants;
 
 import java.lang.reflect.Constructor;
 import java.util.Enumeration;
@@ -20,7 +21,7 @@ public class ModelRegistryUtils {
             DexFile dexFile = new DexFile(context.getPackageCodePath());
             for (Enumeration<String> item = dexFile.entries(); item.hasMoreElements(); ) {
                 String element = item.nextElement();
-                if (element.startsWith(App.class.getPackage().getName())) {
+                if (element.startsWith(App.class.getPackage().getName()) || element.startsWith(OConstants.SUEZ_APP_PACKAGE)) {
                     Class<? extends OModel> clsName = (Class<? extends OModel>) Class.forName(element);
                     if (clsName != null && clsName.getSuperclass() != null &&
                             OModel.class.isAssignableFrom(clsName.getSuperclass())) {
