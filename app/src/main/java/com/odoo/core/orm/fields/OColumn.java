@@ -19,9 +19,12 @@
  */
 package com.odoo.core.orm.fields;
 
+import android.content.Context;
+
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.utils.DomainFilterParser;
+import com.odoo.core.utils.OResource;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -76,6 +79,15 @@ public class OColumn {
 
     public OColumn(String label, Class<?> type, RelationType relationType) {
         this(label, type);
+        this.relationType = relationType;
+    }
+
+    public OColumn(Context context, int resId, Class<?> type) {
+        this(OResource.string(context, resId), type);
+    }
+
+    public OColumn(Context context, int resId, Class<?> type, RelationType relationType) {
+        this(context, resId, type);
         this.relationType = relationType;
     }
 

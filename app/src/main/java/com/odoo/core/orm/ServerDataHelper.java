@@ -93,12 +93,12 @@ public class ServerDataHelper {
         return null;
     }
 
-    public List<ODataRow> searchRecords(OdooFields fields, ODomain domain, int limit) {
+    public List<ODataRow> searchRecords(OdooFields fields, ODomain domain, int offset, int limit, String sort) {
         List<ODataRow> items = new ArrayList<>();
         if (mApp.inNetwork()) {
             OdooResult result = mOdoo
                     .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
-                    .searchRead(mModel.getModelName(), fields, domain, 0, limit, null);
+                    .searchRead(mModel.getModelName(), fields, domain, offset, limit, sort);
             if (result != null && !result.getRecords().isEmpty()) {
                 for (OdooRecord record : result.getRecords()) {
                     items.add(OdooRecordUtils.toDataRow(record));
@@ -107,6 +107,15 @@ public class ServerDataHelper {
         }
         return items;
     }
+
+    public List<ODataRow> searchRecords(OdooFields fields, ODomain domain, int limit, String sort) {
+        return searchRecords(fields, domain, 0, limit, sort);
+    }
+
+    public List<ODataRow> searchRecords(OdooFields fields, ODomain domain, int limit) {
+        return searchRecords(fields, domain, limit, null);
+    }
+
 
     public Odoo getOdoo() {
         return mOdoo;
