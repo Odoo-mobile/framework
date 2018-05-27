@@ -80,6 +80,12 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
             }
         }
         init();
+        // Show custom login url
+        toggleSelfHostedURL();
+        // Hide odoo login url
+        findViewById(R.id.txvAddSelfHosted).setVisibility(View.GONE);
+        findViewById(R.id.forgot_password).setVisibility(View.GONE);
+        findViewById(R.id.create_account).setVisibility(View.GONE);
     }
 
     private void init() {
