@@ -38,6 +38,7 @@ public class App extends Application {
 
     public static final String TAG = App.class.getSimpleName();
     public static String APPLICATION_NAME;
+    public boolean networkState;
     private static HashMap<String, Odoo> mOdooInstances = new HashMap<>();
     private static HashMap<String, OSQLite> mSQLiteObjecs = new HashMap<>();
     private static ModelRegistryUtils modelRegistryUtils = new ModelRegistryUtils();
@@ -47,6 +48,7 @@ public class App extends Application {
         super.onCreate();
         App.APPLICATION_NAME = getPackageManager().getApplicationLabel(getApplicationInfo()).toString();
         App.modelRegistryUtils.makeReady(getApplicationContext());
+        networkState = inNetwork();
     }
 
     public static OSQLite getSQLite(String userName) {

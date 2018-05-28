@@ -28,7 +28,7 @@ public class OConstants {
 
     public static final String ODOO_COMPANY_NAME = "Odoo";
 
-    public static final int RPC_REQUEST_TIME_OUT = 30000; // 30 Seconds
+    public static final int RPC_REQUEST_TIME_OUT = 60000; // 60 Seconds
     public static final int RPC_REQUEST_RETRIES = 1; // Retries when timeout
 
     /**
@@ -39,4 +39,6 @@ public class OConstants {
      * in each of the model class for applying upgrade script for that model.
      */
     public static final int DATABASE_VERSION = 1;
+
+    public static final String SUEZ_APP_PACKAGE = "com.suez";
 }
