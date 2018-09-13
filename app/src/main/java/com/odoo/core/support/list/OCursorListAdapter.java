@@ -145,6 +145,8 @@ public class OCursorListAdapter extends CursorAdapter implements
                 value = false;
                 break;
             case Cursor.FIELD_TYPE_BLOB:
+                value = c.getBlob(index);
+                break;
             case Cursor.FIELD_TYPE_STRING:
                 value = c.getString(index);
                 break;
