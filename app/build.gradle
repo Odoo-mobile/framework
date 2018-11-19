@@ -34,4 +34,5 @@ dependencies {
     compile 'com.android.support:design:25.1.0'
     compile 'com.android.volley:volley:1.0.0'
     compile project(':intro-slider-lib')
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha2'
 }

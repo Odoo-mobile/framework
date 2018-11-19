@@ -27,6 +27,7 @@ import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -210,7 +211,7 @@ public class OForm extends LinearLayout {
         int child = view.getChildCount();
         for (int i = 0; i < child; i++) {
             View v = view.getChildAt(i);
-            if (v instanceof LinearLayout || v instanceof RelativeLayout) {
+            if (v instanceof LinearLayout || v instanceof RelativeLayout || v instanceof ConstraintLayout) {
                 if (v.getVisibility() == View.VISIBLE)
                     findAllFields((ViewGroup) v);
             }
