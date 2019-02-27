@@ -16,4 +16,8 @@
     <string name="toast_permission_download_storage_help">Storage permission required to store downloaded files on sdcard of your phone. Please grant permission for use this feature</string>
     <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
     <string name="toast_record_deleted">Record deleted</string>
+
+
+    <string name="label_no_product_found">No Product Found !</string>
+    <string name="sync_label_products">Products</string>
 </resources>

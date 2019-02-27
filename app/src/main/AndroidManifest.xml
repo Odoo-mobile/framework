@@ -102,6 +102,31 @@
         <activity
             android:name="com.odoo.addons.customers.CustomerDetails"
             android:windowSoftInputMode="adjustPan" />
+
+
+        <!-- Product Sync Provider & Service  // -->
+        <provider
+            android:name="com.odoo.addons.abirex.products.providers.ProductsSyncProvider"
+            android:authorities="${applicationId}.core.provider.content.sync.product_product"
+            android:label="@string/sync_label_products"
+            android:multiprocess="true" />
+
+        <service
+            android:name="com.odoo.addons.abirex.products.services.ProductSyncService"
+            android:exported="true"
+            android:process=":sync_product">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/product_sync_adapter" />
+        </service>
+
+        <activity
+            android:name="com.odoo.addons.abirex.products.ProductDetails"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>
