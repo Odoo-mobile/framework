@@ -40,7 +40,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.R;
-import com.odoo.base.addons.res.ResPartner;
+import com.odoo.base.addons.product.ProductProduct;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
@@ -67,11 +67,6 @@ AdapterView.OnItemClickListener {
     private OCursorListAdapter mAdapter = null;
     private boolean syncRequested = false;
 
-    public enum Type {
-        Product, Supplier, Company
-    }
-
-    private Type mType = Type.Product;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -86,15 +81,14 @@ AdapterView.OnItemClickListener {
         super.onViewCreated(view, savedInstanceState);
         setHasSwipeRefreshView(view, R.id.swipe_container, this);
         mView = view;
-        mType = Type.valueOf(getArguments().getString(EXTRA_KEY_TYPE));
-        ListView mPartnersList = (ListView) view.findViewById(R.id.listview);
+        ListView mProductsList = (ListView) view.findViewById(R.id.listview);
         mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.product_row_item);
         mAdapter.setOnViewBindListener(this);
         mAdapter.setHasSectionIndexers(true, "name");
-        mPartnersList.setAdapter(mAdapter);
-        mPartnersList.setFastScrollAlwaysVisible(true);
-        mPartnersList.setOnItemClickListener(this);
-        setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
+        mProductsList.setAdapter(mAdapter);
+        mProductsList.setFastScrollAlwaysVisible(true);
+        mProductsList.setOnItemClickListener(this);
+        setHasFloatingButton(view, R.id.fabButton, mProductsList, this);
         getLoaderManager().initLoader(0, null, this);
 
     }
@@ -109,36 +103,25 @@ AdapterView.OnItemClickListener {
         }
         OControls.setImage(view, R.id.image_small, img);
         OControls.setText(view, R.id.name, row.getString("name"));
-        OControls.setText(view, R.id.company_name, (row.getString("company_name").equals("false"))
-                ? "" : row.getString("company_name"));
-        OControls.setText(view, R.id.email, (row.getString("email").equals("false") ? " "
-        : row.getString("email")));
+        //OControls.setText(view, R.id.default_code, (row.getString("default_code").equals("false"))
+        //        ? "" : row.getString("default_code"));
+        String sellingPrice =  "Selling Price: " + (!row.getString("lst_price").equals("false") ? row.getFloat("lst_price") : " Price not Set");
+        String qty =  " Qty: " + (!row.getString("product_qty").equals("false") ? row.getFloat("product_qty") : " 0");
+        OControls.setText(view,R.id.lst_price, sellingPrice + qty);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
         String where = "";
         List<String> args = new ArrayList<>();
-        switch (mType) {
-            case Product:
-            where = "product = ?";
-            break;
-            case Supplier:
-            where = "supplier = ?";
-            break;
-            case Company:
-            where = "is_company = ?";
-            break;
-        }
-        args.add("true");
         if (mCurFilter != null) {
-            where += " and name like ? ";
+            where += " name like ? ";
             args.add(mCurFilter + "%");
         }
         String selection = (args.size() > 0) ? where : null;
         String[] selectionArgs = (args.size() > 0) ? args.toArray(new String[args.size()]) : null;
         return new CursorLoader(getActivity(), db().uri(),
-        null, selection, selectionArgs, "name");
+        null, selection, selectionArgs, "id");
     }
 
     @Override
@@ -152,6 +135,7 @@ AdapterView.OnItemClickListener {
                     OControls.setVisible(mView, R.id.swipe_container);
                     OControls.setGone(mView, R.id.data_list_no_item);
                     setHasSwipeRefreshView(mView, R.id.swipe_container, Products.this);
+
                 }
             }, 500);
         } else {
@@ -180,8 +164,8 @@ AdapterView.OnItemClickListener {
     }
 
     @Override
-    public Class<ResPartner> database() {
-        return ResPartner.class;
+    public Class<ProductProduct> database() {
+        return ProductProduct.class;
     }
 
     @Override
@@ -189,23 +173,9 @@ AdapterView.OnItemClickListener {
         List<ODrawerItem> items = new ArrayList<>();
         items.add(new ODrawerItem(KEY).setTitle("Products")
                 .setIcon(R.drawable.ic_action_products)
-                .setExtra(extra(Type.Product))
                 .setInstance(new Products()));
-        items.add(new ODrawerItem(KEY).setTitle("Suppliers")
-                .setIcon(R.drawable.ic_action_suppliers)
-                .setExtra(extra(Type.Supplier))
-                .setInstance(new Products()));
-        items.add(new ODrawerItem(KEY).setTitle("Companies")
-                .setIcon(R.drawable.ic_action_company)
-                .setExtra(extra(Type.Company))
-                .setInstance(new Products()));
-        return items;
-    }
 
-    public Bundle extra(Type type) {
-        Bundle extra = new Bundle();
-        extra.putString(EXTRA_KEY_TYPE, type.toString());
-        return extra;
+        return items;
     }
 
 
@@ -219,7 +189,7 @@ AdapterView.OnItemClickListener {
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            parent().sync().requestSync(ResPartner.AUTHORITY);
+            parent().sync().requestSync(ProductProduct.AUTHORITY);
             setSwipeRefreshing(true);
         } else {
             hideRefreshingProgress();
@@ -232,8 +202,8 @@ AdapterView.OnItemClickListener {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-        inflater.inflate(R.menu.menu_partners, menu);
-        setHasSearchView(this, menu, R.id.menu_partner_search);
+        inflater.inflate(R.menu.menu_partners_2, menu);
+        setHasSearchView(this, menu, R.id.menu_partner_search_2);
     }
 
     @Override
@@ -269,7 +239,7 @@ AdapterView.OnItemClickListener {
         if (row != null) {
             data = row.getPrimaryBundleData();
         }
-        data.putString(ProductDetails.KEY_PARTNER_TYPE, mType.toString());
+        // data.putString(ProductDetails.KEY_PARTNER_TYPE, mType.toString());
         IntentUtils.startActivity(getActivity(), ProductDetails.class, data);
     }
 

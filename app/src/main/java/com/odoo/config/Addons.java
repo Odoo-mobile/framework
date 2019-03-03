@@ -19,6 +19,7 @@
  */
 package com.odoo.config;
 
+import com.odoo.addons.abirex.products.Products;
 import com.odoo.addons.customers.Customers;
 import com.odoo.core.support.addons.AddonsHelper;
 import com.odoo.core.support.addons.OAddon;
@@ -33,5 +34,7 @@ public class Addons extends AddonsHelper {
      * for maintain sequence call withSequence(int sequence)
      * OAddon partners = new OAddon(Partners.class).withSequence(2);
      */
+
+    OAddon products = new OAddon(Products.class);
     OAddon customers = new OAddon(Customers.class).setDefault();
 }

@@ -22,9 +22,12 @@ package com.odoo.base.addons.product;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 import com.odoo.BuildConfig;
+import com.odoo.OdooActivity;
 import com.odoo.base.addons.product.UoM;
+import com.odoo.base.addons.res.ResCompany;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -32,27 +35,34 @@ import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBlob;
 import com.odoo.core.orm.fields.types.OBoolean;
+import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
+import static com.odoo.core.orm.fields.OColumn.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProductProduct extends OModel {
+
+    public static final String TAG = ProductProduct.class.getSimpleName();
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
             ".core.provider.content.sync.product_product";
 
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();
     OColumn active = new OColumn("Active", OBoolean.class).setDefaultValue(false);
+    OColumn image = new OColumn("Image", OBlob.class).setDefaultValue(false);
     OColumn image_small = new OColumn("Avatar", OBlob.class).setDefaultValue(false);
-    OColumn lst_price = new OColumn("Last Price", OVarchar.class).setSize(100);
-    OColumn default_code = new OColumn("Street2", OVarchar.class);
-    OColumn code = new OColumn("COde", OVarchar.class);
-    OColumn product_tmpl_id = new OColumn("Product Template", OVarchar.class, OColumn.RelationType.ManyToOne);
+    OColumn lst_price = new OColumn("Sale Price", OFloat.class);
+    OColumn product_qty = new OColumn("Quantity", OFloat.class);
+    OColumn default_code = new OColumn("Default Code", OVarchar.class);
+    OColumn code = new OColumn("Code", OVarchar.class);
+    OColumn product_tmpl_id = new OColumn(null, ProductTemplate.class, RelationType.ManyToOne);
 
-    @Odoo.Domain("[['uom_id', '=', @uom_id]]")
-    OColumn uom_id = new OColumn("UOM", UoM.class, OColumn.RelationType.ManyToOne);
+//
+//    @Odoo.Domain("[['uom_id', '=', @uom_id]]")
+//    OColumn uom_id = new OColumn("UOM", UoM.class, OColumn.RelationType.ManyToOne);
 
     public ProductProduct(Context context, OUser user) {
         super(context, "product.product", user);
@@ -100,8 +110,19 @@ public class ProductProduct extends OModel {
 //        return add;
 //    }
 
+
     @Override
     public void onModelUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Execute upgrade script
+
+    }
+
+    @Override
+    public void onSyncStarted(){
+        Log.e(TAG, "ProductProduct->onSyncStarted");
+    }
+
+    @Override
+    public void onSyncFinished(){
+        Log.e(TAG, "ProductProduct->onSyncFinished");
     }
 }

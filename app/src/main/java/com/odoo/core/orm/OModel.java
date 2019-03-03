@@ -1048,7 +1048,6 @@ public class OModel implements ISyncServiceListener {
                 break;
         }
         values.remove(command);
-        db.close();
     }
 
     public List<ODataRow> selectManyToManyRecords(String[] projection, String column_name, int row_id) {

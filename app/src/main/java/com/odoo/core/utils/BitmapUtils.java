@@ -33,6 +33,7 @@ import android.text.TextPaint;
 import android.util.Base64;
 
 import com.odoo.R;
+import com.odoo.addons.abirex.products.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -117,7 +118,7 @@ public class BitmapUtils {
 
     public static Bitmap getAlphabetImage(Context context, String content) {
         Resources res = context.getResources();
-        Bitmap mDefaultBitmap = BitmapFactory.decodeResource(res, android.R.drawable.sym_def_app_icon);
+        Bitmap mDefaultBitmap =  BitmapFactory.decodeResource(res, R.drawable.avatar);
         int width = mDefaultBitmap.getWidth();
         int height = mDefaultBitmap.getHeight();
         TextPaint mPaint = new TextPaint();

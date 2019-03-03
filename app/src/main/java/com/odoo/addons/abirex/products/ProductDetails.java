@@ -36,6 +36,7 @@ import com.odoo.R;
 import com.odoo.addons.abirex.products.Products;
 import com.odoo.addons.abirex.products.utils.ShareUtil;
 import com.odoo.base.addons.ir.feature.OFileManager;
+import com.odoo.base.addons.product.ProductProduct;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -60,9 +61,9 @@ public class ProductDetails extends OdooCompatActivity
     private final String KEY_MODE = "key_edit_mode";
     private final String KEY_NEW_IMAGE = "key_new_image";
     private Bundle extras;
-    private ResPartner resPartner;
+    private ProductProduct product;
     private ODataRow record = null;
-    private ImageView userImage = null;
+    private ImageView productImage = null;
     private OForm mForm;
     private App app;
     private Boolean mEditMode = false;
@@ -71,7 +72,6 @@ public class ProductDetails extends OdooCompatActivity
     private String newImage = null;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private Toolbar toolbar;
-    private Products.Type partnerType = Products.Type.Product;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class ProductDetails extends OdooCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        userImage = (ImageView) findViewById(R.id.user_image);
+        productImage = (ImageView) findViewById(R.id.user_image);
         findViewById(R.id.captureImage).setOnClickListener(this);
 
         fileManager = new OFileManager(this);
@@ -96,10 +96,10 @@ public class ProductDetails extends OdooCompatActivity
             newImage = savedInstanceState.getString(KEY_NEW_IMAGE);
         }
         app = (App) getApplicationContext();
-        resPartner = new ResPartner(this, null);
+        product = new ProductProduct(this, null);
         extras = getIntent().getExtras();
-        if (hasRecordInExtra())
-            partnerType = Products.Type.valueOf(extras.getString(KEY_PARTNER_TYPE));
+        // if (hasRecordInExtra())
+        //    partnerType = Products.Type.valueOf(extras.getString(KEY_PARTNER_TYPE));
         if (!hasRecordInExtra())
             mEditMode = true;
         setupToolbar();
@@ -141,15 +141,15 @@ public class ProductDetails extends OdooCompatActivity
     private void setupToolbar() {
         if (!hasRecordInExtra()) {
             setMode(mEditMode);
-            userImage.setColorFilter(Color.parseColor("#ffffff"));
-            userImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            productImage.setColorFilter(Color.parseColor("#ffffff"));
+            productImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             mForm.setEditable(mEditMode);
             mForm.initForm(null);
         } else {
             int rowId = extras.getInt(OColumn.ROW_ID);
-            record = resPartner.browse(rowId);
-            record.put("full_address", resPartner.getAddress(record));
-            checkControls();
+            record = product.browse(rowId);
+            // record.put("full_address", product.getAddress(record));
+            // checkControls();
             setMode(mEditMode);
             mForm.setEditable(mEditMode);
             mForm.initForm(record);
@@ -164,54 +164,54 @@ public class ProductDetails extends OdooCompatActivity
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.full_address:
-                IntentUtils.redirectToMap(this, record.getString("full_address"));
-                break;
-            case R.id.website:
-                IntentUtils.openURLInBrowser(this, record.getString("website"));
-                break;
-            case R.id.email:
-                IntentUtils.requestMessage(this, record.getString("email"));
-                break;
-            case R.id.phone_number:
-                IntentUtils.requestCall(this, record.getString("phone"));
-                break;
-            case R.id.mobile_number:
-                IntentUtils.requestCall(this, record.getString("mobile"));
-                break;
-            case R.id.captureImage:
-                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
-                break;
-        }
+//        switch (v.getId()) {
+//            case R.id.full_address:
+//                IntentUtils.redirectToMap(this, record.getString("full_address"));
+//                break;
+//            case R.id.website:
+//                IntentUtils.openURLInBrowser(this, record.getString("website"));
+//                break;
+//            case R.id.email:
+//                IntentUtils.requestMessage(this, record.getString("email"));
+//                break;
+//            case R.id.phone_number:
+//                IntentUtils.requestCall(this, record.getString("phone"));
+//                break;
+//            case R.id.mobile_number:
+//                IntentUtils.requestCall(this, record.getString("mobile"));
+//                break;
+//            case R.id.captureImage:
+//                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
+//                break;
+//        }
     }
 
-    private void checkControls() {
-        findViewById(R.id.full_address).setOnClickListener(this);
-        findViewById(R.id.website).setOnClickListener(this);
-        findViewById(R.id.email).setOnClickListener(this);
-        findViewById(R.id.phone_number).setOnClickListener(this);
-        findViewById(R.id.mobile_number).setOnClickListener(this);
-    }
+//    private void checkControls() {
+//        findViewById(R.id.full_address).setOnClickListener(this);
+//        findViewById(R.id.website).setOnClickListener(this);
+//        findViewById(R.id.email).setOnClickListener(this);
+//        findViewById(R.id.phone_number).setOnClickListener(this);
+//        findViewById(R.id.mobile_number).setOnClickListener(this);
+//    }
 
     private void setProductImage() {
 
         if (record != null && !record.getString("image_small").equals("false")) {
-            userImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            productImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
             String base64 = newImage;
             if (newImage == null) {
-                if (!record.getString("large_image").equals("false")) {
-                    base64 = record.getString("large_image");
+                if (!record.getString("image").equals("false")) {
+                    base64 = record.getString("image");
                 } else {
                     base64 = record.getString("image_small");
                 }
             }
-            userImage.setImageBitmap(BitmapUtils.getBitmapImage(this, base64));
+            productImage.setImageBitmap(BitmapUtils.getBitmapImage(this, base64));
         } else {
-            userImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-            userImage.setColorFilter(Color.WHITE);
+            productImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            productImage.setColorFilter(Color.WHITE);
             int color = OStringColorUtil.getStringColor(this, record.getString("name"));
-            userImage.setBackgroundColor(color);
+            productImage.setBackgroundColor(color);
         }
     }
 
@@ -228,26 +228,17 @@ public class ProductDetails extends OdooCompatActivity
             case R.id.menu_product_save:
                 OValues values = mForm.getValues();
                 if (values != null) {
-                    switch (partnerType) {
-                        case Supplier:
-                            values.put("product", "false");
-                            values.put("supplier", "true");
-                            break;
-                        default:
-                            values.put("product", "true");
-                            break;
-                    }
                     if (newImage != null) {
                         values.put("image_small", newImage);
-                        values.put("large_image", newImage);
+                        values.put("image", newImage);
                     }
                     if (record != null) {
-                        resPartner.update(record.getInt(OColumn.ROW_ID), values);
+                        product.update(record.getInt(OColumn.ROW_ID), values);
                         Toast.makeText(this, R.string.toast_information_saved, Toast.LENGTH_LONG).show();
                         mEditMode = !mEditMode;
                         setupToolbar();
                     } else {
-                        final int row_id = resPartner.insert(values);
+                        final int row_id = product.insert(values);
                         if (row_id != OModel.INVALID_ROW_ID) {
                             finish();
                         }
@@ -280,7 +271,7 @@ public class ProductDetails extends OdooCompatActivity
                             public void onConfirmChoiceSelect(OAlert.ConfirmType type) {
                                 if (type == OAlert.ConfirmType.POSITIVE) {
                                     // Deleting record and finishing activity if success.
-                                    if (resPartner.delete(record.getInt(OColumn.ROW_ID))) {
+                                    if (product.delete(record.getInt(OColumn.ROW_ID))) {
                                         Toast.makeText(ProductDetails.this, R.string.toast_record_deleted,
                                                 Toast.LENGTH_SHORT).show();
                                         finish();
@@ -320,7 +311,7 @@ public class ProductDetails extends OdooCompatActivity
                 Thread.sleep(300);
                 OdooFields fields = new OdooFields();
                 fields.addAll(new String[]{"image_medium"});
-                OdooResult record = resPartner.getServerDataHelper().read(null, params[0]);
+                OdooResult record = product.getServerDataHelper().read(null, params[0]);
                 if (record != null && !record.getString("image_medium").equals("false")) {
                     image = record.getString("image_medium");
                 }
@@ -336,9 +327,9 @@ public class ProductDetails extends OdooCompatActivity
             if (result != null) {
                 if (!result.equals("false")) {
                     OValues values = new OValues();
-                    values.put("large_image", result);
-                    resPartner.update(record.getInt(OColumn.ROW_ID), values);
-                    record.put("large_image", result);
+                    values.put("image", result);
+                    product.update(record.getInt(OColumn.ROW_ID), values);
+                    record.put("image", result);
                     setProductImage();
                 }
             }
@@ -358,9 +349,9 @@ public class ProductDetails extends OdooCompatActivity
         OValues values = fileManager.handleResult(requestCode, resultCode, data);
         if (values != null && !values.contains("size_limit_exceed")) {
             newImage = values.getString("datas");
-            userImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            userImage.setColorFilter(null);
-            userImage.setImageBitmap(BitmapUtils.getBitmapImage(this, newImage));
+            productImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            productImage.setColorFilter(null);
+            productImage.setImageBitmap(BitmapUtils.getBitmapImage(this, newImage));
         } else if (values != null) {
             Toast.makeText(this, R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
         }

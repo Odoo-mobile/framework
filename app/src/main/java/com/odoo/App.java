@@ -47,6 +47,7 @@ public class App extends Application {
         super.onCreate();
         App.APPLICATION_NAME = getPackageManager().getApplicationLabel(getApplicationInfo()).toString();
         App.modelRegistryUtils.makeReady(getApplicationContext());
+        mContext = this;
     }
 
     public static OSQLite getSQLite(String userName) {
@@ -114,6 +115,16 @@ public class App extends Application {
         }
         return null;
     }
+
+
+        private static Context mContext;
+
+
+
+        public static Context getContext(){
+            return mContext;
+        }
+
 
     public ModelRegistryUtils getModelRegistry() {
         return modelRegistryUtils;
