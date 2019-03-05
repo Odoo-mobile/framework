@@ -2,4 +2,6 @@
     android:accountType="com.odoo.auth"
     android:contentAuthority="com.odoo.core.provider.content.sync.product_product"
     android:supportsUploading="true"
-    android:userVisible="true" />
+    android:userVisible="true"
+    android:multiprocess="false"
+    />

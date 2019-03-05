@@ -23,7 +23,6 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.odoo.base.addons.product.ProductProduct;
-import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
@@ -33,11 +32,11 @@ public class ProductSyncService extends OSyncService {
 
     @Override
     public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
-        return new OSyncAdapter(context, ProductProduct.class, service, true);
+        return new OSyncAdapter(context, ProductProduct.class, this, true);
     }
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
-        adapter.syncDataLimit(1000);
+        adapter.syncDataLimit(10000);
     }
 }

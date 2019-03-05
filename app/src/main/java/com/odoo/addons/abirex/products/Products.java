@@ -29,6 +29,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,6 +61,7 @@ LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
 OCursorListAdapter.OnViewBindListener, IOnSearchViewChangeListener, View.OnClickListener,
 AdapterView.OnItemClickListener {
 
+    public static final String TAG = ProductProduct.class.getSimpleName();
     public static final String KEY = Products.class.getSimpleName();
     public static final String EXTRA_KEY_TYPE = "extra_key_type";
     private View mView;
@@ -128,6 +130,7 @@ AdapterView.OnItemClickListener {
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.changeCursor(data);
         if (data.getCount() > 0) {
+            Log.d(TAG, "Count is...." + data.getCount());
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -139,6 +142,7 @@ AdapterView.OnItemClickListener {
                 }
             }, 500);
         } else {
+            Log.d(TAG, "None Count is...." + data.getCount());
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -239,7 +243,6 @@ AdapterView.OnItemClickListener {
         if (row != null) {
             data = row.getPrimaryBundleData();
         }
-        // data.putString(ProductDetails.KEY_PARTNER_TYPE, mType.toString());
         IntentUtils.startActivity(getActivity(), ProductDetails.class, data);
     }
 

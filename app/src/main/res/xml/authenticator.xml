@@ -1,7 +1,7 @@
 <account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
     android:accountType="com.odoo.auth"
-    android:icon="@drawable/ic_odoo"
+    android:icon="@mipmap/ic_rx_launch"
     android:label="@string/label_accounts_settings"
-    android:smallIcon="@drawable/ic_odoo">
+    android:smallIcon="@mipmap/ic_rx_launch">
 
 </account-authenticator>

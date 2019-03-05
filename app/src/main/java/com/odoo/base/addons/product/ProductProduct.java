@@ -55,7 +55,6 @@ public class ProductProduct extends OModel {
     OColumn image = new OColumn("Image", OBlob.class).setDefaultValue(false);
     OColumn image_small = new OColumn("Avatar", OBlob.class).setDefaultValue(false);
     OColumn lst_price = new OColumn("Sale Price", OFloat.class);
-    OColumn product_qty = new OColumn("Quantity", OFloat.class);
     OColumn default_code = new OColumn("Default Code", OVarchar.class);
     OColumn code = new OColumn("Code", OVarchar.class);
     OColumn product_tmpl_id = new OColumn(null, ProductTemplate.class, RelationType.ManyToOne);
@@ -71,6 +70,7 @@ public class ProductProduct extends OModel {
 
     @Override
     public Uri uri() {
+
         return buildURI(AUTHORITY);
     }
 //
