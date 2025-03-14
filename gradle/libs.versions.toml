@@ -9,7 +9,6 @@ material = "1.12.0"
 fragment = "1.8.6"
 swiperefreshlayout = "1.1.0"
 volley = "1.2.1"
-gson = "2.12.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -20,7 +19,6 @@ material = { group = "com.google.android.material", name = "material", version.r
 fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
 swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -22,10 +22,10 @@ android {
     }
 
     buildTypes {
-//        debug {
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -47,7 +47,6 @@ dependencies {
     implementation libs.material
     implementation libs.swiperefreshlayout
     implementation libs.volley
-    implementation libs.gson
     //
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

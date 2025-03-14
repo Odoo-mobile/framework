@@ -24,7 +24,4 @@ android {
 
 dependencies {
     implementation libs.fragment
-
-//    implementation libs.support.v4
-    implementation libs.fragment
 }

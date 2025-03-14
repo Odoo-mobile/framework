@@ -10,6 +10,6 @@
         android:id="@+id/accountList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"></odoo.controls.ExpandableListControl>
+        android:orientation="vertical"/>
 
 </LinearLayout>

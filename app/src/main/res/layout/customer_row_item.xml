@@ -40,7 +40,7 @@
                     android:fontFamily="@string/font_normal"
                     android:layout_gravity="center_vertical"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"></TextView>
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:fontFamily="@string/font_normal"
@@ -50,7 +50,7 @@
                     android:layout_gravity="center_vertical"
                     android:textColor="@color/body_text_2"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"></TextView>
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
             <TextView
@@ -61,7 +61,7 @@
                 android:textColor="@color/body_text_3"
                 android:layout_width="match_parent"
                 android:singleLine="true"
-                android:layout_height="wrap_content"></TextView>
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
     </LinearLayout>

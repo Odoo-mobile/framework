@@ -1,11 +1,9 @@
 package com.odoo.core.rpc.helper.utils.gson;
 
-import androidx.annotation.NonNull;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public abstract class OdooRecord<K, V> extends AbstractMap<K, V> {
 
@@ -29,25 +27,12 @@ public abstract class OdooRecord<K, V> extends AbstractMap<K, V> {
   }
 
   public OdooRecord getM20(String key) {
-    List<Object> value = getArray(key);
-
-    if (value != null && value.size() >= 2) {
-      final LinkedTreeMap<Object, Object> map = new LinkedTreeMap<>();
-      map.put("id", value.get(0));
-      map.put("name", value.get(1));
-
-      return new OdooRecord<Object, Object>() {
-        @Override
-        public Object get(Object key) {
-          return map.get(key);
-        }
-
-        @NonNull
-        @Override
-        public Set<Entry<Object, Object>> entrySet() {
-          return map.entrySet();
-        }
-      };
+    if (!getString(key).equals("false")) {
+      OdooRecord rec = new LinkedTreeMap();
+      List<Object> value = getArray(key);
+      rec.put("id", value.get(0));
+      rec.put("name", value.get(1));
+      return rec;
     }
     return null;
   }
