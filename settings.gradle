@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Odoo"
+rootProject.name = "Odoo Mobile Framework"
 include ':app', ':intro-slider-lib'
