@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.spotless)
 }
+
+apply from: "$project.rootDir/spotless.gradle"
 
 android {
     namespace 'com.odoo'

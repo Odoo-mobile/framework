@@ -1,6 +1,9 @@
 plugins {
     id 'com.android.library'
+    alias(libs.plugins.spotless)
 }
+
+apply from: "$project.rootDir/spotless.gradle"
 
 android {
     namespace "com.odoo.widgets.slider"
