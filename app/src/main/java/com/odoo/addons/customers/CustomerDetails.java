@@ -23,8 +23,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -163,25 +163,19 @@ public class CustomerDetails extends OdooCompatActivity
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.full_address:
-                IntentUtils.redirectToMap(this, record.getString("full_address"));
-                break;
-            case R.id.website:
-                IntentUtils.openURLInBrowser(this, record.getString("website"));
-                break;
-            case R.id.email:
-                IntentUtils.requestMessage(this, record.getString("email"));
-                break;
-            case R.id.phone_number:
-                IntentUtils.requestCall(this, record.getString("phone"));
-                break;
-            case R.id.mobile_number:
-                IntentUtils.requestCall(this, record.getString("mobile"));
-                break;
-            case R.id.captureImage:
-                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
-                break;
+        int id = v.getId();
+        if (id == R.id.full_address) {
+            IntentUtils.redirectToMap(this, record.getString("full_address"));
+        } else if (id == R.id.website) {
+            IntentUtils.openURLInBrowser(this, record.getString("website"));
+        } else if (id == R.id.email) {
+            IntentUtils.requestMessage(this, record.getString("email"));
+        } else if (id == R.id.phone_number) {
+            IntentUtils.requestCall(this, record.getString("phone"));
+        } else if (id == R.id.mobile_number) {
+            IntentUtils.requestCall(this, record.getString("mobile"));
+        } else if (id == R.id.captureImage) {
+            fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
         }
     }
 
@@ -220,77 +214,90 @@ public class CustomerDetails extends OdooCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                break;
-            case R.id.menu_customer_save:
-                OValues values = mForm.getValues();
-                if (values != null) {
-                    switch (partnerType) {
-                        case Supplier:
-                            values.put("customer", "false");
-                            values.put("supplier", "true");
-                            break;
-                        default:
-                            values.put("customer", "true");
-                            break;
-                    }
-                    if (newImage != null) {
-                        values.put("image_small", newImage);
-                        values.put("large_image", newImage);
-                    }
-                    if (record != null) {
-                        resPartner.update(record.getInt(OColumn.ROW_ID), values);
-                        Toast.makeText(this, R.string.toast_information_saved, Toast.LENGTH_LONG).show();
-                        mEditMode = !mEditMode;
-                        setupToolbar();
-                    } else {
-                        final int row_id = resPartner.insert(values);
-                        if (row_id != OModel.INVALID_ROW_ID) {
-                            finish();
-                        }
-                    }
-                }
-                break;
-            case R.id.menu_customer_cancel:
-            case R.id.menu_customer_edit:
-                if (hasRecordInExtra()) {
-                    mEditMode = !mEditMode;
-                    setMode(mEditMode);
-                    mForm.setEditable(mEditMode);
-                    mForm.initForm(record);
-                    setCustomerImage();
-                } else {
-                    finish();
-                }
-                break;
-            case R.id.menu_customer_share:
-                ShareUtil.shareContact(this, record, true);
-                break;
-            case R.id.menu_customer_import:
-                ShareUtil.shareContact(this, record, false);
-                break;
-            case R.id.menu_customer_delete:
-                OAlert.showConfirm(this, OResource.string(this,
-                        R.string.confirm_are_you_sure_want_to_delete),
-                        new OAlert.OnAlertConfirmListener() {
-                            @Override
-                            public void onConfirmChoiceSelect(OAlert.ConfirmType type) {
-                                if (type == OAlert.ConfirmType.POSITIVE) {
-                                    // Deleting record and finishing activity if success.
-                                    if (resPartner.delete(record.getInt(OColumn.ROW_ID))) {
-                                        Toast.makeText(CustomerDetails.this, R.string.toast_record_deleted,
-                                                Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }
-                                }
-                            }
-                        });
+        int itemId = item.getItemId();
 
+        if (itemId == android.R.id.home) {
+            finish();
+            return true;
+        } else if (itemId == R.id.menu_customer_save) {
+            handleSaveAction();
+            return true;
+        } else if (itemId == R.id.menu_customer_cancel || itemId == R.id.menu_customer_edit) {
+            handleEditOrCancelAction();
+            return true;
+        } else if (itemId == R.id.menu_customer_share) {
+            ShareUtil.shareContact(this, record, true);
+            return true;
+        } else if (itemId == R.id.menu_customer_import) {
+            ShareUtil.shareContact(this, record, false);
+            return true;
+        } else if (itemId == R.id.menu_customer_delete) {
+            handleDeleteAction();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void handleSaveAction() {
+        OValues values = mForm.getValues();
+        if (values == null) return;
+
+        switch (partnerType) {
+            case Supplier:
+                values.put("customer", "false");
+                values.put("supplier", "true");
+                break;
+            default:
+                values.put("customer", "true");
                 break;
         }
-        return super.onOptionsItemSelected(item);
+
+        if (newImage != null) {
+            values.put("image_small", newImage);
+            values.put("large_image", newImage);
+        }
+
+        if (record != null) {
+            resPartner.update(record.getInt(OColumn.ROW_ID), values);
+            Toast.makeText(this, R.string.toast_information_saved, Toast.LENGTH_LONG).show();
+            mEditMode = !mEditMode;
+            setupToolbar();
+        } else {
+            final int row_id = resPartner.insert(values);
+            if (row_id != OModel.INVALID_ROW_ID) {
+                finish();
+            }
+        }
+    }
+
+    private void handleEditOrCancelAction() {
+        if (hasRecordInExtra()) {
+            mEditMode = !mEditMode;
+            setMode(mEditMode);
+            mForm.setEditable(mEditMode);
+            mForm.initForm(record);
+            setCustomerImage();
+        } else {
+            finish();
+        }
+    }
+
+    private void handleDeleteAction() {
+        OAlert.showConfirm(this, OResource.string(this, R.string.confirm_are_you_sure_want_to_delete),
+                new OAlert.OnAlertConfirmListener() {
+                    @Override
+                    public void onConfirmChoiceSelect(OAlert.ConfirmType type) {
+                        if (type == OAlert.ConfirmType.POSITIVE) {
+                            // Deleting record and finishing activity if success.
+                            if (resPartner.delete(record.getInt(OColumn.ROW_ID))) {
+                                Toast.makeText(CustomerDetails.this, R.string.toast_record_deleted,
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }
+                    }
+                });
     }
 
     @Override

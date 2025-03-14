@@ -28,7 +28,9 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.support.v4.view.ViewCompat;
+import androidx.core.view.ViewCompat;
+
+import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -40,7 +42,7 @@ import com.odoo.R;
  * image contents, but is also flexible enough for use with other desired
  * aesthetics.
  */
-public class BezelImageView extends ImageView {
+public class BezelImageView extends androidx.appcompat.widget.AppCompatImageView {
     private Paint mBlackPaint;
     private Paint mMaskedPaint;
 
@@ -175,9 +177,14 @@ public class BezelImageView extends ImageView {
                 mMaskedPaint
                         .setColorFilter((mDesaturateOnPress && isPressed()) ? mDesaturateColorFilter
                                 : null);
-                cacheCanvas.saveLayer(mBoundsF, mMaskedPaint,
-                        Canvas.HAS_ALPHA_LAYER_SAVE_FLAG
-                                | Canvas.FULL_COLOR_LAYER_SAVE_FLAG);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    cacheCanvas.saveLayer(mBoundsF, mMaskedPaint);
+                } else {
+                    cacheCanvas.saveLayer(mBoundsF, mMaskedPaint, Canvas.ALL_SAVE_FLAG);
+                }
+//                cacheCanvas.saveLayer(mBoundsF, mMaskedPaint,
+//                        Canvas.HAS_ALPHA_LAYER_SAVE_FLAG
+//                                | Canvas.FULL_COLOR_LAYER_SAVE_FLAG);
                 super.onDraw(cacheCanvas);
                 cacheCanvas.restoreToCount(sc);
             } else if (mDesaturateOnPress && isPressed()) {
@@ -185,9 +192,11 @@ public class BezelImageView extends ImageView {
                 cacheCanvas.drawRect(0, 0, mCachedWidth, mCachedHeight,
                         mBlackPaint);
                 mMaskedPaint.setColorFilter(mDesaturateColorFilter);
-                cacheCanvas.saveLayer(mBoundsF, mMaskedPaint,
-                        Canvas.HAS_ALPHA_LAYER_SAVE_FLAG
-                                | Canvas.FULL_COLOR_LAYER_SAVE_FLAG);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    cacheCanvas.saveLayer(mBoundsF, mMaskedPaint);
+                } else {
+                    cacheCanvas.saveLayer(mBoundsF, mMaskedPaint, Canvas.ALL_SAVE_FLAG);
+                }
                 super.onDraw(cacheCanvas);
                 cacheCanvas.restoreToCount(sc);
             } else {

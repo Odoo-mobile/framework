@@ -26,8 +26,8 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.BoolRes;
-import android.support.design.widget.BottomSheetDialog;
+import androidx.annotation.BoolRes;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import android.util.Log;
 
 import com.odoo.App;

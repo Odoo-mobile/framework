@@ -222,36 +222,32 @@ public class MailChatterView extends LinearLayout implements
         Bundle extra = new Bundle();
         extra.putString("model", mModel.getModelName());
         extra.putInt("server_id", record_server_id);
-        switch (v.getId()) {
-            case R.id.chatterSendMessage:
-                if (app.inNetwork()) {
-                    extra.putString("type", MailChatterCompose.MessageType.Message.toString());
-                    IntentUtils.startActivity(mContext, MailChatterCompose.class, extra);
-                } else {
-                    Toast.makeText(mContext, OResource.string(mContext,
-                            R.string.toast_network_required), Toast.LENGTH_LONG).show();
-                }
-                break;
-            case R.id.chatterLogInternalNote:
-                if (app.inNetwork()) {
-                    extra.putString("type", MailChatterCompose.MessageType.InternalNote.toString());
-                    IntentUtils.startActivity(mContext, MailChatterCompose.class, extra);
-                } else {
-                    Toast.makeText(mContext, OResource.string(mContext,
-                            R.string.toast_network_required), Toast.LENGTH_LONG).show();
-                }
-                break;
-            case R.id.chatterLoadMoreMessages:
-                loadAllMessages = true;
-                updateChatterList();
-                break;
-            default:
-                ODataRow row = (ODataRow) v.getTag();
-                extra.putAll(row.getPrimaryBundleData());
-                if (row != null) {
-                    IntentUtils.startActivity(mContext, MailDetailDialog.class, extra);
-                }
-                break;
+        int id = v.getId();
+        if (id == R.id.chatterSendMessage) {
+            if (app.inNetwork()) {
+                extra.putString("type", MailChatterCompose.MessageType.Message.toString());
+                IntentUtils.startActivity(mContext, MailChatterCompose.class, extra);
+            } else {
+                Toast.makeText(mContext, OResource.string(mContext,
+                        R.string.toast_network_required), Toast.LENGTH_LONG).show();
+            }
+        } else if (id == R.id.chatterLogInternalNote){
+            if (app.inNetwork()) {
+                extra.putString("type", MailChatterCompose.MessageType.InternalNote.toString());
+                IntentUtils.startActivity(mContext, MailChatterCompose.class, extra);
+            } else {
+                Toast.makeText(mContext, OResource.string(mContext,
+                        R.string.toast_network_required), Toast.LENGTH_LONG).show();
+            }
+        } else if (id == R.id.chatterLoadMoreMessages) {
+            loadAllMessages = true;
+            updateChatterList();
+        } else {
+            ODataRow row = (ODataRow) v.getTag();
+            extra.putAll(row.getPrimaryBundleData());
+            if (row != null) {
+                IntentUtils.startActivity(mContext, MailDetailDialog.class, extra);
+            }
         }
     }
 

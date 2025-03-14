@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -111,19 +111,15 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.txvAddSelfHosted:
-                toggleSelfHostedURL();
-                break;
-            case R.id.btnLogin:
-                loginUser();
-                break;
-            case R.id.forgot_password:
-                IntentUtils.openURLInBrowser(this, OConstants.URL_ODOO_RESET_PASSWORD);
-                break;
-            case R.id.create_account:
-                IntentUtils.openURLInBrowser(this, OConstants.URL_ODOO_SIGN_UP);
-                break;
+        int id = v.getId();
+        if (id == R.id.txvAddSelfHosted) {
+            toggleSelfHostedURL();
+        } else if (id == R.id.btnLogin) {
+            loginUser();
+        } else if (id == R.id.forgot_password) {
+            IntentUtils.openURLInBrowser(this, OConstants.URL_ODOO_RESET_PASSWORD);
+        } else if (id == R.id.create_account) {
+            IntentUtils.openURLInBrowser(this, OConstants.URL_ODOO_SIGN_UP);
         }
     }
 

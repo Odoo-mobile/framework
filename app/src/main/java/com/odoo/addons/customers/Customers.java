@@ -24,10 +24,10 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -256,10 +256,9 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fabButton:
-                loadActivity(null);
-                break;
+        int id = v.getId();
+        if (id == R.id.fabButton) {
+            loadActivity(null);
         }
     }
 

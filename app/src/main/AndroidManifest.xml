@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.odoo">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -30,6 +29,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.odoo.core.account.OdooLogin"
+            android:exported="true"
             android:label="${applicationName}"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -64,7 +64,8 @@
         <receiver android:name="com.odoo.core.utils.reminder.ReminderReceiver" />
         <receiver android:name="com.odoo.core.utils.reminder.ReminderActionReceiver" />
 
-        <service android:name="com.odoo.core.auth.OdooAuthService">
+        <service android:name="com.odoo.core.auth.OdooAuthService"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>

@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -100,24 +100,24 @@ public class About extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // app icon in action bar clicked; go home
-                finish();
-                return true;
-            case R.id.menu_about_our_apps:
-                IntentUtils.openURLInBrowser(this, OConstants.URL_ODOO_APPS_ON_PLAY_STORE);
-                return true;
-            case R.id.menu_about_github:
-                IntentUtils.openURLInBrowser(this, OConstants.URL_ODOO_MOBILE_GIT_HUB);
-                return true;
-            case R.id.menu_export_db:
-                IrModel model = new IrModel(this, null);
-                model.exportDB();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+
+        if (itemId == android.R.id.home) {
+            finish();
+            return true;
+        } else if (itemId == R.id.menu_about_our_apps) {
+            IntentUtils.openURLInBrowser(this, OConstants.URL_ODOO_APPS_ON_PLAY_STORE);
+            return true;
+        } else if (itemId == R.id.menu_about_github) {
+            IntentUtils.openURLInBrowser(this, OConstants.URL_ODOO_MOBILE_GIT_HUB);
+            return true;
+        } else if (itemId == R.id.menu_export_db) {
+            IrModel model = new IrModel(this, null);
+            model.exportDB();
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

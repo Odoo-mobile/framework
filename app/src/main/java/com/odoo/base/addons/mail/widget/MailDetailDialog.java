@@ -161,15 +161,13 @@ public class MailDetailDialog extends OdooCompatActivity implements View.OnClick
             ODataRow attachment = (ODataRow) v.getTag();
             fileManager.downloadAttachment(attachment.getInt(OColumn.ROW_ID));
         } else {
-            switch (v.getId()) {
-                case R.id.btnClose:
-                    finish();
-                    break;
-                case R.id.btnReply:
-                    extra.putString("type", MailChatterCompose.MessageType.Message.toString());
-                    IntentUtils.startActivity(this, MailChatterCompose.class, extra);
-                    finish();
-                    break;
+            int id = v.getId();
+            if (id == R.id.btnClose) {
+                finish();
+            } else if (id == R.id.btnReply) {
+                extra.putString("type", MailChatterCompose.MessageType.Message.toString());
+                IntentUtils.startActivity(this, MailChatterCompose.class, extra);
+                finish();
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.odoo.core.support;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Odoo, Open Source Management Solution

@@ -25,7 +25,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,71 +102,68 @@ public class ManageAccounts extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(final View v) {
-        switch (v.getId()) {
-            case R.id.btnLogin:
-                OUser user = (OUser) v.getTag();
-                OdooAccountManager.login(this, user.getAndroidName());
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(ManageAccounts.this, OResource.string(ManageAccounts.this,
-                                R.string.status_login_success), Toast.LENGTH_LONG).show();
-                        setResult(RESULT_OK);
-                        finish();
-                    }
-                }, OdooActivity.DRAWER_ITEM_LAUNCH_DELAY);
-                break;
-            case R.id.btnLogout:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.title_confirm);
-                builder.setMessage(R.string.toast_are_you_sure_logout);
-                builder.setPositiveButton(R.string.label_logout, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        OUser user = (OUser) v.getTag();
-                        OdooAccountManager.logout(ManageAccounts.this, user.getAndroidName());
+        int id = v.getId();
+        if (id == R.id.btnLogin) {
+            OUser user = (OUser) v.getTag();
+            OdooAccountManager.login(this, user.getAndroidName());
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(ManageAccounts.this, OResource.string(ManageAccounts.this,
+                            R.string.status_login_success), Toast.LENGTH_LONG).show();
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            }, OdooActivity.DRAWER_ITEM_LAUNCH_DELAY);
+        } else if (id == R.id.btnLogout) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.title_confirm);
+            builder.setMessage(R.string.toast_are_you_sure_logout);
+            builder.setPositiveButton(R.string.label_logout, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    OUser user = (OUser) v.getTag();
+                    OdooAccountManager.logout(ManageAccounts.this, user.getAndroidName());
 
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(ManageAccounts.this, OResource.string(ManageAccounts.this,
-                                        R.string.status_logout_success), Toast.LENGTH_LONG).show();
-                                setResult(RESULT_OK);
-                                finish();
-                            }
-                        }, OdooActivity.DRAWER_ITEM_LAUNCH_DELAY);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ManageAccounts.this, OResource.string(ManageAccounts.this,
+                                    R.string.status_logout_success), Toast.LENGTH_LONG).show();
+                            setResult(RESULT_OK);
+                            finish();
+                        }
+                    }, OdooActivity.DRAWER_ITEM_LAUNCH_DELAY);
 
-                    }
-                });
-                builder.setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                builder.show();
-                break;
-            case R.id.btnRemoveAccount:
-                builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.title_confirm);
-                builder.setMessage(R.string.toast_are_you_sure_delete_account);
-                builder.setPositiveButton(R.string.label_delete, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        OUser user = (OUser) v.getTag();
-                        new AccountDeleteTask().execute(user);
-                        setResult(RESULT_OK);
-                        finish();
-                    }
-                });
-                builder.setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                builder.show();
-                break;
+                }
+            });
+            builder.setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+        } else if (id == R.id.btnRemoveAccount) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.title_confirm);
+            builder.setMessage(R.string.toast_are_you_sure_delete_account);
+            builder.setPositiveButton(R.string.label_delete, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    OUser user = (OUser) v.getTag();
+                    new AccountDeleteTask().execute(user);
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            });
+            builder.setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
         }
     }
 

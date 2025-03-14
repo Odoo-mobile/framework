@@ -27,7 +27,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,13 +126,11 @@ public class OdooAccountQuickManage extends AppCompatActivity implements View.On
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.cancel:
-                finish();
-                break;
-            case R.id.save_password:
-                savePassword();
-                break;
+        int id = v.getId();
+        if (id == R.id.cancel){
+            finish();
+        } else if (id == R.id.save_password) {
+            savePassword();
         }
     }
 
