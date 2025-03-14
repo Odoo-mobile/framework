@@ -1,7 +1,7 @@
 DevicePermissionHelper Developer Guide
 ======================================
 
-DevicePermissionHelper is helper class for getting permission from user in API23+ android devices. 
+DevicePermissionHelper is helper class for getting permission from user in API23+ android devices.
 
 **Constructors**
 
@@ -10,7 +10,7 @@ DevicePermissionHelper(OdooCompatActivity activity);
 DevicePermissionHelper(BaseFragment fragment);
 ```
 
-Takes valid **OdooCompatActivity** or **BaseFragment** 
+Takes valid **OdooCompatActivity** or **BaseFragment**
 
 OdooCompatActivity contains required callbacks for permission model and extends **AppCompatActivity**
 
@@ -43,12 +43,12 @@ Takes permission grant listener and permission
     - onPermissionGranted()
     - onPermissionDenied()
     - onPermissionRationale()
-    
-Example: 
+
+Example:
 
 ```java
 
-DevicePermissionHelper devicePermissionHelper = new DevicePermissionHelper(activity); 
+DevicePermissionHelper devicePermissionHelper = new DevicePermissionHelper(activity);
 
 if (devicePermissionHelper.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
