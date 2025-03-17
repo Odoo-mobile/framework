@@ -19,43 +19,43 @@ package com.odoo.core.orm;
 import com.odoo.core.orm.fields.OColumn;
 
 public class OM2ORecord {
-  public static final String TAG = OM2ORecord.class.getSimpleName();
-  private OColumn mCol = null;
-  private Integer record_id = 0;
-  private OModel base_model = null;
-  private OModel rel_model = null;
+    public static final String TAG = OM2ORecord.class.getSimpleName();
+    private OColumn mCol = null;
+    private Integer record_id = 0;
+    private OModel base_model = null;
+    private OModel rel_model = null;
 
-  public OM2ORecord(OModel base, OColumn col, Integer rec_id) {
-    base_model = base;
-    mCol = col;
-    record_id = rec_id;
-  }
-
-  public Integer getId() {
-    return record_id;
-  }
-
-  public String getName() {
-    rel_model = base_model.createInstance(mCol.getType());
-    return rel_model
-        .browse(new String[] {"name"}, OColumn.ROW_ID + "=?", new String[] {record_id + ""})
-        .getString("name");
-  }
-
-  public ODataRow browse(OModel rel_model) {
-    if (record_id != null) {
-      return rel_model.browse(record_id);
+    public OM2ORecord(OModel base, OColumn col, Integer rec_id) {
+        base_model = base;
+        mCol = col;
+        record_id = rec_id;
     }
-    return null;
-  }
 
-  public ODataRow browse() {
-    rel_model = base_model.createInstance(mCol.getType());
-    return browse(rel_model);
-  }
+    public Integer getId() {
+        return record_id;
+    }
 
-  @Override
-  public String toString() {
-    return record_id + "";
-  }
+    public String getName() {
+        rel_model = base_model.createInstance(mCol.getType());
+        return rel_model
+                .browse(new String[] {"name"}, OColumn.ROW_ID + "=?", new String[] {record_id + ""})
+                .getString("name");
+    }
+
+    public ODataRow browse(OModel rel_model) {
+        if (record_id != null) {
+            return rel_model.browse(record_id);
+        }
+        return null;
+    }
+
+    public ODataRow browse() {
+        rel_model = base_model.createInstance(mCol.getType());
+        return browse(rel_model);
+    }
+
+    @Override
+    public String toString() {
+        return record_id + "";
+    }
 }

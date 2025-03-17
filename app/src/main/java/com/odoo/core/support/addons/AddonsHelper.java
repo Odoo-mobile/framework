@@ -17,46 +17,47 @@
 package com.odoo.core.support.addons;
 
 import android.util.Log;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class AddonsHelper {
-  public static final String TAG = AddonsHelper.class.getSimpleName();
-  private List<OAddon> addons = new ArrayList<OAddon>();
-  private OAddon defaultAddon = null;
+    public static final String TAG = AddonsHelper.class.getSimpleName();
+    private List<OAddon> addons = new ArrayList<OAddon>();
+    private OAddon defaultAddon = null;
 
-  public List<OAddon> getAddons() {
-    if (addons.size() <= 0) {
-      prepareAddons();
-    }
-    Collections.sort(addons);
-    return addons;
-  }
-
-  private void prepareAddons() {
-    addons.clear();
-    for (Field addon : getClass().getDeclaredFields()) {
-      if (addon.getType().isAssignableFrom(OAddon.class)) {
-        addon.setAccessible(true);
-        try {
-          OAddon mAddon = (OAddon) addon.get(this);
-          if (mAddon.isDefault()) {
-            defaultAddon = mAddon;
-            addons.add(0, defaultAddon);
-          } else {
-            addons.add(mAddon);
-          }
-        } catch (Exception e) {
-          Log.e(TAG, e.getMessage());
+    public List<OAddon> getAddons() {
+        if (addons.size() <= 0) {
+            prepareAddons();
         }
-      }
+        Collections.sort(addons);
+        return addons;
     }
-  }
 
-  public OAddon getDefaultAddon() {
-    prepareAddons();
-    return defaultAddon;
-  }
+    private void prepareAddons() {
+        addons.clear();
+        for (Field addon : getClass().getDeclaredFields()) {
+            if (addon.getType().isAssignableFrom(OAddon.class)) {
+                addon.setAccessible(true);
+                try {
+                    OAddon mAddon = (OAddon) addon.get(this);
+                    if (mAddon.isDefault()) {
+                        defaultAddon = mAddon;
+                        addons.add(0, defaultAddon);
+                    } else {
+                        addons.add(mAddon);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        }
+    }
+
+    public OAddon getDefaultAddon() {
+        prepareAddons();
+        return defaultAddon;
+    }
 }

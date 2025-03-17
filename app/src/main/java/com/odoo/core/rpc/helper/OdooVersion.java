@@ -17,9 +17,11 @@
 package com.odoo.core.rpc.helper;
 
 import android.os.Bundle;
+
 import com.odoo.core.rpc.handler.OdooVersionException;
 import com.odoo.core.rpc.helper.utils.OBundleUtils;
 import com.odoo.core.rpc.helper.utils.gson.OdooResult;
+
 import java.util.List;
 
 /**
@@ -28,141 +30,143 @@ import java.util.List;
  * <p>8.saas~6 : [8,'saas~6',0,'final',0], 9.0alpha1 : [9,0,0,'alpha',1], 8.0 : [8,0,0,'final',0]
  */
 public class OdooVersion {
-  public static final String TAG = OdooVersion.class.getSimpleName();
-  private String serverSerie, serverVersion, versionType, versionRelease;
-  private int versionNumber, versionTypeNumber;
-  private Boolean isEnterprise = false;
+    public static final String TAG = OdooVersion.class.getSimpleName();
+    private String serverSerie, serverVersion, versionType, versionRelease;
+    private int versionNumber, versionTypeNumber;
+    private Boolean isEnterprise = false;
 
-  public Bundle getAsBundle() {
-    Bundle version = new Bundle();
-    version.putString("server_serie", getServerSerie());
-    version.putString("server_version", getServerVersion());
-    version.putString("version_type", getVersionType());
-    version.putString("version_release", getVersionRelease());
-    version.putInt("version_number", getVersionNumber());
-    version.putInt("version_type_number", getVersionTypeNumber());
-    return version;
-  }
-
-  public void fillFromBundle(Bundle data) {
-    if (OBundleUtils.hasKey(data, "server_serie")) setServerSerie(data.getString("server_serie"));
-    if (OBundleUtils.hasKey(data, "server_version"))
-      setServerVersion(data.getString("server_version"));
-    if (OBundleUtils.hasKey(data, "version_type")) setVersionType(data.getString("version_type"));
-    if (OBundleUtils.hasKey(data, "version_release"))
-      setVersionRelease(data.getString("version_release"));
-    if (OBundleUtils.hasKey(data, "version_number"))
-      setVersionNumber(data.getInt("version_number"));
-    if (OBundleUtils.hasKey(data, "version_type_number"))
-      setVersionTypeNumber(data.getInt("version_type_number"));
-  }
-
-  public static OdooVersion parseVersion(OdooResult result) throws OdooVersionException {
-    OdooVersion version = new OdooVersion();
-    version.setServerSerie(result.getString("server_serie"));
-    version.setServerVersion(result.getString("server_version"));
-    List<Object> version_info = result.getArray("server_version_info");
-    version.setVersionNumber(((Double) version_info.get(0)).intValue());
-    if (version.getVersionNumber() < 7) {
-      throw new OdooVersionException(
-          "Server version is different from "
-              + "the application supported version. (Only Odoo 7.0+ supported)");
-    }
-    String versionType = version_info.get(1) + "";
-    int versionTypeNumber = 0;
-    if (versionType.contains("saas")) {
-      versionTypeNumber = Integer.parseInt(versionType.split("~")[1]);
-      versionType = "saas";
-    }
-    version.setVersionTypeNumber(versionTypeNumber);
-    version.setVersionType(versionType);
-    version.setVersionRelease((String) version_info.get(3));
-
-    if (version.getVersionNumber() > 9) {
-      String ent = version_info.get(5) + "";
-      version.setEnterprise(ent.equals("e"));
+    public Bundle getAsBundle() {
+        Bundle version = new Bundle();
+        version.putString("server_serie", getServerSerie());
+        version.putString("server_version", getServerVersion());
+        version.putString("version_type", getVersionType());
+        version.putString("version_release", getVersionRelease());
+        version.putInt("version_number", getVersionNumber());
+        version.putInt("version_type_number", getVersionTypeNumber());
+        return version;
     }
 
-    return version;
-  }
+    public void fillFromBundle(Bundle data) {
+        if (OBundleUtils.hasKey(data, "server_serie"))
+            setServerSerie(data.getString("server_serie"));
+        if (OBundleUtils.hasKey(data, "server_version"))
+            setServerVersion(data.getString("server_version"));
+        if (OBundleUtils.hasKey(data, "version_type"))
+            setVersionType(data.getString("version_type"));
+        if (OBundleUtils.hasKey(data, "version_release"))
+            setVersionRelease(data.getString("version_release"));
+        if (OBundleUtils.hasKey(data, "version_number"))
+            setVersionNumber(data.getInt("version_number"));
+        if (OBundleUtils.hasKey(data, "version_type_number"))
+            setVersionTypeNumber(data.getInt("version_type_number"));
+    }
 
-  public String getVersionRelease() {
-    return versionRelease;
-  }
+    public static OdooVersion parseVersion(OdooResult result) throws OdooVersionException {
+        OdooVersion version = new OdooVersion();
+        version.setServerSerie(result.getString("server_serie"));
+        version.setServerVersion(result.getString("server_version"));
+        List<Object> version_info = result.getArray("server_version_info");
+        version.setVersionNumber(((Double) version_info.get(0)).intValue());
+        if (version.getVersionNumber() < 7) {
+            throw new OdooVersionException(
+                    "Server version is different from "
+                            + "the application supported version. (Only Odoo 7.0+ supported)");
+        }
+        String versionType = version_info.get(1) + "";
+        int versionTypeNumber = 0;
+        if (versionType.contains("saas")) {
+            versionTypeNumber = Integer.parseInt(versionType.split("~")[1]);
+            versionType = "saas";
+        }
+        version.setVersionTypeNumber(versionTypeNumber);
+        version.setVersionType(versionType);
+        version.setVersionRelease((String) version_info.get(3));
 
-  public void setVersionRelease(String versionRelease) {
-    this.versionRelease = versionRelease;
-  }
+        if (version.getVersionNumber() > 9) {
+            String ent = version_info.get(5) + "";
+            version.setEnterprise(ent.equals("e"));
+        }
 
-  public String getServerSerie() {
-    return serverSerie;
-  }
+        return version;
+    }
 
-  public void setServerSerie(String serverSerie) {
-    this.serverSerie = serverSerie;
-  }
+    public String getVersionRelease() {
+        return versionRelease;
+    }
 
-  public String getServerVersion() {
-    return serverVersion;
-  }
+    public void setVersionRelease(String versionRelease) {
+        this.versionRelease = versionRelease;
+    }
 
-  public void setServerVersion(String serverVersion) {
-    this.serverVersion = serverVersion;
-  }
+    public String getServerSerie() {
+        return serverSerie;
+    }
 
-  public String getVersionType() {
-    return versionType;
-  }
+    public void setServerSerie(String serverSerie) {
+        this.serverSerie = serverSerie;
+    }
 
-  public void setVersionType(String versionType) {
-    this.versionType = versionType;
-  }
+    public String getServerVersion() {
+        return serverVersion;
+    }
 
-  public int getVersionNumber() {
-    return versionNumber;
-  }
+    public void setServerVersion(String serverVersion) {
+        this.serverVersion = serverVersion;
+    }
 
-  public void setVersionNumber(int versionNumber) {
-    this.versionNumber = versionNumber;
-  }
+    public String getVersionType() {
+        return versionType;
+    }
 
-  public int getVersionTypeNumber() {
-    return versionTypeNumber;
-  }
+    public void setVersionType(String versionType) {
+        this.versionType = versionType;
+    }
 
-  public void setVersionTypeNumber(int versionTypeNumber) {
-    this.versionTypeNumber = versionTypeNumber;
-  }
+    public int getVersionNumber() {
+        return versionNumber;
+    }
 
-  public Boolean isEnterprise() {
-    return isEnterprise;
-  }
+    public void setVersionNumber(int versionNumber) {
+        this.versionNumber = versionNumber;
+    }
 
-  public void setEnterprise(Boolean enterprise) {
-    isEnterprise = enterprise;
-  }
+    public int getVersionTypeNumber() {
+        return versionTypeNumber;
+    }
 
-  @Override
-  public String toString() {
-    return "OdooVersion{"
-        + "serverSerie='"
-        + serverSerie
-        + '\''
-        + ", serverVersion='"
-        + serverVersion
-        + '\''
-        + ", versionType='"
-        + versionType
-        + '\''
-        + ", versionRelease='"
-        + versionRelease
-        + '\''
-        + ", versionNumber="
-        + versionNumber
-        + ", versionTypeNumber="
-        + versionTypeNumber
-        + ", isEnterprise="
-        + isEnterprise
-        + '}';
-  }
+    public void setVersionTypeNumber(int versionTypeNumber) {
+        this.versionTypeNumber = versionTypeNumber;
+    }
+
+    public Boolean isEnterprise() {
+        return isEnterprise;
+    }
+
+    public void setEnterprise(Boolean enterprise) {
+        isEnterprise = enterprise;
+    }
+
+    @Override
+    public String toString() {
+        return "OdooVersion{"
+                + "serverSerie='"
+                + serverSerie
+                + '\''
+                + ", serverVersion='"
+                + serverVersion
+                + '\''
+                + ", versionType='"
+                + versionType
+                + '\''
+                + ", versionRelease='"
+                + versionRelease
+                + '\''
+                + ", versionNumber="
+                + versionNumber
+                + ", versionTypeNumber="
+                + versionTypeNumber
+                + ", isEnterprise="
+                + isEnterprise
+                + '}';
+    }
 }

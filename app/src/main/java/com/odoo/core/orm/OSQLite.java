@@ -27,67 +27,67 @@ import com.odoo.datas.OConstants;
 import java.util.HashMap;
 
 public class OSQLite extends SQLiteOpenHelper {
-  public static final String TAG = OSQLite.class.getSimpleName();
-  private Context mContext;
-  private OUser mUser = null;
-  private App odooApp;
+    public static final String TAG = OSQLite.class.getSimpleName();
+    private Context mContext;
+    private OUser mUser = null;
+    private App odooApp;
 
-  public OSQLite(Context context, OUser user) {
-    super(
-        context,
-        (user != null) ? user.getDBName() : OUser.current(context).getDBName(),
-        null,
-        OConstants.DATABASE_VERSION);
-    mContext = context;
-    odooApp = (App) context.getApplicationContext();
-    mUser = (user != null) ? user : OUser.current(context);
-  }
-
-  @Override
-  public void onCreate(SQLiteDatabase db) {
-    Log.i(TAG, "creating database.");
-    ModelRegistryUtils registryUtils = odooApp.getModelRegistry();
-    HashMap<String, Class<? extends OModel>> models = registryUtils.getModels();
-    OSQLHelper sqlHelper = new OSQLHelper(mContext);
-
-    for (String key : models.keySet()) {
-      OModel model = App.getModel(mContext, key, mUser);
-      sqlHelper.createStatements(model);
+    public OSQLite(Context context, OUser user) {
+        super(
+                context,
+                (user != null) ? user.getDBName() : OUser.current(context).getDBName(),
+                null,
+                OConstants.DATABASE_VERSION);
+        mContext = context;
+        odooApp = (App) context.getApplicationContext();
+        mUser = (user != null) ? user : OUser.current(context);
     }
-    for (String key : sqlHelper.getStatements().keySet()) {
-      String query = sqlHelper.getStatements().get(key);
-      db.execSQL(query);
-      Log.i(TAG, "Table Created : " + key);
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        Log.i(TAG, "creating database.");
+        ModelRegistryUtils registryUtils = odooApp.getModelRegistry();
+        HashMap<String, Class<? extends OModel>> models = registryUtils.getModels();
+        OSQLHelper sqlHelper = new OSQLHelper(mContext);
+
+        for (String key : models.keySet()) {
+            OModel model = App.getModel(mContext, key, mUser);
+            sqlHelper.createStatements(model);
+        }
+        for (String key : sqlHelper.getStatements().keySet()) {
+            String query = sqlHelper.getStatements().get(key);
+            db.execSQL(query);
+            Log.i(TAG, "Table Created : " + key);
+        }
     }
-  }
 
-  @Override
-  public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    Log.i(TAG, "upgrading database.");
-    ModelRegistryUtils registryUtils = odooApp.getModelRegistry();
-    HashMap<String, Class<? extends OModel>> models = registryUtils.getModels();
-    for (String key : models.keySet()) {
-      OModel model = App.getModel(mContext, key, mUser);
-      if (model != null) model.onModelUpgrade(db, oldVersion, newVersion);
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.i(TAG, "upgrading database.");
+        ModelRegistryUtils registryUtils = odooApp.getModelRegistry();
+        HashMap<String, Class<? extends OModel>> models = registryUtils.getModels();
+        for (String key : models.keySet()) {
+            OModel model = App.getModel(mContext, key, mUser);
+            if (model != null) model.onModelUpgrade(db, oldVersion, newVersion);
+        }
     }
-  }
 
-  public void dropDatabase() {
-    if (mContext.deleteDatabase(getDatabaseName())) {
-      Log.i(TAG, getDatabaseName() + " database dropped.");
+    public void dropDatabase() {
+        if (mContext.deleteDatabase(getDatabaseName())) {
+            Log.i(TAG, getDatabaseName() + " database dropped.");
+        }
     }
-  }
 
-  public String databaseLocalPath() {
-    App app = (App) mContext.getApplicationContext();
-    return Environment.getDataDirectory().getPath()
-        + "/data/"
-        + app.getPackageName()
-        + "/databases/"
-        + getDatabaseName();
-  }
+    public String databaseLocalPath() {
+        App app = (App) mContext.getApplicationContext();
+        return Environment.getDataDirectory().getPath()
+                + "/data/"
+                + app.getPackageName()
+                + "/databases/"
+                + getDatabaseName();
+    }
 
-  public String getUserAndroidName() {
-    return (this.mUser != null) ? this.mUser.getAndroidName() : "";
-  }
+    public String getUserAndroidName() {
+        return (this.mUser != null) ? this.mUser.getAndroidName() : "";
+    }
 }

@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.odoo.R;
 import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.ir.feature.OFileManager;
@@ -48,6 +49,7 @@ import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.core.utils.logger.OLog;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

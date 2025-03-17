@@ -17,6 +17,6 @@
 package com.odoo.config;
 
 public class BaseConfig {
-  /** Do not remove following constants. */
-  public static final boolean DEVELOPER_MODE = true;
+    /** Do not remove following constants. */
+    public static final boolean DEVELOPER_MODE = true;
 }

@@ -36,12 +36,14 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+
 import com.odoo.core.account.AppIntro;
 import com.odoo.core.account.ManageAccounts;
 import com.odoo.core.account.OdooLogin;
@@ -64,6 +66,7 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.drawer.DrawerUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
+
 import java.util.List;
 
 public class OdooActivity extends OdooCompatActivity {

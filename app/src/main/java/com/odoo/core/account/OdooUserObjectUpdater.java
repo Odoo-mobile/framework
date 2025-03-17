@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
+
 import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.rpc.Odoo;

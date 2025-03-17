@@ -17,5 +17,5 @@
 package com.odoo.core.rpc.listeners;
 
 public interface IModuleInstallListener {
-  void installedOnServer(boolean isInstalled);
+    void installedOnServer(boolean isInstalled);
 }

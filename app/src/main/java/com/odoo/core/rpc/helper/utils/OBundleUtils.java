@@ -19,9 +19,9 @@ package com.odoo.core.rpc.helper.utils;
 import android.os.Bundle;
 
 public class OBundleUtils {
-  public static final String TAG = OBundleUtils.class.getSimpleName();
+    public static final String TAG = OBundleUtils.class.getSimpleName();
 
-  public static boolean hasKey(Bundle bundle, String key) {
-    return (bundle != null && bundle.containsKey(key));
-  }
+    public static boolean hasKey(Bundle bundle, String key) {
+        return (bundle != null && bundle.containsKey(key));
+    }
 }

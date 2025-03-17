@@ -17,96 +17,97 @@
 package com.odoo.core.rpc.listeners;
 
 import com.odoo.core.rpc.helper.utils.gson.OdooResult;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class OdooError {
-  private String message, serverTrace, exceptionType;
-  private List<String> errors = new ArrayList<>();
-  private Throwable throwable;
-  private int responseCode = -1;
+    private String message, serverTrace, exceptionType;
+    private List<String> errors = new ArrayList<>();
+    private Throwable throwable;
+    private int responseCode = -1;
 
-  public static OdooError parse(OdooResult error) {
-    OdooError odooError = new OdooError(error.getString("message"), null);
-    odooError.setServerTrace(error.getMap("data").getString("debug"));
-    if (error.getMap("data").containsKey("exception_type"))
-      odooError.setExceptionType(error.getMap("data").getString("exception_type"));
-    odooError.setMessage(error.getMap("data").getString("message"));
-    odooError.setErrors(error.getMap("data").<String>getArray("arguments"));
-    return odooError;
-  }
+    public static OdooError parse(OdooResult error) {
+        OdooError odooError = new OdooError(error.getString("message"), null);
+        odooError.setServerTrace(error.getMap("data").getString("debug"));
+        if (error.getMap("data").containsKey("exception_type"))
+            odooError.setExceptionType(error.getMap("data").getString("exception_type"));
+        odooError.setMessage(error.getMap("data").getString("message"));
+        odooError.setErrors(error.getMap("data").<String>getArray("arguments"));
+        return odooError;
+    }
 
-  public OdooError(String message, Throwable throwable) {
-    this.message = message;
-    this.throwable = throwable;
-  }
+    public OdooError(String message, Throwable throwable) {
+        this.message = message;
+        this.throwable = throwable;
+    }
 
-  public void setExceptionType(String exceptionType) {
-    this.exceptionType = exceptionType;
-  }
+    public void setExceptionType(String exceptionType) {
+        this.exceptionType = exceptionType;
+    }
 
-  public String getExceptionType() {
-    return exceptionType;
-  }
+    public String getExceptionType() {
+        return exceptionType;
+    }
 
-  public void setErrors(List<String> errors) {
-    this.errors = errors;
-  }
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
+    }
 
-  public List<String> getErrors() {
-    return errors;
-  }
+    public List<String> getErrors() {
+        return errors;
+    }
 
-  public String getServerTrace() {
-    return serverTrace;
-  }
+    public String getServerTrace() {
+        return serverTrace;
+    }
 
-  public void setServerTrace(String serverTrace) {
-    this.serverTrace = serverTrace;
-  }
+    public void setServerTrace(String serverTrace) {
+        this.serverTrace = serverTrace;
+    }
 
-  public int getResponseCode() {
-    return responseCode;
-  }
+    public int getResponseCode() {
+        return responseCode;
+    }
 
-  public void setResponseCode(int responseCode) {
-    this.responseCode = responseCode;
-  }
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+    }
 
-  public String getMessage() {
-    return message;
-  }
+    public String getMessage() {
+        return message;
+    }
 
-  public void setMessage(String message) {
-    this.message = message;
-  }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-  public Throwable getThrowable() {
-    return throwable;
-  }
+    public Throwable getThrowable() {
+        return throwable;
+    }
 
-  public void setThrowable(Throwable throwable) {
-    this.throwable = throwable;
-  }
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+    }
 
-  @Override
-  public String toString() {
-    return "OdooError{"
-        + "message='"
-        + message
-        + '\''
-        + ", serverTrace='"
-        + serverTrace
-        + '\''
-        + ", exceptionType='"
-        + exceptionType
-        + '\''
-        + ", errors="
-        + errors
-        + ", throwable="
-        + throwable
-        + ", responseCode="
-        + responseCode
-        + '}';
-  }
+    @Override
+    public String toString() {
+        return "OdooError{"
+                + "message='"
+                + message
+                + '\''
+                + ", serverTrace='"
+                + serverTrace
+                + '\''
+                + ", exceptionType='"
+                + exceptionType
+                + '\''
+                + ", errors="
+                + errors
+                + ", throwable="
+                + throwable
+                + ", responseCode="
+                + responseCode
+                + '}';
+    }
 }

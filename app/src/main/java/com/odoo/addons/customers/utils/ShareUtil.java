@@ -19,8 +19,10 @@ package com.odoo.addons.customers.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.utils.OStorageUtils;
+
 import java.io.File;
 import java.io.FileWriter;
 

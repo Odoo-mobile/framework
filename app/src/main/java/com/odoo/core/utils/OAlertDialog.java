@@ -18,39 +18,40 @@ package com.odoo.core.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
+
 import com.odoo.R;
 
 public class OAlertDialog {
 
-  private Context mContext;
-  private String title, message;
-  private Boolean cancelable = true;
+    private Context mContext;
+    private String title, message;
+    private Boolean cancelable = true;
 
-  public OAlertDialog(Context context) {
-    mContext = context;
-  }
+    public OAlertDialog(Context context) {
+        mContext = context;
+    }
 
-  public OAlertDialog setTitle(String title) {
-    this.title = title;
-    return this;
-  }
+    public OAlertDialog setTitle(String title) {
+        this.title = title;
+        return this;
+    }
 
-  public OAlertDialog setCancelable(Boolean cancelable) {
-    this.cancelable = cancelable;
-    return this;
-  }
+    public OAlertDialog setCancelable(Boolean cancelable) {
+        this.cancelable = cancelable;
+        return this;
+    }
 
-  public OAlertDialog setMessage(String message) {
-    this.message = message;
-    return this;
-  }
+    public OAlertDialog setMessage(String message) {
+        this.message = message;
+        return this;
+    }
 
-  public void show() {
-    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-    builder.setTitle(title);
-    builder.setMessage(message);
-    builder.setNegativeButton(OResource.string(mContext, R.string.label_ok), null);
-    builder.setCancelable(cancelable);
-    builder.create().show();
-  }
+    public void show() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setNegativeButton(OResource.string(mContext, R.string.label_ok), null);
+        builder.setCancelable(cancelable);
+        builder.create().show();
+    }
 }

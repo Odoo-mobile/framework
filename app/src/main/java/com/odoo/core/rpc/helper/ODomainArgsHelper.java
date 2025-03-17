@@ -16,9 +16,10 @@
  */
 package com.odoo.core.rpc.helper;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONArray;
 
 public class ODomainArgsHelper<T> {
   public static final String TAG = ODomainArgsHelper.class.getSimpleName();

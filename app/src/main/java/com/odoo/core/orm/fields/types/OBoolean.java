@@ -17,15 +17,15 @@
 package com.odoo.core.orm.fields.types;
 
 public class OBoolean extends OTypeHelper {
-  public static final String TAG = OBoolean.class.getSimpleName();
+    public static final String TAG = OBoolean.class.getSimpleName();
 
-  @Override
-  public String getFieldType() {
-    return "VARCHAR";
-  }
+    @Override
+    public String getFieldType() {
+        return "VARCHAR";
+    }
 
-  @Override
-  public Integer getFieldSize() {
-    return 10;
-  }
+    @Override
+    public Integer getFieldSize() {
+        return 10;
+    }
 }

@@ -17,10 +17,10 @@
 package com.odoo.core.orm.fields.types;
 
 public class OFloat extends OTypeHelper {
-  public static final String TAG = OFloat.class.getSimpleName();
+    public static final String TAG = OFloat.class.getSimpleName();
 
-  @Override
-  public String getFieldType() {
-    return "REAL";
-  }
+    @Override
+    public String getFieldType() {
+        return "REAL";
+    }
 }

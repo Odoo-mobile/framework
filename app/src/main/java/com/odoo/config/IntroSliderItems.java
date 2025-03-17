@@ -20,10 +20,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.odoo.R;
 import com.odoo.core.utils.OControls;
 import com.odoo.widgets.slider.SliderItem;
 import com.odoo.widgets.slider.SliderPagerAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 

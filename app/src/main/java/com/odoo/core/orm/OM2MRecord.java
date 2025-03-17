@@ -21,27 +21,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OM2MRecord {
-  public static final String TAG = OM2MRecord.class.getSimpleName();
-  private OColumn mCol = null;
-  private int mId = 0;
-  private OModel mDatabase = null;
+    public static final String TAG = OM2MRecord.class.getSimpleName();
+    private OColumn mCol = null;
+    private int mId = 0;
+    private OModel mDatabase = null;
 
-  public OM2MRecord(OModel model, OColumn col, int id) {
-    mDatabase = model;
-    mCol = col;
-    mId = id;
-  }
-
-  public List<Integer> getRelIds() {
-    List<Integer> ids = new ArrayList<>();
-    for (ODataRow row :
-        mDatabase.selectManyToManyRecords(new String[] {OColumn.ROW_ID}, mCol.getName(), mId)) {
-      ids.add(row.getInt(OColumn.ROW_ID));
+    public OM2MRecord(OModel model, OColumn col, int id) {
+        mDatabase = model;
+        mCol = col;
+        mId = id;
     }
-    return ids;
-  }
 
-  public List<ODataRow> browseEach() {
-    return mDatabase.selectManyToManyRecords(null, mCol.getName(), mId);
-  }
+    public List<Integer> getRelIds() {
+        List<Integer> ids = new ArrayList<>();
+        for (ODataRow row :
+                mDatabase.selectManyToManyRecords(
+                        new String[] {OColumn.ROW_ID}, mCol.getName(), mId)) {
+            ids.add(row.getInt(OColumn.ROW_ID));
+        }
+        return ids;
+    }
+
+    public List<ODataRow> browseEach() {
+        return mDatabase.selectManyToManyRecords(null, mCol.getName(), mId);
+    }
 }

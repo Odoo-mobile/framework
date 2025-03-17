@@ -25,198 +25,198 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OdooSession {
-  public static final String TAG = OdooSession.class.getSimpleName();
-  private String username, db, sessionId;
-  private OdooResult userContext;
-  private Integer companyId, uid;
+    public static final String TAG = OdooSession.class.getSimpleName();
+    private String username, db, sessionId;
+    private OdooResult userContext;
+    private Integer companyId, uid;
 
-  /* For Odoo 10.0+ */
-  private List<OdooUserCurrency> currencies = new ArrayList<>();
-  private String warning_level = "user";
-  private Boolean is_admin = false;
-  private String server_version = "false";
-  private String web_base_url = "false";
-  private String expiration_reason = "false";
-  private String expiration_date = "false";
-  private Boolean is_superuser = false;
+    /* For Odoo 10.0+ */
+    private List<OdooUserCurrency> currencies = new ArrayList<>();
+    private String warning_level = "user";
+    private Boolean is_admin = false;
+    private String server_version = "false";
+    private String web_base_url = "false";
+    private String expiration_reason = "false";
+    private String expiration_date = "false";
+    private Boolean is_superuser = false;
 
-  public static OdooSession parseSessionInfo(OdooResult result) {
-    OdooLog.v("Parsing Session :" + result);
-    OdooSession session = new OdooSession();
-    if (!result.containsKey("error")) {
-      if (result.get("username") != null) session.setUsername(result.getString("username"));
-      session.setUserContext(result.getMap("user_context"));
-      if (result.get("uid") != null && !result.getString("uid").equals("false"))
-        session.setUid(result.getInt("uid"));
-      if (result.get("company_id") != null && !result.getString("company_id").equals("false"))
-        session.setCompanyId(result.getInt("company_id"));
-      if (result.get("db") != null) session.setDb(result.getString("db"));
-      session.setSessionId(result.getString("session_id"));
+    public static OdooSession parseSessionInfo(OdooResult result) {
+        OdooLog.v("Parsing Session :" + result);
+        OdooSession session = new OdooSession();
+        if (!result.containsKey("error")) {
+            if (result.get("username") != null) session.setUsername(result.getString("username"));
+            session.setUserContext(result.getMap("user_context"));
+            if (result.get("uid") != null && !result.getString("uid").equals("false"))
+                session.setUid(result.getInt("uid"));
+            if (result.get("company_id") != null && !result.getString("company_id").equals("false"))
+                session.setCompanyId(result.getInt("company_id"));
+            if (result.get("db") != null) session.setDb(result.getString("db"));
+            session.setSessionId(result.getString("session_id"));
+        }
+        return session;
     }
-    return session;
-  }
 
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getDb() {
-    return db;
-  }
-
-  public void setDb(String db) {
-    this.db = db;
-  }
-
-  public String getSessionId() {
-    return sessionId;
-  }
-
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
-  }
-
-  public OdooResult userContext() {
-    return userContext;
-  }
-
-  public JSONObject getUserContext() {
-    Gson gson = new Gson();
-    try {
-      return new JSONObject(gson.toJson(userContext));
-    } catch (JSONException e) {
-      e.printStackTrace();
+    public String getUsername() {
+        return username;
     }
-    return new JSONObject();
-  }
 
-  public void setUserContext(OdooResult userContext) {
-    this.userContext = userContext;
-  }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-  public Integer getCompanyId() {
-    return companyId;
-  }
+    public String getDb() {
+        return db;
+    }
 
-  public void setCompanyId(Integer companyId) {
-    this.companyId = companyId;
-  }
+    public void setDb(String db) {
+        this.db = db;
+    }
 
-  public Integer getUid() {
-    return uid;
-  }
+    public String getSessionId() {
+        return sessionId;
+    }
 
-  public void setUid(Integer uid) {
-    this.uid = uid;
-  }
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
 
-  public List<OdooUserCurrency> getCurrencies() {
-    return currencies;
-  }
+    public OdooResult userContext() {
+        return userContext;
+    }
 
-  public void setCurrencies(List<OdooUserCurrency> currencies) {
-    this.currencies = currencies;
-  }
+    public JSONObject getUserContext() {
+        Gson gson = new Gson();
+        try {
+            return new JSONObject(gson.toJson(userContext));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new JSONObject();
+    }
 
-  public String getWarning_level() {
-    return warning_level;
-  }
+    public void setUserContext(OdooResult userContext) {
+        this.userContext = userContext;
+    }
 
-  public void setWarning_level(String warning_level) {
-    this.warning_level = warning_level;
-  }
+    public Integer getCompanyId() {
+        return companyId;
+    }
 
-  public Boolean getIs_admin() {
-    return is_admin;
-  }
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
 
-  public void setIs_admin(Boolean is_admin) {
-    this.is_admin = is_admin;
-  }
+    public Integer getUid() {
+        return uid;
+    }
 
-  public String getServer_version() {
-    return server_version;
-  }
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
 
-  public void setServer_version(String server_version) {
-    this.server_version = server_version;
-  }
+    public List<OdooUserCurrency> getCurrencies() {
+        return currencies;
+    }
 
-  public String getWeb_base_url() {
-    return web_base_url;
-  }
+    public void setCurrencies(List<OdooUserCurrency> currencies) {
+        this.currencies = currencies;
+    }
 
-  public void setWeb_base_url(String web_base_url) {
-    this.web_base_url = web_base_url;
-  }
+    public String getWarning_level() {
+        return warning_level;
+    }
 
-  public String getExpiration_reason() {
-    return expiration_reason;
-  }
+    public void setWarning_level(String warning_level) {
+        this.warning_level = warning_level;
+    }
 
-  public void setExpiration_reason(String expiration_reason) {
-    this.expiration_reason = expiration_reason;
-  }
+    public Boolean getIs_admin() {
+        return is_admin;
+    }
 
-  public String getExpiration_date() {
-    return expiration_date;
-  }
+    public void setIs_admin(Boolean is_admin) {
+        this.is_admin = is_admin;
+    }
 
-  public void setExpiration_date(String expiration_date) {
-    this.expiration_date = expiration_date;
-  }
+    public String getServer_version() {
+        return server_version;
+    }
 
-  public Boolean getIs_superuser() {
-    return is_superuser;
-  }
+    public void setServer_version(String server_version) {
+        this.server_version = server_version;
+    }
 
-  public void setIs_superuser(Boolean is_superuser) {
-    this.is_superuser = is_superuser;
-  }
+    public String getWeb_base_url() {
+        return web_base_url;
+    }
 
-  @Override
-  public String toString() {
-    return "OdooSession{"
-        + "username='"
-        + username
-        + '\''
-        + ", db='"
-        + db
-        + '\''
-        + ", sessionId='"
-        + sessionId
-        + '\''
-        + ", userContext="
-        + userContext
-        + ", companyId="
-        + companyId
-        + ", uid="
-        + uid
-        + ", currencies="
-        + currencies
-        + ", warning_level='"
-        + warning_level
-        + '\''
-        + ", is_admin="
-        + is_admin
-        + ", server_version='"
-        + server_version
-        + '\''
-        + ", web_base_url='"
-        + web_base_url
-        + '\''
-        + ", expiration_reason='"
-        + expiration_reason
-        + '\''
-        + ", expiration_date='"
-        + expiration_date
-        + '\''
-        + ", is_superuser="
-        + is_superuser
-        + '}';
-  }
+    public void setWeb_base_url(String web_base_url) {
+        this.web_base_url = web_base_url;
+    }
+
+    public String getExpiration_reason() {
+        return expiration_reason;
+    }
+
+    public void setExpiration_reason(String expiration_reason) {
+        this.expiration_reason = expiration_reason;
+    }
+
+    public String getExpiration_date() {
+        return expiration_date;
+    }
+
+    public void setExpiration_date(String expiration_date) {
+        this.expiration_date = expiration_date;
+    }
+
+    public Boolean getIs_superuser() {
+        return is_superuser;
+    }
+
+    public void setIs_superuser(Boolean is_superuser) {
+        this.is_superuser = is_superuser;
+    }
+
+    @Override
+    public String toString() {
+        return "OdooSession{"
+                + "username='"
+                + username
+                + '\''
+                + ", db='"
+                + db
+                + '\''
+                + ", sessionId='"
+                + sessionId
+                + '\''
+                + ", userContext="
+                + userContext
+                + ", companyId="
+                + companyId
+                + ", uid="
+                + uid
+                + ", currencies="
+                + currencies
+                + ", warning_level='"
+                + warning_level
+                + '\''
+                + ", is_admin="
+                + is_admin
+                + ", server_version='"
+                + server_version
+                + '\''
+                + ", web_base_url='"
+                + web_base_url
+                + '\''
+                + ", expiration_reason='"
+                + expiration_reason
+                + '\''
+                + ", expiration_date='"
+                + expiration_date
+                + '\''
+                + ", is_superuser="
+                + is_superuser
+                + '}';
+    }
 }

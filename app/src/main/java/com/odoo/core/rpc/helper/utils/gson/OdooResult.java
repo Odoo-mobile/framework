@@ -23,53 +23,53 @@ import java.util.TreeMap;
 
 public class OdooResult extends TreeMap<String, Object> {
 
-  public int getTotalRecords() {
-    return has("length") ? getInt("length") : 0;
-  }
-
-  public int getSize() {
-    if (has("records")) {
-      return getArray("records").size();
+    public int getTotalRecords() {
+        return has("length") ? getInt("length") : 0;
     }
-    return 0;
-  }
 
-  public List<OdooRecord> getRecords() {
-    List<OdooRecord> records = new ArrayList<>();
-    if (has("records")) {
-      records = getArray("records");
+    public int getSize() {
+        if (has("records")) {
+            return getArray("records").size();
+        }
+        return 0;
     }
-    return records;
-  }
 
-  public String getString(String key) {
-    return get(key).toString();
-  }
+    public List<OdooRecord> getRecords() {
+        List<OdooRecord> records = new ArrayList<>();
+        if (has("records")) {
+            records = getArray("records");
+        }
+        return records;
+    }
 
-  public Double getDouble(String key) {
-    return (Double) get(key);
-  }
+    public String getString(String key) {
+        return get(key).toString();
+    }
 
-  public Integer getInt(String key) {
-    return getDouble(key).intValue();
-  }
+    public Double getDouble(String key) {
+        return (Double) get(key);
+    }
 
-  public Boolean getBoolean(String key) {
-    return (Boolean) get(key);
-  }
+    public Integer getInt(String key) {
+        return getDouble(key).intValue();
+    }
 
-  public boolean has(String key) {
-    return containsKey(key);
-  }
+    public Boolean getBoolean(String key) {
+        return (Boolean) get(key);
+    }
 
-  public OdooResult getMap(String key) {
-    LinkedTreeMap mapTree = (LinkedTreeMap) get(key);
-    OdooResult result = new OdooResult();
-    result.putAll(mapTree);
-    return result;
-  }
+    public boolean has(String key) {
+        return containsKey(key);
+    }
 
-  public <T> List<T> getArray(String key) {
-    return (List<T>) get(key);
-  }
+    public OdooResult getMap(String key) {
+        LinkedTreeMap mapTree = (LinkedTreeMap) get(key);
+        OdooResult result = new OdooResult();
+        result.putAll(mapTree);
+        return result;
+    }
+
+    public <T> List<T> getArray(String key) {
+        return (List<T>) get(key);
+    }
 }

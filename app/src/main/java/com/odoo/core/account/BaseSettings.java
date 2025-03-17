@@ -20,24 +20,25 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+
 import com.odoo.R;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 
 public class BaseSettings extends PreferenceFragment {
-  public static final String TAG = BaseSettings.class.getSimpleName();
-  // Keys
-  public static final String KEY_NOTIFICATION_RING_TONE = "notification_ringtone";
+    public static final String TAG = BaseSettings.class.getSimpleName();
+    // Keys
+    public static final String KEY_NOTIFICATION_RING_TONE = "notification_ringtone";
 
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    addPreferencesFromResource(R.xml.base_preference);
-  }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.base_preference);
+    }
 
-  public static Uri getNotificationRingTone(Context context) {
-    OPreferenceManager mPref = new OPreferenceManager(context);
-    String defaultUri = OResource.string(context, R.string.notification_default_ring_tone);
-    return Uri.parse(mPref.getString(KEY_NOTIFICATION_RING_TONE, defaultUri));
-  }
+    public static Uri getNotificationRingTone(Context context) {
+        OPreferenceManager mPref = new OPreferenceManager(context);
+        String defaultUri = OResource.string(context, R.string.notification_default_ring_tone);
+        return Uri.parse(mPref.getString(KEY_NOTIFICATION_RING_TONE, defaultUri));
+    }
 }

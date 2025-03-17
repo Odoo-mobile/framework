@@ -17,42 +17,42 @@
 package com.odoo.core.orm.fields.types;
 
 public abstract class OTypeHelper {
-  public Integer field_size = 0;
+    public Integer field_size = 0;
 
-  public final boolean equals(String type) {
-    return getFieldType().equals(type);
-  }
-
-  public final String getType() {
-    String type = getFieldType();
-    if (field_size > 0) {
-      type += "(" + field_size + ")";
+    public final boolean equals(String type) {
+        return getFieldType().equals(type);
     }
-    return type;
-  }
 
-  public void setSize(Integer size) {
-    if (size != null) field_size = size;
-  }
+    public final String getType() {
+        String type = getFieldType();
+        if (field_size > 0) {
+            type += "(" + field_size + ")";
+        }
+        return type;
+    }
 
-  public abstract String getFieldType();
+    public void setSize(Integer size) {
+        if (size != null) field_size = size;
+    }
 
-  public Integer getFieldSize() {
-    return field_size;
-  }
+    public abstract String getFieldType();
 
-  public String getDataFormat() {
-    return null;
-  }
+    public Integer getFieldSize() {
+        return field_size;
+    }
 
-  @Override
-  public String toString() {
-    return "OTypeHelper{"
-        + "field_type='"
-        + getFieldType()
-        + '\''
-        + ", field_size="
-        + field_size
-        + '}';
-  }
+    public String getDataFormat() {
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "OTypeHelper{"
+                + "field_type='"
+                + getFieldType()
+                + '\''
+                + ", field_size="
+                + field_size
+                + '}';
+    }
 }

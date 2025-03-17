@@ -23,8 +23,10 @@ import android.content.SyncAdapterType;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.support.OUser;
@@ -32,6 +34,7 @@ import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
+
 import java.util.ArrayList;
 import java.util.List;
 

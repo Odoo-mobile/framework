@@ -22,42 +22,42 @@ import com.odoo.core.rpc.Odoo;
 import java.util.Locale;
 
 public class OdooLog {
-  public static final String TAG = OdooLog.class.getSimpleName();
+    public static final String TAG = OdooLog.class.getSimpleName();
 
-  public static void v(Object... args) {
-    if (Odoo.DEBUG) Log.v(TAG, buildMessage(null, args));
-  }
-
-  public static void d(Object... args) {
-    if (Odoo.DEBUG) Log.d(TAG, buildMessage(null, args));
-  }
-
-  public static void e(Object... args) {
-    if (Odoo.DEBUG) Log.e(TAG, buildMessage(null, args));
-  }
-
-  public static void e(Throwable tr, Object... args) {
-    if (Odoo.DEBUG) Log.e(TAG, buildMessage(null, args), tr);
-  }
-
-  private static String buildMessage(String format, Object... args) {
-    String msg = (args == null) ? "" : TextUtils.join(", ", args);
-    StackTraceElement[] trace = new Throwable().fillInStackTrace().getStackTrace();
-
-    String caller = "<unknown>";
-    // Walk up the stack looking for the first caller outside of VolleyLog.
-    // It will be at least two frames up, so start there.
-    for (int i = 2; i < trace.length; i++) {
-      Class<?> clazz = trace[i].getClass();
-      if (!clazz.equals(OdooLog.class)) {
-        String callingClass = trace[i].getClassName();
-        callingClass = callingClass.substring(callingClass.lastIndexOf('.') + 1);
-        callingClass = callingClass.substring(callingClass.lastIndexOf('$') + 1);
-
-        caller = callingClass + "." + trace[i].getMethodName();
-        break;
-      }
+    public static void v(Object... args) {
+        if (Odoo.DEBUG) Log.v(TAG, buildMessage(null, args));
     }
-    return String.format(Locale.US, "[%d] %s: %s", Thread.currentThread().getId(), caller, msg);
-  }
+
+    public static void d(Object... args) {
+        if (Odoo.DEBUG) Log.d(TAG, buildMessage(null, args));
+    }
+
+    public static void e(Object... args) {
+        if (Odoo.DEBUG) Log.e(TAG, buildMessage(null, args));
+    }
+
+    public static void e(Throwable tr, Object... args) {
+        if (Odoo.DEBUG) Log.e(TAG, buildMessage(null, args), tr);
+    }
+
+    private static String buildMessage(String format, Object... args) {
+        String msg = (args == null) ? "" : TextUtils.join(", ", args);
+        StackTraceElement[] trace = new Throwable().fillInStackTrace().getStackTrace();
+
+        String caller = "<unknown>";
+        // Walk up the stack looking for the first caller outside of VolleyLog.
+        // It will be at least two frames up, so start there.
+        for (int i = 2; i < trace.length; i++) {
+            Class<?> clazz = trace[i].getClass();
+            if (!clazz.equals(OdooLog.class)) {
+                String callingClass = trace[i].getClassName();
+                callingClass = callingClass.substring(callingClass.lastIndexOf('.') + 1);
+                callingClass = callingClass.substring(callingClass.lastIndexOf('$') + 1);
+
+                caller = callingClass + "." + trace[i].getMethodName();
+                break;
+            }
+        }
+        return String.format(Locale.US, "[%d] %s: %s", Thread.currentThread().getId(), caller, msg);
+    }
 }

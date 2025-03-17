@@ -17,7 +17,7 @@
 package com.odoo.core.support.addons.fragment;
 
 public interface ISyncStatusObserverListener {
-  public static final String TAG = ISyncStatusObserverListener.class.getSimpleName();
+    public static final String TAG = ISyncStatusObserverListener.class.getSimpleName();
 
-  public void onStatusChange(Boolean refreshing);
+    public void onStatusChange(Boolean refreshing);
 }

@@ -31,47 +31,47 @@ import com.odoo.core.utils.OStringColorUtil;
 import odoo.controls.OForm;
 
 public class Profile extends AppCompatActivity {
-  public static final String TAG = Profile.class.getSimpleName();
+    public static final String TAG = Profile.class.getSimpleName();
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.base_profile);
-    OAppBarUtils.setAppBar(this, true);
-    OUser user = OUser.current(this);
-    OForm form = (OForm) findViewById(R.id.profileDetails);
-    int color = OStringColorUtil.getStringColor(this, user.getName());
-    form.setIconTintColor(color);
-    ODataRow userData = new ODataRow();
-    userData.put("name", user.getName());
-    userData.put("user_login", user.getUsername());
-    userData.put("server_url", user.getHost());
-    userData.put("database", user.getDatabase());
-    userData.put("version", user.getOdooVersion().getServerSerie());
-    userData.put("timezone", user.getTimezone());
-    form.initForm(userData);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.base_profile);
+        OAppBarUtils.setAppBar(this, true);
+        OUser user = OUser.current(this);
+        OForm form = (OForm) findViewById(R.id.profileDetails);
+        int color = OStringColorUtil.getStringColor(this, user.getName());
+        form.setIconTintColor(color);
+        ODataRow userData = new ODataRow();
+        userData.put("name", user.getName());
+        userData.put("user_login", user.getUsername());
+        userData.put("server_url", user.getHost());
+        userData.put("database", user.getDatabase());
+        userData.put("version", user.getOdooVersion().getServerSerie());
+        userData.put("timezone", user.getTimezone());
+        form.initForm(userData);
 
-    CollapsingToolbarLayout collapsing_toolbar =
-        (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-    collapsing_toolbar.setTitle(userData.getString("name"));
-    setTitle(userData.getString("name"));
-    Bitmap avatar;
-    if (user.getAvatar().equals("false")) {
-      avatar = BitmapUtils.getAlphabetImage(this, user.getName());
-    } else {
-      avatar = BitmapUtils.getBitmapImage(this, user.getAvatar());
+        CollapsingToolbarLayout collapsing_toolbar =
+                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsing_toolbar.setTitle(userData.getString("name"));
+        setTitle(userData.getString("name"));
+        Bitmap avatar;
+        if (user.getAvatar().equals("false")) {
+            avatar = BitmapUtils.getAlphabetImage(this, user.getName());
+        } else {
+            avatar = BitmapUtils.getBitmapImage(this, user.getAvatar());
+        }
+        ImageView imageView = (ImageView) findViewById(R.id.image);
+        imageView.setImageBitmap(avatar);
     }
-    ImageView imageView = (ImageView) findViewById(R.id.image);
-    imageView.setImageBitmap(avatar);
-  }
 
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        finish();
-        break;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
-    return super.onOptionsItemSelected(item);
-  }
 }

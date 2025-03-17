@@ -16,38 +16,39 @@
  */
 package com.odoo.core.rpc.helper;
 
-import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class OArguments extends ODomainArgsHelper<OArguments> {
-  public static final String TAG = OArguments.class.getSimpleName();
+    public static final String TAG = OArguments.class.getSimpleName();
 
-  public OArguments add(List<Object> datas) {
-    try {
-      add(new JSONArray(datas.toString()));
-    } catch (JSONException e) {
+    public OArguments add(List<Object> datas) {
+        try {
+            add(new JSONArray(datas.toString()));
+        } catch (JSONException e) {
+        }
+        return this;
     }
-    return this;
-  }
 
-  public OArguments addNULL() {
-    mObjects.add(null);
-    return this;
-  }
-
-  public JSONArray get() {
-    JSONArray arguments = new JSONArray();
-    for (Object obj : getObject()) {
-      JSONArray data = new JSONArray();
-      data.put(obj);
-      if (obj instanceof JSONObject) {
-        arguments.put(obj);
-      } else {
-        arguments.put(data);
-      }
+    public OArguments addNULL() {
+        mObjects.add(null);
+        return this;
     }
-    return arguments;
-  }
+
+    public JSONArray get() {
+        JSONArray arguments = new JSONArray();
+        for (Object obj : getObject()) {
+            JSONArray data = new JSONArray();
+            data.put(obj);
+            if (obj instanceof JSONObject) {
+                arguments.put(obj);
+            } else {
+                arguments.put(data);
+            }
+        }
+        return arguments;
+    }
 }

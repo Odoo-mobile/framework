@@ -17,7 +17,9 @@
 package com.odoo.core.support.addons.fragment;
 
 import android.content.Context;
+
 import com.odoo.core.support.drawer.ODrawerItem;
+
 import java.util.List;
 
 public interface IBaseFragment {

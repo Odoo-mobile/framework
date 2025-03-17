@@ -24,6 +24,7 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.support.OUser;
 

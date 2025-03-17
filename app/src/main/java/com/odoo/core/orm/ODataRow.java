@@ -25,130 +25,130 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ODataRow implements Parcelable {
-  public static final String TAG = ODataRow.class.getSimpleName();
+    public static final String TAG = ODataRow.class.getSimpleName();
 
-  HashMap<String, Object> _data = new HashMap<>();
+    HashMap<String, Object> _data = new HashMap<>();
 
-  public void put(String key, Object value) {
-    _data.put(key, value);
-  }
-
-  public Object get(String key) {
-    return _data.get(key);
-  }
-
-  public Integer getInt(String key) {
-    if (_data.get(key).toString().equals("false")) return 0;
-    else return Integer.parseInt(_data.get(key).toString());
-  }
-
-  public Float getFloat(String key) {
-    return Float.parseFloat(_data.get(key).toString());
-  }
-
-  public String getString(String key) {
-    if (_data.containsKey(key) && _data.get(key) != null) return _data.get(key).toString();
-    else return "false";
-  }
-
-  public Boolean getBoolean(String key) {
-    return Boolean.parseBoolean(_data.get(key).toString());
-  }
-
-  public OM2ORecord getM2ORecord(String key) {
-    return (OM2ORecord) _data.get(key);
-  }
-
-  public OM2MRecord getM2MRecord(String key) {
-    return (OM2MRecord) _data.get(key);
-  }
-
-  public OO2MRecord getO2MRecord(String key) {
-    return (OO2MRecord) _data.get(key);
-  }
-
-  public List<Object> values() {
-    List<Object> values = new ArrayList<>();
-    values.addAll(_data.values());
-    return values;
-  }
-
-  public List<String> keys() {
-    List<String> list = new ArrayList<>();
-    list.addAll(_data.keySet());
-    return list;
-  }
-
-  public boolean contains(String key) {
-    return _data.containsKey(key);
-  }
-
-  public int size() {
-    return _data.size();
-  }
-
-  @Override
-  public String toString() {
-    return _data.toString();
-  }
-
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {}
-
-  public class IdName {
-    Integer id;
-    String name;
-
-    public IdName(Integer id, String name) {
-      super();
-      this.id = id;
-      this.name = name;
+    public void put(String key, Object value) {
+        _data.put(key, value);
     }
 
-    public Integer getId() {
-      return id;
+    public Object get(String key) {
+        return _data.get(key);
     }
 
-    public void setId(Integer id) {
-      this.id = id;
+    public Integer getInt(String key) {
+        if (_data.get(key).toString().equals("false")) return 0;
+        else return Integer.parseInt(_data.get(key).toString());
     }
 
-    public String getName() {
-      return name;
+    public Float getFloat(String key) {
+        return Float.parseFloat(_data.get(key).toString());
     }
 
-    public void setName(String name) {
-      this.name = name;
+    public String getString(String key) {
+        if (_data.containsKey(key) && _data.get(key) != null) return _data.get(key).toString();
+        else return "false";
     }
-  }
 
-  public void addAll(HashMap<String, Object> data) {
-    _data.putAll(data);
-  }
+    public Boolean getBoolean(String key) {
+        return Boolean.parseBoolean(_data.get(key).toString());
+    }
 
-  public void addAll(ODataRow row) {
-    _data.putAll(row.getAll());
-  }
+    public OM2ORecord getM2ORecord(String key) {
+        return (OM2ORecord) _data.get(key);
+    }
 
-  public HashMap<String, Object> getAll() {
-    return _data;
-  }
+    public OM2MRecord getM2MRecord(String key) {
+        return (OM2MRecord) _data.get(key);
+    }
 
-  public OValues toValues() {
-    OValues values = new OValues();
-    values.addAll(getAll());
-    return values;
-  }
+    public OO2MRecord getO2MRecord(String key) {
+        return (OO2MRecord) _data.get(key);
+    }
 
-  public Bundle getPrimaryBundleData() {
-    Bundle bundle = new Bundle();
-    bundle.putInt("id", getInt("id"));
-    bundle.putInt(OColumn.ROW_ID, getInt(OColumn.ROW_ID));
-    return bundle;
-  }
+    public List<Object> values() {
+        List<Object> values = new ArrayList<>();
+        values.addAll(_data.values());
+        return values;
+    }
+
+    public List<String> keys() {
+        List<String> list = new ArrayList<>();
+        list.addAll(_data.keySet());
+        return list;
+    }
+
+    public boolean contains(String key) {
+        return _data.containsKey(key);
+    }
+
+    public int size() {
+        return _data.size();
+    }
+
+    @Override
+    public String toString() {
+        return _data.toString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {}
+
+    public class IdName {
+        Integer id;
+        String name;
+
+        public IdName(Integer id, String name) {
+            super();
+            this.id = id;
+            this.name = name;
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public void addAll(HashMap<String, Object> data) {
+        _data.putAll(data);
+    }
+
+    public void addAll(ODataRow row) {
+        _data.putAll(row.getAll());
+    }
+
+    public HashMap<String, Object> getAll() {
+        return _data;
+    }
+
+    public OValues toValues() {
+        OValues values = new OValues();
+        values.addAll(getAll());
+        return values;
+    }
+
+    public Bundle getPrimaryBundleData() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", getInt("id"));
+        bundle.putInt(OColumn.ROW_ID, getInt(OColumn.ROW_ID));
+        return bundle;
+    }
 }

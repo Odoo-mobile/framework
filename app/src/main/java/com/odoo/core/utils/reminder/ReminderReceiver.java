@@ -22,13 +22,13 @@ import android.content.Intent;
 import android.os.Bundle;
 
 public class ReminderReceiver extends BroadcastReceiver {
-  public static final String TAG = ReminderReceiver.class.getSimpleName();
+    public static final String TAG = ReminderReceiver.class.getSimpleName();
 
-  @Override
-  public void onReceive(Context context, Intent intent) {
-    String type = intent.getStringExtra(ReminderUtils.KEY_REMINDER_TYPE);
-    showNotification(context, type, intent.getExtras());
-  }
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String type = intent.getStringExtra(ReminderUtils.KEY_REMINDER_TYPE);
+        showNotification(context, type, intent.getExtras());
+    }
 
-  private void showNotification(Context context, String type, Bundle data) {}
+    private void showNotification(Context context, String type, Bundle data) {}
 }

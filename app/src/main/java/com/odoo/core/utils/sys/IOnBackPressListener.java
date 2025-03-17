@@ -17,5 +17,5 @@
 package com.odoo.core.utils.sys;
 
 public interface IOnBackPressListener {
-  public boolean onBackPressed();
+    public boolean onBackPressed();
 }

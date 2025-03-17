@@ -17,17 +17,18 @@
 package com.odoo.base.addons.mail;
 
 import android.content.Context;
+
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
 public class MailMessageSubType extends OModel {
-  public static final String TAG = MailMessageSubType.class.getSimpleName();
+    public static final String TAG = MailMessageSubType.class.getSimpleName();
 
-  OColumn name = new OColumn("Name", OVarchar.class);
+    OColumn name = new OColumn("Name", OVarchar.class);
 
-  public MailMessageSubType(Context context, OUser user) {
-    super(context, "mail.message.subtype", user);
-  }
+    public MailMessageSubType(Context context, OUser user) {
+        super(context, "mail.message.subtype", user);
+    }
 }

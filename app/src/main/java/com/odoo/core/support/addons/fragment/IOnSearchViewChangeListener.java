@@ -17,9 +17,9 @@
 package com.odoo.core.support.addons.fragment;
 
 public interface IOnSearchViewChangeListener {
-  public static final String TAG = IOnSearchViewChangeListener.class.getSimpleName();
+    public static final String TAG = IOnSearchViewChangeListener.class.getSimpleName();
 
-  public boolean onSearchViewTextChange(String newFilter);
+    public boolean onSearchViewTextChange(String newFilter);
 
-  public void onSearchViewClose();
+    public void onSearchViewClose();
 }

@@ -17,11 +17,11 @@
 package com.odoo.core.service;
 
 public interface ISyncServiceListener {
-  public void onSyncStarted();
+    public void onSyncStarted();
 
-  public void onSyncFinished();
+    public void onSyncFinished();
 
-  public void onSyncFailed();
+    public void onSyncFailed();
 
-  public void onSyncTimedOut();
+    public void onSyncTimedOut();
 }

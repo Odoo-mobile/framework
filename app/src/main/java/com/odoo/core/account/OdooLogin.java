@@ -15,7 +15,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.odoo.App;
 import com.odoo.OdooActivity;
 import com.odoo.R;
@@ -35,6 +37,7 @@ import com.odoo.core.support.OdooUserLoginSelectorDialog;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.datas.OConstants;
+
 import java.util.ArrayList;
 import java.util.List;
 

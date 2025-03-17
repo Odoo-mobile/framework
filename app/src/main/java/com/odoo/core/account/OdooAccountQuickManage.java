@@ -30,7 +30,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.odoo.App;
 import com.odoo.OdooActivity;
 import com.odoo.R;

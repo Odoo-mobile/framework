@@ -19,5 +19,5 @@ package com.odoo.core.service.receivers;
 import android.content.BroadcastReceiver;
 
 public abstract class ISyncFinishReceiver extends BroadcastReceiver {
-  public static final String SYNC_FINISH = "ISyncFinishReceiver.SYNC_FINISH";
+    public static final String SYNC_FINISH = "ISyncFinishReceiver.SYNC_FINISH";
 }

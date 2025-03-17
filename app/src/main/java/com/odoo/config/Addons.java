@@ -22,10 +22,10 @@ import com.odoo.core.support.addons.OAddon;
 
 public class Addons extends AddonsHelper {
 
-  /**
-   * Declare your required module here NOTE: For maintain sequence use object name in asc order.
-   * Ex.: OAddon partners = new OAddon(Partners.class).setDefault(); for maintain sequence call
-   * withSequence(int sequence) OAddon partners = new OAddon(Partners.class).withSequence(2);
-   */
-  OAddon customers = new OAddon(Customers.class).setDefault();
+    /**
+     * Declare your required module here NOTE: For maintain sequence use object name in asc order.
+     * Ex.: OAddon partners = new OAddon(Partners.class).setDefault(); for maintain sequence call
+     * withSequence(int sequence) OAddon partners = new OAddon(Partners.class).withSequence(2);
+     */
+    OAddon customers = new OAddon(Customers.class).setDefault();
 }

@@ -25,57 +25,57 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OdooFields {
-  public static final String TAG = OdooFields.class.getSimpleName();
-  private JSONObject jFields = new JSONObject();
+    public static final String TAG = OdooFields.class.getSimpleName();
+    private JSONObject jFields = new JSONObject();
 
-  public OdooFields(List<OColumn> columns) {
-    List<String> fields = new ArrayList<>();
-    if (columns != null) {
-      for (OColumn column : columns) {
-        if (!column.isLocal() && !column.isFunctionalColumn()) {
-          fields.add(column.getName());
+    public OdooFields(List<OColumn> columns) {
+        List<String> fields = new ArrayList<>();
+        if (columns != null) {
+            for (OColumn column : columns) {
+                if (!column.isLocal() && !column.isFunctionalColumn()) {
+                    fields.add(column.getName());
+                }
+            }
         }
-      }
+        addAll(fields.toArray(new String[fields.size()]));
     }
-    addAll(fields.toArray(new String[fields.size()]));
-  }
 
-  public OdooFields(String... fields) {
-    if (fields != null && fields.length > 0) addAll(fields);
-  }
-
-  public void addAll(String[] fields) {
-    try {
-      for (String field : fields) {
-        jFields.accumulate("fields", field);
-      }
-      if (fields.length == 1) {
-        jFields.accumulate("fields", fields[0]);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
+    public OdooFields(String... fields) {
+        if (fields != null && fields.length > 0) addAll(fields);
     }
-  }
 
-  public JSONArray getArray() {
-    if (jFields.length() != 0) {
-      try {
-        return jFields.getJSONArray("fields");
-      } catch (JSONException e) {
-        Log.d(TAG, e.getMessage());
-      }
+    public void addAll(String[] fields) {
+        try {
+            for (String field : fields) {
+                jFields.accumulate("fields", field);
+            }
+            if (fields.length == 1) {
+                jFields.accumulate("fields", fields[0]);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    return new JSONArray();
-  }
 
-  public JSONObject get() {
-    if (jFields.length() == 0) {
-      try {
-        jFields.put("fields", new JSONArray());
-      } catch (JSONException e) {
-        Log.d(TAG, e.getMessage());
-      }
+    public JSONArray getArray() {
+        if (jFields.length() != 0) {
+            try {
+                return jFields.getJSONArray("fields");
+            } catch (JSONException e) {
+                Log.d(TAG, e.getMessage());
+            }
+        }
+        return new JSONArray();
     }
-    return jFields;
-  }
+
+    public JSONObject get() {
+        if (jFields.length() == 0) {
+            try {
+                jFields.put("fields", new JSONArray());
+            } catch (JSONException e) {
+                Log.d(TAG, e.getMessage());
+            }
+        }
+        return jFields;
+    }
 }

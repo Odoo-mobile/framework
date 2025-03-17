@@ -20,7 +20,7 @@ import com.odoo.core.rpc.Odoo;
 import com.odoo.core.support.OUser;
 
 public interface IOdooLoginCallback {
-  void onLoginSuccess(Odoo odoo, OUser user);
+    void onLoginSuccess(Odoo odoo, OUser user);
 
-  void onLoginFail(OdooError error);
+    void onLoginFail(OdooError error);
 }

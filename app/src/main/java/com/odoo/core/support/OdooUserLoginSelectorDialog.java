@@ -26,6 +26,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+
 import com.odoo.R;
 import com.odoo.core.account.OdooUserAskPassword;
 import com.odoo.core.auth.OdooAccountManager;
@@ -34,8 +35,10 @@ import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
-import java.util.List;
+
 import odoo.controls.BezelImageView;
+
+import java.util.List;
 
 public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListener {
   private Context mContext;

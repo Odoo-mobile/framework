@@ -17,38 +17,39 @@
 package com.odoo.base.addons.res;
 
 import android.content.Context;
+
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
 public class ResUsers extends OModel {
-  public static final String TAG = ResUsers.class.getSimpleName();
+    public static final String TAG = ResUsers.class.getSimpleName();
 
-  OColumn name = new OColumn("Name", OVarchar.class);
-  OColumn login = new OColumn("User Login name", OVarchar.class);
+    OColumn name = new OColumn("Name", OVarchar.class);
+    OColumn login = new OColumn("User Login name", OVarchar.class);
 
-  @Override
-  public boolean allowCreateRecordOnServer() {
-    return false;
-  }
+    @Override
+    public boolean allowCreateRecordOnServer() {
+        return false;
+    }
 
-  @Override
-  public boolean allowUpdateRecordOnServer() {
-    return false;
-  }
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return false;
+    }
 
-  @Override
-  public boolean allowDeleteRecordInLocal() {
-    return false;
-  }
+    @Override
+    public boolean allowDeleteRecordInLocal() {
+        return false;
+    }
 
-  public ResUsers(Context context, OUser user) {
-    super(context, "res.users", user);
-  }
+    public ResUsers(Context context, OUser user) {
+        super(context, "res.users", user);
+    }
 
-  public static int myId(Context context) {
-    ResUsers users = new ResUsers(context, null);
-    return users.selectRowId(users.getUser().getUserId());
-  }
+    public static int myId(Context context) {
+        ResUsers users = new ResUsers(context, null);
+        return users.selectRowId(users.getUser().getUserId());
+    }
 }

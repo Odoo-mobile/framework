@@ -21,34 +21,34 @@ import android.net.Uri;
 import android.os.Handler;
 
 public class MessageObserver extends ContentObserver {
-  public static final String TAG = MessageObserver.class.getSimpleName();
-  private OnDataSetChangeListener mOnDataSetChangeListener;
+    public static final String TAG = MessageObserver.class.getSimpleName();
+    private OnDataSetChangeListener mOnDataSetChangeListener;
 
-  public MessageObserver() {
-    super(new Handler());
-  }
-
-  @Override
-  public void onChange(boolean selfChange) {
-    super.onChange(selfChange);
-    if (mOnDataSetChangeListener != null) {
-      mOnDataSetChangeListener.onDataSetChange();
+    public MessageObserver() {
+        super(new Handler());
     }
-  }
 
-  @Override
-  public void onChange(boolean selfChange, Uri uri) {
-    super.onChange(selfChange, uri);
-    if (mOnDataSetChangeListener != null) {
-      mOnDataSetChangeListener.onDataSetChange();
+    @Override
+    public void onChange(boolean selfChange) {
+        super.onChange(selfChange);
+        if (mOnDataSetChangeListener != null) {
+            mOnDataSetChangeListener.onDataSetChange();
+        }
     }
-  }
 
-  public void setOnDataSetChangeListener(OnDataSetChangeListener listener) {
-    mOnDataSetChangeListener = listener;
-  }
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        super.onChange(selfChange, uri);
+        if (mOnDataSetChangeListener != null) {
+            mOnDataSetChangeListener.onDataSetChange();
+        }
+    }
 
-  public interface OnDataSetChangeListener {
-    public void onDataSetChange();
-  }
+    public void setOnDataSetChangeListener(OnDataSetChangeListener listener) {
+        mOnDataSetChangeListener = listener;
+    }
+
+    public interface OnDataSetChangeListener {
+        public void onDataSetChange();
+    }
 }

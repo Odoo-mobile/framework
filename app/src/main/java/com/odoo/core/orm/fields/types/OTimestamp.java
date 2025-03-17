@@ -17,5 +17,5 @@
 package com.odoo.core.orm.fields.types;
 
 public class OTimestamp extends ODateTime {
-  public static final String TAG = OTimestamp.class.getSimpleName();
+    public static final String TAG = OTimestamp.class.getSimpleName();
 }

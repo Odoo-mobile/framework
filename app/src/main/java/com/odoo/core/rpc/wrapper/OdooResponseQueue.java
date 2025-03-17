@@ -17,37 +17,38 @@
 package com.odoo.core.rpc.wrapper;
 
 import com.odoo.core.rpc.listeners.IOdooResponse;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
 public class OdooResponseQueue {
-  public static final String TAG = OdooResponseQueue.class.getSimpleName();
-  private Map<String, Queue<IOdooResponse>> mOdooResponseQueue = new HashMap<>();
+    public static final String TAG = OdooResponseQueue.class.getSimpleName();
+    private Map<String, Queue<IOdooResponse>> mOdooResponseQueue = new HashMap<>();
 
-  public void add(int id, IOdooResponse callback) {
-    if (!mOdooResponseQueue.containsKey("queue_" + id)) {
-      Queue<IOdooResponse> response = new LinkedList<>();
-      response.add(callback);
-      mOdooResponseQueue.put("queue_" + id, response);
+    public void add(int id, IOdooResponse callback) {
+        if (!mOdooResponseQueue.containsKey("queue_" + id)) {
+            Queue<IOdooResponse> response = new LinkedList<>();
+            response.add(callback);
+            mOdooResponseQueue.put("queue_" + id, response);
+        }
     }
-  }
 
-  public IOdooResponse get(int id) {
-    if (mOdooResponseQueue.containsKey("queue_" + id)) {
-      return mOdooResponseQueue.get("queue_" + id).poll();
+    public IOdooResponse get(int id) {
+        if (mOdooResponseQueue.containsKey("queue_" + id)) {
+            return mOdooResponseQueue.get("queue_" + id).poll();
+        }
+        return null;
     }
-    return null;
-  }
 
-  public void remove(int id) {
-    if (mOdooResponseQueue.containsKey("queue_" + id)) {
-      mOdooResponseQueue.remove("queue_" + id);
+    public void remove(int id) {
+        if (mOdooResponseQueue.containsKey("queue_" + id)) {
+            mOdooResponseQueue.remove("queue_" + id);
+        }
     }
-  }
 
-  public boolean contain(int id) {
-    return mOdooResponseQueue.containsKey("queue_" + id);
-  }
+    public boolean contain(int id) {
+        return mOdooResponseQueue.containsKey("queue_" + id);
+    }
 }

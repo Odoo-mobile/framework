@@ -17,10 +17,10 @@
 package com.odoo.core.orm.fields.types;
 
 public class OSelection extends OTypeHelper {
-  public static final String TAG = OSelection.class.getSimpleName();
+    public static final String TAG = OSelection.class.getSimpleName();
 
-  @Override
-  public String getFieldType() {
-    return "VARCHAR";
-  }
+    @Override
+    public String getFieldType() {
+        return "VARCHAR";
+    }
 }

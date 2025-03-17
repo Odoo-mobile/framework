@@ -24,64 +24,65 @@ import android.util.Log;
 import com.odoo.core.support.OUser;
 
 public class SyncUtils {
-  public static final String TAG = SyncUtils.class.getSimpleName();
+    public static final String TAG = SyncUtils.class.getSimpleName();
 
-  private OUser mUser;
+    private OUser mUser;
 
-  public SyncUtils(Context context, OUser user) {
-    mUser = (user != null) ? user : OUser.current(context);
-  }
-
-  public static SyncUtils get(Context context) {
-    return new SyncUtils(context, null);
-  }
-
-  public static SyncUtils get(Context context, OUser user) {
-    return new SyncUtils(context, user);
-  }
-
-  public void setAutoSync(String authority, boolean autoSync) {
-    try {
-      Account account = mUser.getAccount();
-      if (!ContentResolver.isSyncActive(account, authority)) {
-        ContentResolver.setSyncAutomatically(account, authority, autoSync);
-      }
-    } catch (NullPointerException e) {
-      Log.e(TAG, e.getMessage());
-      e.printStackTrace();
+    public SyncUtils(Context context, OUser user) {
+        mUser = (user != null) ? user : OUser.current(context);
     }
-  }
 
-  public void requestSync(String authority) {
-    requestSync(authority, null);
-  }
-
-  public void requestSync(String authority, Bundle bundle) {
-    Account account = mUser.getAccount();
-    Bundle settingsBundle = new Bundle();
-    settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-    settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-    if (bundle != null) {
-      settingsBundle.putAll(bundle);
+    public static SyncUtils get(Context context) {
+        return new SyncUtils(context, null);
     }
-    ContentResolver.requestSync(account, authority, settingsBundle);
-  }
 
-  public void setSyncPeriodic(
-      String authority,
-      long interval_in_minute,
-      long seconds_per_minute,
-      long milliseconds_per_second) {
-    Account account = mUser.getAccount();
-    Bundle extras = new Bundle();
-    this.setAutoSync(authority, true);
-    ContentResolver.setIsSyncable(account, authority, 1);
-    final long sync_interval = interval_in_minute * seconds_per_minute * milliseconds_per_second;
-    ContentResolver.addPeriodicSync(account, authority, extras, sync_interval);
-  }
+    public static SyncUtils get(Context context, OUser user) {
+        return new SyncUtils(context, user);
+    }
 
-  public void cancelSync(String authority) {
-    Account account = mUser.getAccount();
-    ContentResolver.cancelSync(account, authority);
-  }
+    public void setAutoSync(String authority, boolean autoSync) {
+        try {
+            Account account = mUser.getAccount();
+            if (!ContentResolver.isSyncActive(account, authority)) {
+                ContentResolver.setSyncAutomatically(account, authority, autoSync);
+            }
+        } catch (NullPointerException e) {
+            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void requestSync(String authority) {
+        requestSync(authority, null);
+    }
+
+    public void requestSync(String authority, Bundle bundle) {
+        Account account = mUser.getAccount();
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        if (bundle != null) {
+            settingsBundle.putAll(bundle);
+        }
+        ContentResolver.requestSync(account, authority, settingsBundle);
+    }
+
+    public void setSyncPeriodic(
+            String authority,
+            long interval_in_minute,
+            long seconds_per_minute,
+            long milliseconds_per_second) {
+        Account account = mUser.getAccount();
+        Bundle extras = new Bundle();
+        this.setAutoSync(authority, true);
+        ContentResolver.setIsSyncable(account, authority, 1);
+        final long sync_interval =
+                interval_in_minute * seconds_per_minute * milliseconds_per_second;
+        ContentResolver.addPeriodicSync(account, authority, extras, sync_interval);
+    }
+
+    public void cancelSync(String authority) {
+        Account account = mUser.getAccount();
+        ContentResolver.cancelSync(account, authority);
+    }
 }

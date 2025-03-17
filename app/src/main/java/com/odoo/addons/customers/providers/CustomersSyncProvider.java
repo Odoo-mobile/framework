@@ -20,10 +20,10 @@ import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.provider.BaseModelProvider;
 
 public class CustomersSyncProvider extends BaseModelProvider {
-  public static final String TAG = CustomersSyncProvider.class.getSimpleName();
+    public static final String TAG = CustomersSyncProvider.class.getSimpleName();
 
-  @Override
-  public String authority() {
-    return ResPartner.AUTHORITY;
-  }
+    @Override
+    public String authority() {
+        return ResPartner.AUTHORITY;
+    }
 }

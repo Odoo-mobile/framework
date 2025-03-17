@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.odoo.core.service.receivers.ISyncFinishReceiver;
 import com.odoo.core.support.OUser;
 

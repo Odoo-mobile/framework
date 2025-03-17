@@ -17,9 +17,9 @@
 package com.odoo.core.rpc.handler;
 
 public class OdooVersionException extends Exception {
-  public static final String TAG = OdooVersionException.class.getSimpleName();
+    public static final String TAG = OdooVersionException.class.getSimpleName();
 
-  public OdooVersionException(String message) {
-    super(message);
-  }
+    public OdooVersionException(String message) {
+        super(message);
+    }
 }

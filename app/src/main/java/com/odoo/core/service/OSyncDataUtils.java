@@ -19,6 +19,7 @@ package com.odoo.core.service;
 import android.content.Context;
 import android.content.SyncResult;
 import android.util.Log;
+
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -33,6 +34,7 @@ import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.core.utils.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;

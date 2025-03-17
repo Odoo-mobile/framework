@@ -19,6 +19,7 @@ package com.odoo.core.orm.fields;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.utils.DomainFilterParser;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;

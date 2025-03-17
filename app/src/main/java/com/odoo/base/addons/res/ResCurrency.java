@@ -17,6 +17,7 @@
 package com.odoo.base.addons.res;
 
 import android.content.Context;
+
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;

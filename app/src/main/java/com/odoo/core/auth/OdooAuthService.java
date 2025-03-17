@@ -22,15 +22,15 @@ import android.content.Intent;
 import android.os.IBinder;
 
 public class OdooAuthService extends Service {
-  private OdooAuthenticator mAuthenticator;
+    private OdooAuthenticator mAuthenticator;
 
-  @Override
-  public IBinder onBind(Intent intent) {
-    IBinder binder = null;
-    if (intent.getAction().equals(AccountManager.ACTION_AUTHENTICATOR_INTENT)) {
-      mAuthenticator = new OdooAuthenticator(this);
-      binder = mAuthenticator.getIBinder();
+    @Override
+    public IBinder onBind(Intent intent) {
+        IBinder binder = null;
+        if (intent.getAction().equals(AccountManager.ACTION_AUTHENTICATOR_INTENT)) {
+            mAuthenticator = new OdooAuthenticator(this);
+            binder = mAuthenticator.getIBinder();
+        }
+        return binder;
     }
-    return binder;
-  }
 }

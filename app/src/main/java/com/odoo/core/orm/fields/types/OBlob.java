@@ -17,10 +17,10 @@
 package com.odoo.core.orm.fields.types;
 
 public class OBlob extends OTypeHelper {
-  public static final String TAG = OBlob.class.getSimpleName();
+    public static final String TAG = OBlob.class.getSimpleName();
 
-  @Override
-  public String getFieldType() {
-    return "BLOB";
-  }
+    @Override
+    public String getFieldType() {
+        return "BLOB";
+    }
 }

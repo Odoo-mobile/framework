@@ -19,5 +19,5 @@ package com.odoo.core.utils.sys;
 import android.content.Intent;
 
 public interface IOnActivityResultListener {
-  public void onOdooActivityResult(int requestCode, int resultCode, Intent data);
+    public void onOdooActivityResult(int requestCode, int resultCode, Intent data);
 }

@@ -18,6 +18,7 @@ package com.odoo.addons.customers.services;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;

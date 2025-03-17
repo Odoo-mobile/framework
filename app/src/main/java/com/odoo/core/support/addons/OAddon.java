@@ -17,7 +17,9 @@
 package com.odoo.core.support.addons;
 
 import android.util.Log;
+
 import androidx.annotation.NonNull;
+
 import com.odoo.core.support.addons.fragment.BaseFragment;
 
 public class OAddon implements Comparable<OAddon> {

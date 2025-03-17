@@ -19,7 +19,7 @@ package com.odoo.core.rpc.listeners;
 import com.odoo.core.rpc.Odoo;
 
 public interface IOdooConnectionListener {
-  void onConnect(Odoo odoo);
+    void onConnect(Odoo odoo);
 
-  void onError(OdooError error);
+    void onError(OdooError error);
 }

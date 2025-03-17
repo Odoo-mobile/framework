@@ -20,27 +20,27 @@ import com.odoo.core.rpc.helper.utils.gson.OdooResponse;
 
 public class OdooSyncResponse {
 
-  private OdooResponse response = null;
-  private Object object;
+    private OdooResponse response = null;
+    private Object object;
 
-  public void setObject(Object obj) {
-    object = obj;
-  }
+    public void setObject(Object obj) {
+        object = obj;
+    }
 
-  public Object getObject() {
-    return object;
-  }
+    public Object getObject() {
+        return object;
+    }
 
-  public void setResponse(OdooResponse response) {
-    this.response = response;
-  }
+    public void setResponse(OdooResponse response) {
+        this.response = response;
+    }
 
-  public OdooResponse get() {
-    return response;
-  }
+    public OdooResponse get() {
+        return response;
+    }
 
-  @Override
-  public String toString() {
-    return "OdooSyncResponse{" + "response=" + response + ", object=" + object + '}';
-  }
+    @Override
+    public String toString() {
+        return "OdooSyncResponse{" + "response=" + response + ", object=" + object + '}';
+    }
 }

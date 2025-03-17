@@ -24,7 +24,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+
 import androidx.annotation.NonNull;
+
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -33,6 +35,7 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OObjectUtils;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;

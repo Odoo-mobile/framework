@@ -20,21 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OListUtils {
-  public static final String TAG = OListUtils.class.getSimpleName();
+    public static final String TAG = OListUtils.class.getSimpleName();
 
-  public static List<Integer> doubleToIntList(List<Double> list) {
-    List<Integer> vals = new ArrayList<>();
-    for (Double val : list) {
-      vals.add(val.intValue());
+    public static List<Integer> doubleToIntList(List<Double> list) {
+        List<Integer> vals = new ArrayList<>();
+        for (Double val : list) {
+            vals.add(val.intValue());
+        }
+        return vals;
     }
-    return vals;
-  }
 
-  public static List<String> toStringList(List<Integer> list) {
-    List<String> items = new ArrayList<>();
-    for (Integer item : list) {
-      items.add(item + "");
+    public static List<String> toStringList(List<Integer> list) {
+        List<String> items = new ArrayList<>();
+        for (Integer item : list) {
+            items.add(item + "");
+        }
+        return items;
     }
-    return items;
-  }
 }

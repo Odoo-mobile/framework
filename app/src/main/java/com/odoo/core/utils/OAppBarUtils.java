@@ -23,15 +23,15 @@ import com.odoo.R;
 
 public class OAppBarUtils {
 
-  public static void setAppBar(AppCompatActivity activity, Boolean withHomeButtonEnabled) {
-    Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
-    if (toolbar != null) {
-      activity.setSupportActionBar(toolbar);
-      ActionBar actionBar = activity.getSupportActionBar();
-      if (withHomeButtonEnabled && actionBar != null) {
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-      }
+    public static void setAppBar(AppCompatActivity activity, Boolean withHomeButtonEnabled) {
+        Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            activity.setSupportActionBar(toolbar);
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (withHomeButtonEnabled && actionBar != null) {
+                actionBar.setHomeButtonEnabled(true);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+        }
     }
-  }
 }

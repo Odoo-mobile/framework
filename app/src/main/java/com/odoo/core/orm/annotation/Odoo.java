@@ -24,100 +24,100 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Odoo {
 
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target(ElementType.FIELD)
-  @interface SyncColumnName {
-    String value() default "";
-  }
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    @interface SyncColumnName {
+        String value() default "";
+    }
 
-  /** The Interface Functional. */
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target(ElementType.FIELD)
-  @interface Functional {
+    /** The Interface Functional. */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    @interface Functional {
 
-    /**
-     * Method.
-     *
-     * @return the string
-     */
-    String method() default "";
+        /**
+         * Method.
+         *
+         * @return the string
+         */
+        String method() default "";
 
-    /**
-     * If true, system create column for this functional field and store value (on create and
-     * update) given by this function
-     *
-     * @return true, if successful
-     */
-    boolean store() default false;
+        /**
+         * If true, system create column for this functional field and store value (on create and
+         * update) given by this function
+         *
+         * @return true, if successful
+         */
+        boolean store() default false;
 
-    /**
-     * Depends.
-     *
-     * @return the string[]
-     */
-    String[] depends() default {};
-  }
-
-  @Retention(RetentionPolicy.RUNTIME)
-  @interface api {
+        /**
+         * Depends.
+         *
+         * @return the string[]
+         */
+        String[] depends() default {};
+    }
 
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.FIELD, ElementType.METHOD})
-    @interface v7 {
-      String[] versions() default {};
+    @interface api {
 
-      String[] exclude() default {};
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target({ElementType.FIELD, ElementType.METHOD})
+        @interface v7 {
+            String[] versions() default {};
+
+            String[] exclude() default {};
+        }
+
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target({ElementType.FIELD, ElementType.METHOD})
+        @interface v8 {
+            String[] versions() default {};
+
+            String[] exclude() default {};
+        }
+
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target({ElementType.FIELD, ElementType.METHOD})
+        @interface v9 {
+            String[] versions() default {};
+
+            String[] exclude() default {};
+        }
+
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target({ElementType.FIELD, ElementType.METHOD})
+        @interface v10 {
+            String[] versions() default {};
+
+            String[] exclude() default {};
+        }
+
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target({ElementType.FIELD, ElementType.METHOD})
+        @interface v11alpha {
+            String[] versions() default {};
+
+            String[] exclude() default {};
+        }
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD})
-    @interface v8 {
-      String[] versions() default {};
+    @interface onChange {
+        String method();
 
-      String[] exclude() default {};
+        /**
+         * Background process If true, method block executed in background thread. default false
+         *
+         * @return boolean flag
+         */
+        boolean bg_process() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD})
-    @interface v9 {
-      String[] versions() default {};
-
-      String[] exclude() default {};
+    @interface Domain {
+        String value() default "";
     }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.FIELD, ElementType.METHOD})
-    @interface v10 {
-      String[] versions() default {};
-
-      String[] exclude() default {};
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.FIELD, ElementType.METHOD})
-    @interface v11alpha {
-      String[] versions() default {};
-
-      String[] exclude() default {};
-    }
-  }
-
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target({ElementType.FIELD, ElementType.METHOD})
-  @interface onChange {
-    String method();
-
-    /**
-     * Background process If true, method block executed in background thread. default false
-     *
-     * @return boolean flag
-     */
-    boolean bg_process() default false;
-  }
-
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target({ElementType.FIELD, ElementType.METHOD})
-  @interface Domain {
-    String value() default "";
-  }
 }

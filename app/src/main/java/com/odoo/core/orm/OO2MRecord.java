@@ -17,49 +17,50 @@
 package com.odoo.core.orm;
 
 import com.odoo.core.orm.fields.OColumn;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class OO2MRecord {
-  public static final String TAG = OO2MRecord.class.getSimpleName();
-  private OColumn mCol = null;
-  private int mRecordId = 0;
-  private OModel mDatabase = null;
-  private OModel rel_model = null;
-  private String mOrderBy = null;
+    public static final String TAG = OO2MRecord.class.getSimpleName();
+    private OColumn mCol = null;
+    private int mRecordId = 0;
+    private OModel mDatabase = null;
+    private OModel rel_model = null;
+    private String mOrderBy = null;
 
-  public OO2MRecord(OModel oModel, OColumn col, int id) {
-    mDatabase = oModel;
-    mCol = col;
-    mRecordId = id;
-  }
-
-  public OO2MRecord setOrder(String order_by) {
-    mOrderBy = order_by;
-    return this;
-  }
-
-  public List<Integer> getIds() {
-    rel_model = mDatabase.createInstance(mCol.getType());
-    return getIds(rel_model);
-  }
-
-  public List<Integer> getIds(OModel rel_model) {
-    List<Integer> ids = new ArrayList<>();
-    List<ODataRow> records =
-        rel_model.select(
-            new String[] {OColumn.ROW_ID},
-            mCol.getRelatedColumn() + " = ?",
-            new String[] {mRecordId + ""});
-    for (ODataRow record : records) {
-      ids.add(record.getInt(OColumn.ROW_ID));
+    public OO2MRecord(OModel oModel, OColumn col, int id) {
+        mDatabase = oModel;
+        mCol = col;
+        mRecordId = id;
     }
-    return ids;
-  }
 
-  public List<ODataRow> browseEach() {
-    rel_model = mDatabase.createInstance(mCol.getType());
-    return rel_model.select(
-        null, mCol.getRelatedColumn() + " = ?", new String[] {mRecordId + ""}, mOrderBy);
-  }
+    public OO2MRecord setOrder(String order_by) {
+        mOrderBy = order_by;
+        return this;
+    }
+
+    public List<Integer> getIds() {
+        rel_model = mDatabase.createInstance(mCol.getType());
+        return getIds(rel_model);
+    }
+
+    public List<Integer> getIds(OModel rel_model) {
+        List<Integer> ids = new ArrayList<>();
+        List<ODataRow> records =
+                rel_model.select(
+                        new String[] {OColumn.ROW_ID},
+                        mCol.getRelatedColumn() + " = ?",
+                        new String[] {mRecordId + ""});
+        for (ODataRow record : records) {
+            ids.add(record.getInt(OColumn.ROW_ID));
+        }
+        return ids;
+    }
+
+    public List<ODataRow> browseEach() {
+        rel_model = mDatabase.createInstance(mCol.getType());
+        return rel_model.select(
+                null, mCol.getRelatedColumn() + " = ?", new String[] {mRecordId + ""}, mOrderBy);
+    }
 }

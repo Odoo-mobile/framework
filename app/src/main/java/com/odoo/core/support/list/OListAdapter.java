@@ -21,116 +21,117 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class OListAdapter extends ArrayAdapter<Object> {
-  public static final String TAG = OListAdapter.class.getSimpleName();
+    public static final String TAG = OListAdapter.class.getSimpleName();
 
-  private Context mContext = null;
-  private List<Object> mObjects = null;
-  private List<Object> mAllObjects = null;
-  private RowFilter mFilter = null;
-  private int mResourceId = 0;
-  private RowFilterTextListener mRowFilterTextListener = null;
-  private OnSearchChange mOnSearchChange = null;
+    private Context mContext = null;
+    private List<Object> mObjects = null;
+    private List<Object> mAllObjects = null;
+    private RowFilter mFilter = null;
+    private int mResourceId = 0;
+    private RowFilterTextListener mRowFilterTextListener = null;
+    private OnSearchChange mOnSearchChange = null;
 
-  public OListAdapter(Context context, int resource, List<Object> objects) {
-    super(context, resource, objects);
-    Log.d(TAG, "OListAdapter->constructor()");
-    mContext = context;
-    mObjects = new ArrayList<>(objects);
-    mAllObjects = new ArrayList<>(objects);
-    mResourceId = resource;
-  }
-
-  @Override
-  public Filter getFilter() {
-    if (mFilter == null) {
-      mFilter = new RowFilter();
+    public OListAdapter(Context context, int resource, List<Object> objects) {
+        super(context, resource, objects);
+        Log.d(TAG, "OListAdapter->constructor()");
+        mContext = context;
+        mObjects = new ArrayList<>(objects);
+        mAllObjects = new ArrayList<>(objects);
+        mResourceId = resource;
     }
-    return mFilter;
-  }
-
-  public int getResource() {
-    return mResourceId;
-  }
-
-  public void replaceObjectAtPosition(int position, Object object) {
-    mAllObjects.remove(position);
-    mAllObjects.add(position, object);
-    mObjects.remove(position);
-    mObjects.add(position, object);
-  }
-
-  public void notifiyDataChange(List<Object> objects) {
-    Log.d(TAG, "OListAdapter->notifiyDataChange()");
-    mAllObjects.clear();
-    mObjects.clear();
-    mAllObjects.addAll(objects);
-    mObjects.addAll(objects);
-    notifyDataSetChanged();
-  }
-
-  class RowFilter extends Filter {
 
     @Override
-    protected FilterResults performFiltering(CharSequence constraint) {
-      FilterResults result = new FilterResults();
-      if (!TextUtils.isEmpty(constraint)) {
-        String searchingStr = constraint.toString().toLowerCase();
-        List<Object> filteredItems = new ArrayList<Object>();
-        for (Object item : mAllObjects) {
-          String filterText = "";
-          if (mRowFilterTextListener != null) {
-            filterText = mRowFilterTextListener.filterCompareWith(item).toLowerCase();
-          } else {
-            filterText = item.toString().toLowerCase();
-          }
-          if (filterText.contains(searchingStr)) {
-            filteredItems.add(item);
-          }
+    public Filter getFilter() {
+        if (mFilter == null) {
+            mFilter = new RowFilter();
         }
-        result.count = filteredItems.size();
-        result.values = filteredItems;
-
-      } else {
-        synchronized (this) {
-          result.count = mAllObjects.size();
-          result.values = mAllObjects;
-        }
-      }
-      return result;
+        return mFilter;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    protected void publishResults(CharSequence constraint, FilterResults results) {
-      clear();
-      mObjects = (List<Object>) results.values;
-      addAll(mObjects);
-      notifyDataSetChanged();
-      if (mOnSearchChange != null) {
-        mOnSearchChange.onSearchChange(mObjects);
-      }
+    public int getResource() {
+        return mResourceId;
     }
-  }
 
-  public void setOnSearchChange(OnSearchChange callback) {
-    mOnSearchChange = callback;
-  }
+    public void replaceObjectAtPosition(int position, Object object) {
+        mAllObjects.remove(position);
+        mAllObjects.add(position, object);
+        mObjects.remove(position);
+        mObjects.add(position, object);
+    }
 
-  public void setRowFilterTextListener(RowFilterTextListener listener) {
-    mRowFilterTextListener = listener;
-  }
+    public void notifiyDataChange(List<Object> objects) {
+        Log.d(TAG, "OListAdapter->notifiyDataChange()");
+        mAllObjects.clear();
+        mObjects.clear();
+        mAllObjects.addAll(objects);
+        mObjects.addAll(objects);
+        notifyDataSetChanged();
+    }
 
-  public interface RowFilterTextListener {
+    class RowFilter extends Filter {
 
-    public String filterCompareWith(Object object);
-  }
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults result = new FilterResults();
+            if (!TextUtils.isEmpty(constraint)) {
+                String searchingStr = constraint.toString().toLowerCase();
+                List<Object> filteredItems = new ArrayList<Object>();
+                for (Object item : mAllObjects) {
+                    String filterText = "";
+                    if (mRowFilterTextListener != null) {
+                        filterText = mRowFilterTextListener.filterCompareWith(item).toLowerCase();
+                    } else {
+                        filterText = item.toString().toLowerCase();
+                    }
+                    if (filterText.contains(searchingStr)) {
+                        filteredItems.add(item);
+                    }
+                }
+                result.count = filteredItems.size();
+                result.values = filteredItems;
 
-  public interface OnSearchChange {
+            } else {
+                synchronized (this) {
+                    result.count = mAllObjects.size();
+                    result.values = mAllObjects;
+                }
+            }
+            return result;
+        }
 
-    public void onSearchChange(List<Object> newRecords);
-  }
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            clear();
+            mObjects = (List<Object>) results.values;
+            addAll(mObjects);
+            notifyDataSetChanged();
+            if (mOnSearchChange != null) {
+                mOnSearchChange.onSearchChange(mObjects);
+            }
+        }
+    }
+
+    public void setOnSearchChange(OnSearchChange callback) {
+        mOnSearchChange = callback;
+    }
+
+    public void setRowFilterTextListener(RowFilterTextListener listener) {
+        mRowFilterTextListener = listener;
+    }
+
+    public interface RowFilterTextListener {
+
+        public String filterCompareWith(Object object);
+    }
+
+    public interface OnSearchChange {
+
+        public void onSearchChange(List<Object> newRecords);
+    }
 }

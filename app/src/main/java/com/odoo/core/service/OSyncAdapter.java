@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.odoo.App;
 import com.odoo.R;
 import com.odoo.base.addons.ir.IrModel;
@@ -47,6 +48,7 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.core.utils.logger.OLog;
 import com.odoo.datas.OConstants;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

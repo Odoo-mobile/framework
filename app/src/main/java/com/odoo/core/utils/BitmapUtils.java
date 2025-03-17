@@ -28,11 +28,14 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.text.TextPaint;
 import android.util.Base64;
+
 import com.odoo.R;
+
+import odoo.controls.OControlHelper;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import odoo.controls.OControlHelper;
 
 public class BitmapUtils {
   public static final int THUMBNAIL_SIZE = 500;

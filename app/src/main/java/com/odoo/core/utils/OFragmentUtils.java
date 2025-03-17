@@ -26,43 +26,45 @@ import androidx.fragment.app.FragmentTransaction;
 import com.odoo.R;
 
 public class OFragmentUtils {
-  public static final String TAG = OFragmentUtils.class.getSimpleName();
+    public static final String TAG = OFragmentUtils.class.getSimpleName();
 
-  private AppCompatActivity mActivity;
-  private Context mContext;
-  private Bundle savedInstance = null;
-  private FragmentManager fragmentManager;
+    private AppCompatActivity mActivity;
+    private Context mContext;
+    private Bundle savedInstance = null;
+    private FragmentManager fragmentManager;
 
-  public OFragmentUtils(AppCompatActivity activity, Bundle savedInstance) {
-    mActivity = activity;
-    mContext = activity;
-    fragmentManager = mActivity.getSupportFragmentManager();
-  }
-
-  public static OFragmentUtils get(AppCompatActivity activity, Bundle savedInstance) {
-    return new OFragmentUtils(activity, savedInstance);
-  }
-
-  public void startFragment(Fragment fragment, boolean addToBackState, Bundle extra) {
-    Bundle extra_data = fragment.getArguments();
-    if (extra_data == null) extra_data = new Bundle();
-    if (extra != null) extra_data.putAll(extra);
-    fragment.setArguments(extra_data);
-    loadFragment(fragment, addToBackState);
-  }
-
-  private void loadFragment(Fragment fragment, Boolean addToBackState) {
-    String tag = fragment.getClass().getCanonicalName();
-    if (fragmentManager.findFragmentByTag(tag) != null && savedInstance != null) {
-      fragmentManager.popBackStack(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-      fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    public OFragmentUtils(AppCompatActivity activity, Bundle savedInstance) {
+        mActivity = activity;
+        mContext = activity;
+        fragmentManager = mActivity.getSupportFragmentManager();
     }
-    if (savedInstance == null) {
-      Log.i(TAG, "Fragment Loaded (" + tag + ")");
-      FragmentTransaction tran =
-          fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, tag);
-      if (addToBackState) tran.addToBackStack(tag);
-      tran.commitAllowingStateLoss();
+
+    public static OFragmentUtils get(AppCompatActivity activity, Bundle savedInstance) {
+        return new OFragmentUtils(activity, savedInstance);
     }
-  }
+
+    public void startFragment(Fragment fragment, boolean addToBackState, Bundle extra) {
+        Bundle extra_data = fragment.getArguments();
+        if (extra_data == null) extra_data = new Bundle();
+        if (extra != null) extra_data.putAll(extra);
+        fragment.setArguments(extra_data);
+        loadFragment(fragment, addToBackState);
+    }
+
+    private void loadFragment(Fragment fragment, Boolean addToBackState) {
+        String tag = fragment.getClass().getCanonicalName();
+        if (fragmentManager.findFragmentByTag(tag) != null && savedInstance != null) {
+            fragmentManager.popBackStack(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+        if (savedInstance == null) {
+            Log.i(TAG, "Fragment Loaded (" + tag + ")");
+            FragmentTransaction tran =
+                    fragmentManager
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, fragment, tag);
+            if (addToBackState) tran.addToBackStack(tag);
+            tran.commitAllowingStateLoss();
+        }
+    }
 }

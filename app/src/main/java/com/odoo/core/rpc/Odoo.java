@@ -27,80 +27,80 @@ import com.odoo.core.rpc.wrapper.OdooWrapper;
 import com.odoo.core.support.OUser;
 
 public class Odoo extends OdooWrapper<Odoo> {
-  public static final String TAG = Odoo.class.getSimpleName();
-  public static Boolean DEBUG = false;
-  public static Integer REQUEST_TIMEOUT_MS = DefaultRetryPolicy.DEFAULT_TIMEOUT_MS;
-  public static Integer DEFAULT_MAX_RETRIES = DefaultRetryPolicy.DEFAULT_MAX_RETRIES;
+    public static final String TAG = Odoo.class.getSimpleName();
+    public static Boolean DEBUG = false;
+    public static Integer REQUEST_TIMEOUT_MS = DefaultRetryPolicy.DEFAULT_TIMEOUT_MS;
+    public static Integer DEFAULT_MAX_RETRIES = DefaultRetryPolicy.DEFAULT_MAX_RETRIES;
 
-  public enum ErrorCode {
-    OdooVersionError(700),
-    InvalidURL(404),
-    OdooServerError(200),
-    UnknownError(703),
-    AuthenticationFail(401);
+    public enum ErrorCode {
+        OdooVersionError(700),
+        InvalidURL(404),
+        OdooServerError(200),
+        UnknownError(703),
+        AuthenticationFail(401);
 
-    int code;
+        int code;
 
-    ErrorCode(int code) {
-      this.code = code;
+        ErrorCode(int code) {
+            this.code = code;
+        }
+
+        public int get() {
+            return this.code;
+        }
     }
 
-    public int get() {
-      return this.code;
+    public Odoo(Context context, String baseURL) {
+        super(context, baseURL);
     }
-  }
 
-  public Odoo(Context context, String baseURL) {
-    super(context, baseURL);
-  }
+    public static OUser quickConnect(
+            Context context, String url, String username, String password, String database)
+            throws OdooVersionException {
+        Odoo odoo = new Odoo(context, url).connect(true);
+        return odoo.authenticate(username, password, database);
+    }
 
-  public static OUser quickConnect(
-      Context context, String url, String username, String password, String database)
-      throws OdooVersionException {
-    Odoo odoo = new Odoo(context, url).connect(true);
-    return odoo.authenticate(username, password, database);
-  }
+    public static void quickConnect(
+            Context context,
+            String url,
+            String username,
+            String password,
+            String database,
+            IOdooLoginCallback callback)
+            throws OdooVersionException {
+        Odoo odoo = createInstance(context, url);
+        odoo.authenticate(username, password, database, callback);
+    }
 
-  public static void quickConnect(
-      Context context,
-      String url,
-      String username,
-      String password,
-      String database,
-      IOdooLoginCallback callback)
-      throws OdooVersionException {
-    Odoo odoo = createInstance(context, url);
-    odoo.authenticate(username, password, database, callback);
-  }
+    public static Odoo createInstance(Context context, String baseURL) throws OdooVersionException {
+        return new Odoo(context, baseURL).connect(false);
+    }
 
-  public static Odoo createInstance(Context context, String baseURL) throws OdooVersionException {
-    return new Odoo(context, baseURL).connect(false);
-  }
+    public static Odoo createQuickInstance(Context context, String baseURL)
+            throws OdooVersionException {
+        return new Odoo(context, baseURL).connect(true);
+    }
 
-  public static Odoo createQuickInstance(Context context, String baseURL)
-      throws OdooVersionException {
-    return new Odoo(context, baseURL).connect(true);
-  }
+    public Odoo setOnConnect(IOdooConnectionListener callback) {
+        mIOdooConnectionListener = callback;
+        return this;
+    }
 
-  public Odoo setOnConnect(IOdooConnectionListener callback) {
-    mIOdooConnectionListener = callback;
-    return this;
-  }
+    public OdooVersion getVersion() {
+        return mVersion;
+    }
 
-  public OdooVersion getVersion() {
-    return mVersion;
-  }
+    public OUser getUser() {
+        return user;
+    }
 
-  public OUser getUser() {
-    return user;
-  }
+    public OdooSession getSession() {
+        return odooSession;
+    }
 
-  public OdooSession getSession() {
-    return odooSession;
-  }
-
-  @Override
-  public String toString() {
-    return "Odoo{" + serverURL + ": " + mVersion + '}';
-  }
+    @Override
+    public String toString() {
+        return "Odoo{" + serverURL + ": " + mVersion + '}';
+    }
 }

@@ -1,6 +1,7 @@
 package com.odoo.config;
 
 import android.Manifest;
+
 import com.odoo.core.tools.permissions.DevicePermissionHelper;
 
 /**

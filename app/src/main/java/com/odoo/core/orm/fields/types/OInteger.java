@@ -17,10 +17,10 @@
 package com.odoo.core.orm.fields.types;
 
 public class OInteger extends OTypeHelper {
-  public static final String TAG = OInteger.class.getSimpleName();
+    public static final String TAG = OInteger.class.getSimpleName();
 
-  @Override
-  public String getFieldType() {
-    return "INTEGER";
-  }
+    @Override
+    public String getFieldType() {
+        return "INTEGER";
+    }
 }

@@ -20,48 +20,48 @@ import android.text.Html;
 import android.text.Spanned;
 
 public class StringUtils {
-  public static final String TAG = StringUtils.class.getSimpleName();
+    public static final String TAG = StringUtils.class.getSimpleName();
 
-  public static String repeat(String string, int repeat) {
-    StringBuffer str = new StringBuffer();
-    for (int i = 0; i < repeat; i++) str.append(string);
-    return str.toString();
-  }
-
-  public static String capitalizeString(String string) {
-    char[] chars = string.toLowerCase().toCharArray();
-    boolean found = false;
-    for (int i = 0; i < chars.length; i++) {
-      if (!found && Character.isLetter(chars[i])) {
-        chars[i] = Character.toUpperCase(chars[i]);
-        found = true;
-      } else if (Character.isWhitespace(chars[i]) || chars[i] == '.' || chars[i] == '\'') {
-        found = false;
-      }
+    public static String repeat(String string, int repeat) {
+        StringBuffer str = new StringBuffer();
+        for (int i = 0; i < repeat; i++) str.append(string);
+        return str.toString();
     }
-    return String.valueOf(chars);
-  }
 
-  /**
-   * Html to string.
-   *
-   * @param html the html
-   * @return the string
-   */
-  public static String htmlToString(String html) {
+    public static String capitalizeString(String string) {
+        char[] chars = string.toLowerCase().toCharArray();
+        boolean found = false;
+        for (int i = 0; i < chars.length; i++) {
+            if (!found && Character.isLetter(chars[i])) {
+                chars[i] = Character.toUpperCase(chars[i]);
+                found = true;
+            } else if (Character.isWhitespace(chars[i]) || chars[i] == '.' || chars[i] == '\'') {
+                found = false;
+            }
+        }
+        return String.valueOf(chars);
+    }
 
-    return Html.fromHtml(
-            html.replaceAll("\\<.*?\\>", "").replaceAll("\n", "").replaceAll("\t", " "))
-        .toString();
-  }
+    /**
+     * Html to string.
+     *
+     * @param html the html
+     * @return the string
+     */
+    public static String htmlToString(String html) {
 
-  /**
-   * String to html.
-   *
-   * @param string the string
-   * @return the spanned
-   */
-  public static Spanned stringToHtml(String string) {
-    return Html.fromHtml(string);
-  }
+        return Html.fromHtml(
+                        html.replaceAll("\\<.*?\\>", "").replaceAll("\n", "").replaceAll("\t", " "))
+                .toString();
+    }
+
+    /**
+     * String to html.
+     *
+     * @param string the string
+     * @return the spanned
+     */
+    public static Spanned stringToHtml(String string) {
+        return Html.fromHtml(string);
+    }
 }

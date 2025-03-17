@@ -19,5 +19,5 @@ package com.odoo.core.rpc.listeners;
 import java.util.List;
 
 public interface IDatabaseListListener {
-  void onDatabasesLoad(List<String> dbs);
+    void onDatabasesLoad(List<String> dbs);
 }

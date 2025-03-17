@@ -17,6 +17,7 @@
 package com.odoo.base.addons.mail;
 
 import android.content.Context;
+
 import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
@@ -30,106 +31,107 @@ import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MailMessage extends OModel {
-  public static final String TAG = MailMessage.class.getSimpleName();
-  OColumn author_id = new OColumn("Author", ResPartner.class, OColumn.RelationType.ManyToOne);
-  OColumn email_from = new OColumn("Email From", OVarchar.class).setDefaultValue("false");
-  OColumn subject = new OColumn("Subject", OVarchar.class).setSize(100);
-  OColumn body = new OColumn("Body", OText.class);
-  OColumn date = new OColumn("Date", ODateTime.class);
-  OColumn record_name = new OColumn("Record Name", OVarchar.class).setSize(150);
-  OColumn model = new OColumn("Model", OVarchar.class).setDefaultValue("false");
-  OColumn res_id = new OColumn("Resource Id", OInteger.class).setDefaultValue(0);
-  OColumn attachment_ids =
-      new OColumn("Attachments", IrAttachment.class, OColumn.RelationType.ManyToMany);
-  OColumn type = new OColumn("Type", OVarchar.class);
-  OColumn subtype_id =
-      new OColumn("Subtype", MailMessageSubType.class, OColumn.RelationType.ManyToOne);
+    public static final String TAG = MailMessage.class.getSimpleName();
+    OColumn author_id = new OColumn("Author", ResPartner.class, OColumn.RelationType.ManyToOne);
+    OColumn email_from = new OColumn("Email From", OVarchar.class).setDefaultValue("false");
+    OColumn subject = new OColumn("Subject", OVarchar.class).setSize(100);
+    OColumn body = new OColumn("Body", OText.class);
+    OColumn date = new OColumn("Date", ODateTime.class);
+    OColumn record_name = new OColumn("Record Name", OVarchar.class).setSize(150);
+    OColumn model = new OColumn("Model", OVarchar.class).setDefaultValue("false");
+    OColumn res_id = new OColumn("Resource Id", OInteger.class).setDefaultValue(0);
+    OColumn attachment_ids =
+            new OColumn("Attachments", IrAttachment.class, OColumn.RelationType.ManyToMany);
+    OColumn type = new OColumn("Type", OVarchar.class);
+    OColumn subtype_id =
+            new OColumn("Subtype", MailMessageSubType.class, OColumn.RelationType.ManyToOne);
 
-  @Odoo.Functional(
-      method = "authorName",
-      depends = {"author_id", "email_from"},
-      store = true)
-  OColumn author_name = new OColumn("Author Name", OVarchar.class).setLocalColumn();
+    @Odoo.Functional(
+            method = "authorName",
+            depends = {"author_id", "email_from"},
+            store = true)
+    OColumn author_name = new OColumn("Author Name", OVarchar.class).setLocalColumn();
 
-  @Odoo.Functional(
-      method = "hasAttachment",
-      depends = {"attachment_ids"},
-      store = true)
-  OColumn has_attachments =
-      new OColumn("Has Attachments", OBoolean.class).setLocalColumn().setDefaultValue(false);
+    @Odoo.Functional(
+            method = "hasAttachment",
+            depends = {"attachment_ids"},
+            store = true)
+    OColumn has_attachments =
+            new OColumn("Has Attachments", OBoolean.class).setLocalColumn().setDefaultValue(false);
 
-  public MailMessage(Context context, OUser user) {
-    super(context, "mail.message", user);
-  }
-
-  public boolean hasAttachment(OValues values) {
-    try {
-      List<Integer> attachment_ids = (ArrayList<Integer>) values.get("attachment_ids");
-      if (attachment_ids.size() > 0) {
-        return true;
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
+    public MailMessage(Context context, OUser user) {
+        super(context, "mail.message", user);
     }
-    return false;
-  }
 
-  public String authorName(OValues values) {
-    try {
-      if (!values.getString("author_id").equals("false")) {
-        List<Object> author_id = (ArrayList<Object>) values.get("author_id");
-        return author_id.get(1) + "";
-      } else {
-        return values.getString("email_from");
-      }
-    } catch (Exception e) {
-
+    public boolean hasAttachment(OValues values) {
+        try {
+            List<Integer> attachment_ids = (ArrayList<Integer>) values.get("attachment_ids");
+            if (attachment_ids.size() > 0) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return "";
-  }
 
-  public String getAuthorImage(int row_id) {
-    ODataRow row = browse(new String[] {"author_id"}, row_id);
-    if (row.getInt("author_id") != 0) {
-      ODataRow author_id = row.getM2ORecord("author_id").browse();
-      return author_id.getString("image_small");
+    public String authorName(OValues values) {
+        try {
+            if (!values.getString("author_id").equals("false")) {
+                List<Object> author_id = (ArrayList<Object>) values.get("author_id");
+                return author_id.get(1) + "";
+            } else {
+                return values.getString("email_from");
+            }
+        } catch (Exception e) {
+
+        }
+        return "";
     }
-    return "false";
-  }
 
-  public List<Integer> getServerIds(String model, int res_server_id) {
-    List<Integer> ids = new ArrayList<>();
-    for (ODataRow row :
-        select(
-            new String[] {},
-            "model = ? and res_id = ?",
-            new String[] {model, res_server_id + ""})) {
-      ids.add(row.getInt("id"));
+    public String getAuthorImage(int row_id) {
+        ODataRow row = browse(new String[] {"author_id"}, row_id);
+        if (row.getInt("author_id") != 0) {
+            ODataRow author_id = row.getM2ORecord("author_id").browse();
+            return author_id.getString("image_small");
+        }
+        return "false";
     }
-    return ids;
-  }
 
-  @Override
-  public boolean checkForWriteDate() {
-    return false;
-  }
+    public List<Integer> getServerIds(String model, int res_server_id) {
+        List<Integer> ids = new ArrayList<>();
+        for (ODataRow row :
+                select(
+                        new String[] {},
+                        "model = ? and res_id = ?",
+                        new String[] {model, res_server_id + ""})) {
+            ids.add(row.getInt("id"));
+        }
+        return ids;
+    }
 
-  @Override
-  public boolean allowCreateRecordOnServer() {
-    return false;
-  }
+    @Override
+    public boolean checkForWriteDate() {
+        return false;
+    }
 
-  @Override
-  public boolean allowDeleteRecordOnServer() {
-    return false;
-  }
+    @Override
+    public boolean allowCreateRecordOnServer() {
+        return false;
+    }
 
-  @Override
-  public boolean allowUpdateRecordOnServer() {
-    return false;
-  }
+    @Override
+    public boolean allowDeleteRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return false;
+    }
 }

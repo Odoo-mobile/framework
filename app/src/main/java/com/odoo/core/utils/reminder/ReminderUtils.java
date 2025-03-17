@@ -21,7 +21,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
 import com.odoo.core.orm.fields.OColumn;
+
 import java.util.Date;
 
 public class ReminderUtils {

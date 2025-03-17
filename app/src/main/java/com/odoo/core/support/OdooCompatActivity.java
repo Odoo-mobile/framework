@@ -19,25 +19,25 @@ import androidx.appcompat.app.AppCompatActivity;
  * <p>Created on 26/11/15
  */
 public abstract class OdooCompatActivity extends AppCompatActivity {
-  public static final String TAG = OdooCompatActivity.class.getSimpleName();
-  private DevicePermissionResultListener mDevicePermissionResultListener = null;
+    public static final String TAG = OdooCompatActivity.class.getSimpleName();
+    private DevicePermissionResultListener mDevicePermissionResultListener = null;
 
-  // API23+ Permission model helper methods
-  public void setOnDevicePermissionResultListener(DevicePermissionResultListener callback) {
-    mDevicePermissionResultListener = callback;
-  }
-
-  @Override
-  public void onRequestPermissionsResult(
-      int requestCode, String[] permissions, int[] grantResults) {
-    if (mDevicePermissionResultListener != null) {
-      mDevicePermissionResultListener.onRequestPermissionsResult(
-          requestCode, permissions, grantResults);
+    // API23+ Permission model helper methods
+    public void setOnDevicePermissionResultListener(DevicePermissionResultListener callback) {
+        mDevicePermissionResultListener = callback;
     }
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-  }
 
-  public interface DevicePermissionResultListener {
-    void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults);
-  }
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode, String[] permissions, int[] grantResults) {
+        if (mDevicePermissionResultListener != null) {
+            mDevicePermissionResultListener.onRequestPermissionsResult(
+                    requestCode, permissions, grantResults);
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public interface DevicePermissionResultListener {
+        void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults);
+    }
 }

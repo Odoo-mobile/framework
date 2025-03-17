@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.odoo.App;
 import com.odoo.R;
 import com.odoo.base.addons.mail.MailMessage;
@@ -48,9 +49,11 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
+
+import odoo.controls.ExpandableListControl;
+
 import java.util.ArrayList;
 import java.util.List;
-import odoo.controls.ExpandableListControl;
 
 public class MailChatterView extends LinearLayout
     implements ExpandableListControl.ExpandableListAdapterGetViewListener, View.OnClickListener {

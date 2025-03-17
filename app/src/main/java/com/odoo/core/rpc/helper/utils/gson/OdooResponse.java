@@ -17,24 +17,24 @@
 package com.odoo.core.rpc.helper.utils.gson;
 
 public class OdooResponse {
-  public String jsonrpc;
-  public Integer id;
-  public OdooResult result;
-  public OdooResult error;
+    public String jsonrpc;
+    public Integer id;
+    public OdooResult result;
+    public OdooResult error;
 
-  @Override
-  public String toString() {
-    return "OdooResponse{"
-        + "jsonrpc='"
-        + jsonrpc
-        + '\''
-        + ", error='"
-        + error
-        + '\''
-        + ", id="
-        + id
-        + ", result="
-        + result
-        + '}';
-  }
+    @Override
+    public String toString() {
+        return "OdooResponse{"
+                + "jsonrpc='"
+                + jsonrpc
+                + '\''
+                + ", error='"
+                + error
+                + '\''
+                + ", id="
+                + id
+                + ", result="
+                + result
+                + '}';
+    }
 }

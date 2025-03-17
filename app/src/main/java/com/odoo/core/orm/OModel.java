@@ -24,6 +24,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.odoo.App;
 import com.odoo.BuildConfig;
 import com.odoo.base.addons.ir.IrModel;
@@ -47,6 +48,7 @@ import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
 import com.odoo.core.utils.OStorageUtils;
 import com.odoo.core.utils.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

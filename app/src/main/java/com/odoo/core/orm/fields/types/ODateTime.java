@@ -19,15 +19,15 @@ package com.odoo.core.orm.fields.types;
 import com.odoo.core.utils.ODateUtils;
 
 public class ODateTime extends OTypeHelper {
-  public static final String TAG = ODateTime.class.getSimpleName();
+    public static final String TAG = ODateTime.class.getSimpleName();
 
-  @Override
-  public String getFieldType() {
-    return "VARCHAR";
-  }
+    @Override
+    public String getFieldType() {
+        return "VARCHAR";
+    }
 
-  @Override
-  public String getDataFormat() {
-    return ODateUtils.DEFAULT_FORMAT;
-  }
+    @Override
+    public String getDataFormat() {
+        return ODateUtils.DEFAULT_FORMAT;
+    }
 }

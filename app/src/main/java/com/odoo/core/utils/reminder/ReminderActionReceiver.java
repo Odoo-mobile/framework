@@ -21,8 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 
 public class ReminderActionReceiver extends BroadcastReceiver {
-  public static final String TAG = ReminderActionReceiver.class.getSimpleName();
+    public static final String TAG = ReminderActionReceiver.class.getSimpleName();
 
-  @Override
-  public void onReceive(Context context, Intent intent) {}
+    @Override
+    public void onReceive(Context context, Intent intent) {}
 }

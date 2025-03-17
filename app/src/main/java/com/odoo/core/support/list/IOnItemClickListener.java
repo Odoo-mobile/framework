@@ -19,7 +19,7 @@ package com.odoo.core.support.list;
 import android.view.View;
 
 public interface IOnItemClickListener {
-  public void onItemDoubleClick(View view, int position);
+    public void onItemDoubleClick(View view, int position);
 
-  public void onItemClick(View view, int position);
+    public void onItemClick(View view, int position);
 }

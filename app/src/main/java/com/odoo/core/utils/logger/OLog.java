@@ -19,12 +19,12 @@ import android.util.Log;
 
 public class OLog {
 
-  public static void log(String... messages) {
-    String message = TextUtils.join(", ", messages);
-    final Throwable throwable = new Throwable();
-    final StackTraceElement[] elements = throwable.getStackTrace();
-    final String callerClassName = elements[1].getClassName();
-    final String callerMethodName = elements[1].getMethodName();
-    Log.e(callerClassName + "[" + callerMethodName + "] ", message);
-  }
+    public static void log(String... messages) {
+        String message = TextUtils.join(", ", messages);
+        final Throwable throwable = new Throwable();
+        final StackTraceElement[] elements = throwable.getStackTrace();
+        final String callerClassName = elements[1].getClassName();
+        final String callerMethodName = elements[1].getMethodName();
+        Log.e(callerClassName + "[" + callerMethodName + "] ", message);
+    }
 }

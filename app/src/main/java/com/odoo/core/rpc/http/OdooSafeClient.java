@@ -31,61 +31,62 @@ import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
 
 public class OdooSafeClient {
-  private static DefaultHttpClient httpClient;
+    private static DefaultHttpClient httpClient;
 
-  public static DefaultHttpClient getSafeClient(boolean forceConnect) {
-    createThreadSafeClient(forceConnect);
-    httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "odoo-mobile-android");
-    return httpClient;
-  }
-
-  private static void createThreadSafeClient(boolean forceSecure) {
-    httpClient = new DefaultHttpClient();
-    ClientConnectionManager mgr = httpClient.getConnectionManager();
-    HttpParams params = httpClient.getParams();
-    SchemeRegistry schemeRegistry = mgr.getSchemeRegistry();
-
-    if (forceSecure) {
-      schemeRegistry.register(new Scheme("https", getSecureConnectionSetting(), 443));
-    } else {
-      HostnameVerifier hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
-      SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
-      socketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
-      schemeRegistry.register(new Scheme("https", socketFactory, 443));
+    public static DefaultHttpClient getSafeClient(boolean forceConnect) {
+        createThreadSafeClient(forceConnect);
+        httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "odoo-mobile-android");
+        return httpClient;
     }
 
-    httpClient =
-        new DefaultHttpClient(new ThreadSafeClientConnManager(params, schemeRegistry), params);
-  }
+    private static void createThreadSafeClient(boolean forceSecure) {
+        httpClient = new DefaultHttpClient();
+        ClientConnectionManager mgr = httpClient.getConnectionManager();
+        HttpParams params = httpClient.getParams();
+        SchemeRegistry schemeRegistry = mgr.getSchemeRegistry();
 
-  private static SSLSocketFactory getSecureConnectionSetting() {
-    TrustManager[] trustAllCerts =
-        new TrustManager[] {
-          new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(
-                java.security.cert.X509Certificate[] chain, String authType)
-                throws java.security.cert.CertificateException {}
+        if (forceSecure) {
+            schemeRegistry.register(new Scheme("https", getSecureConnectionSetting(), 443));
+        } else {
+            HostnameVerifier hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+            SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+            socketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
+            schemeRegistry.register(new Scheme("https", socketFactory, 443));
+        }
 
-            @Override
-            public void checkServerTrusted(
-                java.security.cert.X509Certificate[] chain, String authType)
-                throws java.security.cert.CertificateException {}
-
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-              return new java.security.cert.X509Certificate[] {};
-            }
-          }
-        };
-    SSLSocketFactory ssf = null;
-    try {
-      SSLContext sc = SSLContext.getInstance("TLS");
-      sc.init(null, trustAllCerts, null);
-      ssf = new OSSLSocketFactory(sc);
-      ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-    } catch (Exception ea) {
-      ea.printStackTrace();
+        httpClient =
+                new DefaultHttpClient(
+                        new ThreadSafeClientConnManager(params, schemeRegistry), params);
     }
-    return ssf;
-  }
+
+    private static SSLSocketFactory getSecureConnectionSetting() {
+        TrustManager[] trustAllCerts =
+                new TrustManager[] {
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] chain, String authType)
+                                throws java.security.cert.CertificateException {}
+
+                        @Override
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] chain, String authType)
+                                throws java.security.cert.CertificateException {}
+
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[] {};
+                        }
+                    }
+                };
+        SSLSocketFactory ssf = null;
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, null);
+            ssf = new OSSLSocketFactory(sc);
+            ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        } catch (Exception ea) {
+            ea.printStackTrace();
+        }
+        return ssf;
+    }
 }

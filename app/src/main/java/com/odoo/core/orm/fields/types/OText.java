@@ -17,10 +17,10 @@
 package com.odoo.core.orm.fields.types;
 
 public class OText extends OTypeHelper {
-  public static final String TAG = OText.class.getSimpleName();
+    public static final String TAG = OText.class.getSimpleName();
 
-  @Override
-  public String getFieldType() {
-    return "TEXT";
-  }
+    @Override
+    public String getFieldType() {
+        return "TEXT";
+    }
 }

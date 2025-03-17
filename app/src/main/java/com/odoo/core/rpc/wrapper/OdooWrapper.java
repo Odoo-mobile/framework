@@ -18,6 +18,7 @@ package com.odoo.core.rpc.wrapper;
  */
 import android.content.Context;
 import android.net.Uri;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -27,6 +28,7 @@ import com.android.volley.toolbox.HttpClientStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
+
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.odoo.core.rpc.Odoo;
@@ -51,6 +53,11 @@ import com.odoo.core.rpc.listeners.IOdooResponse;
 import com.odoo.core.rpc.listeners.OdooError;
 import com.odoo.core.rpc.listeners.OdooSyncResponse;
 import com.odoo.core.support.OUser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,9 +65,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class OdooWrapper<T> implements Response.Listener<JSONObject> {
   public static final String TAG = OdooWrapper.class.getName();

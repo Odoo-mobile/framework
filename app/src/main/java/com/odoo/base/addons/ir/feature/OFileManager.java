@@ -40,6 +40,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
+
 import com.odoo.App;
 import com.odoo.R;
 import com.odoo.base.addons.ir.IrAttachment;
@@ -53,6 +54,7 @@ import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OStorageUtils;
 import com.odoo.core.utils.notification.ONotificationBuilder;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
