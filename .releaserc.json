@@ -89,7 +89,8 @@
             {
                 "assets": [
                     "app/build.gradle",
-                    "CHANGELOG.md"
+                    "CHANGELOG.md",
+                    "README.md"
                 ],
                 "message": "chore(release): ${nextRelease.version} [skip ci]"
             }
