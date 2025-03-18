@@ -29,6 +29,23 @@ public class ODataRow implements Parcelable {
 
     HashMap<String, Object> _data = new HashMap<>();
 
+    public ODataRow() {}
+
+    protected ODataRow(Parcel in) {}
+
+    public static final Creator<ODataRow> CREATOR =
+            new Creator<ODataRow>() {
+                @Override
+                public ODataRow createFromParcel(Parcel in) {
+                    return new ODataRow(in);
+                }
+
+                @Override
+                public ODataRow[] newArray(int size) {
+                    return new ODataRow[size];
+                }
+            };
+
     public void put(String key, Object value) {
         _data.put(key, value);
     }

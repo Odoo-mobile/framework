@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.core.content.ContextCompat;
 import com.odoo.App;
 import com.odoo.R;
 import com.odoo.base.addons.mail.MailMessage;
@@ -95,7 +96,11 @@ public class MailChatterView extends LinearLayout
         }
         setOrientation(VERTICAL);
         mailMessage = new MailMessage(context, null);
-        mContext.registerReceiver(dataChangeReceiver, new IntentFilter("mail.message.update"));
+        ContextCompat.registerReceiver(
+                mContext,
+                dataChangeReceiver,
+                new IntentFilter("mail.message.update"),
+                ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     public void generateView() {

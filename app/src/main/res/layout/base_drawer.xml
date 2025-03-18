@@ -87,8 +87,8 @@
                                 android:layout_height="wrap_content"
                                 android:scaleType="center"
                                 android:src="@drawable/ic_drawer_accounts_expand"
-                                android:tint="@android:color/white"
-                                android:visibility="gone" />
+                                android:visibility="gone"
+                                app:tint="@android:color/white" />
 
                         </LinearLayout>
                     </LinearLayout>

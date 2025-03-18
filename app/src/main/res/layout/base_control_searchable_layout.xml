@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/statusBarHeight"
@@ -23,7 +24,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:src="@drawable/ic_action_search"
-            android:tint="#414141" />
+            app:tint="#414141" />
 
         <EditText
             android:id="@+id/edt_searchable_input"

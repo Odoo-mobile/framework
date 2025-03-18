@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:background="?android:selectableItemBackground"
@@ -10,10 +11,10 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:tint="@color/drawer_icon_tint"
         android:layout_width="32dp"
         android:layout_marginRight="24dp"
-        android:layout_height="32dp" />
+        android:layout_height="32dp"
+        app:tint="@color/drawer_icon_tint" />
 
     <TextView
         android:id="@+id/title"

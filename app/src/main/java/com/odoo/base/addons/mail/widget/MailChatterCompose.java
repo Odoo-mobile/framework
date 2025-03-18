@@ -346,6 +346,7 @@ public class MailChatterCompose extends OdooCompatActivity implements View.OnCli
             Context ctx = MailChatterCompose.this;
             Intent intent = new Intent();
             intent.setAction("mail.message.update");
+            intent.setPackage(getPackageName());
             ctx.sendBroadcast(intent);
             finish();
         }

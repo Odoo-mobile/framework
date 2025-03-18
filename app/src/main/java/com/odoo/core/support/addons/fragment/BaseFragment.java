@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.ListView;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -198,8 +199,11 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
             mSyncObserverHandle =
                     ContentResolver.addStatusChangeListener(mask, mSyncStatusObserver);
         }
-        parent().registerReceiver(
-                        syncFinishReceiver, new IntentFilter(ISyncFinishReceiver.SYNC_FINISH));
+        ContextCompat.registerReceiver(
+                parent(),
+                syncFinishReceiver,
+                new IntentFilter(ISyncFinishReceiver.SYNC_FINISH),
+                ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     public void setHasSearchView(IOnSearchViewChangeListener listener, Menu menu, int menu_id) {

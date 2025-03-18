@@ -42,7 +42,9 @@ public class ReminderUtils {
         myIntent.putExtras(extra);
         int row_id = extra.getInt(OColumn.ROW_ID);
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, row_id, myIntent, 0);
+        PendingIntent pendingIntent =
+                PendingIntent.getBroadcast(
+                        mContext, row_id, myIntent, PendingIntent.FLAG_IMMUTABLE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime(), pendingIntent);
         return true;
     }
@@ -61,7 +63,10 @@ public class ReminderUtils {
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         PendingIntent pendingIntent =
                 PendingIntent.getBroadcast(
-                        mContext, row_id, myIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                        mContext,
+                        row_id,
+                        myIntent,
+                        PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         alarmManager.cancel(pendingIntent);
         return true;
     }

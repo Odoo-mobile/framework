@@ -44,7 +44,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="20dp"
                     android:src="@drawable/odoo_mobile_small"
-                    android:tint="#ffffff" />
+                    app:tint="#ffffff" />
 
                 <TextView
                     android:id="@+id/txvVersionName"

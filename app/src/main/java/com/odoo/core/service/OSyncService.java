@@ -60,6 +60,7 @@ public abstract class OSyncService extends Service {
         Log.i(TAG, "Service destroyed");
         Intent intent = new Intent();
         intent.setAction(ISyncFinishReceiver.SYNC_FINISH);
+        intent.setPackage(getPackageName());
         getApplicationContext().sendBroadcast(intent);
     }
 

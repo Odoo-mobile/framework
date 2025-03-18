@@ -22,10 +22,10 @@ public class OControlHelper {
     public static final String TAG = OControlHelper.class.getSimpleName();
 
     public static Typeface boldFont() {
-        return Typeface.create("sans-serif-condensed", 0);
+        return Typeface.create("sans-serif-condensed", Typeface.NORMAL);
     }
 
     public static Typeface lightFont() {
-        return Typeface.create("sans-serif-light", 0);
+        return Typeface.create("sans-serif-light", Typeface.NORMAL);
     }
 }
