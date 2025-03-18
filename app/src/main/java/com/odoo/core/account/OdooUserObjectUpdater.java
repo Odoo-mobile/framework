@@ -22,7 +22,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
-
 import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.rpc.Odoo;
@@ -32,86 +31,89 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OControls;
 
 public class OdooUserObjectUpdater extends AlertDialog {
-  public static final String TAG = OdooUserObjectUpdater.class.getSimpleName();
-  private OnUpdateFinish mOnUpdateFinish;
-  private Context mContext;
-  private UpdateData updateData;
+    public static final String TAG = OdooUserObjectUpdater.class.getSimpleName();
+    private OnUpdateFinish mOnUpdateFinish;
+    private Context mContext;
+    private UpdateData updateData;
 
-  protected OdooUserObjectUpdater(Context context, OnUpdateFinish onUpdateFinish) {
-    super(context);
-    mContext = context;
-    mOnUpdateFinish = onUpdateFinish;
-  }
-
-  public interface OnUpdateFinish {
-    void userObjectUpdateFinished();
-
-    void userObjectUpdateFail();
-  }
-
-  public void showDialog() {
-    View view =
-        LayoutInflater.from(mContext).inflate(R.layout.base_user_object_updater, null, false);
-    bindView(view);
-    setView(view);
-    setCancelable(false);
-    show();
-    updateData = new UpdateData(this);
-    updateData.execute(OUser.current(mContext));
-  }
-
-  private void bindView(View view) {
-    OUser user = OUser.current(mContext);
-    String avatar = user.getAvatar();
-    if (!avatar.equals("false")) {
-      Bitmap img = BitmapUtils.getBitmapImage(mContext, avatar);
-      OControls.setImage(view, R.id.userAvatar, img);
-    }
-    OControls.setText(view, R.id.userName, "Hello " + user.getName());
-  }
-
-  private class UpdateData extends AsyncTask<OUser, Void, Boolean> {
-
-    private OdooUserObjectUpdater mObj;
-
-    public UpdateData(OdooUserObjectUpdater obj) {
-      mObj = obj;
+    protected OdooUserObjectUpdater(Context context, OnUpdateFinish onUpdateFinish) {
+        super(context);
+        mContext = context;
+        mOnUpdateFinish = onUpdateFinish;
     }
 
-    @Override
-    protected Boolean doInBackground(OUser... params) {
-      try {
-        OUser user = params[0];
-        Odoo odoo = Odoo.createInstance(mContext, user.getHost());
-        OUser mUser = odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
-        if (mUser != null) {
-          OUser updatedUser = new OUser();
-          updatedUser.setFromBundle(mUser.getAsBundle());
-          OdooAccountManager.updateUserData(mContext, user, updatedUser);
+    public interface OnUpdateFinish {
+        void userObjectUpdateFinished();
 
-          Thread.sleep(1500);
-          return true;
+        void userObjectUpdateFail();
+    }
+
+    public void showDialog() {
+        View view =
+                LayoutInflater.from(mContext)
+                        .inflate(R.layout.base_user_object_updater, null, false);
+        bindView(view);
+        setView(view);
+        setCancelable(false);
+        show();
+        updateData = new UpdateData(this);
+        updateData.execute(OUser.current(mContext));
+    }
+
+    private void bindView(View view) {
+        OUser user = OUser.current(mContext);
+        String avatar = user.getAvatar();
+        if (!avatar.equals("false")) {
+            Bitmap img = BitmapUtils.getBitmapImage(mContext, avatar);
+            OControls.setImage(view, R.id.userAvatar, img);
         }
-      } catch (OdooVersionException | InterruptedException e) {
-        e.printStackTrace();
-      }
-      return false;
+        OControls.setText(view, R.id.userName, "Hello " + user.getName());
     }
 
-    @Override
-    protected void onPostExecute(Boolean result) {
-      super.onPostExecute(result);
-      mObj.dismiss();
-      if (!result) {
-        mOnUpdateFinish.userObjectUpdateFail();
-      } else {
-        mOnUpdateFinish.userObjectUpdateFinished();
-      }
-    }
-  }
+    private class UpdateData extends AsyncTask<OUser, Void, Boolean> {
 
-  public static void showUpdater(Context context, OnUpdateFinish callback) {
-    OdooUserObjectUpdater updater = new OdooUserObjectUpdater(context, callback);
-    updater.showDialog();
-  }
+        private OdooUserObjectUpdater mObj;
+
+        public UpdateData(OdooUserObjectUpdater obj) {
+            mObj = obj;
+        }
+
+        @Override
+        protected Boolean doInBackground(OUser... params) {
+            try {
+                OUser user = params[0];
+                Odoo odoo = Odoo.createInstance(mContext, user.getHost());
+                OUser mUser =
+                        odoo.authenticate(
+                                user.getUsername(), user.getPassword(), user.getDatabase());
+                if (mUser != null) {
+                    OUser updatedUser = new OUser();
+                    updatedUser.setFromBundle(mUser.getAsBundle());
+                    OdooAccountManager.updateUserData(mContext, user, updatedUser);
+
+                    Thread.sleep(1500);
+                    return true;
+                }
+            } catch (OdooVersionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            mObj.dismiss();
+            if (!result) {
+                mOnUpdateFinish.userObjectUpdateFail();
+            } else {
+                mOnUpdateFinish.userObjectUpdateFinished();
+            }
+        }
+    }
+
+    public static void showUpdater(Context context, OnUpdateFinish callback) {
+        OdooUserObjectUpdater updater = new OdooUserObjectUpdater(context, callback);
+        updater.showDialog();
+    }
 }

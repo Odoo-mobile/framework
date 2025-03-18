@@ -1,7 +1,6 @@
 package com.odoo.core.rpc.helper.utils.gson;
 
 import com.google.gson.internal.LinkedTreeMap;
-
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;

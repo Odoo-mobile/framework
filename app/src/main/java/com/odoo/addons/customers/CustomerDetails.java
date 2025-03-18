@@ -25,9 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.appcompat.widget.Toolbar;
-
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.odoo.App;
 import com.odoo.R;
@@ -46,7 +44,6 @@ import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OStringColorUtil;
-
 import odoo.controls.OField;
 import odoo.controls.OForm;
 

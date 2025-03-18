@@ -17,7 +17,6 @@
 package com.odoo.core.utils;
 
 import android.os.Environment;
-
 import java.io.File;
 
 public class OStorageUtils {

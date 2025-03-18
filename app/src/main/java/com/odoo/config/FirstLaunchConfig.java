@@ -17,10 +17,9 @@
 package com.odoo.config;
 
 import android.content.Context;
-
 import com.odoo.core.support.OUser;
 
 public class FirstLaunchConfig {
 
-  public static void onFirstLaunch(Context context, OUser user) {}
+    public static void onFirstLaunch(Context context, OUser user) {}
 }

@@ -1,18 +1,15 @@
 package com.odoo.core.utils;
 
 import android.text.TextUtils;
-
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.rpc.helper.ORecordValues;
 import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
-
-import org.json.JSONArray;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.json.JSONArray;
 
 public class OdooRecordUtils {
     public static <T> List<T> toList(JSONArray array) {

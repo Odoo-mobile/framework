@@ -17,56 +17,55 @@
 package com.odoo.core.rpc.helper;
 
 import android.content.ContentValues;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class ORecordValues extends HashMap<String, Object> {
 
-  public long getLong(String key) {
-    if (get(key).toString().equals("false")) {
-      return -1;
+    public long getLong(String key) {
+        if (get(key).toString().equals("false")) {
+            return -1;
+        }
+        return Long.parseLong(get(key).toString());
     }
-    return Long.parseLong(get(key).toString());
-  }
 
-  public Integer getInt(String key) {
-    if (get(key).toString().equals("false")) {
-      return -1;
+    public Integer getInt(String key) {
+        if (get(key).toString().equals("false")) {
+            return -1;
+        }
+        return Integer.parseInt(get(key).toString());
     }
-    return Integer.parseInt(get(key).toString());
-  }
 
-  public String getString(String key) {
-    return get(key).toString();
-  }
-
-  public Boolean getBoolean(String key) {
-    return Boolean.parseBoolean(get(key).toString());
-  }
-
-  public boolean contains(String key) {
-    return containsKey(key);
-  }
-
-  public List<String> keys() {
-    List<String> list = new ArrayList<>();
-    list.addAll(keySet());
-    return list;
-  }
-
-  public ContentValues toContentValues() {
-    ContentValues values = new ContentValues();
-    for (String key : keySet()) {
-      Object val = get(key);
-      val = (val == null) ? "false" : val;
-      values.put(key, val.toString());
+    public String getString(String key) {
+        return get(key).toString();
     }
-    return values;
-  }
 
-  public void addAll(HashMap<String, Object> data) {
-    putAll(data);
-  }
+    public Boolean getBoolean(String key) {
+        return Boolean.parseBoolean(get(key).toString());
+    }
+
+    public boolean contains(String key) {
+        return containsKey(key);
+    }
+
+    public List<String> keys() {
+        List<String> list = new ArrayList<>();
+        list.addAll(keySet());
+        return list;
+    }
+
+    public ContentValues toContentValues() {
+        ContentValues values = new ContentValues();
+        for (String key : keySet()) {
+            Object val = get(key);
+            val = (val == null) ? "false" : val;
+            values.put(key, val.toString());
+        }
+        return values;
+    }
+
+    public void addAll(HashMap<String, Object> data) {
+        putAll(data);
+    }
 }

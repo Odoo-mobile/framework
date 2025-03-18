@@ -30,12 +30,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import com.odoo.R;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
@@ -48,7 +46,6 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -19,58 +19,57 @@ package com.odoo.core.utils.dialog;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class OChoiceDialog implements DialogInterface.OnClickListener {
-  public static final String TAG = OChoiceDialog.class.getSimpleName();
-  private Context mContext;
-  private AlertDialog.Builder mBuilder;
-  private List<String> options = new ArrayList<>();
-  private OnChoiceSelectListener mOnChoiceSelectListener;
-  private int defaultSelected = -1;
-  private String title = null;
+    public static final String TAG = OChoiceDialog.class.getSimpleName();
+    private Context mContext;
+    private AlertDialog.Builder mBuilder;
+    private List<String> options = new ArrayList<>();
+    private OnChoiceSelectListener mOnChoiceSelectListener;
+    private int defaultSelected = -1;
+    private String title = null;
 
-  public OChoiceDialog(Context context) {
-    mContext = context;
-    mBuilder = new AlertDialog.Builder(mContext);
-  }
-
-  public static OChoiceDialog get(Context context) {
-    return new OChoiceDialog(context);
-  }
-
-  public OChoiceDialog withTitle(String title) {
-    this.title = title;
-    return this;
-  }
-
-  public OChoiceDialog withOptions(List<String> options, int selected) {
-    this.options = options;
-    defaultSelected = selected;
-    return this;
-  }
-
-  public void show(OnChoiceSelectListener listener) {
-    mOnChoiceSelectListener = listener;
-    if (title != null) {
-      mBuilder.setTitle(title);
+    public OChoiceDialog(Context context) {
+        mContext = context;
+        mBuilder = new AlertDialog.Builder(mContext);
     }
-    mBuilder.setSingleChoiceItems(
-        options.toArray(new String[options.size()]), defaultSelected, this);
-    mBuilder.show();
-  }
 
-  @Override
-  public void onClick(DialogInterface dialog, int which) {
-    if (mOnChoiceSelectListener != null) {
-      mOnChoiceSelectListener.choiceSelected(which, options.get(which));
+    public static OChoiceDialog get(Context context) {
+        return new OChoiceDialog(context);
     }
-    dialog.dismiss();
-  }
 
-  public interface OnChoiceSelectListener {
-    public void choiceSelected(int position, String value);
-  }
+    public OChoiceDialog withTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public OChoiceDialog withOptions(List<String> options, int selected) {
+        this.options = options;
+        defaultSelected = selected;
+        return this;
+    }
+
+    public void show(OnChoiceSelectListener listener) {
+        mOnChoiceSelectListener = listener;
+        if (title != null) {
+            mBuilder.setTitle(title);
+        }
+        mBuilder.setSingleChoiceItems(
+                options.toArray(new String[options.size()]), defaultSelected, this);
+        mBuilder.show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if (mOnChoiceSelectListener != null) {
+            mOnChoiceSelectListener.choiceSelected(which, options.get(which));
+        }
+        dialog.dismiss();
+    }
+
+    public interface OnChoiceSelectListener {
+        public void choiceSelected(int position, String value);
+    }
 }

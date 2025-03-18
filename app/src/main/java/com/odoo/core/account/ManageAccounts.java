@@ -26,9 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
@@ -37,11 +35,9 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
-
-import odoo.controls.ExpandableListControl;
-
 import java.util.ArrayList;
 import java.util.List;
+import odoo.controls.ExpandableListControl;
 
 public class ManageAccounts extends AppCompatActivity
         implements View.OnClickListener,

@@ -19,7 +19,6 @@ package com.odoo.core.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

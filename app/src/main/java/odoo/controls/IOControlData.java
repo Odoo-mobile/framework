@@ -20,37 +20,37 @@ import android.view.View;
 import com.odoo.core.orm.fields.OColumn;
 
 interface IOControlData {
-  String TAG = IOControlData.class.getSimpleName();
+    String TAG = IOControlData.class.getSimpleName();
 
-  void setValue(Object value);
+    void setValue(Object value);
 
-  Object getValue();
+    Object getValue();
 
-  void setEditable(Boolean editable);
+    void setEditable(Boolean editable);
 
-  Boolean isEditable();
+    Boolean isEditable();
 
-  void setLabelText(String label);
+    void setLabelText(String label);
 
-  void setColumn(OColumn column);
+    void setColumn(OColumn column);
 
-  void initControl();
+    void initControl();
 
-  String getLabel();
+    String getLabel();
 
-  void setValueUpdateListener(ValueUpdateListener listener);
+    void setValueUpdateListener(ValueUpdateListener listener);
 
-  interface ValueUpdateListener {
-    void onValueUpdate(Object value);
+    interface ValueUpdateListener {
+        void onValueUpdate(Object value);
 
-    void visibleControl(boolean isVisible);
-  }
+        void visibleControl(boolean isVisible);
+    }
 
-  Boolean isControlReady();
+    Boolean isControlReady();
 
-  void resetData();
+    void resetData();
 
-  View getFieldView();
+    View getFieldView();
 
-  void setError(String error);
+    void setError(String error);
 }

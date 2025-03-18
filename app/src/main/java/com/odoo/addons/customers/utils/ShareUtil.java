@@ -19,78 +19,81 @@ package com.odoo.addons.customers.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.utils.OStorageUtils;
-
 import java.io.File;
 import java.io.FileWriter;
 
 public class ShareUtil {
-  public static final String TAG = ShareUtil.class.getSimpleName();
+    public static final String TAG = ShareUtil.class.getSimpleName();
 
-  public static void shareContact(Context context, ODataRow row, Boolean view) {
-    try {
-      File vcfFile =
-          new File(OStorageUtils.getDirectoryPath("file"), row.getString("name") + ".vcf");
-      FileWriter fw = new FileWriter(vcfFile);
-      fw.write("BEGIN:VCARD\r\n");
-      fw.write("VERSION:3.0\r\n");
-      fw.write("N:" + row.getString("name") + ";\r\n");
-      fw.write("FN:" + row.getString("name") + "\r\n");
-      if (row.get("parent_id") instanceof Integer) {
-        fw.write("ORG:" + row.getM2ORecord("parent_id").browse().getString("name") + "\r\n");
-      }
-      if (!row.getString("phone").equals("false"))
-        fw.write("TEL;TYPE=WORK,VOICE:" + row.getString("phone") + "\r\n");
-      if (!row.getString("mobile").equals("false"))
-        fw.write("TEL;TYPE=HOME,VOICE:" + row.getString("mobile") + "\r\n");
-      String country = "";
-      if (row.get("country_id") instanceof Integer) {
-        country = row.getM2ORecord("country_id").browse().getString("name");
-      }
-      //            if (!row.getString("street").equals("false") &&
-      // !row.getString("street").equals("")) {
-      //            fw.write("ADR;TYPE=WORK:;;" + row.getString("street"));
-      fw.write(
-          "ADR;TYPE=WORK:;;"
-              + row.getString("street")
-              + " "
-              + row.getString("street2")
-              + ";"
-              + row.getString("city")
-              + ";"
-              + row.getString("zip")
-              + ";"
-              + country
-              + "\r\n");
-      //            }
-      //            if (!row.getString("street2").equals("false") &&
-      // !row.getString("street2").equals(""))
-      //                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("street2"));
-      //            if (!row.getString("city").equals("false") && !row.getString("city").equals(""))
-      //                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("city"));
-      //            if (!row.getString("zip").equals("false") && !row.getString("zip").equals(""))
-      //                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("zip") + ";" + country);
+    public static void shareContact(Context context, ODataRow row, Boolean view) {
+        try {
+            File vcfFile =
+                    new File(
+                            OStorageUtils.getDirectoryPath("file"), row.getString("name") + ".vcf");
+            FileWriter fw = new FileWriter(vcfFile);
+            fw.write("BEGIN:VCARD\r\n");
+            fw.write("VERSION:3.0\r\n");
+            fw.write("N:" + row.getString("name") + ";\r\n");
+            fw.write("FN:" + row.getString("name") + "\r\n");
+            if (row.get("parent_id") instanceof Integer) {
+                fw.write(
+                        "ORG:" + row.getM2ORecord("parent_id").browse().getString("name") + "\r\n");
+            }
+            if (!row.getString("phone").equals("false"))
+                fw.write("TEL;TYPE=WORK,VOICE:" + row.getString("phone") + "\r\n");
+            if (!row.getString("mobile").equals("false"))
+                fw.write("TEL;TYPE=HOME,VOICE:" + row.getString("mobile") + "\r\n");
+            String country = "";
+            if (row.get("country_id") instanceof Integer) {
+                country = row.getM2ORecord("country_id").browse().getString("name");
+            }
+            //            if (!row.getString("street").equals("false") &&
+            // !row.getString("street").equals("")) {
+            //            fw.write("ADR;TYPE=WORK:;;" + row.getString("street"));
+            fw.write(
+                    "ADR;TYPE=WORK:;;"
+                            + row.getString("street")
+                            + " "
+                            + row.getString("street2")
+                            + ";"
+                            + row.getString("city")
+                            + ";"
+                            + row.getString("zip")
+                            + ";"
+                            + country
+                            + "\r\n");
+            //            }
+            //            if (!row.getString("street2").equals("false") &&
+            // !row.getString("street2").equals(""))
+            //                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("street2"));
+            //            if (!row.getString("city").equals("false") &&
+            // !row.getString("city").equals(""))
+            //                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("city"));
+            //            if (!row.getString("zip").equals("false") &&
+            // !row.getString("zip").equals(""))
+            //                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("zip") + ";" +
+            // country);
 
-      //            if (!row.getString("email").equals("false") &&
-      // !row.getString("email").equals(""))
-      fw.write("EMAIL;TYPE=PREF,INTERNET:" + row.getString("email") + "\r\n");
-      fw.write("END:VCARD\r\n");
-      fw.close();
+            //            if (!row.getString("email").equals("false") &&
+            // !row.getString("email").equals(""))
+            fw.write("EMAIL;TYPE=PREF,INTERNET:" + row.getString("email") + "\r\n");
+            fw.write("END:VCARD\r\n");
+            fw.close();
 
-      Intent i = new Intent();
-      if (view) {
-        i.setAction(Intent.ACTION_SEND);
-        i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(vcfFile));
-        i.setType("text/x-vcard");
-      } else {
-        i.setAction(Intent.ACTION_VIEW);
-        i.setDataAndType(Uri.fromFile(vcfFile), "text/x-vcard");
-      }
-      context.startActivity(i);
-    } catch (Exception e) {
-      e.printStackTrace();
+            Intent i = new Intent();
+            if (view) {
+                i.setAction(Intent.ACTION_SEND);
+                i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(vcfFile));
+                i.setType("text/x-vcard");
+            } else {
+                i.setAction(Intent.ACTION_VIEW);
+                i.setDataAndType(Uri.fromFile(vcfFile), "text/x-vcard");
+            }
+            context.startActivity(i);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-  }
 }

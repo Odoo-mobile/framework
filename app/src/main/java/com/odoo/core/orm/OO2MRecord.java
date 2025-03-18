@@ -17,7 +17,6 @@
 package com.odoo.core.orm;
 
 import com.odoo.core.orm.fields.OColumn;
-
 import java.util.ArrayList;
 import java.util.List;
 

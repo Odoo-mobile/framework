@@ -19,5 +19,5 @@ package odoo.controls;
 import java.util.List;
 
 public interface ExpandableListOperationListener {
-  public void onAdapterDataChange(List<Object> items);
+    public void onAdapterDataChange(List<Object> items);
 }

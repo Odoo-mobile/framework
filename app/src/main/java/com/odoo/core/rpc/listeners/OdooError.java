@@ -17,7 +17,6 @@
 package com.odoo.core.rpc.listeners;
 
 import com.odoo.core.rpc.helper.utils.gson.OdooResult;
-
 import java.util.ArrayList;
 import java.util.List;
 

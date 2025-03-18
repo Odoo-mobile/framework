@@ -21,49 +21,48 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
 import com.odoo.core.orm.fields.OColumn;
-
 import java.util.Date;
 
 public class ReminderUtils {
-  public static final String TAG = ReminderUtils.class.getSimpleName();
-  public static final String KEY_REMINDER_TYPE = "key_reminder_type";
-  private Context mContext;
+    public static final String TAG = ReminderUtils.class.getSimpleName();
+    public static final String KEY_REMINDER_TYPE = "key_reminder_type";
+    private Context mContext;
 
-  public ReminderUtils(Context context) {
-    mContext = context;
-  }
-
-  public static ReminderUtils get(Context context) {
-    return new ReminderUtils(context);
-  }
-
-  public boolean setReminder(Date date, Bundle extra) {
-    Intent myIntent = new Intent(mContext, ReminderReceiver.class);
-    myIntent.putExtras(extra);
-    int row_id = extra.getInt(OColumn.ROW_ID);
-    AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, row_id, myIntent, 0);
-    alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime(), pendingIntent);
-    return true;
-  }
-
-  public boolean resetReminder(Date date, Bundle extra) {
-    if (cancelReminder(date, extra)) {
-      setReminder(date, extra);
+    public ReminderUtils(Context context) {
+        mContext = context;
     }
-    return true;
-  }
 
-  public boolean cancelReminder(Date date, Bundle extra) {
-    Intent myIntent = new Intent(mContext, ReminderReceiver.class);
-    myIntent.putExtras(extra);
-    int row_id = extra.getInt(OColumn.ROW_ID);
-    AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-    PendingIntent pendingIntent =
-        PendingIntent.getBroadcast(mContext, row_id, myIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-    alarmManager.cancel(pendingIntent);
-    return true;
-  }
+    public static ReminderUtils get(Context context) {
+        return new ReminderUtils(context);
+    }
+
+    public boolean setReminder(Date date, Bundle extra) {
+        Intent myIntent = new Intent(mContext, ReminderReceiver.class);
+        myIntent.putExtras(extra);
+        int row_id = extra.getInt(OColumn.ROW_ID);
+        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, row_id, myIntent, 0);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime(), pendingIntent);
+        return true;
+    }
+
+    public boolean resetReminder(Date date, Bundle extra) {
+        if (cancelReminder(date, extra)) {
+            setReminder(date, extra);
+        }
+        return true;
+    }
+
+    public boolean cancelReminder(Date date, Bundle extra) {
+        Intent myIntent = new Intent(mContext, ReminderReceiver.class);
+        myIntent.putExtras(extra);
+        int row_id = extra.getInt(OColumn.ROW_ID);
+        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent =
+                PendingIntent.getBroadcast(
+                        mContext, row_id, myIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.cancel(pendingIntent);
+        return true;
+    }
 }

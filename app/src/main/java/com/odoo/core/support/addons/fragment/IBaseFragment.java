@@ -17,13 +17,11 @@
 package com.odoo.core.support.addons.fragment;
 
 import android.content.Context;
-
 import com.odoo.core.support.drawer.ODrawerItem;
-
 import java.util.List;
 
 public interface IBaseFragment {
-  public List<ODrawerItem> drawerMenus(Context context);
+    public List<ODrawerItem> drawerMenus(Context context);
 
-  public <T> Class<T> database();
+    public <T> Class<T> database();
 }

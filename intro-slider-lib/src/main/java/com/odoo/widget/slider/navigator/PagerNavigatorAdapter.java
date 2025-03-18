@@ -6,7 +6,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.view.View;
 import android.widget.LinearLayout;
-
 import com.odoo.widgets.slider.R;
 import com.odoo.widgets.slider.R.color;
 

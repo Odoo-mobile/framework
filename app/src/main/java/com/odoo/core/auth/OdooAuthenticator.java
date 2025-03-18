@@ -24,91 +24,96 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.support.OUser;
 
 public class OdooAuthenticator extends AbstractAccountAuthenticator {
 
-  public static final String TAG = OdooAuthenticator.class.getSimpleName();
-  public static final String KEY_NEW_ACCOUNT_REQUEST = "create_new_account";
-  private Context mContext;
+    public static final String TAG = OdooAuthenticator.class.getSimpleName();
+    public static final String KEY_NEW_ACCOUNT_REQUEST = "create_new_account";
+    private Context mContext;
 
-  public OdooAuthenticator(Context context) {
-    super(context);
-    mContext = context;
-  }
-
-  @Override
-  public Bundle addAccount(
-      AccountAuthenticatorResponse response,
-      String accountType,
-      String authTokenType,
-      String[] requiredFeatures,
-      Bundle options)
-      throws NetworkErrorException {
-    final Bundle result;
-    final Intent intent;
-
-    intent = new Intent(mContext, OdooLogin.class);
-    result = new Bundle();
-    intent.putExtra(KEY_NEW_ACCOUNT_REQUEST, true);
-    result.putParcelable(AccountManager.KEY_INTENT, intent);
-
-    return result;
-  }
-
-  @Override
-  public Bundle getAccountRemovalAllowed(AccountAuthenticatorResponse response, Account account)
-      throws NetworkErrorException {
-    Bundle result = super.getAccountRemovalAllowed(response, account);
-    if (result != null
-        && result.containsKey(AccountManager.KEY_BOOLEAN_RESULT)
-        && !result.containsKey(AccountManager.KEY_INTENT)) {
-      final boolean removalAllowed = result.getBoolean(AccountManager.KEY_BOOLEAN_RESULT);
-      if (removalAllowed) {
-        OUser user = OdooAccountManager.getDetails(mContext, account.name);
-        OdooAccountManager.dropDatabase(user);
-      }
+    public OdooAuthenticator(Context context) {
+        super(context);
+        mContext = context;
     }
-    return result;
-  }
 
-  @Override
-  public Bundle editProperties(AccountAuthenticatorResponse response, String accountType) {
-    return null;
-  }
+    @Override
+    public Bundle addAccount(
+            AccountAuthenticatorResponse response,
+            String accountType,
+            String authTokenType,
+            String[] requiredFeatures,
+            Bundle options)
+            throws NetworkErrorException {
+        final Bundle result;
+        final Intent intent;
 
-  @Override
-  public Bundle confirmCredentials(
-      AccountAuthenticatorResponse response, Account account, Bundle options)
-      throws NetworkErrorException {
-    return null;
-  }
+        intent = new Intent(mContext, OdooLogin.class);
+        result = new Bundle();
+        intent.putExtra(KEY_NEW_ACCOUNT_REQUEST, true);
+        result.putParcelable(AccountManager.KEY_INTENT, intent);
 
-  @Override
-  public Bundle getAuthToken(
-      AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options)
-      throws NetworkErrorException {
-    return null;
-  }
+        return result;
+    }
 
-  @Override
-  public String getAuthTokenLabel(String authTokenType) {
-    return null;
-  }
+    @Override
+    public Bundle getAccountRemovalAllowed(AccountAuthenticatorResponse response, Account account)
+            throws NetworkErrorException {
+        Bundle result = super.getAccountRemovalAllowed(response, account);
+        if (result != null
+                && result.containsKey(AccountManager.KEY_BOOLEAN_RESULT)
+                && !result.containsKey(AccountManager.KEY_INTENT)) {
+            final boolean removalAllowed = result.getBoolean(AccountManager.KEY_BOOLEAN_RESULT);
+            if (removalAllowed) {
+                OUser user = OdooAccountManager.getDetails(mContext, account.name);
+                OdooAccountManager.dropDatabase(user);
+            }
+        }
+        return result;
+    }
 
-  @Override
-  public Bundle updateCredentials(
-      AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options)
-      throws NetworkErrorException {
-    return null;
-  }
+    @Override
+    public Bundle editProperties(AccountAuthenticatorResponse response, String accountType) {
+        return null;
+    }
 
-  @Override
-  public Bundle hasFeatures(
-      AccountAuthenticatorResponse response, Account account, String[] features)
-      throws NetworkErrorException {
-    return null;
-  }
+    @Override
+    public Bundle confirmCredentials(
+            AccountAuthenticatorResponse response, Account account, Bundle options)
+            throws NetworkErrorException {
+        return null;
+    }
+
+    @Override
+    public Bundle getAuthToken(
+            AccountAuthenticatorResponse response,
+            Account account,
+            String authTokenType,
+            Bundle options)
+            throws NetworkErrorException {
+        return null;
+    }
+
+    @Override
+    public String getAuthTokenLabel(String authTokenType) {
+        return null;
+    }
+
+    @Override
+    public Bundle updateCredentials(
+            AccountAuthenticatorResponse response,
+            Account account,
+            String authTokenType,
+            Bundle options)
+            throws NetworkErrorException {
+        return null;
+    }
+
+    @Override
+    public Bundle hasFeatures(
+            AccountAuthenticatorResponse response, Account account, String[] features)
+            throws NetworkErrorException {
+        return null;
+    }
 }

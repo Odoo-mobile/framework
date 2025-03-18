@@ -19,5 +19,5 @@ package odoo.controls;
 import com.odoo.core.orm.ODataRow;
 
 public interface IOnQuickRecordCreateListener {
-  public void onRecordCreated(ODataRow row);
+    public void onRecordCreated(ODataRow row);
 }

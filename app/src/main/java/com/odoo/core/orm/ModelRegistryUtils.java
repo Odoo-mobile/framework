@@ -1,12 +1,9 @@
 package com.odoo.core.orm;
 
 import android.content.Context;
-
-import dalvik.system.DexFile;
-
 import com.odoo.App;
 import com.odoo.core.support.OUser;
-
+import dalvik.system.DexFile;
 import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 import java.util.HashMap;

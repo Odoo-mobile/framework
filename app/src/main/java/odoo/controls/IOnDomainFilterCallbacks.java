@@ -17,5 +17,5 @@
 package odoo.controls;
 
 public interface IOnDomainFilterCallbacks {
-  void onFieldValueChanged(Object value);
+    void onFieldValueChanged(Object value);
 }

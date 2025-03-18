@@ -24,54 +24,54 @@ import java.math.BigDecimal;
  * @author Inderjeet Singh
  */
 public final class LazilyParsedNumber extends Number {
-  private final String value;
+    private final String value;
 
-  public LazilyParsedNumber(String value) {
-    this.value = value;
-  }
-
-  @Override
-  public int intValue() {
-    try {
-      return Integer.parseInt(value);
-    } catch (NumberFormatException e) {
-      try {
-        return (int) Long.parseLong(value);
-      } catch (NumberFormatException nfe) {
-        return new BigDecimal(value).intValue();
-      }
+    public LazilyParsedNumber(String value) {
+        this.value = value;
     }
-  }
 
-  @Override
-  public long longValue() {
-    try {
-      return Long.parseLong(value);
-    } catch (NumberFormatException e) {
-      return new BigDecimal(value).longValue();
+    @Override
+    public int intValue() {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            try {
+                return (int) Long.parseLong(value);
+            } catch (NumberFormatException nfe) {
+                return new BigDecimal(value).intValue();
+            }
+        }
     }
-  }
 
-  @Override
-  public float floatValue() {
-    return Float.parseFloat(value);
-  }
+    @Override
+    public long longValue() {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return new BigDecimal(value).longValue();
+        }
+    }
 
-  @Override
-  public double doubleValue() {
-    return Double.parseDouble(value);
-  }
+    @Override
+    public float floatValue() {
+        return Float.parseFloat(value);
+    }
 
-  @Override
-  public String toString() {
-    return value;
-  }
+    @Override
+    public double doubleValue() {
+        return Double.parseDouble(value);
+    }
 
-  /**
-   * If somebody is unlucky enough to have to serialize one of these, serialize it as a BigDecimal
-   * so that they won't need Gson on the other side to deserialize it.
-   */
-  private Object writeReplace() throws ObjectStreamException {
-    return new BigDecimal(value);
-  }
+    @Override
+    public String toString() {
+        return value;
+    }
+
+    /**
+     * If somebody is unlucky enough to have to serialize one of these, serialize it as a BigDecimal
+     * so that they won't need Gson on the other side to deserialize it.
+     */
+    private Object writeReplace() throws ObjectStreamException {
+        return new BigDecimal(value);
+    }
 }

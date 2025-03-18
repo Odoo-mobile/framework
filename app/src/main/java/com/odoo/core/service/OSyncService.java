@@ -23,53 +23,52 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.odoo.core.service.receivers.ISyncFinishReceiver;
 import com.odoo.core.support.OUser;
 
 public abstract class OSyncService extends Service {
-  public static final String TAG = OSyncService.class.getSimpleName();
-  private static final Object sSyncAdapterLock = new Object();
-  private AbstractThreadedSyncAdapter sSyncAdapter = null;
-  private Context mContext;
-  private OSyncService service;
+    public static final String TAG = OSyncService.class.getSimpleName();
+    private static final Object sSyncAdapterLock = new Object();
+    private AbstractThreadedSyncAdapter sSyncAdapter = null;
+    private Context mContext;
+    private OSyncService service;
 
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    mContext = getApplicationContext();
-    service = this;
-    Log.i(TAG, "Service created");
-    synchronized (sSyncAdapterLock) {
-      if (sSyncAdapter == null) {
-        sSyncAdapter = getSyncAdapter(service, mContext);
-      }
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mContext = getApplicationContext();
+        service = this;
+        Log.i(TAG, "Service created");
+        synchronized (sSyncAdapterLock) {
+            if (sSyncAdapter == null) {
+                sSyncAdapter = getSyncAdapter(service, mContext);
+            }
+        }
     }
-  }
 
-  public void setService(OSyncService service) {
-    this.service = service;
-  }
+    public void setService(OSyncService service) {
+        this.service = service;
+    }
 
-  public void setContext(Context context) {
-    mContext = context;
-  }
+    public void setContext(Context context) {
+        mContext = context;
+    }
 
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    Log.i(TAG, "Service destroyed");
-    Intent intent = new Intent();
-    intent.setAction(ISyncFinishReceiver.SYNC_FINISH);
-    getApplicationContext().sendBroadcast(intent);
-  }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "Service destroyed");
+        Intent intent = new Intent();
+        intent.setAction(ISyncFinishReceiver.SYNC_FINISH);
+        getApplicationContext().sendBroadcast(intent);
+    }
 
-  @Override
-  public IBinder onBind(Intent intent) {
-    return sSyncAdapter.getSyncAdapterBinder();
-  }
+    @Override
+    public IBinder onBind(Intent intent) {
+        return sSyncAdapter.getSyncAdapterBinder();
+    }
 
-  public abstract OSyncAdapter getSyncAdapter(OSyncService service, Context context);
+    public abstract OSyncAdapter getSyncAdapter(OSyncService service, Context context);
 
-  public abstract void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user);
+    public abstract void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user);
 }

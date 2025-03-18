@@ -21,13 +21,11 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
 import com.odoo.core.orm.ModelRegistryUtils;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OSQLite;
 import com.odoo.core.rpc.Odoo;
 import com.odoo.core.support.OUser;
-
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 

@@ -18,7 +18,6 @@ package com.odoo.core.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
-
 import com.odoo.R;
 
 public class OAlertDialog {

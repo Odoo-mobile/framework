@@ -17,7 +17,6 @@
 package com.odoo.core.rpc.wrapper;
 
 import com.odoo.core.rpc.listeners.IOdooResponse;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;

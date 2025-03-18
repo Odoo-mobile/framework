@@ -17,7 +17,6 @@
 package com.odoo.base.addons.mail;
 
 import android.content.Context;
-
 import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
@@ -31,7 +30,6 @@ import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
-
 import java.util.ArrayList;
 import java.util.List;
 

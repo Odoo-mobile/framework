@@ -17,47 +17,45 @@
 package com.odoo.core.support.addons;
 
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.odoo.core.support.addons.fragment.BaseFragment;
 
 public class OAddon implements Comparable<OAddon> {
-  public static final String TAG = OAddon.class.getSimpleName();
-  private Class<?> addon = null;
-  private Boolean isDefault = false;
-  private Integer sequence = 0;
+    public static final String TAG = OAddon.class.getSimpleName();
+    private Class<?> addon = null;
+    private Boolean isDefault = false;
+    private Integer sequence = 0;
 
-  public OAddon(Class<? extends BaseFragment> addon_class) {
-    addon = addon_class;
-  }
-
-  public OAddon setDefault() {
-    isDefault = true;
-    return this;
-  }
-
-  public Object get() {
-    try {
-      return addon.newInstance();
-    } catch (Exception e) {
-      Log.i(TAG, e.getMessage());
+    public OAddon(Class<? extends BaseFragment> addon_class) {
+        addon = addon_class;
     }
-    return null;
-  }
 
-  public Boolean isDefault() {
-    return isDefault;
-  }
+    public OAddon setDefault() {
+        isDefault = true;
+        return this;
+    }
 
-  public OAddon withSequence(int sequence) {
-    if (!isDefault()) this.sequence = sequence;
-    else this.sequence = 0;
-    return this;
-  }
+    public Object get() {
+        try {
+            return addon.newInstance();
+        } catch (Exception e) {
+            Log.i(TAG, e.getMessage());
+        }
+        return null;
+    }
 
-  @Override
-  public int compareTo(@NonNull OAddon addon) {
-    return sequence.compareTo(addon.sequence);
-  }
+    public Boolean isDefault() {
+        return isDefault;
+    }
+
+    public OAddon withSequence(int sequence) {
+        if (!isDefault()) this.sequence = sequence;
+        else this.sequence = 0;
+        return this;
+    }
+
+    @Override
+    public int compareTo(@NonNull OAddon addon) {
+        return sequence.compareTo(addon.sequence);
+    }
 }

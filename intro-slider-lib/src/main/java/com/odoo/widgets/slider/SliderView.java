@@ -6,9 +6,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
 import androidx.fragment.app.FragmentManager;
-
 import java.util.List;
 
 public class SliderView extends LinearLayout {

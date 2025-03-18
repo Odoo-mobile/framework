@@ -7,9 +7,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
-
 import androidx.core.view.ViewCompat;
-
 import com.odoo.R;
 
 public class ODrawerScrollView extends ScrollView {

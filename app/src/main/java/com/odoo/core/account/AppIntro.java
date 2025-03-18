@@ -1,9 +1,7 @@
 package com.odoo.core.account;
 
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.odoo.R;
 import com.odoo.config.IntroSliderItems;
 import com.odoo.widgets.slider.SliderView;

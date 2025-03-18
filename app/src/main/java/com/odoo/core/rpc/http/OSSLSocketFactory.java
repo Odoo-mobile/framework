@@ -18,8 +18,6 @@
  */
 package com.odoo.core.rpc.http;
 
-import org.apache.http.conn.ssl.SSLSocketFactory;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.security.KeyManagementException;
@@ -29,18 +27,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 
 public class OSSLSocketFactory extends SSLSocketFactory {
     SSLContext sslContext = SSLContext.getInstance("TLS");
 
     public OSSLSocketFactory(KeyStore trustStore)
-            throws NoSuchAlgorithmException,
-                    KeyManagementException,
-                    KeyStoreException,
+            throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
                     UnrecoverableKeyException {
         super(trustStore);
 
@@ -61,9 +57,7 @@ public class OSSLSocketFactory extends SSLSocketFactory {
     }
 
     public OSSLSocketFactory(SSLContext context)
-            throws KeyManagementException,
-                    NoSuchAlgorithmException,
-                    KeyStoreException,
+            throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
                     UnrecoverableKeyException {
         super(null);
         sslContext = context;

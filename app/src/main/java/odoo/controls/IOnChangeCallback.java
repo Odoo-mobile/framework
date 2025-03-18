@@ -19,7 +19,7 @@ package odoo.controls;
 import com.odoo.core.orm.ODataRow;
 
 public interface IOnChangeCallback {
-  public static final String TAG = IOnChangeCallback.class.getSimpleName();
+    public static final String TAG = IOnChangeCallback.class.getSimpleName();
 
-  public void onValueChange(ODataRow row);
+    public void onValueChange(ODataRow row);
 }

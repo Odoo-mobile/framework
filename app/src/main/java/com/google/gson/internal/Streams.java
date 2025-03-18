@@ -31,83 +31,85 @@ import java.io.Writer;
 
 /** Reads and writes GSON parse trees over streams. */
 public final class Streams {
-  /** Takes a reader in any state and returns the next value as a JsonElement. */
-  public static JsonElement parse(JsonReader reader) throws JsonParseException {
-    boolean isEmpty = true;
-    try {
-      reader.peek();
-      isEmpty = false;
-      return TypeAdapters.JSON_ELEMENT.read(reader);
-    } catch (EOFException e) {
-      /*
-       * For compatibility with JSON 1.5 and earlier, we return a JsonNull for
-       * empty documents instead of throwing.
-       */
-      if (isEmpty) {
-        return JsonNull.INSTANCE;
-      }
-      // The stream ended prematurely so it is likely a syntax error.
-      throw new JsonSyntaxException(e);
-    } catch (MalformedJsonException e) {
-      throw new JsonSyntaxException(e);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    } catch (NumberFormatException e) {
-      throw new JsonSyntaxException(e);
-    }
-  }
-
-  /** Writes the JSON element to the writer, recursively. */
-  public static void write(JsonElement element, JsonWriter writer) throws IOException {
-    TypeAdapters.JSON_ELEMENT.write(writer, element);
-  }
-
-  @SuppressWarnings("resource")
-  public static Writer writerForAppendable(Appendable appendable) {
-    return appendable instanceof Writer ? (Writer) appendable : new AppendableWriter(appendable);
-  }
-
-  /** Adapts an {@link Appendable} so it can be passed anywhere a {@link Writer} is used. */
-  private static final class AppendableWriter extends Writer {
-    private final Appendable appendable;
-    private final CurrentWrite currentWrite = new CurrentWrite();
-
-    private AppendableWriter(Appendable appendable) {
-      this.appendable = appendable;
+    /** Takes a reader in any state and returns the next value as a JsonElement. */
+    public static JsonElement parse(JsonReader reader) throws JsonParseException {
+        boolean isEmpty = true;
+        try {
+            reader.peek();
+            isEmpty = false;
+            return TypeAdapters.JSON_ELEMENT.read(reader);
+        } catch (EOFException e) {
+            /*
+             * For compatibility with JSON 1.5 and earlier, we return a JsonNull for
+             * empty documents instead of throwing.
+             */
+            if (isEmpty) {
+                return JsonNull.INSTANCE;
+            }
+            // The stream ended prematurely so it is likely a syntax error.
+            throw new JsonSyntaxException(e);
+        } catch (MalformedJsonException e) {
+            throw new JsonSyntaxException(e);
+        } catch (IOException e) {
+            throw new JsonIOException(e);
+        } catch (NumberFormatException e) {
+            throw new JsonSyntaxException(e);
+        }
     }
 
-    @Override
-    public void write(char[] chars, int offset, int length) throws IOException {
-      currentWrite.chars = chars;
-      appendable.append(currentWrite, offset, offset + length);
+    /** Writes the JSON element to the writer, recursively. */
+    public static void write(JsonElement element, JsonWriter writer) throws IOException {
+        TypeAdapters.JSON_ELEMENT.write(writer, element);
     }
 
-    @Override
-    public void write(int i) throws IOException {
-      appendable.append((char) i);
+    @SuppressWarnings("resource")
+    public static Writer writerForAppendable(Appendable appendable) {
+        return appendable instanceof Writer
+                ? (Writer) appendable
+                : new AppendableWriter(appendable);
     }
 
-    @Override
-    public void flush() {}
+    /** Adapts an {@link Appendable} so it can be passed anywhere a {@link Writer} is used. */
+    private static final class AppendableWriter extends Writer {
+        private final Appendable appendable;
+        private final CurrentWrite currentWrite = new CurrentWrite();
 
-    @Override
-    public void close() {}
+        private AppendableWriter(Appendable appendable) {
+            this.appendable = appendable;
+        }
 
-    /** A mutable char sequence pointing at a single char[]. */
-    static class CurrentWrite implements CharSequence {
-      char[] chars;
+        @Override
+        public void write(char[] chars, int offset, int length) throws IOException {
+            currentWrite.chars = chars;
+            appendable.append(currentWrite, offset, offset + length);
+        }
 
-      public int length() {
-        return chars.length;
-      }
+        @Override
+        public void write(int i) throws IOException {
+            appendable.append((char) i);
+        }
 
-      public char charAt(int i) {
-        return chars[i];
-      }
+        @Override
+        public void flush() {}
 
-      public CharSequence subSequence(int start, int end) {
-        return new String(chars, start, end - start);
-      }
+        @Override
+        public void close() {}
+
+        /** A mutable char sequence pointing at a single char[]. */
+        static class CurrentWrite implements CharSequence {
+            char[] chars;
+
+            public int length() {
+                return chars.length;
+            }
+
+            public char charAt(int i) {
+                return chars[i];
+            }
+
+            public CharSequence subSequence(int start, int end) {
+                return new String(chars, start, end - start);
+            }
+        }
     }
-  }
 }

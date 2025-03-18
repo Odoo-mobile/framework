@@ -20,31 +20,30 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.odoo.R;
 import com.odoo.core.utils.OControls;
 import com.odoo.widgets.slider.SliderItem;
 import com.odoo.widgets.slider.SliderPagerAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class IntroSliderItems implements SliderPagerAdapter.SliderBuilderListener {
-  public static final String TAG = IntroSliderItems.class.getSimpleName();
+    public static final String TAG = IntroSliderItems.class.getSimpleName();
 
-  public List<SliderItem> getItems() {
-    List<SliderItem> items = new ArrayList<>();
-    return items;
-  }
+    public List<SliderItem> getItems() {
+        List<SliderItem> items = new ArrayList<>();
+        return items;
+    }
 
-  @Override
-  public View getCustomView(Context context, SliderItem item, ViewGroup parent) {
-    View view =
-        LayoutInflater.from(context).inflate(R.layout.base_intro_slider_view, parent, false);
-    OControls.setText(view, R.id.big_title, item.getTitle());
-    OControls.setImage(view, R.id.slider_image, item.getImagePath());
-    OControls.setText(view, R.id.sub_title, item.getExtras().get("sub_title").toString());
-    OControls.setText(view, R.id.description, item.getContent());
-    return view;
-  }
+    @Override
+    public View getCustomView(Context context, SliderItem item, ViewGroup parent) {
+        View view =
+                LayoutInflater.from(context)
+                        .inflate(R.layout.base_intro_slider_view, parent, false);
+        OControls.setText(view, R.id.big_title, item.getTitle());
+        OControls.setImage(view, R.id.slider_image, item.getImagePath());
+        OControls.setText(view, R.id.sub_title, item.getExtras().get("sub_title").toString());
+        OControls.setText(view, R.id.description, item.getContent());
+        return view;
+    }
 }

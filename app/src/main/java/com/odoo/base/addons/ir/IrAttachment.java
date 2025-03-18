@@ -17,7 +17,6 @@
 package com.odoo.base.addons.ir;
 
 import android.content.Context;
-
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -31,7 +30,6 @@ import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
 import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.support.OUser;
-
 import java.util.ArrayList;
 
 public class IrAttachment extends OModel {

@@ -17,7 +17,6 @@
 package com.odoo.core.utils;
 
 import android.database.Cursor;
-
 import com.odoo.core.orm.ODataRow;
 
 public class OCursorUtils {

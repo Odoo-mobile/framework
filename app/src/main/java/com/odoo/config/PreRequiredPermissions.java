@@ -1,7 +1,6 @@
 package com.odoo.config;
 
 import android.Manifest;
-
 import com.odoo.core.tools.permissions.DevicePermissionHelper;
 
 /**
@@ -21,19 +20,19 @@ import com.odoo.core.tools.permissions.DevicePermissionHelper;
  * <p>Created on 30/11/15
  */
 public class PreRequiredPermissions implements DevicePermissionHelper.DevicePermissionImpl {
-  public static final String TAG = PreRequiredPermissions.class.getSimpleName();
+    public static final String TAG = PreRequiredPermissions.class.getSimpleName();
 
-  /**
-   * Provide permission list used by device, This method invoked only in API23+ devices. Used by
-   * runtime permission model of Odoo Mobile to identify default required permissions before start
-   * using application.
-   *
-   * <p>If, user not grant any of this permission; application will not start.
-   *
-   * @return String[] array of required permissions.
-   */
-  @Override
-  public String[] permissions() {
-    return new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-  }
+    /**
+     * Provide permission list used by device, This method invoked only in API23+ devices. Used by
+     * runtime permission model of Odoo Mobile to identify default required permissions before start
+     * using application.
+     *
+     * <p>If, user not grant any of this permission; application will not start.
+     *
+     * @return String[] array of required permissions.
+     */
+    @Override
+    public String[] permissions() {
+        return new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    }
 }

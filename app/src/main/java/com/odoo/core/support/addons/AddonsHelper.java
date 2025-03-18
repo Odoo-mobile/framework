@@ -17,7 +17,6 @@
 package com.odoo.core.support.addons;
 
 import android.util.Log;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;

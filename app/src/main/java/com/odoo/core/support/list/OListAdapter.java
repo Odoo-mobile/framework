@@ -21,7 +21,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
-
 import java.util.ArrayList;
 import java.util.List;
 

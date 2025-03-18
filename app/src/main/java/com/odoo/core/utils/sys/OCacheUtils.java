@@ -17,7 +17,6 @@
 package com.odoo.core.utils.sys;
 
 import android.content.Context;
-
 import java.io.File;
 
 public class OCacheUtils {

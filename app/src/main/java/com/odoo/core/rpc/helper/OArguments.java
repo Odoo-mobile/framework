@@ -16,11 +16,10 @@
  */
 package com.odoo.core.rpc.helper;
 
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 public class OArguments extends ODomainArgsHelper<OArguments> {
     public static final String TAG = OArguments.class.getSimpleName();

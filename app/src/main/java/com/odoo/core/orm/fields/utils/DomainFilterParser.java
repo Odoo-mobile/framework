@@ -1,16 +1,13 @@
 package com.odoo.core.orm.fields.utils;
 
 import android.os.Bundle;
-
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.rpc.helper.ODomain;
-
-import org.json.JSONArray;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import org.json.JSONArray;
 
 public class DomainFilterParser {
 

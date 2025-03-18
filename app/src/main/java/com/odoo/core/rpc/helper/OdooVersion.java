@@ -17,11 +17,9 @@
 package com.odoo.core.rpc.helper;
 
 import android.os.Bundle;
-
 import com.odoo.core.rpc.handler.OdooVersionException;
 import com.odoo.core.rpc.helper.utils.OBundleUtils;
 import com.odoo.core.rpc.helper.utils.gson.OdooResult;
-
 import java.util.List;
 
 /**

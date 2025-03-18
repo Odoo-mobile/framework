@@ -18,7 +18,6 @@ package com.odoo.base.addons.ir;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -26,7 +25,6 @@ import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
-
 import java.util.Calendar;
 import java.util.Date;
 

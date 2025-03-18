@@ -17,7 +17,6 @@
 package com.odoo.core.orm;
 
 import android.content.Context;
-
 import com.google.gson.internal.LinkedTreeMap;
 import com.odoo.App;
 import com.odoo.core.rpc.Odoo;
@@ -31,7 +30,6 @@ import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.datas.OConstants;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

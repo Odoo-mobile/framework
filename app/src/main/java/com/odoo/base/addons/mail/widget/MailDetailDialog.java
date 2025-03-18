@@ -29,7 +29,6 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.odoo.R;
 import com.odoo.base.addons.ir.feature.OFileManager;
 import com.odoo.base.addons.mail.MailMessage;
@@ -42,7 +41,6 @@ import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OStringColorUtil;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

@@ -26,86 +26,90 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExpandableListControl extends LinearLayout implements ExpandableListOperationListener {
-  public static final String TAG = ExpandableListControl.class.getSimpleName();
-  private ExpandableListAdapter mAdapter;
-  private Context context;
-
-  public ExpandableListControl(Context context) {
-    super(context);
-    this.context = context;
-  }
-
-  public ExpandableListControl(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    this.context = context;
-  }
-
-  public ExpandableListControl(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-    this.context = context;
-  }
-
-  @Override
-  public void onAdapterDataChange(List<Object> items) {
-    removeAllViews();
-    for (int i = 0; i < items.size(); i++) {
-      View view = mAdapter.getView(i, null, this);
-      addView(view);
-    }
-  }
-
-  public ExpandableListAdapter getAdapter(
-      int resource, List<Object> objects, final ExpandableListAdapterGetViewListener listener) {
-    mAdapter =
-        new ExpandableListAdapter(context, resource, objects) {
-          @Override
-          public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-              convertView = LayoutInflater.from(context).inflate(getResource(), parent, false);
-            }
-            if (listener != null) {
-              return listener.getView(position, convertView, parent);
-            }
-            return convertView;
-          }
-        };
-    mAdapter.setOperationListener(this);
-    return mAdapter;
-  }
-
-  public abstract static class ExpandableListAdapter {
-    private List<Object> objects = new ArrayList<>();
+    public static final String TAG = ExpandableListControl.class.getSimpleName();
+    private ExpandableListAdapter mAdapter;
     private Context context;
-    private int resource = android.R.layout.simple_list_item_1;
-    private ExpandableListOperationListener listener;
 
-    public ExpandableListAdapter(Context context, int resource, List<Object> objects) {
-      this.context = context;
-      this.objects = objects;
-      this.resource = resource;
+    public ExpandableListControl(Context context) {
+        super(context);
+        this.context = context;
     }
 
-    public abstract View getView(int position, View convertView, ViewGroup parent);
-
-    public void notifyDataSetChanged(List<Object> items) {
-      objects = items;
-      listener.onAdapterDataChange(items);
+    public ExpandableListControl(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        this.context = context;
     }
 
-    public Object getItem(int position) {
-      return objects.get(position);
+    public ExpandableListControl(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        this.context = context;
     }
 
-    public void setOperationListener(ExpandableListOperationListener listener) {
-      this.listener = listener;
+    @Override
+    public void onAdapterDataChange(List<Object> items) {
+        removeAllViews();
+        for (int i = 0; i < items.size(); i++) {
+            View view = mAdapter.getView(i, null, this);
+            addView(view);
+        }
     }
 
-    public int getResource() {
-      return resource;
+    public ExpandableListAdapter getAdapter(
+            int resource,
+            List<Object> objects,
+            final ExpandableListAdapterGetViewListener listener) {
+        mAdapter =
+                new ExpandableListAdapter(context, resource, objects) {
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        if (convertView == null) {
+                            convertView =
+                                    LayoutInflater.from(context)
+                                            .inflate(getResource(), parent, false);
+                        }
+                        if (listener != null) {
+                            return listener.getView(position, convertView, parent);
+                        }
+                        return convertView;
+                    }
+                };
+        mAdapter.setOperationListener(this);
+        return mAdapter;
     }
-  }
 
-  public static interface ExpandableListAdapterGetViewListener {
-    public View getView(int position, View view, ViewGroup parent);
-  }
+    public abstract static class ExpandableListAdapter {
+        private List<Object> objects = new ArrayList<>();
+        private Context context;
+        private int resource = android.R.layout.simple_list_item_1;
+        private ExpandableListOperationListener listener;
+
+        public ExpandableListAdapter(Context context, int resource, List<Object> objects) {
+            this.context = context;
+            this.objects = objects;
+            this.resource = resource;
+        }
+
+        public abstract View getView(int position, View convertView, ViewGroup parent);
+
+        public void notifyDataSetChanged(List<Object> items) {
+            objects = items;
+            listener.onAdapterDataChange(items);
+        }
+
+        public Object getItem(int position) {
+            return objects.get(position);
+        }
+
+        public void setOperationListener(ExpandableListOperationListener listener) {
+            this.listener = listener;
+        }
+
+        public int getResource() {
+            return resource;
+        }
+    }
+
+    public static interface ExpandableListAdapterGetViewListener {
+        public View getView(int position, View view, ViewGroup parent);
+    }
 }

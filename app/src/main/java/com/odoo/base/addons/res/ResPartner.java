@@ -19,7 +19,6 @@ package com.odoo.base.addons.res;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-
 import com.odoo.BuildConfig;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -31,7 +30,6 @@ import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
-
 import java.util.ArrayList;
 import java.util.List;
 
