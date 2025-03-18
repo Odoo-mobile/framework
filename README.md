@@ -32,7 +32,7 @@ It has pre-developed services, providers, controls and more other features to ma
 
 ## HOW TO START
 
-Learn more about the integrating odoo apps with your android app, accessing source code, and more at [https://odoo-mobile-doc-v2.readthedocs.io](docs).
+Learn more about the integrating odoo apps with your android app, accessing source code, and more at [docs](https://odoo-mobile-doc-v2.readthedocs.io).
  
 ## REQUIRES
 
@@ -46,6 +46,6 @@ This project is licensed under the AGPLv3 License. See the [LICENSE](LICENSE) fi
 
 ---
 
-If you have any questions or suggestions, please create an [https://github.com/Odoo-mobile/framework/issues](issue) or contact the author <android@odoo.co.in>.
+If you have any questions or suggestions, please create an [issue](https://github.com/Odoo-mobile/framework/issues) or contact the author <android@odoo.co.in>.
 
-Follow us on Twitter: [https://twitter.com/odoomobile](@odoomobile)
+Follow us on Twitter: [@odoomobile](https://twitter.com/odoomobile)
