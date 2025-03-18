@@ -54,7 +54,3 @@ dependencies {
     //
     implementation project(':intro-slider-lib')
 }
-
-tasks.withType(JavaCompile).configureEach {
-    options.deprecation = false
-}
