@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Check if version_name argument is provided
+if [ -z "$1" ]; then
+    echo "Error: version_name is not specified."
+    echo "Usage: $0 <version_name>"
+    exit 1
+fi
+
+# Get version_name from the first argument
+version_name=$1
+
+# Extract current versionCode from build.gradle
+version_code=$(grep -oP 'versionCode\s+\K\d+' app/build.gradle)
+if [ -z "$version_code" ]; then
+    echo "Error: Failed to extract versionCode from app/build.gradle."
+    exit 1
+fi
+
+# Increment versionCode by 1
+version_code=$((version_code + 1))
+if ! [[ "$version_code" =~ ^[0-9]+$ ]]; then
+    echo "Error: Failed to increment versionCode."
+    exit 1
+fi
+
+# Update versionCode in build.gradle
+sed -i "s/versionCode\s\+[0-9]\+/versionCode $version_code/g" app/build.gradle
+if ! grep -q "versionCode $version_code" app/build.gradle; then
+    echo "Error: Failed to update versionCode in app/build.gradle."
+    exit 1
+fi
+
+# Update versionName in build.gradle
+sed -i "s/versionName \"[^\"]*\"/versionName \"$version_name\"/g" app/build.gradle
+if ! grep -q "versionName \"$version_name\"" app/build.gradle; then
+    echo "Error: Failed to update versionName in app/build.gradle."
+    exit 1
+fi
+
+# Make gradlew executable
+chmod +x ./gradlew
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to change permissions for gradlew."
+    exit 1
+fi
+
+# Build the project
+./gradlew --no-daemon assembleRelease
+if [ $? -ne 0 ]; then
+    echo "Error: Project build failed."
+    exit 1
+fi
+
+echo "Build completed successfully!"

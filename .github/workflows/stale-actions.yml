@@ -1,0 +1,28 @@
+name: "Mark or close stale issues and PRs"
+on:
+  schedule:
+    - cron: "5 8 * * 0"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v4
+        with:
+          repo-token: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
+          days-before-stale: 90
+          stale-issue-label: stale
+          stale-pr-label: stale
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has been open 90 days
+            with no activity. Remove stale label or comment or this issue will be closed in 60 days
+          stale-pr-message: |
+            This PR has been automatically marked as stale because it has been open 90 days
+            with no activity. Remove stale label or comment or this PR will be closed in 60 days
+          exempt-issue-labels: bug,wip,on-hold
+          exempt-pr-labels: bug,wip,on-hold
+          exempt-all-milestones: true
+          days-before-close: 60
+          delete-branch: true
+          close-issue-message: This issue was automatically closed because of stale in 60 days
+          close-pr-message: This PR was automatically closed because of stale in 60 days

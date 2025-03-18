@@ -1,0 +1,84 @@
+name: Develop
+
+on:
+  push:
+    branches:
+      - dev
+      - develop
+  pull_request:
+    branches:
+      - dev
+      - develop
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    name: Tests on Java version 17
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository || !contains(github.event.head_commit.message, 'skip ci')
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install Java version 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run tests
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test
+
+  build:
+    needs: [tests]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    name: Build on Java version 17
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository || !contains(github.event.head_commit.message, 'skip ci')
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install Java version 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run APK build
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build
+        env:
+          KEYSTORE_DECRYPTION_KEY: ${{ secrets.KEYSTORE_DECRYPTION_KEY }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+
+      - name: Run AAB build
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bundle
+        env:
+          KEYSTORE_DECRYPTION_KEY: ${{ secrets.KEYSTORE_DECRYPTION_KEY }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
