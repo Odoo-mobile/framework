@@ -38,6 +38,12 @@ if ! grep -q "versionName \"$version_name\"" app/build.gradle; then
     exit 1
 fi
 
+sed -i -E "s/(Odoo Mobile v)([0-9]+\.[0-9]+\.[0-9]+)( \(Framework\))/\1${version_name}\3/g" README.md
+
+sed -i -E "s/(v)([0-9]+\.[0-9]+\.[0-9]+)( \(Build )([0-9]+)(\))/\1${version_name}\3${version_code}\5/g" README.md
+
+sed -i -E "s/(Build )([0-9]+)( )/\1${version_code}\3/g" README.md
+
 # Make gradlew executable
 chmod +x ./gradlew
 if [ $? -ne 0 ]; then
