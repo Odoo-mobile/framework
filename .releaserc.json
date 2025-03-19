@@ -88,6 +88,7 @@
             "@semantic-release/git",
             {
                 "assets": [
+                    "**/*.{java,xml}",
                     "app/build.gradle",
                     "CHANGELOG.md",
                     "README.md"

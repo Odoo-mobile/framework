@@ -52,6 +52,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Build the project
+./gradlew spotlessApply
 ./gradlew --no-daemon assembleRelease
 if [ $? -ne 0 ]; then
     echo "Error: Project build failed."
